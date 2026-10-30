@@ -50,7 +50,9 @@ try {
     }
   }
 } catch { /* 저장 공간을 쓸 수 없는 브라우저에서도 현재 화면에서는 동작합니다. */ }
+items.forEach(x => normalizeSavedAt(x));
 function persist() {
+  items.forEach(x => normalizeSavedAt(x));
   if(PM_ENV.development)return;
   try { localStorage.setItem(STORAGE, JSON.stringify({items,preferences,onboardDone,settings})); }
   catch { toast('브라우저 저장 공간을 사용할 수 없어 현재 화면에서만 보관합니다.'); }

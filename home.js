@@ -100,7 +100,7 @@ function calWidget(){
 
 /* ---------- 작은 위젯 · 최근 저장 ---------- */
 // 관심 키워드에서 켠 것들의 콘텐츠를 모아 보여줘요 (아무것도 안 켰으면 최근 저장)
-const rcard = x => `<button class="rcard" data-detail="${x.id}"><span class="rcimg">${libThumb(x)}</span><b>${esc(x.title)}</b><small>${esc(x.ago)} 저장</small></button>`;
+const rcard = x => `<button class="rcard" data-detail="${x.id}"><span class="rcimg">${libThumb(x)}</span><b>${esc(x.title)}</b><small>${esc(savedAgo(x))} 저장</small></button>`;
 function subWidgets(){
   const list = items.slice(0, 12);
   return `<section class="recentw">
@@ -151,15 +151,24 @@ document.addEventListener('click', e => {
 pages.home = function(){
   const chips = homeCategoryChips();
   const picks = homePicks();
+  const emptyHome = PM_ENV.development && !items.length;
   const main = picks.length || PM_ENV.development
-    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div></div>`
+    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${!picks.length && PM_ENV.development ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아보세요.</p><button type="button" data-action="save">${icon('plus')}콘텐츠 추가하기</button><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
     : `<div class="empty small"><p class="muted">선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.</p><button class="tonal" data-action="save">새로 저장하기</button></div>`;
   const brand = '<div class="homebrand"><img src="img/pinmap-logo-splash.svg" alt="Pinmap 로고"></div>';
-  return stripBar() + brand + main + calWidget() + chips + subWidgets();
+  return stripBar() + brand + main + (emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + chips + (emptyHome ? '' : subWidgets());
 };
 
+// Android 공유 안내: 실제 설치나 공유 수신이 연결된 것으로 표시하지 않아요.
+actions.sharehelp = () => modal('공유로 저장하기', `<div class="home-share-guide">
+  <p>안드로이드에서는 별도의 단축어가 필요 없어요.</p>
+  <ol><li><b>저장할 콘텐츠에서 공유 누르기</b><span>인스타그램·유튜브 등에서 공유 메뉴를 열어요.</span></li><li><b>공유할 앱에서 핀맵 선택하기</b><span>공유받기 기능이 연결된 핀맵 앱을 설치한 뒤 사용할 수 있어요.</span></li><li><b>핀맵에서 내용 확인 후 저장하기</b><span>카테고리와 메모를 확인해 저장해요.</span></li></ol>
+  <p class="home-share-note">현재 웹 미리보기는 앱 설치·공유받기가 연결되지 않았어요. 링크를 복사해 추가창에 붙여넣어 주세요.</p>
+  <button type="button" data-action="save">링크 직접 추가하기</button>
+</div>`);
+
 /* 캘린더 위젯의 날짜를 누르면 그 날짜가 선택된 캘린더로 */
-document.addEventListener('click', e => { const d = e.target.closest('[data-calday]'); if (d) { calSel = d.dataset.calday; backHome = true; go('calendar'); } });
+document.addEventListener('click', e => { const d = e.target.closest('[data-calday]'); if (d && page === 'home') { calSel = d.dataset.calday; const date = calSelDate(); calMonth = new Date(date.getFullYear(),date.getMonth(),1); backHome = true; go('calendar'); } });
 
 /* 홈의 캘린더 위젯 · 전체 보기 · 검색으로 들어간 화면: 왼쪽 위 ← 버튼으로 홈으로 */
 let backHome = false;

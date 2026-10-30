@@ -19,7 +19,7 @@ function notifications(){
   if (pending.length) list.push({id:'pending', emoji:'🔎', title:`장소 확인이 필요한 콘텐츠 ${pending.length}개`, body:'AI가 위치를 확정하지 못했어요. 주소를 확인해 주세요.', time:'어제', detail:pending[0].id});
   if (settings.notiReminder && items.length) {
     const old = items[items.length-1];
-    list.push({id:'remind-'+old.id, emoji:'🔖', title:'잊고 있던 저장, 다시 볼까요?', body:`${old.title} · ${old.ago} 저장`, time:'2일 전', detail:old.id});
+    list.push({id:'remind-'+old.id, emoji:'🔖', title:'잊고 있던 저장, 다시 볼까요?', body:`${old.title} · ${savedAgo(old)} 저장`, time:'2일 전', detail:old.id});
   }
   return list;
 }

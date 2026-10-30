@@ -29,6 +29,7 @@ const CF_GALLERY = new Set(['쇼핑', '레시피', '기타']); // 장소가 아�
 // 저장 콘텐츠 → 폴더 (맛집·카페는 카페 여부로 나눠요)
 const cfIsCafe = x => /카페|커피|cafe|coffee|디저트|베이커리/i.test(`${x.category||''} ${x.title||''}`);
 function folderOf(x){
+  if (CF_ALL.some(f=>f.id===x.folderCategory)) return x.folderCategory;
   if (x.type === '맛집·카페') return cfIsCafe(x) ? '카페' : '맛집';
   return CF_FOLDERS.some(f => f.id === x.type) ? x.type : '기타';
 }
@@ -115,20 +116,15 @@ function cfStatus(){
 // 정렬: 최신 저장 순(기본) · 오래된 순 · 가까운 순(장소 폴더에서만)
 const CF_SORTS = {recent:'최신 저장 순', old:'오래된 저장 순', near:'가까운 순'};
 const cfHasPlaces = list => list.some(x => isPlace(x) && !x.pending && x.address);
-// 저장 시점('방금' · '3일 전' · '어제' · '2주 전' …)을 분 단위로 바꿔 정렬해요
-function cfAgoMin(x){
-  const a = String(x.ago || '').trim();
-  if (!a || a === '방금') return 0;
-  if (a === '어제') return 1440;
-  const m = a.match(/(\d+)\s*(분|시간|일|주|개월|달|년)/);
-  if (!m) return 0;
-  return Number(m[1]) * ({'분':1, '시간':60, '일':1440, '주':10080, '개월':43200, '달':43200, '년':525600})[m[2]];
-}
+// 날짜 미상은 마지막에 두고 실제 저장 시각으로 정렬합니다.
 function cfSort(list){
-  const byAgo = [...list].sort((a,b) => cfAgoMin(a) - cfAgoMin(b)); // 최신 저장 순 (같으면 원래 순서)
-  if (libSort === 'old') return byAgo.reverse();
   if (libSort === 'near' && cfHasPlaces(list)) return [...list].sort((a,b) => distanceOf(a) - distanceOf(b));
-  return byAgo;
+  return [...list].sort((a,b) => {
+    const left = savedTimestamp(a), right = savedTimestamp(b);
+    if (left === null) return right === null ? 0 : 1;
+    if (right === null) return -1;
+    return libSort === 'old' ? left - right : right - left;
+  });
 }
 // 선택 모드: null이면 꺼짐, Set이면 선택한 콘텐츠 id
 let cfSel = null, cfSelKey = '';
@@ -153,7 +149,7 @@ function cfItem(x){
   const on = cfSel?.has(x.id);
   const role = cfSel ? `role="checkbox" aria-checked="${!!on}"` : `role="button" data-detail="${x.id}"`;
   return `<div class="cf-item${on ? ' on' : ''}" tabindex="0" ${role} data-cfitem="${x.id}" aria-label="${esc(x.title)}${cfSel ? '' : ' 상세 보기'}">
-    <div class="cf-itemimg">${libThumb(x)}${cfSel ? `<span class="cf-check cf-glass" aria-hidden="true">${icon('check')}</span>` : `<button type="button" class="libmark cf-glass" data-unsave="${x.id}" aria-label="${esc(x.title)} 컬렉션에서 삭제">${icon('bookmark')}</button>`}</div>
+    <div class="cf-itemimg">${libThumb(x)}${cfSel ? `<span class="cf-check cf-glass" aria-hidden="true">${icon('check')}</span>` : `<span class="cf-saved-time">${esc(savedAgo(x))} 저장</span>`}</div>
     <div class="cf-itembody">
       <div class="cf-itemtext"><h3>${esc(x.title)}</h3><p class="cf-itemdesc">${esc(x.desc || x.memo || '')}</p>${cfMetaLine(x)}</div>
     </div>
@@ -236,7 +232,7 @@ pages.library = function(){
     </div>` : '';
   return `<div class="libpage cfpage ${open ? 'cf-infolder' : ''} ${cfSel ? 'cf-selecting' : ''}">${CF_DEFS}
     <div class="libhead cf-fhead${back ? ' hasback' : ''}">${back}<h1>${esc(open || '컬렉션')}</h1>${open ? `<span class="cf-hcount" aria-label="저장 ${cfTotal()}개">${cfTotal()}</span>` : ''}${collection && cfCustom().includes(collection) && !cfSel ? `<button type="button" class="cf-delfolder" data-action="cfdelfolder" aria-label="‘${esc(collection)}’ 폴더 삭제">${icon('trash')}</button>` : ''}</div>
-    <label class="libsearch">${icon('search')}<input id="search" type="search" enterkeyhint="search" aria-label="${esc(ph)}" placeholder="${esc(ph)}" value="${esc(query)}"><button class="iconbtn" data-action="clear" aria-label="검색 지우기" ${query ? '' : 'hidden'}>${icon('close')}</button><button type="button" class="libgo" data-action="libgo" aria-label="검색">${icon('arrow')}</button></label>
+    <label class="libsearch">${icon('search')}<input id="search" type="search" enterkeyhint="search" aria-label="${esc(ph)}" placeholder="${esc(ph)}" value="${esc(query)}"><button class="iconbtn" data-action="clear" aria-label="검색 지우기" ${query ? '' : 'hidden'}>${icon('close')}</button></label>
     ${chips}
     <p id="resultcount" class="sr" role="status">${cfStatus()}</p>
     <div id="results" class="cf-results">${resultCards()}</div>
@@ -294,8 +290,12 @@ document.addEventListener('keydown', e => {
 // 폴더 밖으로 (홈에서 들어온 경우의 ← 는 컬렉션 첫 화면에서 다시 보여요)
 actions.cfback = () => { filter = '전체'; collection = null; query = ''; render(); window.scrollTo(0, 0); };
 
-// 검색창 → 버튼: 키보드만 내려요 (검색은 입력하는 대로 바로 돼요)
-actions.libgo = () => document.activeElement?.blur();
+// 입력 즉시 검색하며 Enter로 키보드를 닫습니다.
+document.addEventListener('keydown', e => {
+  if (e.target.id === 'search' && page === 'library' && e.key === 'Enter') {
+    e.preventDefault(); e.target.blur();
+  }
+});
 // 새 폴더 만들기
 actions.newfolder = () => {
   modal('새 폴더', `<form id="cfnewform" class="cf-form" novalidate>

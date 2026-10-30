@@ -77,6 +77,45 @@ let unreadCount = () => 0; // my.js가 알림 개수 계산을 연결합니다
 const pages = {};          // 화면 렌더 함수 (pinmap.js가 home을 개인화 버전으로 바꿉니다)
 let afterChange = () => {}; // 데이터가 바뀌면 호출 (pinmap.js가 브라우저 저장을 연결합니다)
 
+/* ---------- 저장 시점: 실제 타임스탬프를 기준으로 표시 ---------- */
+const SAVED_DAY = 86400000;
+const SAVED_KST = 9 * 3600000;
+function savedTimestamp(x){
+  if (x.savedAt == null || x.savedAt === '') return null;
+  const value = typeof x.savedAt === 'number' ? x.savedAt : Date.parse(x.savedAt);
+  return Number.isFinite(value) && Number.isFinite(new Date(value).getTime()) ? value : null;
+}
+function normalizeSavedAt(x, now = Date.now()){
+  if (savedTimestamp(x) !== null) return;
+  // 이전 사용자 저장 항목은 Date.now()로 만든 id에서 실제 저장 시점을 복원합니다.
+  if (Number.isFinite(x.id) && x.id >= 1000000000000 && x.id <= now) {
+    x.savedAt = new Date(x.id).toISOString(); return;
+  }
+  // 과거 예시 데이터에는 ago만 있습니다. 최초 이전 때 한 번 추정해 고정합니다.
+  const text = String(x.ago || '').trim();
+  const match = text.match(/^(\d+)\s*(분|시간|일|주|개월|달|년)\s*전$/);
+  let offset;
+  if (text === '방금' || text === '오늘') offset = 0;
+  else if (text === '어제') offset = SAVED_DAY;
+  else if (match) offset = Number(match[1]) * ({'분':60000,'시간':3600000,'일':SAVED_DAY,'주':7*SAVED_DAY,'개월':30*SAVED_DAY,'달':30*SAVED_DAY,'년':365*SAVED_DAY})[match[2]];
+  if (offset !== undefined && Number.isFinite(offset)) {
+    x.savedAt = new Date(now - offset).toISOString();
+    x.savedAtEstimated = true;
+  }
+}
+function savedAgo(x, now = Date.now()){
+  const timestamp = savedTimestamp(x);
+  if (timestamp === null) return '저장일 확인 필요';
+  // 한국 날짜 경계로 계산해 같은 날 저장한 항목에 0일 전이 나타나지 않게 합니다.
+  const days = Math.max(0, Math.floor((now + SAVED_KST) / SAVED_DAY) - Math.floor((timestamp + SAVED_KST) / SAVED_DAY));
+  if (days === 0) return '오늘';
+  if (days < 7) return `${days}일 전`;
+  if (days <= 30) return `${Math.floor(days / 7)}주 전`;
+  if (days < 365) return `${Math.floor(days / 30)}달 전`;
+  const date = new Date(timestamp + SAVED_KST);
+  return `${date.getUTCFullYear()}.${String(date.getUTCMonth()+1).padStart(2,'0')}.${String(date.getUTCDate()).padStart(2,'0')}`;
+}
+
 /* ---------- 일러스트 (직접 만든 SVG) ---------- */
 function art(kind){const base='<svg viewBox="0 0 400 230" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';const svgs={
 cafe:'<rect width="400" height="230" fill="#D9D1BF"/><path d="M0 180 400 55v175H0" fill="#B6AA91"/><rect x="58" y="0" width="177" height="150" rx="2" fill="#E6ECE0"/><path d="M145 0v150 M58 75h177" stroke="#8C9886" stroke-width="7"/><path d="m60 150 125 80h155L232 150" fill="#F5E2B5"/><ellipse cx="260" cy="174" rx="73" ry="17" fill="#786E5B"/><path d="M246 183v47" stroke="#786E5B" stroke-width="9"/><ellipse cx="260" cy="166" rx="72" ry="17" fill="#EAE1CF"/><path d="M243 141h29v23q-14 14-29 0z" fill="#FFFDF5"/><path d="M272 146q20-2 13 12h-13" fill="none" stroke="#FFFDF5" stroke-width="6"/><path d="M336 136v-60" stroke="#577154" stroke-width="4"/><ellipse cx="324" cy="84" rx="15" ry="29" fill="#64865D" transform="rotate(-35 324 84)"/><ellipse cx="349" cy="63" rx="14" ry="26" fill="#80966A" transform="rotate(35 349 63)"/><path d="m319 130 8 29h22l8-29" fill="#A97050"/>',
@@ -99,9 +138,9 @@ function infoLine(x){
   return '';
 }
 const badge = x => `<span class="badge">${typeOf(x.type).emoji} ${esc(x.category||shortType(x.type))}</span>`;
-function card(x){const info=infoLine(x);return `<button class="card" data-detail="${x.id}"><div class="art">${art(x.art)}${badge(x)}<span class="saved">${icon('bookmark')}</span></div><div class="cardbody"><div class="meta"><span>${esc(x.ago)} 저장</span></div><h3>${esc(x.title)}</h3>${info?`<p class="infoline">${esc(info)}</p>`:`<p>${esc(x.desc)}</p>`}<span class="tag">${esc(x.collection||'미분류')}</span>${x.deadline?`<span class="tag due">${esc(x.deadline)}</span>`:''}</div></button>`}
+function card(x){const info=infoLine(x);return `<button class="card" data-detail="${x.id}"><div class="art">${art(x.art)}${badge(x)}<span class="saved">${icon('bookmark')}</span></div><div class="cardbody"><div class="meta"><span>${esc(savedAgo(x))} 저장</span></div><h3>${esc(x.title)}</h3>${info?`<p class="infoline">${esc(info)}</p>`:`<p>${esc(x.desc)}</p>`}<span class="tag">${esc(x.collection||'미분류')}</span>${x.deadline?`<span class="tag due">${esc(x.deadline)}</span>`:''}</div></button>`}
 // 비장소 콘텐츠: 갤러리형 카드 (썸네일 · 제목 · 간단 정보 + 원본은 SNS에서)
-function gcard(x){const ratio=[0.82,1.12,0.95,1.28][x.id%4];const info=infoLine(x);return `<button class="gcard" data-detail="${x.id}"><div class="gart" style="aspect-ratio:${ratio}">${art(x.art)}${badge(x)}</div><div class="gbody"><h3>${esc(x.title)}</h3>${info?`<p class="infoline">${esc(info)}</p>`:''}<p class="hint">${esc(x.ago)} 저장</p></div></button>`}
+function gcard(x){const ratio=[0.82,1.12,0.95,1.28][x.id%4];const info=infoLine(x);return `<button class="gcard" data-detail="${x.id}"><div class="gart" style="aspect-ratio:${ratio}">${art(x.art)}${badge(x)}</div><div class="gbody"><h3>${esc(x.title)}</h3>${info?`<p class="infoline">${esc(info)}</p>`:''}<p class="hint">${esc(savedAgo(x))} 저장</p></div></button>`}
 
 /* ---------- 공통 레이아웃 ---------- */
 const NAV = [['home','home','홈'],['map','map','지도'],['library','bookmark','저장함'],['my','user','마이']];
@@ -148,7 +187,7 @@ function detail(){
     ? `<div class="infobox deletedbox"><div class="inline">${icon('external')}<h3>원본 콘텐츠</h3></div><p>삭제된 게시물입니다.</p><p class="hint">원본을 열 수 없지만 ${t.place?'장소 정보와 ':''}내 메모는 그대로 남아 있어요.</p></div>`
     : '';
   const mapLink = t.place && x.address && !x.pending ? `<a class="outlined" target="_blank" rel="noopener noreferrer" href="${(MAP_APPS[settings.mapApp]||MAP_APPS.naver).url(encodeURIComponent(x.mapQuery||x.address))}">${icon('map')} ${(MAP_APPS[settings.mapApp]||MAP_APPS.naver).name}에서 길찾기</a>` : '';
-  return `<div class="detail"><button class="back" data-action="back">${icon('back')} 돌아가기</button><div class="art">${art(x.art)}${badge(x)}</div><div class="detailmeta"><span>${esc(x.source)}에서 저장 · ${esc(x.ago)}</span><span class="classlabel">${x.aiClassified?'✨ AI 분류':'직접 분류'} · ${t.emoji} ${esc(x.type)}</span></div><h1>${esc(x.title)}</h1><p class="muted">${esc(x.desc)}</p><span class="tag">${esc(x.collection||'미분류')}</span>${info}<div class="infobox"><div class="inline">${icon('bookmark')}<h3>이래서 저장했어요</h3></div><p>${esc(x.memo||'아직 메모가 없어요.')}</p><button class="textbtn" data-action="edit">${t.place?'장소·분류·메모 수정':'분류·메모 수정'}</button></div>${original}<div class="actions">${x.deleted?'':`<button class="filled" data-action="original">${icon('external')} 원본 콘텐츠 보기</button>`}${mapLink}</div><p class="hint">원본 콘텐츠는 저장한 SNS에서 확인해요. 핀맵은 썸네일과 요약만 보여줘요. (예시 콘텐츠)</p></div>`;
+  return `<div class="detail"><button class="back" data-action="back">${icon('back')} 돌아가기</button><div class="art">${art(x.art)}${badge(x)}</div><div class="detailmeta"><span>${esc(x.source)}에서 저장 · ${esc(savedAgo(x))}</span><span class="classlabel">${x.aiClassified?'✨ AI 분류':'직접 분류'} · ${t.emoji} ${esc(x.type)}</span></div><h1>${esc(x.title)}</h1><p class="muted">${esc(x.desc)}</p><span class="tag">${esc(x.collection||'미분류')}</span>${info}<div class="infobox"><div class="inline">${icon('bookmark')}<h3>이래서 저장했어요</h3></div><p>${esc(x.memo||'아직 메모가 없어요.')}</p><button class="textbtn" data-action="edit">${t.place?'장소·분류·메모 수정':'분류·메모 수정'}</button></div>${original}<div class="actions">${x.deleted?'':`<button class="filled" data-action="original">${icon('external')} 원본 콘텐츠 보기</button>`}${mapLink}</div><p class="hint">원본 콘텐츠는 저장한 SNS에서 확인해요. 핀맵은 썸네일과 요약만 보여줘요. (예시 콘텐츠)</p></div>`;
 }
 
 function render(){
@@ -214,16 +253,34 @@ document.addEventListener('submit',e=>{
     e.preventDefault();const f=e.target;let u;
     try{u=new URL(f.url.value);if(!['https:','http:'].includes(u.protocol))throw Error()}catch{$('#saveerror').textContent='http 또는 https 링크를 입력해 주세요.';return}
     const title=f.elements.namedItem('title').value.trim(), ai=!PM_ENV.development&&f.type.value==='ai', type=ai?guessType(title+' '+u.href):f.type.value, sample=!PM_ENV.development&&f.url.value.includes('sample-prototype');
-    const x={id:Date.now(),title,type,category:shortType(type),source:sample?'YouTube':u.hostname.replace(/^www\./,''),ago:'방금',desc:PM_ENV.development?'':'새롭게 담아둔 나의 취향',memo:f.memo.value,art:typeOf(type).art,collection:f.collection.value,url:u.href,sample,aiClassified:ai};
+    const x={id:Date.now(),title,type,category:shortType(type),source:sample?'YouTube':u.hostname.replace(/^www\./,''),ago:'방금',savedAt:new Date().toISOString(),desc:PM_ENV.development?'':'새롭게 담아둔 나의 취향',memo:f.memo.value,art:typeOf(type).art,collection:f.collection.value,url:u.href,sample,aiClassified:ai};
     if(typeOf(type).place)x.pending=true;
     items.unshift(x);afterChange();$('#sheet').close();page='library';openDetail(x.id);
     toast(ai?`저장했어요. AI가 ‘${type}’로 분류했어요.`:'저장했어요. 필요할 때 다시 꺼내보세요.');
   } else if(e.target.id==='editform'){
     e.preventDefault();const data=new FormData(e.target),x=items.find(x=>x.id===detailId);
+    const previousFolder=cfCustom().includes(x.collection)?'custom:'+x.collection:'category:'+folderOf(x), previousCollection=x.collection||'';
     const type=String(data.get('type'));
-    if(type!==x.type){x.aiClassified=false;x.category=shortType(type);x.art=x.art||typeOf(type).art;}
+    if(type!==x.type){delete x.folderCategory;x.aiClassified=false;x.category=shortType(type);x.art=x.art||typeOf(type).art;}
     x.type=type;
     for(const k of ['title','address','memo','collection']) x[k]=String(data.get(k)||'').trim();
+    const folder = String(data.get('folder') || '');
+    if(folder.startsWith('category:')){
+      const name = folder.slice(9);
+      if(CF_ALL.some(f=>f.id===name)){
+        x.folderCategory = name;
+        const folderType = ['맛집','카페'].includes(name) ? '맛집·카페' : name==='기타' ? (['생활 정보','기타'].includes(x.type)?x.type:'기타') : name;
+        if(x.type!==folderType || x.category!==name)x.aiClassified=false;
+        x.type=folderType; x.category=name; x.collection=folder===previousFolder?previousCollection:'';
+      }
+    } else if(folder.startsWith('custom:') || folder==='new:'){
+      const name = folder==='new:' ? x.collection : folder.slice(7);
+      if(name){
+        x.collection=name;
+        settings.customFolders=[...new Set([...(settings.customFolders||[]),name])];
+        cfSyncCollections();
+      }
+    }
     x.pending=isPlace(x)&&!x.address; if(x.address)x.mapQuery=x.mapQuery||x.address;
     $('#sheet').close();render();toast('저장 정보를 수정했어요.');afterChange();
   }

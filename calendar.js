@@ -36,7 +36,6 @@ function calDue(x){ // 마감일 (오늘 기준 D-n)
   const d = new Date(calToday); d.setDate(d.getDate() + calDays(x)); return d;
 }
 const calDueList = () => items.filter(x => calDue(x)).sort((a,b) => calDue(a) - calDue(b));
-let calBodyH = 0; // 월 목록 높이 (열기 직전 달력 높이)
 let calPick = false; // 월 선택 패널 열림
 let calMonth = new Date(calToday.getFullYear(), calToday.getMonth(), 1);
 let calSel = calKey(calToday);
@@ -60,12 +59,8 @@ pages.calendar = function(){
   for (let i = 0; i < first; i++) cells.push('<span class="calcell calblank"></span>');
   for (let d = 1; d <= last; d++) {
     const date = new Date(y, m, d), k = calKey(date), list = dueByDay[k] || [];
-    // 오늘 → 고른 날짜까지 남은 기간을 연한 띠로 이어 보여줘요 (주 끝·시작은 둥글게)
-    const selD = calSelDate(), lo = selD < calToday ? selD : calToday, hi = selD < calToday ? calToday : selD;
-    const inRange = +lo !== +hi && date >= lo && date <= hi;
-    const dow = date.getDay();
-    const cls = [k === calKey(calToday) ? 'today' : '', k === calSel ? 'sel' : '', date < calToday ? 'past' : '', list.length ? 'hasdue' : '',
-      inRange ? 'range' : '', inRange && (+date === +lo || dow === 0 || d === 1) ? 'rstart' : '', inRange && (+date === +hi || dow === 6 || d === last) ? 'rend' : ''].join(' ');
+    // 선택한 하루만 표시합니다. 오늘부터 이어지는 기간 띠는 사용하지 않습니다.
+    const cls = [k === calKey(calToday) ? 'today' : '', k === calSel ? 'sel' : '', date < calToday ? 'past' : '', list.length ? 'hasdue' : ''].join(' ');
     cells.push(`<button class="calcell ${cls}" data-calday="${k}" aria-pressed="${k === calSel}" aria-label="${m+1}월 ${d}일${list.length ? `, 마감 ${list.length}개` : ''}"><span>${d}</span>${list.length ? '<i class="caldot"></i>' : ''}</button>`);
   }
   const [sy, sm, sd] = calSel.split('-').map(Number);
@@ -77,36 +72,55 @@ pages.calendar = function(){
   const back = typeof backHome !== 'undefined' && backHome ? `<button class="calback" data-action="backhome" aria-label="홈으로 돌아가기">${icon('back')}</button>` : '';
   // 월 선택: 작년 ~ 내년을 연도별로 묶은 세로 스크롤 목록
   const y0 = calToday.getFullYear();
-  const months = [y0 - 1, y0, y0 + 1].map(yy => `<div class="calyr"><b>${yy}년</b>${Array.from({length:12}, (_, i) => `<button class="calmon ${yy === y && i === m ? 'on' : ''} ${yy === y0 && i === calToday.getMonth() ? 'now' : ''}" data-calmon="${yy}-${i}">${i + 1}월${yy === y0 && i === calToday.getMonth() ? '<small>이번 달</small>' : ''}</button>`).join('')}</div>`).join('');
+  const months = [y0 - 1, y0, y0 + 1].map(yy => `<div class="calyr"><b>${yy}년</b>${Array.from({length:12}, (_, i) => `<button class="calmon ${yy === y && i === m ? 'on' : ''} ${yy === y0 && i === calToday.getMonth() ? 'now' : ''}" data-calmon="${yy}-${i}" aria-label="${yy}년 ${i + 1}월" aria-pressed="${yy === y && i === m}">${i + 1}월${yy === y0 && i === calToday.getMonth() ? '<small>이번 달</small>' : ''}</button>`).join('')}</div>`).join('');
   return `<div class="calfhead">${back}<h1>캘린더</h1></div>` + `
     <section class="calbox">${bg}
       <div class="calhead">
-        <button class="caltitle" data-calpick aria-expanded="${calPick}" aria-label="다른 달로 이동"><span>${y}년 ${m + 1}월${icon('chevron')}</span></button>
-        ${`<div class="calnav" ${calPick ? 'style="visibility:hidden"' : ''}><button data-calnav="-1" aria-label="이전 달">${icon('chevleft')}</button><button data-calnav="1" aria-label="다음 달">${icon('chevright')}</button></div>`}
+        <button class="caltitle" data-calpick aria-expanded="${calPick}" aria-controls="cal-month-picker" aria-haspopup="dialog" aria-label="다른 달로 이동"><span>${y}년 ${m + 1}월${icon('chevron')}</span></button>
+        ${`<div class="calnav"><button data-calnav="-1" aria-label="이전 달">${icon('chevleft')}</button><button data-calnav="1" aria-label="다음 달">${icon('chevright')}</button></div>`}
       </div>
-      ${calPick ? `<div class="calmonths" role="group" aria-label="월 선택">${months}</div>` : `
       <div class="calweek" aria-hidden="true">${['일','월','화','수','목','금','토'].map(w => `<span>${w}</span>`).join('')}</div>
-      <div class="calgrid">${cells.join('')}</div>`}
+      <div class="calgrid">${cells.join('')}</div>
+      ${calPick ? `<div class="cal-month-picker" id="cal-month-picker" role="dialog" aria-label="월 선택">
+        <div class="cal-picker-head"><button type="button" data-calclose aria-label="월 선택 닫기">${icon('close')}</button></div>
+        <div class="calmonths" role="group" aria-label="연도별 월 목록">${months}</div>
+        <button type="button" class="cal-picker-today" data-caltoday>이번 달로 이동</button>
+      </div>` : ''}
     </section>
     ${selList.length ? `<div class="sectionhead calsec"><h2>${sm}월 ${sd}일 마감<span>${selList.length}</span></h2></div><div class="callist">${selList.map(calRow).join('')}</div>` : ''}
     ${soon.length ? `<div class="sectionhead calsec"><h2>곧 마감돼요<span>${soon.length}</span></h2></div><div class="callist">${soon.map(calRow).join('')}</div>` : ''}`;
 };
 
+function calClosePicker(){
+  calPick = false; const y = scrollY; render(); scrollTo(0, y);
+  document.querySelector('[data-calpick]')?.focus({preventScroll:true});
+}
+document.addEventListener('keydown', e => {
+  if (calPick && page === 'calendar' && e.key === 'Escape') {
+    e.preventDefault(); calClosePicker();
+  }
+});
 document.addEventListener('click', e => {
+  if (calPick && page !== 'calendar') calPick = false;
+  if (calPick && !e.target.closest('.cal-month-picker,[data-calpick]')) { calClosePicker(); return; }
   const day = e.target.closest('[data-calday]');
-  if (day) { calSel = day.dataset.calday; const y = scrollY; render(); scrollTo(0, y); return; }
-  if (e.target.closest("[data-calpick]")) {
-    // 지금 달력(요일 + 날짜) 높이를 재서, 월 목록도 같은 높이로 → 블럭 크기 그대로
-    const wk = document.querySelector('.calweek'), gr = document.querySelector('.calgrid');
-    if (wk && gr) calBodyH = wk.offsetHeight + gr.offsetHeight;
+  if (day && page === 'calendar') { calSel = day.dataset.calday; const y = scrollY; render(); scrollTo(0, y); return; }
+  if (e.target.closest('[data-calclose]')) { calClosePicker(); return; }
+  if (e.target.closest('[data-caltoday]')) {
+    calMonth = new Date(calToday.getFullYear(), calToday.getMonth(), 1);
+    calClosePicker(); return;
+  }
+  if (e.target.closest('[data-calpick]')) {
     calPick = !calPick; const y = scrollY; render(); scrollTo(0, y);
-    const ml = document.querySelector('.calmonths'); if (ml && calBodyH) ml.style.height = calBodyH + 'px';
-    // 열면 보고 있던 달이 목록 가운데에 오게
     const list = document.querySelector('.calmonths'), on = list?.querySelector('.calmon.on');
-    if (list && on) list.scrollTop = on.offsetTop - list.offsetTop - list.clientHeight / 2 + on.offsetHeight / 2;
-    return; }
+    if (list && on) {
+      list.scrollTop += on.getBoundingClientRect().top - list.getBoundingClientRect().top - list.clientHeight / 2 + on.offsetHeight / 2;
+      on.focus({preventScroll:true});
+    }
+    return;
+  }
   const mon = e.target.closest('[data-calmon]');
-  if (mon) { const [my, mm] = mon.dataset.calmon.split('-').map(Number); calMonth = new Date(my, mm, 1); calPick = false; const y = scrollY; render(); scrollTo(0, y); return; }
+  if (mon) { const [my, mm] = mon.dataset.calmon.split('-').map(Number); calMonth = new Date(my, mm, 1); calClosePicker(); return; }
   const nav = e.target.closest('[data-calnav]');
   if (nav) { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + Number(nav.dataset.calnav), 1); const y = scrollY; render(); scrollTo(0, y); }
 });

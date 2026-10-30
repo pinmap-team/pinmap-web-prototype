@@ -133,7 +133,7 @@ function sdCreateItem(){
   if(PM_ENV.development)return;
   if (sdSaved()) return;
   const a = demoPost.ai;
-  sd.item = {id:Date.now(), title:a.title, type:a.type, category:a.category, source:'SNS · '+demoPost.author, ago:'방금', desc:'공유하기로 저장한 콘텐츠', memo:'', art:demoPost.art, distance:a.distance, address:a.address, collection:'', aiClassified:true, sample:true};
+  sd.item = {id:Date.now(), title:a.title, type:a.type, category:a.category, source:'SNS · '+demoPost.author, ago:'방금', savedAt:new Date().toISOString(), desc:'공유하기로 저장한 콘텐츠', memo:'', art:demoPost.art, distance:a.distance, address:a.address, collection:'', aiClassified:true, sample:true};
   // 마이 > 설정에서 AI 자동 분류 기본 사용을 끄면 ‘기타’로 시작해 직접 고르게 합니다.
   sd.aiOn = settings.aiDefault;
   if (!sd.aiOn) Object.assign(sd.item, {type:'기타', category:'기타', aiClassified:false});

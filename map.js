@@ -130,7 +130,7 @@ document.addEventListener('submit',event=>{
   const title=String(data.get('title')||'').trim(), address=String(data.get('address')||'').trim();
   const type=String(data.get('type')||''), lat=Number(data.get('lat')), lng=Number(data.get('lng'));
   if(!title||!address||!typeOf(type).place||!Number.isFinite(lat)||!Number.isFinite(lng)||Math.abs(lat)>90||Math.abs(lng)>180)return;
-  const place={id:Date.now(),title,address,type,category:shortType(type),source:'직접 추가',ago:'방금',desc:'지도에서 직접 추가한 장소',memo:String(data.get('memo')||'').trim(),art:typeOf(type).art,coords:[lat,lng],aiClassified:false};
+  const place={id:Date.now(),title,address,type,category:shortType(type),source:'직접 추가',ago:'방금',savedAt:new Date().toISOString(),desc:'지도에서 직접 추가한 장소',memo:String(data.get('memo')||'').trim(),art:typeOf(type).art,coords:[lat,lng],aiClassified:false};
   items.unshift(place);selectedPin=place.id;mapPickMode=false;mapSheetState='peek';afterChange();$('#sheet').close();render();toast('새 장소를 지도에 추가했어요.');
 });
 

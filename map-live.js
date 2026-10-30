@@ -1,6 +1,7 @@
 /* Photo place markers, real user-submitted place search, and shared navigation. */
 (() => {
   const originalRender = render;
+  let detailMap;
   let liveMap, pinLayer, locationMarker, searchController, placeController;
   let expandedKey=null, sheetStage='peek', sheetDrag=null, suppressSheetClickUntil=0;
   const markerEntries=new Map();
@@ -192,7 +193,29 @@
     liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); if(!expandedKey)renderSheet(); });
     requestAnimationFrame(() => liveMap?.invalidateSize());
   }
+  // The detail preview uses the exact same saved-place resolver, marker and basemap.
+  function mountDetailMap(){
+    const host=document.getElementById('detail-map-canvas');
+    if(!host)return;
+    const fallback=document.getElementById('detail-map-fallback');
+    const place=savedPlaces().find(p=>p.id===detailId);
+    if(!window.L || !place){
+      fallback.hidden=false;
+      if(!place)fallback.textContent='저장된 좌표가 없어요. 장소 위치를 먼저 확인해 주세요.';
+      return;
+    }
+    try {
+      detailMap=L.map(host,{zoomControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false,zoomAnimation:false}).setView([place.lat,place.lng],15);
+      window.attachPinmapBasemap(detailMap);
+      detailMap.attributionControl?.remove();
+      L.marker([place.lat,place.lng],{title:place.title,icon:markerIcon(place),interactive:false}).addTo(detailMap);
+      requestAnimationFrame(()=>detailMap?.invalidateSize());
+    } catch(error){
+      detailMap?.remove(); detailMap=null; fallback.hidden=false;
+    }
+  }
   render = function() {
+    if(detailMap){detailMap.remove();detailMap=null;}
     searchController?.abort();
     sheetDrag=null;expandedKey=null;sheetStage='peek';markerEntries.clear();
     window.unmountCourseMap?.();
@@ -207,7 +230,7 @@
       const f = savedPlaces().find(p => p.id === focusId); if (f) { center = [f.lat, f.lng]; zoom = 15; } }
     if (isMap) { $('#app').innerHTML=content(); mount(); if(searchResults) showResults();
       if (focusId != null) { const f = savedPlaces().find(p => p.id === focusId); if (f && liveMap) expandPlace(f); } }
-    else { originalRender(); if(page==='course' && !detailId) window.mountCourseMap?.(); if(page==='courses' && !detailId) window.mountCourseThumbnails?.(); }
+    else { originalRender(); if(detailId)mountDetailMap(); if(page==='course' && !detailId) window.mountCourseMap?.(); if(page==='courses' && !detailId) window.mountCourseThumbnails?.(); }
   };
   function drawLocation() {
     if(!liveMap)return;

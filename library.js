@@ -22,7 +22,7 @@ function libArea(x){
 
 // 카드 둘째 줄: 기간 또는 저장 시점 + 동네 · 판매처
 function libSub(x){
-  const parts = [x.period ? x.period.replace(' · 예시 기간','') + ' 운영' : `${x.ago} 저장`];
+  const parts = [x.period ? x.period.replace(' · 예시 기간','') + ' 운영' : `${savedAgo(x)} 저장`];
   if (isPlace(x) && !x.pending && libArea(x)) parts.push(libArea(x));
   else if (x.type === '쇼핑' && x.shop) parts.push(x.shop);
   else if (!isPlace(x) && x.type !== '쇼핑' && x.type !== '레시피') parts.push(x.desc);
@@ -149,7 +149,7 @@ function unsaveSheet(id){
   const x = items.find(i => i.id === id); if (!x) return;
   modal('', `<div class="esform delsheet">
     <div class="nthead"><div><h2>컬렉션에서 삭제할까요?</h2><p>삭제하면 메모 · 모음 정보도 함께 지워져요.</p></div><button type="button" class="ntclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
-    <div class="esbody"><div class="delitem"><span class="delthumb">${libThumb(x)}</span><span><b>${esc(x.title)}</b><small>${esc(x.type)} · ${esc(x.ago)} 저장</small></span></div>
+    <div class="esbody"><div class="delitem"><span class="delthumb">${libThumb(x)}</span><span><b>${esc(x.title)}</b><small>${esc(x.type)} · ${esc(savedAgo(x))} 저장</small></span></div>
       <p class="eshint">원본 SNS 게시물은 그대로 남아 있어요.</p></div>
     <div class="esfoot"><button type="button" class="escancel" data-action="close">취소</button><button type="button" class="essubmit deldanger" data-delconfirm="${x.id}">삭제</button></div>
   </div>`);

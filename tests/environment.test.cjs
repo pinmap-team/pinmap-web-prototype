@@ -123,18 +123,23 @@ test('disconnected map controls do not request location or fetch external places
   assert(messages.every(text=>text.includes('연결되지')));
 });
 
-test('empty home shows the existing card layout as placeholders without real content or actions',()=>{
+test('empty development home keeps decorative cards and offers one first-save action',()=>{
   const source=read('home.js'),start=source.indexOf('pages.home = function(){'),end=source.indexOf('\n};',start)+3;
   const placeholderStart=source.indexOf('function emptyPickCards(){'),placeholderEnd=source.indexOf('\n/* ---------- 캘린더',placeholderStart);
   const html=vm.runInNewContext(source.slice(placeholderStart,placeholderEnd)+source.slice(start,end)+';pages.home();',{
-    PM_ENV:{development:true},pages:{},preferences:[],interestOptions:[],homePicks:()=>[],
-    stripBar:()=>'',calWidget:()=>'<section id="calendar"></section>',subWidgets:()=>'',PM_IMG:{logo:'logo.png'}
+    PM_ENV:{development:true},items:[],pages:{},preferences:[],interestOptions:[],homePicks:()=>[],icon:()=>'<svg></svg>',
+    homeCategoryChips:()=>'',stripBar:()=>'',calWidget:()=>'<section id="calendar"></section>',subWidgets:()=>'<section>최근 저장한 목록</section>',PM_IMG:{logo:'logo.png'}
   });
   assert(html.includes('class="mainpick" data-placeholder="true" aria-hidden="true"'));
   assert.equal((html.match(/class="pick pick-placeholder"/g)||[]).length,3);
   for(const slot of ['pickimg','pickword','picktext','pickdots'])assert(html.includes('class="'+slot+'"'));
   assert(!html.includes('data-detail='));
-  assert(!html.includes('data-action="save"'));
+  assert.equal((html.match(/data-action="save"/g)||[]).length,1);
+  assert(html.includes('aria-label="첫 콘텐츠 추가"'));
+  assert(html.includes('콘텐츠 추가하기'));
+  assert(html.includes('공유로 저장하는 방법'));
+  assert(html.includes('class="home-empty-calendar" inert aria-hidden="true"'));
+  assert(!html.includes('최근 저장한 목록'));
   assert(!html.includes('선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.'));
   assert(html.indexOf('mainpick')<html.indexOf('id="calendar"'));
 });
