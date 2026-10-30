@@ -209,3 +209,89 @@ body.onboarding-open{overflow:hidden}
 .step3 .ob-option{padding-left:14px!important;padding-right:10px!important}
 /* 첫 화면: 검정 배경 시작 이미지 */
 #onboarding .ob-screen.step1,#onboarding:has(.step1){background:#000!important}
+
+/* 저장 안내: 세로 비율의 휴대폰 화면과 그 아래 설명 */
+.step2 .ob-flowcard{flex-direction:column;align-items:stretch;gap:14px;padding:16px;min-height:0}
+.step2 .ob-flowtext{flex:none}
+.step2 .ob-flowtext h3{margin:0;font-size:15px}
+.step2 .ob-flowtext p{margin:6px 0 0;font-size:13px;line-height:1.5}
+#onboarding .step2 .ob-flow{margin-top:16px!important;gap:7px}
+#onboarding .step2 .ob-title{font-size:27px;margin:12px 0 8px}
+#onboarding .step2 .ob-actions{flex:none;position:static;padding-top:18px}
+.ob-phone-stage{display:flex;align-items:center;justify-content:center;padding:16px;background:#F4F4F6;border-radius:14px}
+.ob-phone{position:relative;isolation:isolate;flex:none;width:132px;height:240px;overflow:hidden;border:3px solid #252529;border-radius:23px;background:#fff;color:#222;box-shadow:0 5px 12px rgba(0,0,0,.12);font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+.ob-phone-status{position:relative;height:25px;display:flex;align-items:center;justify-content:space-between;padding:2px 10px 0;font-size:6px}
+.ob-phone-status>i{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:34px;height:9px;background:#19191B;border-radius:8px}
+.ob-phone-status>span{font-size:6px;letter-spacing:.5px}
+.ob-phone-app{display:flex;align-items:center;gap:4px;height:23px;padding:0 8px;border-bottom:1px solid #F0F0F2}
+.ob-phone-app>img{width:11px;height:11px;object-fit:contain}
+.ob-phone-app>b{font-size:8px;font-weight:700}
+.ob-phone .ob-phone-app>.icon{width:10px;height:10px;margin-left:auto}
+.ob-phone-posthead{display:flex;align-items:center;gap:4px;height:22px;padding:0 8px;font-size:6px;font-weight:600}
+.ob-phone-posthead>i{width:11px;height:11px;border-radius:50%;background:#DED4C6;border:1px solid #B7A694}
+.ob-phone-photo{display:block;width:100%;height:97px;object-fit:cover}
+.ob-phone-toolbar{display:flex;align-items:center;gap:8px;height:29px;padding:0 8px}
+.ob-phone .ob-phone-toolbar .icon,.ob-phone-toolbar>span>img{display:block;width:12px;height:12px;object-fit:contain}
+.ob-phone-toolbar>span{display:grid;place-items:center;flex:none}
+.ob-phone-toolbar .ob-phone-bookmark{margin-left:auto}
+.ob-phone-highlight{position:relative}
+.ob-phone-highlight::after{content:'';position:absolute;inset:-5px;border:1.5px solid #111;border-radius:50%}
+.ob-phone-lines{display:grid;gap:4px;padding:1px 8px}
+.ob-phone-lines>i{display:block;width:84%;height:3px;border-radius:2px;background:#E5E5E8}
+.ob-phone-lines>i+ i{width:55%}
+.ob-phone-home{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);z-index:4;width:42px;height:3px;border-radius:3px;background:#29292D}
+.ob-phone-dim{position:absolute;inset:25px 0 0;background:rgba(0,0,0,.25);z-index:1}
+.ob-phone-sheet{position:absolute;inset:auto 0 0;z-index:2;min-height:132px;padding:7px 7px 17px;background:#fff;border-radius:14px 14px 0 0}
+.ob-phone-grip{display:block;width:25px;height:3px;margin:0 auto 8px;border-radius:3px;background:#D4D4D8}
+.ob-phone-sheet>b{display:block;text-align:center;font-size:8px}
+.ob-phone-people{display:flex;justify-content:space-around;margin:10px 0;padding-bottom:9px;border-bottom:1px solid #EDEDEF}
+.ob-phone-people>i{width:20px;height:20px;border-radius:50%;background:#D6CEC3}
+.ob-phone-people>i:nth-child(2){background:#C6D1CD}
+.ob-phone-people>i:nth-child(3){background:#D2CEDC}
+.ob-phone-options{display:flex;align-items:flex-start;justify-content:space-around;gap:3px}
+.ob-phone-options>span{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:30px;padding:3px 1px}
+.ob-phone .ob-phone-options .icon,.ob-phone-options>span>img{width:20px;height:20px;object-fit:contain;display:block}
+.ob-phone-options small{font-size:6px;white-space:nowrap;line-height:1.3}
+.ob-phone-options .ob-phone-selected{outline:1.5px solid #111;outline-offset:3px;border-radius:7px;background:#F0F0F2}
+.ob-phone-selected small{font-weight:800;color:#111}
+.ob-phone-preview{display:flex;align-items:center;gap:5px;margin-bottom:12px;font-size:6px;font-weight:600}
+.ob-phone-preview>img{width:22px;height:22px;object-fit:cover;border-radius:4px}
+.ob-phone-preview small{display:block;margin-top:3px;font-size:5px;font-weight:400;color:#888}
+.ob-phone-copy{display:flex;align-items:center;gap:5px;margin-top:13px;padding-top:7px;border-top:1px solid #EDEDEF;font-size:6px}
+.ob-phone .ob-phone-copy .icon{width:10px;height:10px}
+/* 이전은 좁게, 시작하기는 넓게 한 줄에 배치해요. */
+.step3 .ob-actions{flex-direction:row;align-items:stretch;gap:10px}
+.step3 .ob-action-back{flex:0 0 76px;width:76px;min-height:56px;background:#E4E4E7;border-radius:28px}
+.step3 .ob-next{flex:1;min-width:0;width:auto}
+
+/* 설명과 다음 버튼을 포함해 첫 안내 화면을 한 화면에 맞춰요. */
+#onboarding .ob-screen.step2{height:100%;min-height:0;flex:none;overflow:hidden}
+#onboarding .step2 .ob-top{flex:none;min-height:40px}
+#onboarding .step2 .ob-title{flex:none;font-size:24px;line-height:1.3;margin:8px 0!important}
+#onboarding .step2 .ob-flow{flex:1;min-height:0;display:grid;grid-template-rows:auto 14px auto 14px auto;align-content:start;gap:3px;margin:14px 0 0!important}
+#onboarding .step2 .ob-flowcard{min-height:0;align-self:start;padding:12px 16px;gap:10px}
+#onboarding .step2 .ob-phone-stage{flex:none;min-height:0;height:clamp(44px,calc(var(--ob-viewport,100dvh) * .09),76px);width:calc(100% - 16px);align-self:center}
+#onboarding .step2 .ob-flowtext h3{font-size:14px;line-height:20px}
+#onboarding .step2 .ob-num{width:20px;height:20px;font-size:11px}
+#onboarding .step2 .ob-flowtext p{font-size:12px;line-height:17px;margin-top:4px}
+#onboarding .step2 .ob-arrow{font-size:14px;line-height:14px}
+#onboarding .step2 .ob-actions{flex:none;margin-top:0!important;padding:18px 0 0}
+#onboarding .step2 .ob-next{min-height:50px}
+
+/* 각 단계의 조작 부분을 확대하고, 휴대폰의 나머지 영역은 잘라내요. */
+.ob-phone-stage.ob-phone-crop{--phone-zoom:2;position:relative;display:block;height:180px;padding:0;overflow:hidden}
+.ob-phone-crop .ob-phone{position:absolute;left:50%;transform:translateX(-50%) scale(var(--phone-zoom));transform-origin:top center}
+.ob-phone-crop1 .ob-phone{top:calc(-121px * var(--phone-zoom))}
+.ob-phone-crop2 .ob-phone{top:calc(-140px * var(--phone-zoom))}
+.ob-phone-crop3 .ob-phone{top:calc(-134px * var(--phone-zoom))}
+@media(max-width:360px){.ob-phone-stage.ob-phone-crop{--phone-zoom:1.8;height:164px}}
+
+/* 조작 부분을 중앙에 두고 이미지의 위아래를 더 좁게 잘라요. */
+#onboarding .ob-phone-crop1 .ob-phone{top:calc(50% - 184px * var(--phone-zoom))}
+#onboarding .ob-phone-crop2 .ob-phone{top:calc(50% - 204px * var(--phone-zoom))}
+#onboarding .ob-phone-crop3 .ob-phone{top:calc(50% - 170px * var(--phone-zoom))}
+@media(max-height:760px){#onboarding .ob-phone-stage.ob-phone-crop{--phone-zoom:1.5}}
+@media(max-height:640px){#onboarding .ob-phone-stage.ob-phone-crop{--phone-zoom:1.2}#onboarding .ob-screen.step2{padding-bottom:12px}#onboarding .step2 .ob-title{font-size:22px}}
+
+#onboarding:has(.step2){height:var(--ob-viewport,100%)!important}
+#onboarding .ob-phone-stage.ob-phone-crop{--phone-zoom:calc(var(--ob-phone-zoom,2) * .82)}

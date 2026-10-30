@@ -274,3 +274,10 @@ body.notipanel-open .bottomnav{display:none!important}
 .pick-placeholder .pickword i{width:68px;height:28px}
 .pick-placeholder .picktext b i{width:72%;height:18px}
 .pick-placeholder .picktext small i{width:90%;height:13px}
+
+/* 카테고리 수가 한 줄을 넘을 때만 두 줄로 확장해요. */
+.homecategories{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none;padding:4px 0;margin-inline:0}
+.homecategories::-webkit-scrollbar{display:none}
+.homecategories .prefchip{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex:none;width:max-content;min-height:30px;margin:0;padding:0 12px;font-size:12.5px;white-space:nowrap}
+.homecategories .prefchip .icon{width:15px;height:15px;flex:none}
+.homecategories.two-rows{display:grid;grid-template-rows:repeat(2,30px);grid-auto-flow:column;grid-auto-columns:max-content;justify-content:start;gap:8px}

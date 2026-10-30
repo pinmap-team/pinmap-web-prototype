@@ -3,10 +3,10 @@
 
 /* ---------- 프로필 사진 ---------- */
 const avatarHtml = (cls = '') => PM_ENV.development && !settings.avatar ? `<span class="pavatar ${cls}" aria-hidden="true">${icon('user')}</span>` : `<span class="pavatar ${cls}" aria-hidden="true"><img src="${settings.avatar || 'img/profile-demo.png'}" alt=""></span>`;
-const subHead = (title, back = 'my') => `<div class="subhead"><button class="subback" data-page="${back}" aria-label="${back === 'guide' ? '이용 가이드로' : '마이로'} 돌아가기">${icon('back')}</button><h1>${title}</h1></div>`;
+const subHead = (title, back = 'my') => `<div class="subhead"><button class="subback" data-page="${back}" aria-label="${back === 'guide' ? '이용 가이드로' : back === 'account' ? '프로필 및 계정으로' : '마이로'} 돌아가기">${icon('back')}</button><h1>${title}</h1></div>`;
 
 pages.profile = function(){
-  return subHead('프로필 편집') + `
+  return subHead('프로필 편집', 'account') + `
   <div class="pfedit">
     <div class="pfphoto">${avatarHtml('big')}
       <label class="pfchange" aria-label="프로필 사진 변경">${icon('image')}<input type="file" id="avatarfile" accept="image/*" hidden></label>
@@ -38,7 +38,7 @@ document.addEventListener('submit', e => {
   if (e.target.id !== 'profilepage') return;
   e.preventDefault();
   const nick = e.target.nickname.value.trim(); if (!nick) return;
-  settings.nickname = nick; afterChange(); go('my'); toast('프로필을 저장했어요.');
+  settings.nickname = nick; afterChange(); go('account'); toast('프로필을 저장했어요.');
 });
 
 /* ---------- SNS 계정 연동 ---------- */
@@ -55,7 +55,7 @@ const snsLogo = sns => `<img class="snslogo" src="${SNS[sns].logo}" alt="">`;
 
 pages.accounts = function(){
   const acc = myAccounts(), total = acc.reduce((n, a) => n + accountCount(a), 0);
-  return subHead('SNS 계정 연동') + `
+  return subHead('SNS 계정 연동', 'account') + `
   <p class="muted acchint">연동한 계정들의 저장 콘텐츠를 핀맵 한곳에 모아 보여줘요.</p>
   ${syncBtn()}
   <button class="accall" data-page="library"><span><b>모든 계정의 저장 모음 보기</b><small>${acc.length}개 계정 · 저장 ${total}개</small></span>${icon('arrow')}</button>
@@ -118,6 +118,8 @@ const SYNC_POOL = PM_ENV.development ? {} : { // SNS마다 아직 안 가져온 
     {id:104, title:'성수 플리마켓 일정 정리', type:'전시·팝업', category:'마켓', ago:'방금', desc:'이번 달 주말 플리마켓 모음', memo:'', art:'exhibit', address:'서울 성동구 성수동 · 예시 장소', distance:'도보 10분', aiClassified:true},
     {id:108, title:'이번 주 무료 전시 모음', type:'전시·팝업', category:'전시', ago:'방금', desc:'예약 없이 볼 수 있는 곳', memo:'', art:'exhibit', aiClassified:true}]
 };
+let syncTimer = null;
+function cancelAccountSync(){ clearTimeout(syncTimer); syncTimer = null; syncing = false; syncingAcc = null; }
 let syncing = false, syncingAcc = null; // 전체 새로고침 중 / 계정 하나만 새로고침 중
 const syncTime = t => t ? (Date.now() - t < 60000 ? '방금 업데이트' : `${new Date(t).toLocaleString('ko-KR', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'})} 업데이트`) : '아직 업데이트 안 함';
 const syncLabel = () => syncTime(settings.lastSync);
@@ -133,7 +135,8 @@ const syncToast = (n, who) => toast(n ? `${who ? who + '에서 ' : ''}새 저장
 actions.accsync = () => { // 연동한 계정 전체
   if (syncing || syncingAcc) return;
   syncing = true; render();
-  setTimeout(() => {
+  syncTimer = setTimeout(() => {
+    syncTimer = null;
     const got = myAccounts().flatMap(pullAccount);
     settings.lastSync = Date.now(); syncing = false; afterChange(); render(); syncToast(got.length);
   }, 1200);
@@ -143,7 +146,8 @@ document.addEventListener('click', e => { // 계정별 새로고침
   if (syncing || syncingAcc) return;
   const a = myAccounts().find(x => x.id === b.dataset.accSync); if (!a) return;
   syncingAcc = a.id; render();
-  setTimeout(() => {
+  syncTimer = setTimeout(() => {
+    syncTimer = null;
     const got = pullAccount(a); syncingAcc = null; afterChange(); render(); syncToast(got.length, a.handle);
   }, 1000);
 });

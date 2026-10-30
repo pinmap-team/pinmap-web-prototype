@@ -123,13 +123,33 @@ document.addEventListener('click', e => {
   e.stopImmediatePropagation(); topicId = b.dataset.homeint; go('topic');
 }, true);
 
+/* ---------- 저장된 카테고리만 표시 ---------- */
+function savedHomeCategories(){
+  const saved = new Set(items.map(folderOf));
+  return CF_ALL.filter(category => saved.has(category.id));
+}
+function homeCategoryChips(){
+  const categories = savedHomeCategories();
+  if (!categories.length) return '';
+  return `<div class="chiprows homecategories" role="group" aria-label="저장한 카테고리 바로가기">${categories.map(category => `<button class="prefchip" data-homecategory="${esc(category.id)}">${icon(category.icon)} ${esc(category.id)}</button>`).join('')}</div>`;
+}
+function layoutHomeCategories(){
+  const host = document.querySelector('.homecategories');
+  if (!host) return;
+  const width = [...host.children].reduce((sum, chip) => sum + chip.getBoundingClientRect().width, 0) + Math.max(0, host.children.length - 1) * 8;
+  host.classList.toggle('two-rows', width > host.clientWidth + 1);
+}
+window.addEventListener('resize', layoutHomeCategories);
+document.addEventListener('click', e => {
+  const button = e.target.closest('[data-homecategory]'); if (!button) return;
+  query = ''; collection = null; filter = button.dataset.homecategory;
+  backHome = true; page = 'library'; detailId = null; cfChipScroll = 0;
+  render(); window.scrollTo(0, 0);
+});
+
 /* ---------- 홈 ---------- */
 pages.home = function(){
-  const rank = o => preferences.includes(o.id) ? 1 : 0; // 온보딩에서 고른 관심사 먼저
-  const order = interestOptions.filter(o => o.id !== 'later').sort((a,b) => rank(b) - rank(a)); // '나중에 보기'는 키워드에서 빼요
-  const chip = o => `<button class="prefchip" data-homeint="${o.id}">${o.emoji} ${o.short}</button>`;
-  const half = Math.ceil(order.length / 2);
-  const chips = `<div class="chiprows" role="group" aria-label="카테고리 바로가기"><div class="prefchips">${order.slice(0, half).map(chip).join('')}</div><div class="prefchips">${order.slice(half).map(chip).join('')}</div></div>`;
+  const chips = homeCategoryChips();
   const picks = homePicks();
   const main = picks.length || PM_ENV.development
     ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div></div>`
@@ -207,7 +227,7 @@ function goPick(target){ // target: 이동할 위치 (현재 위치 기준 가�
   animatePick(to);
 }
 const renderBeforeHome = render;
-render = function(){ cancelAnimationFrame(pickAnim); pickAnim = null; renderBeforeHome(); const n = pickCount(); if (n) { pickPos = n >= 3 ? wrapIdx(pickPos, n) : Math.max(0, Math.min(n - 1, Math.round(pickPos))); } layoutPicks(); };
+render = function(){ cancelAnimationFrame(pickAnim); pickAnim = null; renderBeforeHome(); layoutHomeCategories(); const n = pickCount(); if (n) { pickPos = n >= 3 ? wrapIdx(pickPos, n) : Math.max(0, Math.min(n - 1, Math.round(pickPos))); } layoutPicks(); };
 window.addEventListener('resize', layoutPicks);
 
 // 끌어서 넘기기 (터치 · 마우스 공통). 세로로 움직이면 화면 스크롤에 양보해요

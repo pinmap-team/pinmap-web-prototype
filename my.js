@@ -44,35 +44,25 @@ pages.my = function(){
   const prefText = prefs.length ? (prefs.length > 1 ? `${prefs[0]} 외 ${prefs.length-1}개` : prefs[0]) : '선택 안 함';
   const notiOn = ['notiNearby','notiDeadline','notiReminder'].filter(k => settings[k]).length;
   return `
-  <button class="mprofile" data-action="profile" aria-label="프로필 편집">
+  <button class="mprofile profilecard" data-action="account" aria-label="프로필 및 계정 설정">
     ${avatarHtml()}
-    <span class="mpinfo"><b>${esc(settings.nickname)}</b><small>프로필 편집</small></span>${icon('chevron')}
+    <span class="mpinfo"><b>${esc(settings.nickname || '프로필 설정')}</b><small>계정 정보 · 데이터 관리</small></span>${icon('chevron')}
   </button>
-  <nav class="my-shortcuts" aria-label="마이 바로가기">
-    <button data-page="courses">${icon('route')}<span>코스</span></button>
-    <button data-page="library">${icon('folder')}<span>컬렉션</span></button>
-    <button data-page="placeset">${icon('pin')}<span>위치</span></button>
-    <button data-page="guide">${icon('note')}<span>가이드</span></button>
-  </nav>
   <button class="sharepromo" data-action="snsdemo"><span aria-hidden="true">📲</span><div><b>SNS에서 바로 저장해보기</b><small>게시물에서 공유 → 핀맵, 저장 과정을 체험해요</small></div>${icon('arrow')}</button>
 
-  <section class="mgroup"><h2>나의 핀맵</h2>
+  <section class="mgroup my-section" aria-label="위치와 관심 키워드">
     ${myRow('placesheet','📍','위치 설정', esc(myPlaces().join(' · ')))}
+    <button class="mrow" data-page="courses"><span class="mrico" aria-hidden="true">${icon('route')}</span><span class="mrlabel">저장한 코스 보기</span>${icon('chevron')}</button>
     ${myRow('interests','💡','관심사 · 활용 목적', esc(prefText))}
   </section>
-  <section class="mgroup"><h2>계정 설정</h2>
-    ${myRow('accounts','🔗','SNS 계정 연동', `${myAccounts().length}개 연결됨`)}
-    ${syncBtn()}
-  </section>
-  <section class="mgroup"><h2>설정</h2>
+  <section class="mgroup my-section" aria-label="앱 설정">
     ${myRow('notisheet','🔔','알림 설정', settings.push ? `푸시 켜짐 · ${notiOn}개` : '푸시 꺼짐')}
     ${myRow('savesheet','✨','저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
     ${myRow('mapsheet','🗺️','위치 · 지도', esc(MAP_APPS[settings.mapApp].name))}
   </section>
-  <section class="mgroup"><h2>도움말</h2>
+  <section class="mgroup my-section" aria-label="도움말">
     ${myRow('guide','📖','이용 가이드')}
     ${myRow('appinfo','ℹ️','앱 정보')}
-    ${myRow('resetask','↺','저장 데이터 초기화')}
   </section>
   <button class="logout" data-action="logout">로그아웃</button>`;
 };
@@ -114,8 +104,8 @@ Object.assign(actions, {
   appinfo: () => { modal('앱 정보', `<p>핀맵 Prototype 03</p><p class="hint">예시 데이터로 체험하는 프로토타입이에요. 데이터는 이 브라우저에만 저장돼요.</p>`); $('#sheet').classList.add('bottomsheet'); },
   howto: () => openOnboarding(1),
   profile: () => { modal('프로필 편집', `<form id="profileform"><label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label><p class="hint">위치는 ‘위치 설정’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장</button></div></form>`); $('#sheet').classList.add('bottomsheet'); },
-  resetask: () => modal('저장 데이터 초기화', `<p>이 브라우저에 저장한 콘텐츠, 관심사, 설정이 모두 지워지고 예시 상태로 돌아가요.</p><div class="dialogactions"><button class="textbtn" data-action="close">취소</button><button class="filled danger" data-action="resetdata">초기화</button></div>`),
-  resetdata: () => { try { [STORAGE, ...LEGACY_KEYS].forEach(k => localStorage.removeItem(k)); } catch {} location.reload(); },
+  resetask: () => go('resetsettings'),
+  resetdata: () => go('resetsettings'),
   logout: () => toast('프로토타입에서는 로그아웃 기능을 제공하지 않아요.')
 });
 

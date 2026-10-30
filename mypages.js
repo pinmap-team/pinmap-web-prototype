@@ -2,7 +2,7 @@
 // 마이에서 누르는 기능은 아래에서 올라오는 시트 대신 새 페이지로 열리고, 왼쪽 위 ← 로 마이로 돌아가요.
 // 현재 위치 · 관심 키워드 · 알림 · 저장 · 위치/지도 · 저장하는 방법 · 앱 정보 · 핀맵 계정 설정
 
-const MY_PAGES = {placeset:'위치 설정', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', mapset:'위치 · 지도', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', account:'핀맵 계정 설정'};
+const MY_PAGES = {placeset:'위치 설정', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', mapset:'위치 · 지도', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', account:'프로필 및 계정', resetsettings:'항목별 초기화'};
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
 const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
@@ -12,8 +12,7 @@ pages.my = function(){
   return myBase()
     .replace(/<button class="sharepromo"[\s\S]*?<\/button>\s*/, '')
     .replace('관심사 · 활용 목적', '관심 키워드 설정')
-    .replace(/<button class="logout"[^>]*>[\s\S]*?<\/button>/, '')
-    .replace(/(<section class="mgroup"><h2>도움말<\/h2>[\s\S]*?)(<\/section>)/, `$1${myRow('account', '👤', '핀맵 계정 설정')}$2`);
+    .replace(/<button class="logout"[^>]*>[\s\S]*?<\/button>/, '');
 };
 
 /* ---------- 현재 위치 ---------- */
@@ -41,7 +40,7 @@ actions.placesheet = () => { if (page === 'placeset') placeSheet(); else placeSh
 pages.interestset = function(){
   const opts = interestOptions.filter(o => o.id !== 'later');
   return myPage('관심 키워드 설정', `
-    <p class="muted mpdesc">고른 키워드에 맞는 저장 콘텐츠를 홈에서 먼저 보여드려요. 복수 선택이 가능해요!</p>
+    <p class="muted mpdesc">고른 키워드에 맞는 저장 콘텐츠를 홈에서 먼저 보여드려요. 복수 선택이 가능해요</p>
     <div class="kwgrid" role="group" aria-label="관심 키워드">${opts.map(o => { const on = preferences.includes(o.id);
       return `<button class="kwopt ${on ? 'on' : ''}" data-kw="${o.id}" role="checkbox" aria-checked="${on}"><span class="kwico" aria-hidden="true">${o.emoji}</span><span>${o.short}</span></button>`; }).join('')}</div>
     <p class="hint mpnote">${preferences.length ? `${preferences.length}개 선택됨 · 바로 저장돼요` : '아무것도 고르지 않으면 홈에서 랜덤으로 추천해요'}</p>`);
@@ -108,14 +107,64 @@ pages.howtopage = function(){
 };
 
 /* ---------- 핀맵 계정 설정: 로그아웃 · 탈퇴하기 (한 번 더 묻는 팝업) ---------- */
-pages.account = () => myPage('핀맵 계정 설정', `<div class="mycard settings">
-    <button class="setrow" data-action="logoutask"><div><b>로그아웃</b><small>이 기기에서 핀맵 계정을 로그아웃해요</small></div>${icon('chevright')}</button>
-    <button class="setrow danger" data-action="leaveask"><div><b>탈퇴하기</b><small>저장한 콘텐츠와 설정이 모두 지워져요</small></div>${icon('chevright')}</button>
-  </div>`);
+pages.account = () => myPage('프로필 및 계정', `<div class="account-summary">${avatarHtml()}<div><b>${esc(settings.nickname || '프로필 설정')}</b><small>프로필과 계정 정보를 관리해요</small></div></div>
+  <section class="account-section" aria-label="계정 정보">
+    ${myRow('profile',icon('user'),'프로필 편집')}
+    ${myRow('accounts','🔗','SNS 계정 연동', `${myAccounts().length}개 연결됨`)}
+    ${syncBtn()}
+  </section>
+  <section class="account-section" aria-label="데이터 관리">
+    ${myRow('resetsettings','↺','항목별 초기화')}
+  </section>
+  <section class="account-section" aria-label="로그아웃 및 탈퇴">
+    ${myRow('logoutask',icon('user'),'로그아웃')}
+    <button class="mrow account-leave" data-action="leaveask"><span class="mrlabel">탈퇴하기</span>${icon('chevron')}</button>
+  </section>`, 'accountpage');
+
+/* ---------- 항목별 초기화: 저장 콘텐츠와 코스는 보존 ---------- */
+const RESET_OPTIONS = {
+  connections: {label:'연동 초기화', description:'SNS 계정 연결과 연동 기록만 초기화해요. 이미 저장한 콘텐츠는 유지돼요.'},
+  keywords: {label:'키워드 초기화', description:'선택한 관심 키워드만 해제해요. 저장한 카테고리와 콘텐츠는 유지돼요.'},
+  notifications: {label:'알림 설정 초기화', description:'푸시와 마감·주변·리마인드 알림을 꺼요.'},
+  saving: {label:'저장 설정 초기화', description:'AI 자동 분류 설정을 기본값으로 되돌려요.'}
+};
+function partialResetState(key, currentSettings, currentPreferences){
+  const next = {settings:{...currentSettings}, preferences:[...currentPreferences]};
+  switch (key) {
+    case 'connections': Object.assign(next.settings, {accounts:[], accSync:{}, lastSync:null}); break;
+    case 'keywords': next.preferences = []; break;
+    case 'notifications': Object.assign(next.settings, {push:false, notiDeadline:false, notiNearby:false, notiReminder:false}); break;
+    case 'saving': next.settings.aiDefault = !PM_ENV.development; break;
+    default: throw new Error('알 수 없는 초기화 항목');
+  }
+  return next;
+}
+function applyPartialReset(key){
+  if (!Object.hasOwn(RESET_OPTIONS, key)) return;
+  if (PM_ENV.development) { toast('아직 데이터가 연결되지 않았어요.'); return; }
+  const next = partialResetState(key, settings, preferences);
+  try {
+    localStorage.setItem(STORAGE, JSON.stringify({items, preferences:next.preferences, onboardDone, settings:next.settings}));
+  } catch {
+    toast('변경 내용을 저장하지 못했어요. 초기화하지 않았습니다.'); return;
+  }
+  if (key === 'connections') cancelAccountSync();
+  settings = next.settings; preferences = next.preferences;
+  if (key === 'keywords') homeViewIds = null;
+  $('#sheet').close(); render(); toast(`${RESET_OPTIONS[key].label}를 완료했어요.`);
+}
+pages.resetsettings = () => myPage('항목별 초기화', `<p class="muted mpdesc">초기화할 항목을 선택해 주세요. 저장한 콘텐츠와 코스는 삭제되지 않아요.</p>
+  <div class="reset-options">${Object.entries(RESET_OPTIONS).map(([key, option]) => `<button class="setrow" data-action="resetask-${key}"><div><b>${option.label}</b><small>${option.description}</small></div>${icon('chevright')}</button>`).join('')}</div>`, 'resetpage', 'account');
+actions.resetsettings = () => go('resetsettings');
+Object.entries(RESET_OPTIONS).forEach(([key, option]) => {
+  actions[`resetask-${key}`] = () => confirmPop(`${option.label}를 진행할까요?`, option.description, `resetdo-${key}`, '초기화', '취소');
+  actions[`resetdo-${key}`] = () => applyPartialReset(key);
+});
+
 // 확인(회색 · 왼쪽) / 유지하기(검정 · 오른쪽)
-function confirmPop(title, desc, okAction){
+function confirmPop(title, desc, okAction, okLabel = '확인', cancelLabel = '유지하기'){
   modal('', `<div class="cfpop"><b>${title}</b><p>${desc}</p>
-    <div class="cfpopbtns"><button class="cfok" data-action="${okAction}">확인</button><button class="cfkeep" data-action="close">유지하기</button></div></div>`);
+    <div class="cfpopbtns"><button class="cfok" data-action="${okAction}">${okLabel}</button><button class="cfkeep" data-action="close">${cancelLabel}</button></div></div>`);
   $('#sheet').classList.add('confirmpop');
 }
 $('#sheet').addEventListener('close', () => $('#sheet').classList.remove('confirmpop'));
@@ -124,7 +173,7 @@ Object.assign(actions, {
   leaveask: () => confirmPop('탈퇴하시겠습니까?', '탈퇴하면 저장한 콘텐츠와 설정이 모두 지워지고 되돌릴 수 없어요.', 'leaveyes'),
   logoutyes: () => { $('#sheet').close(); go('home'); toast('로그아웃했어요. (체험)'); openOnboarding(0); },
   leaveyes: () => { try { [STORAGE, ...LEGACY_KEYS].forEach(k => localStorage.removeItem(k)); } catch {} location.reload(); },
-  resetask: () => confirmPop('저장 데이터를 초기화하시겠습니까?', '이 브라우저에 저장한 콘텐츠, 관심사, 설정이 모두 지워지고 예시 상태로 돌아가요.', 'resetdata')
+  resetask: () => go('resetsettings')
 });
 
 /* ---------- 온보딩 다시 보기: 처음 온보딩과 따로 · 고른 관심사는 반영하지 않고 끝나면 마이로 ---------- */

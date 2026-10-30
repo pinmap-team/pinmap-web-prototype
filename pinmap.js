@@ -10,7 +10,7 @@ const interestOptions = [
   {id:'food',   emoji:'🍴', label:'먹을 곳을 찾을 때', short:'맛집'},
   {id:'study',  emoji:'📚', label:'공부/자료를 찾을 때', short:'공부·자료'},
   {id:'idea',   emoji:'💡', label:'아이디어를 찾을 때', short:'아이디어'},
-  {id:'later',  emoji:'🔖', label:'기타', short:'나중에 보기'}
+  {id:'later',  emoji:'🔖', label:'그 외 다른 목적으로 찾을 때', short:'나중에 보기'}
 ];
 const interestIds = interestOptions.map(x => x.id);
 const MAX_INTERESTS = Infinity; // 관심사 키워드 개수 제한 없음
@@ -156,6 +156,19 @@ pages.home = function() {
 /* ---------- 전체 화면 온보딩 (4단계) ---------- */
 const photo = (kind, cls='') => `<div class="ob-tile photo ${cls}">${art(kind)}</div>`;
 const loader = text => `<div class="ob-loader" role="status"><div class="ob-bar"><i></i></div><p>${text}</p></div>`;
+// 같은 휴대폰 화면에서 콘텐츠 → 공유 메뉴 → 핀맵 선택을 차례로 보여줘요.
+function onboardPhone(stage){
+  const feed = `<div class="ob-phone-app"><img src="img/logo-instagram.png" alt=""><b>Instagram</b>${icon('more')}</div>
+    <div class="ob-phone-posthead"><i></i><span>daily.place</span></div>
+    <img class="ob-phone-photo" src="img/cafe.jpg" alt="">
+    <div class="ob-phone-toolbar">${icon('heart')}${icon('comment')}<span class="${stage === 1 ? 'ob-phone-highlight' : ''}"><img src="${PM_IMG.send}" alt=""></span><span class="ob-phone-bookmark">${icon('bookmark')}</span></div>
+    <div class="ob-phone-lines"><i></i><i></i></div>`;
+  const sharing = stage === 2 ? `<div class="ob-phone-dim"></div><div class="ob-phone-sheet"><i class="ob-phone-grip"></i><b>게시물 공유</b>
+    <div class="ob-phone-people"><i></i><i></i><i></i></div>
+    <div class="ob-phone-options"><span>${icon('link')}<small>링크 복사</small></span><span class="ob-phone-selected">${icon('share')}<small>공유하기</small></span><span>${icon('comment')}<small>메시지</small></span></div></div>` : stage === 3 ? `<div class="ob-phone-dim"></div><div class="ob-phone-sheet ob-phone-system"><i class="ob-phone-grip"></i><div class="ob-phone-preview"><img src="img/cafe.jpg" alt=""><span>마음에 드는 콘텐츠<small>instagram.com</small></span></div>
+    <div class="ob-phone-options"><span><img src="img/logo-instagram.png" alt=""><small>Instagram</small></span><span class="ob-phone-selected"><img src="img/pinmap-symbol-splash.svg" alt=""><small>핀맵</small></span><span>${icon('more')}<small>더보기</small></span></div><div class="ob-phone-copy">${icon('link')} 링크 복사</div></div>` : '';
+  return `<div class="ob-phone-stage ob-phone-crop ob-phone-crop${stage}" aria-hidden="true"><div class="ob-phone"><div class="ob-phone-status"><b>9:41</b><i></i><span>▮▮ ▰</span></div><div class="ob-phone-feed">${feed}</div>${sharing}<i class="ob-phone-home"></i></div></div>`;
+}
 function onboardScreen() {
   const s = onboardStep;
   // 첫 화면: 로고만 심플하게 (화면을 누르면 바로 다음 단계)
@@ -163,19 +176,16 @@ function onboardScreen() {
   if (s === 1) return `
     <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를 <em>발견</em>했다면?</h1>
     <ol class="ob-flow">
-      <li class="ob-flowcard"><div class="ob-flowtext"><h3><span class="ob-num">1</span>콘텐츠 발견</h3><p>SNS에서 마음에 드는 콘텐츠를 찾아요.</p></div>
-        <div class="ob-mock ob-post" aria-hidden="true"><div class="ob-postimg">${art('park')}</div><div class="ob-postbar">${icon('heart')}${icon('comment')}<span class="ob-hl"><img class="ob-sendico" src="${PM_IMG.send}" alt=""></span><span class="ob-gap"></span>${icon('more')}</div></div></li>
+      <li class="ob-flowcard">${onboardPhone(1)}<div class="ob-flowtext"><h3><span class="ob-num">1</span>콘텐츠 발견</h3><p>SNS를 보다가 마음에 드는 콘텐츠 발견!</p></div></li>
       <li class="ob-arrow" aria-hidden="true">↓</li>
-      <li class="ob-flowcard"><div class="ob-flowtext"><h3><span class="ob-num">2</span>공유하기</h3><p>공유하기 버튼을 눌러주세요.</p></div>
-        <div class="ob-mock ob-sheet" aria-hidden="true"><span><i>${icon('link')}</i>링크 복사</span><span><i>${icon('story')}</i>스토리</span><span class="on"><i><img class="ob-sendico" src="${PM_IMG.send}" alt=""></i>공유하기</span><span><i>${icon('comment')}</i>메시지</span></div></li>
+      <li class="ob-flowcard">${onboardPhone(2)}<div class="ob-flowtext"><h3><span class="ob-num">2</span>공유하기</h3><p>하단의 공유하기 버튼 클릭하기</p></div></li>
       <li class="ob-arrow" aria-hidden="true">↓</li>
-      <li class="ob-flowcard"><div class="ob-flowtext"><h3><span class="ob-num">3</span>핀맵으로 보내기</h3><p>[핀맵]을 선택하면 저장 완료!</p></div>
-        <div class="ob-mock ob-sheet apps" aria-hidden="true"><span><i>${icon('image')}</i>SNS</span><span class="on"><i class="pin-app"><img src="${PM_IMG.logo}" alt=""></i>핀맵</span><span><i>${icon('more')}</i>더보기</span></div></li>
+      <li class="ob-flowcard">${onboardPhone(3)}<div class="ob-flowtext"><h3><span class="ob-num">3</span>핀맵으로 보내기</h3><p>[핀맵]을 선택하면 저장 완료!</p></div></li>
     </ol>
     <div class="ob-actions"><button class="filled ob-next" data-ob="next">다음</button></div>`;
   if (s === 2) return `
     <h1 class="ob-title" tabindex="-1">저장한 콘텐츠를<br><em>언제 다시 찾아보나요?</em></h1>
-    <p class="ob-desc">복수 선택이 가능해요!</p>
+    <p class="ob-desc">복수 선택이 가능해요</p>
     <div class="ob-options" role="group" aria-label="관심사 · 활용 목적">
       ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${o.emoji}</span><span class="ob-label">${o.label}</span></button>`; }).join('')}
     </div>
@@ -183,6 +193,15 @@ function onboardScreen() {
   // 마지막 화면: 문구 없이, 저장 카드에서 핀맵으로 점이 하나씩 채워지며 이어지는 애니메이션
   return '';
 }
+// 데스크톱 미리보기 안에서도 현재 보이는 창 높이에 안내 화면을 맞춰요.
+function fitOnboardingViewport(){
+  const el = $('#onboarding'); if (!el) return;
+  let height = window.innerHeight;
+  try { height = Math.min(height, window.parent.innerHeight); } catch {}
+  el.style.setProperty('--ob-viewport', `${height}px`);
+  el.style.setProperty('--ob-phone-zoom', height < 640 ? '1.2' : height < 760 ? '1.5' : '2');
+}
+window.addEventListener('resize', fitOnboardingViewport);
 function drawOnboarding() {
   clearTimeout(onboardTimer);
   const el = $('#onboarding');
@@ -195,6 +214,7 @@ function drawOnboarding() {
     </div>
     ${onboardScreen()}
   </div>`;
+  fitOnboardingViewport();
   el.scrollTop = 0;
   el.querySelector('.ob-title')?.focus?.();
   if (onboardStep === 0) onboardTimer = setTimeout(() => { onboardStep = 1; drawOnboarding(); }, 1400);
