@@ -36,6 +36,7 @@
   // Editing saves a recoverable draft; only the Save button updates the saved list.
   const save=()=>{if(PM_ENV.development)return true;draft=clone(course);try{localStorage.setItem(draftKey,JSON.stringify(draft));return true}catch{toast('임시 저장 공간을 확인해 주세요.');return false}};
   const openCourse=value=>{course=clone(value);pickerOpen=false;editing=false;save();go('course')};
+  window.startNewCourse=()=>openCourse({id:newId(),title:'새 코스',date:today,days:[[]]});
   const eligible=()=>items.filter(item=>isPlace(item)&&item.address&&!item.pending);
   const dayStops=()=>course.days[0];
   const findPlace=id=>eligible().find(item=>item.id===id);
@@ -207,7 +208,7 @@
   }
   document.addEventListener('click',async event=>{
     if(['map','courses'].includes(page)&&event.target.closest('[data-course-new]')){
-      openCourse({id:newId(),title:'새 코스',date:today,days:[[]]});return;
+      window.startNewCourse();return;
     }
     if(page==='courses'){
       const button=event.target.closest('[data-course-open]');const saved=button&&courses.find(value=>value.id===button.dataset.courseOpen);if(saved)openCourse(saved);
