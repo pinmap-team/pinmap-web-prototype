@@ -49,18 +49,19 @@
     return `<section class="live-map" aria-label="지도에서 장소 탐색"><div id="live-map-canvas"></div>
       <header class="lm-header">
         <h1 class="lm-sr-only">지도에서 저장한 장소 찾기</h1>
-        <div class="lm-location-header"><button type="button" class="lm-location-title" data-lm="location-menu" aria-expanded="${locationMenuOpen}" aria-controls="lm-location-menu">${icon('pin')}<span>${safe(mapLocationName ? (settings.placeLabels?.[mapLocationName] || mapLocationName) : '현재 위치')}</span>${icon('chevron')}</button><button type="button" class="lm-header-search" data-lm="toggle-search" aria-label="지도에서 장소 검색" aria-expanded="${searchOpen}">${icon('search')}</button></div>
+        <div class="lm-location-header"><button type="button" class="lm-location-title" data-lm="location-menu" aria-expanded="${locationMenuOpen}" aria-controls="lm-location-menu">${icon('pin')}<span>${safe(mapLocationName ? (settings.placeLabels?.[mapLocationName] || mapLocationName) : '현재 위치')}</span>${icon('chevron')}</button><button type="button" class="lm-header-search" data-lm="toggle-search" aria-label="${searchOpen?'검색창 닫기':'지도에서 장소 검색'}" aria-expanded="${searchOpen}" aria-controls="lm-search-row"><span class="lm-search-open-icon">${icon('search')}</span><span class="lm-search-close-icon">${icon('close')}</span></button></div>
         <div class="lm-location-menu" id="lm-location-menu" ${locationMenuOpen?'':'hidden'}><button type="button" data-lm="choose-current" class="${mapLocationName?'':'is-active'}">현재 위치</button>${myPlaces().map(name=>`<button type="button" data-lm="choose-saved-location" data-location-name="${safe(name)}" class="${mapLocationName===name?'is-active':''}">${safe(settings.placeLabels?.[name] || name)}<small>${safe(name)}</small></button>`).join('')}<button type="button" data-action="placesheet">위치 추가·수정</button></div>
-        <div class="lm-search-row cfpage${searchOpen?' is-open':''}" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><button type="button" class="lm-search-close" data-lm="toggle-search" aria-label="검색창 닫기">${icon('close')}</button><input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="어디로 가고 싶으세요?" value="${safe(searchQuery)}" autocomplete="off" ${searchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button><button type="submit" class="libgo" aria-label="장소 검색">${icon('search')}</button></form></div>
+        <div class="lm-search-row cfpage${searchOpen?' is-open':''}" id="lm-search-row" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="어디로 가고 싶으세요?" value="${safe(searchQuery)}" autocomplete="off" ${searchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button></form></div>
         <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,cats.findIndex(([id])=>id===category))*100}%">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
       </header>
+      <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">ⓘ</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p class="lm-map-credits-vector"><a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a> · © <a href="https://openmaptiles.org/" target="_blank" rel="noopener noreferrer">OpenMapTiles</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></p><p class="lm-map-credits-fallback">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></p><p>지하철 출입구 © <a href="https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0" target="_blank" rel="noopener noreferrer">행정안전부·Esri Korea</a></p></div></details>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
       <div class="lm-floating-actions"><button type="button" class="lm-course-button" data-lm="new-course" aria-label="새 코스 만들기" title="새 코스 만들기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="4.2" cy="4.2" r="2.1"/><path d="M6.3 4.2h9.2a5.1 5.1 0 0 1 0 10.2H10a3.2 3.2 0 0 0 0 6.4h7.7"/><circle cx="19.8" cy="20.8" r="2.1"/></svg></button>${round('현재 위치로 이동','target')}</div>
       <section class="lm-selected-host" id="lm-selected-place" aria-label="이 근방 저장된 장소"></section>
       <nav class="bottomnav lm-shared-nav" aria-label="하단 메뉴">${nav()}</nav></section>`;
   }
-  function status(message) { const el = $('#app .lm-status'); if (el) { el.textContent = message; el.hidden = !/못|실패|입력|확인하고|검색하고/.test(message); } }
+  function status(message) { const el = $('#app .lm-status'); if (el) { el.textContent = message; el.hidden = !/못|실패|입력|확인|검색하고/.test(message); } }
   function selectCategory(next) {
     category=next;
     const bar=document.querySelector('.lm-categories');
@@ -360,7 +361,9 @@
         row.classList.toggle('is-open',searchOpen);
         row.setAttribute('aria-hidden',String(!searchOpen));
         row.inert=!searchOpen;
-        $('#app .lm-header-search').setAttribute('aria-expanded',String(searchOpen));
+        const toggle=$('#app .lm-header-search');
+        toggle.setAttribute('aria-expanded',String(searchOpen));
+        toggle.setAttribute('aria-label',searchOpen?'검색창 닫기':'지도에서 장소 검색');
         input.tabIndex=searchOpen?0:-1;
         if(searchOpen)requestAnimationFrame(()=>input.focus());
         else {input.blur();$('#lm-search-results').hidden=true;}
@@ -380,14 +383,21 @@
       }
       case 'select-place':{const place=markerEntries.get(button.dataset.placeKey)?.place;if(place)expandPlace(place);break;}
       case 'close-place':clearSelection();renderSheet();break;
-      case 'open-place':{const place=markerEntries.get(button.dataset.placeKey)?.place;if(!place)break;if(place.saved)openDetail(place.id);else window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place.lat+','+place.lng),'_blank','noopener,noreferrer');break;}
+      case 'open-place':{const place=markerEntries.get(button.dataset.placeKey)?.place;if(!place)break;if(place.saved)openDetail(place.id,button);else window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place.lat+','+place.lng),'_blank','noopener,noreferrer');break;}
       case 'clear-search':searchResults=null;searchQuery='';$('#lm-search input').value='';$('#lm-search [data-lm="clear-search"]').hidden=true;$('#lm-search-results').hidden=true;markers();break;
     }
   });
   document.addEventListener('error',event=>{if(event.target.matches?.('.lm-badge-image img'))event.target.hidden=true;},true);
   document.addEventListener('keydown',event=>{if(page==='map'&&event.key===' '&&event.target.closest('.lm-photo-marker')){event.preventDefault();event.target.closest('.lm-photo-marker').click();}});
   document.addEventListener('input',event=>{if(event.target.matches('#lm-search input'))$('#lm-search [data-lm="clear-search"]').hidden=!event.target.value;});
-  document.addEventListener('submit',event => { if(event.target.id==='lm-search'){event.preventDefault();searchPlaces(new FormData(event.target).get('q').trim());} });
+  document.addEventListener('submit',event => {
+    if(event.target.id!=='lm-search')return;
+    event.preventDefault();
+    const q=new FormData(event.target).get('q').trim();
+    // Native Enter and the preview keyboard's search button share the same dismissal.
+    if(q.length>=2)event.target.querySelector('input')?.blur();
+    searchPlaces(q);
+  });
   window.addEventListener('pinmap:place-changed',async event=>{
     if(page!=='map'||!liveMap||PM_ENV.development)return;
     const name=event.detail?.name;

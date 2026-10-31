@@ -1,0 +1,228 @@
+/* Week 9 integration layer. Semantic values live only in tokens.css.
+   Geometry/material exceptions are listed in DESIGN.md; no layout redesign. */
+:root{--gutter:var(--space-xl);--gap-title:var(--space-xl);--gap-section:var(--space-2xl)}
+body{font:var(--type-body-md)}
+button,input,select,textarea,svg text,.libpage,.live-map,#login-screen,.ob-phone{font-family:var(--font-family)}
+:where(input,textarea)::placeholder{color:var(--color-secondary);opacity:1}
+:where(.muted,.hint,.dthint,.eshint,.escount,.nttime,.cf-count,.cf-sortlead,.cf-itemmeta){color:var(--color-secondary)}
+
+/* Five complete type roles: use label-md for compact card titles. */
+.heading h1,.libhead h1,.toptitle,.dt .dthtitle h1,.ob-title{font:var(--type-headline-lg)}
+.live-map .lm-header .lm-location-title,.libpage .libhead h1{font:var(--type-headline-lg)}
+.sectionhead h2,.libsection h2,.mysec>h2,.dtsec>h2,.dtsechead h2,.eshead h2,.nthead h2,.dialoghead h2{font:var(--type-headline-md)}
+.dtsum p,.dtmemobox,.field input,.field textarea,.esinput input,.esinput textarea,.ob-desc{font:var(--type-body-md)}
+.cfpage .libsearch input,.live-map .lm-header .lm-search-row .libsearch input{font:var(--type-body-md)}
+.cf-title,.cf-itemtext h3,.cf-picktext b,.nttext b,.ntsheet .nttext b,.dtcat,.dtact,.dtcol,.dtghost,.dtprimary,.essubmit,.escancel,.eschip,.eslabel,.dtsum h2,.homecategories .prefchip,.cfpage .libchip,.filled,.tonal,.outlined,.textbtn,.my-shortcuts button{font:var(--type-label-md)}
+.cf-count,.cf-itemdesc,.cf-itemmeta,.cf-saved-time,.escount,.eshint,.dthint,.nttime,.ntbody,.ntsheet .ntbody,.dthtitle small,.live-map .lm-location-menu small,.live-map .lm-carousel-bottom small,.home-share-note{font:var(--type-body-sm)}
+.live-map .lm-location-menu button,.live-map .lm-carousel-top strong,.live-map .lm-carousel-bottom p{font:var(--type-label-md)}
+.live-map .lm-header .lm-categories button{color:var(--color-secondary)}
+.live-map .lm-header .lm-categories b{font:var(--type-body-sm)}
+.live-map .lm-header .lm-categories button[aria-pressed="true"]{color:var(--color-primary)}
+.bottomnav .pm-nav-main .navitem>span.pm-nav-label{font:var(--type-body-sm)}
+.mainpick .picktext b{font:var(--type-headline-md)}
+.mainpick .picktext small{font:var(--type-label-md)}
+
+/* Shared internal rhythm; carousel/photo/folder anchor geometry stays intact. */
+.cf-grid{column-gap:var(--space-xl);row-gap:var(--space-xl);padding-inline:var(--space-xs)}
+.cf-items,.esbody{gap:var(--space-xl)}
+.cf-meta,.my-shortcuts button,.live-map .lm-header .lm-location-title{gap:var(--space-sm)}
+.cf-itembody{padding:0 var(--space-lg) var(--space-lg);gap:var(--space-sm)}
+.my-shortcuts{padding:var(--space-lg) 0}
+.live-map .lm-location-menu{padding:var(--space-sm)}
+.live-map .lm-location-menu button{min-height:48px;padding:var(--space-sm) var(--space-md)}
+.live-map .lm-floating-actions{gap:var(--space-md)}
+.live-map .lm-carousel-copy{padding:var(--space-sm) var(--space-md)}
+.live-map .lm-carousel-top{gap:var(--space-xs)}
+.live-map .lm-carousel-bottom{padding-right:44px}
+.live-map .lm-carousel-bottom p{margin:var(--space-xs) 0 0;color:var(--color-on-surface)}
+.live-map .lm-carousel-bottom small{color:var(--color-secondary)}
+.cfpage .libsearch{gap:var(--space-sm);padding:0 var(--space-sm) 0 var(--space-lg)}
+.field input,.field textarea,.esinput.area{padding:var(--space-md)}
+
+/* Regular surfaces use three radii. Pill search, circles and folder silhouettes are geometric exceptions. */
+.libcard,.card,.gcard,.mycard,.infobox,.mgroup,.cf-item,.live-map .lm-carousel-card,.esinput,.esselect{border-radius:var(--rounded-md)}
+.libart,.cf-photo,.cf-pickthumb,.ntthumb,.field input,.field textarea,.field select,.live-map .lm-location-menu button{border-radius:var(--rounded-sm)}
+.forhero,.live-map .lm-location-menu,.live-map .lm-carousel-empty,#sheet.cfcenter,dialog{border-radius:var(--rounded-lg)}
+.libcard{padding:var(--space-sm) var(--space-sm) var(--space-md)}
+.mgroup{padding:var(--space-sm) var(--space-lg)}
+.mgroup>h2{margin:var(--space-md) 0 var(--space-xs)}
+.libcard,.card,.gcard,.mycard,.infobox,.mgroup,.cf-item,.live-map .lm-round,.live-map .lm-course-button{box-shadow:var(--shadow-sm)}
+.live-map .lm-carousel{filter:none}
+.live-map .lm-carousel-card{box-shadow:var(--shadow-sm)}
+.live-map .lm-header{box-shadow:var(--shadow-sm)}
+.live-map .lm-location-menu,.live-map .lm-search-results,#sheet,dialog{box-shadow:var(--shadow-md)}
+.live-map .lm-header .lm-location-title,.live-map .lm-header .lm-header-search{box-shadow:none}
+
+/* Visible icon sizes stay fixed. Real 44px controls, no overlapping pseudo targets. */
+.live-map .lm-header .lm-location-header{height:44px;min-height:44px}
+.live-map .lm-header .lm-header-search,.live-map .lm-header .lm-search-row{width:44px;height:44px}
+.live-map .lm-header .lm-search-row.is-open{width:calc(100% - var(--gutter)*2)}
+.live-map .lm-header .lm-search-row .libsearch{height:44px;gap:var(--space-xs);padding:0 48px 0 var(--space-md)}
+.live-map .lm-header .lm-search-row .libsearch input{height:42px;min-width:0}
+.live-map .lm-header .lm-header-search svg{width:24px;height:24px}
+.live-map .lm-header .lm-search-row [data-lm="clear-search"]{min-width:44px;min-height:44px;padding:0}
+.cfpage .libsearch .iconbtn{width:44px;height:44px;min-width:44px;min-height:44px;flex:0 0 44px;padding:0}
+.live-map button.lm-carousel-heart{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;margin-top:-8px;margin-bottom:-8px}
+.live-map .lm-carousel-top{align-items:center;min-height:28px}
+.live-map .lm-carousel-top strong{min-width:0;max-height:40px}
+.live-map .lm-carousel-copy button.lm-carousel-detail{width:44px;height:44px;right:0;bottom:0}
+.live-map .lm-carousel-copy button.lm-carousel-detail svg{width:16px;height:16px}
+.live-map .lm-carousel-copy{justify-content:space-between}
+.live-map .lm-carousel-bottom{margin-top:var(--space-xs)}
+.live-map .lm-result-row,.live-map .lm-results-head button,.dtcopy,.dtmemoedit,.dtmap-open,.esclose,.ntclose,.cf-delfolder,.cf-textbtn,.cf-pickbtn,.accsync,.libchip{min-width:44px;min-height:44px}
+.live-map .lm-header .lm-categories button{min-height:75px}
+
+/* Semantic red: icon/badge use only. Text stays dark for readable contrast. */
+.live-map button.lm-carousel-heart.is-active{color:var(--color-error)}
+.strip-item.soon b,.cnbadge.soon,.calbadge.soon{background:var(--color-error);color:#fff}
+.error,.eserror{color:var(--color-on-surface);border-inline-start:3px solid var(--color-error);padding-inline-start:var(--space-sm)}
+
+/* Shared interaction states. Native disabled + async guard handle behavior. */
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex="0"]:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+.libsearch:focus-within{outline:2px solid var(--color-primary);outline-offset:2px}
+.libsearch input:focus-visible{outline:none}
+button:disabled,button[aria-disabled="true"],input:disabled,textarea:disabled{cursor:not-allowed;opacity:.55}
+button:disabled:hover{filter:none}
+button:not(:disabled):not([aria-busy="true"]):active{filter:brightness(.90)}
+.filled:not(:disabled):active,.cm-next:not(:disabled):active,.pm-done:not(:disabled):active,.ob-next:not(:disabled):active{background:var(--color-primary-pressed)!important}
+button[aria-busy="true"]{position:relative;cursor:wait;opacity:1}
+button[aria-busy="true"]>svg{visibility:hidden}
+button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto;width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:pm-busy .7s linear infinite}
+@keyframes pm-busy{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){button[aria-busy="true"]::after{animation:none}}
+
+.live-map .lm-header .lm-categories button{gap:var(--space-sm);padding:var(--space-sm) 0 var(--space-md)}
+/* Home controls: keep the 52px strip; reserve a separate, non-overlapping close column. */
+.strip{align-items:center;gap:var(--space-sm);padding:var(--space-xs) var(--gutter);background:var(--color-disabled)}
+.strip-roll,.strip-item{height:44px}
+.strip-item{font:var(--type-label-md)}
+.strip-item b{font:var(--type-body-sm);padding:var(--space-xs) var(--space-sm)}
+.strip-hide{position:static;flex:0 0 112px;min-height:44px;padding:0;font:var(--type-body-sm);color:var(--color-secondary)}
+.homecategories .prefchip,.hwhead .textbtn,.cnrow,.cm-prev,.cm-next,.calnav button{min-height:44px}
+.calnav button{min-width:44px}
+.weekstrip{gap:0}
+.hwhead h2,.calhead h2{font:var(--type-headline-md)}
+.hwhead .textbtn,.cntext{font:var(--type-label-md)}
+.wday small,.cnbadge,.calbadge{font:var(--type-body-sm)}
+.hwidget,.calbox{border-radius:var(--rounded-lg);padding:var(--space-lg);box-shadow:var(--shadow-sm)}
+.calbox .calnav{gap:var(--space-xs)}
+.homecategories{grid-auto-rows:minmax(44px,auto)}
+.live-map .lm-carousel-top strong,.live-map button.lm-carousel-heart,.live-map .lm-carousel-copy button.lm-carousel-detail{color:var(--color-on-surface)}
+.live-map button.lm-carousel-heart.is-active{color:var(--color-error)}
+.filled:disabled,.cm-next:disabled,.pm-done:disabled,.ob-next:disabled{background:var(--color-disabled)!important;color:var(--color-secondary)!important;opacity:1}
+.cfpage .libchip{min-height:44px;height:44px}
+.live-map .lm-header .lm-categories .selected b{font:var(--type-body-sm)}
+.dtdelete{color:var(--color-on-surface);border:1px solid var(--color-error);border-radius:var(--rounded-sm);padding:var(--space-sm) var(--space-lg);min-height:44px}
+
+.error:empty,.eserror:empty{display:none}
+
+/* Independent review follow-up: win against legacy specificity, not geometry. */
+.bottomnav .pm-nav-main .navitem,.bottomnav .pm-nav-main .navitem *{color:var(--color-secondary)!important}
+.bottomnav .pm-nav-main .navitem.active,.bottomnav .pm-nav-main .navitem.active *{color:var(--color-primary)!important}
+.live-map .lm-header .lm-location-title,.live-map .lm-header .lm-header-search,
+.live-map .lm-floating-actions .lm-round{color:var(--color-on-surface)}
+.cfpage .libsearch input,.live-map .lm-header .lm-search-row .libsearch input{color:var(--color-on-surface)}
+.cfpage .libsearch,.live-map .lm-header .lm-search-row .libsearch{border-radius:999px}
+.cfpage .libsearch>.icon{color:var(--color-on-surface)}
+.cfpage .libchip{color:var(--color-secondary);background:var(--color-surface);border-radius:999px;box-shadow:var(--shadow-sm)}
+.cfpage .libchip[aria-pressed="true"]{color:var(--color-neutral);background:var(--color-primary)}
+.homecategories .prefchip{border-radius:999px;color:var(--color-on-surface)!important;background:var(--color-surface)}
+.homecategories.two-rows{grid-template-rows:repeat(2,44px)}
+.chiprows .prefchips.homecategories{padding-top:var(--space-xs)!important;padding-bottom:var(--space-xs)!important}
+.live-map .lm-floating-actions .lm-course-button{background:var(--color-primary)!important;color:var(--color-neutral)!important;box-shadow:var(--shadow-sm)}
+.live-map .lm-floating-actions .lm-round{background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important}
+.live-map .lm-header .lm-location-title{min-height:44px}
+.live-map .leaflet-control-attribution{display:none!important}
+.live-map .lm-map-credits{position:absolute;z-index:605;left:8px;bottom:calc(246px + env(safe-area-inset-bottom));color:var(--color-on-surface)}
+.live-map .lm-map-credits summary{display:grid;place-items:center;width:44px;height:44px;list-style:none;cursor:pointer;font-size:18px;color:var(--color-secondary);text-shadow:0 1px 2px #fff;background:transparent}
+.live-map .lm-map-credits summary::-webkit-details-marker{display:none}
+.live-map .lm-map-credits summary:focus-visible{outline:2px solid var(--color-primary);outline-offset:-5px;border-radius:50%}
+.live-map .lm-map-credits-panel{position:absolute;bottom:44px;left:4px;width:min(290px,calc(100vw - 32px));padding:12px 14px;border:1px solid var(--color-border);border-radius:var(--rounded-md);background:var(--color-surface);box-shadow:var(--shadow-md);font:var(--type-body-sm)}
+.live-map .lm-map-credits-panel strong{display:block;margin-bottom:6px}
+.live-map .lm-map-credits-panel p{margin:5px 0;line-height:1.5}
+.live-map .lm-map-credits-panel a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.live-map .lm-map-credits-fallback{display:none}
+.live-map:has(#live-map-canvas[data-basemap="osm-fallback"]) .lm-map-credits-vector{display:none}
+.live-map:has(#live-map-canvas[data-basemap="osm-fallback"]) .lm-map-credits-fallback{display:block}
+.live-map .lm-header .lm-categories{margin-top:var(--space-sm)}
+.cfpage .libsearch:focus-within,.live-map .lm-header .lm-search-row .libsearch:focus-within{outline:2px solid var(--color-primary)!important;outline-offset:-2px}
+.calw .cnrow{min-height:44px;gap:var(--space-sm);padding:0 var(--space-sm)}
+.calw .hwhead{margin-bottom:var(--space-sm)}
+.calw .calmore{gap:var(--space-sm);color:var(--color-on-surface)!important}
+.calw .wday{padding:var(--space-xs) 0;gap:var(--space-xs)}
+.calw .wday b,.calw .wday.today b{font:var(--type-label-md)}
+.calw .wday small,.calw .wday.today small{font:var(--type-body-sm)}
+.calw .wday.today{background:var(--color-disabled)!important;color:var(--color-on-surface)!important}
+.calw .wday.today small{color:var(--color-on-surface)!important}
+.calw .wday.today i.on{background:var(--color-primary)!important}
+.calw .calnext{margin-top:var(--space-sm);padding-top:var(--space-xs)}
+.recentw .rwtitle{font:var(--type-headline-md)}
+.recentrow .rcard b{font:var(--type-label-md)}
+.recentrow .rcard small{font:var(--type-body-sm);color:var(--color-secondary)}
+.mainpick .picktext small{opacity:1}
+
+/* Appearance: same semantic roles and geometry in both modes. */
+.pm-theme-options{display:flex;gap:var(--space-sm);margin:var(--space-lg) 0}
+.pm-theme-options button{flex:1;min-height:48px;border:1px solid var(--color-border);border-radius:var(--rounded-md);background:var(--color-surface);color:var(--color-on-surface)}
+.pm-theme-options button[aria-pressed="true"]{background:var(--color-primary);color:var(--color-neutral);font-weight:700}
+:root[data-theme="dark"]{
+ --t-glass:rgba(27,27,29,.78);--t-glass-strong:rgba(27,27,29,.94);--pm-glass:rgba(27,27,29,.78);--pm-glass-border:rgba(255,255,255,.14);
+ --cf-back:var(--color-disabled);--cf-front:rgba(35,35,38,.72);--cf-front-solid:var(--color-surface);--cf-empty:var(--color-disabled);
+ --md-sys-color-primary:var(--color-primary);--md-sys-color-on-primary:var(--color-neutral);--md-sys-color-surface-container:var(--color-surface);--md-sys-color-surface-container-low:var(--color-surface);--md-sys-color-surface-container-high:var(--color-disabled);--md-sys-color-outline:var(--color-border);--md-sys-color-outline-variant:var(--color-disabled);--md-sys-color-secondary-container:var(--color-disabled);--md-sys-color-on-secondary-container:var(--color-on-surface);
+}
+[data-theme="dark"] body,[data-theme="dark"] .live-map{background:var(--color-neutral)!important;color:var(--color-on-surface)}
+[data-theme="dark"] :is(.live-map,.libpage){--pm-header-bg:var(--color-surface)}
+[data-theme="dark"] :is(.topbar,.libhead,.mypage,.cfpage,.coursepage,.calpage){color:var(--color-on-surface)}
+[data-theme="dark"] :is(dialog,.mycard,.mgroup,.profilecard,.mprofile,.account-summary,.libsearch,.cf-item,.cf-addbox,.hwidget,.calbox,.notirow.unread,.ntrow,.ntsheet,.esinput,.esselect,.eshint,.dtmemobox,.dtcol,.dtghost,.dtmap,.choice-menu,.pm-choice-menu,.lm-location-menu,.lm-search-results,.lm-result-row,.lm-carousel-card,.lm-carousel-empty,.lm-sheet,.lm-status,.ob-option,.ob-flowcard,.ob-phone){background:var(--color-surface)!important;color:var(--color-on-surface);border-color:var(--color-disabled)}
+[data-theme="dark"] :is(.mrow,.mrlabel,.mpinfo b,.pname,.setrow,.segmented button,.cf-title,.cf-itemtext h3,.cf-folder-title,.cf-sort,.cf-sortbtn,.dt h1,.dt h2,.dt h3,.dtmemobox,.nttitle,.ob-title,.ob-desc,.ob-option,.lm-result-row b,.lm-carousel-top strong,.coursepage h1){color:var(--color-on-surface)}
+[data-theme="dark"] :is(.mrval,.mpinfo small,.setrow small,.mrow small,.cf-addtext small,.cf-itemdesc,.ntbody,.ob-sub,.ob-hint,.lm-result-row small,.lm-result-credit){color:var(--color-secondary)}
+[data-theme="dark"] :is(.field input,.field textarea,.field select,.libsearch input,.esinput input,.esinput textarea){background:transparent;color:var(--color-on-surface)}
+[data-theme="dark"] :is(.filled,.cm-next,.pm-done,.ob-next,.prefchip.on,.ob-option.selected,.cf-addplus,.libpill.due){background:var(--color-primary)!important;color:var(--color-neutral)!important}
+[data-theme="dark"] :is(.tonal,.outlined,.padd,.pchip,.segmented,.dtcat,.dtsum,.tag,.colpill){background:var(--color-disabled);color:var(--color-on-surface);border-color:var(--color-border)}
+[data-theme="dark"] :is(.segmented button.on,.cfpage .libchip.on){background:var(--color-primary);color:var(--color-neutral)}
+[data-theme="dark"] :is(.strip-item,.cnbadge:not(.soon),.calbadge:not(.soon)){color:var(--color-on-surface)}
+[data-theme="dark"] .strip-item:not(.soon) b{background:var(--color-primary);color:var(--color-neutral)}
+[data-theme="dark"] :is(.cnbadge:not(.soon),.calbadge:not(.soon)){background:var(--color-disabled)}
+[data-theme="dark"] .homebrand img{filter:invert(1)}
+[data-theme="dark"] .live-map .lm-header .lm-location-title .icon:first-child{stroke:var(--color-surface)}
+[data-theme="dark"] :is(.lm-badge-category,.lm-place-badge){background:var(--color-surface);border-color:var(--color-surface)}
+[data-theme="dark"] .lm-place-badge::after{background:var(--color-surface)}
+[data-theme="dark"] .lm-map-credits summary{text-shadow:none}
+[data-theme="dark"] .live-map .lm-floating-actions .lm-course-button{background:var(--color-primary)!important;color:var(--color-neutral)!important}
+[data-theme="dark"] .bottomnav .pm-nav-main::before{background:rgba(27,27,29,.82)}
+[data-theme="dark"] .bottomnav .pm-nav-indicator::before{background:linear-gradient(145deg,#ffffff24,#ffffff0d 52%,#ffffff1c);border-color:#ffffff30}
+[data-theme="dark"] .bottomnav .pm-nav-main::after{background:linear-gradient(120deg,#ffffff40,#ffffff0d,#ffffff30)}
+[data-theme="dark"] #pm-keyboard-preview{background:#202023;color:var(--color-on-surface)}
+[data-theme="dark"] #pm-keyboard-preview button{background:#3b3b40;color:#fff}
+[data-theme="dark"] :is(.choice-popover,.choice-option,.cm-sheet,.cm-search,.course-card){background:var(--color-surface);color:var(--color-on-surface)}
+[data-theme="dark"] .main .strip{background:var(--color-disabled)!important;color:var(--color-on-surface)}
+[data-theme="dark"] .cfpage .cf-front{background:linear-gradient(180deg,rgba(45,45,49,.55),rgba(32,32,35,.92))}
+[data-theme="dark"] .cfpage .cf-backshape{background:var(--color-disabled)}
+[data-theme="dark"] .cfpage .cf-add .cf-addplus{background:transparent!important;color:var(--color-on-surface)!important}
+[data-theme="dark"] .cfpage .cf-list>.empty{background:var(--color-surface);border-color:var(--color-disabled);box-shadow:var(--shadow-sm)}
+[data-theme="dark"] .belldot{background:var(--color-primary)!important;color:var(--color-neutral)!important}
+[data-theme="dark"] :is(.leaflet-container,.maplibregl-map){background:var(--color-neutral)!important}
+[data-theme="dark"] .lm-location-demo{background:var(--color-surface);color:var(--color-secondary)}
+[data-theme="dark"] :is(.dt,.dtsheet,.esfoot,.esshare,.ntcard,.ntghost){background:var(--color-surface);color:var(--color-on-surface)}
+[data-theme="dark"] .dtbar::before{background:linear-gradient(180deg,#1b1b1d00,var(--color-surface) 50px)}
+[data-theme="dark"] :is(.dtbtn,.dtfav,.dtmap-open){background:var(--t-glass);color:var(--color-on-surface)}
+[data-theme="dark"] :is(.dtprimary,.essubmit,.ntprimary){background:var(--color-primary);color:var(--color-neutral)}
+[data-theme="dark"] :is(.dtwarn,.dtgone,.eschip,.ntclose,.dtcopy:hover){background:var(--color-disabled);color:var(--color-on-surface)}
+[data-theme="dark"] .eschip.on{background:var(--color-primary);color:var(--color-neutral)}
+[data-theme="dark"] body.dtscrolled:has(.dt)::before{background:var(--t-glass-strong)}
+[data-theme="dark"] .calcell.sel span{color:var(--color-neutral)!important}
+[data-theme="dark"] .calcell.today:not(.sel) span{background:var(--color-surface)!important;color:var(--color-primary)!important}
+[data-theme="dark"] .calcell.sel .caldot{background:var(--color-neutral)}
+[data-theme="dark"] #onboarding{--ob-key:var(--color-primary);--ob-key-strong:var(--color-primary);--ob-key-soft:var(--color-disabled);--ob-on-key:var(--color-neutral);--ob-ink:var(--color-on-surface);--ob-sub:var(--color-secondary);--ob-line:var(--color-border)}
+[data-theme="dark"] #onboarding .ob-screen:is(.step2,.step3){background:var(--color-neutral)!important;color:var(--color-on-surface)}
+[data-theme="dark"] #onboarding .step3 .ob-option{background:var(--color-surface)!important;border-color:var(--color-border)!important}
+[data-theme="dark"] #onboarding .step3 .ob-option.on{background:var(--color-disabled)!important;border-color:var(--color-primary)!important}
+[data-theme="dark"] #onboarding .step3 :is(.ob-option,.ob-label,.ob-emoji){color:var(--color-on-surface)!important}
+[data-theme="dark"] #onboarding .step3 .ob-option.on .ob-check{background:var(--color-primary)!important;border-color:var(--color-primary)!important;color:var(--color-neutral)!important}
+[data-theme="dark"] [data-basemap="osm-fallback"] .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.65) saturate(.6)}
+[data-theme="dark"] :is(.dtmemoedit,.pm-keyboard-tools){color:var(--color-secondary)}
+[data-theme="dark"] #onboarding .ob-action-back{background:var(--color-disabled);color:var(--color-on-surface)}
+[data-theme="dark"] #onboarding .ob-num{background:var(--color-primary);color:var(--color-neutral)}
+/* External app illustrations retain their own light appearance. */
+[data-theme="dark"] #onboarding .ob-phone{background:#fff!important;color:#111;--ob-ink:#111;--ob-sub:#606060;--ob-key:#111;--ob-on-key:#fff}
+[data-theme="dark"] #onboarding .ob-phone-sheet{color:#111}

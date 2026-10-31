@@ -4,11 +4,12 @@ const fs=require('node:fs');
 const crypto=require('node:crypto');
 const vm=require('node:vm');
 test('shared Positron layer keeps Leaflet controls, credit and load status without an API key',()=>{
-  const host={dataset:{}},events={};let received,addedTo;
-  const layer={addTo(map){addedTo=map;return this},getMaplibreMap(){return {on(name,fn){events[name]=fn}}}};
-  const context={window:{},L:{maplibreGL(options){received=options;return layer}}};
+  const host={dataset:{}},events={},themeEvents={},paintChanges=[];let received,addedTo;
+  const layers=[{id:'background',type:'background',paint:{'background-color':'#F6F2E9'}}];
+  const layer={addTo(map){addedTo=map;return this},getMaplibreMap(){return {on(name,fn){events[name]=fn},getStyle(){return {layers}},setPaintProperty(...args){paintChanges.push(args)}}}};
+  const context={document:{documentElement:{dataset:{theme:'light'}}},window:{addEventListener(name,fn){themeEvents[name]=fn},removeEventListener(name){delete themeEvents[name]}},L:{maplibreGL(options){received=options;return layer}}};
   vm.runInNewContext(fs.readFileSync('integration.js','utf8'),context);
-  const map={getContainer:()=>host};
+  const map={getContainer:()=>host,on(name,fn){events['map:'+name]=fn}};
   assert.equal(context.window.attachPinmapBasemap(map),layer);
   assert.equal(addedTo,map);
   assert.match(received.style,/^map-style\.json\?v=/);
@@ -16,7 +17,12 @@ test('shared Positron layer keeps Leaflet controls, credit and load status witho
   for(const source of ['OpenFreeMap','OpenMapTiles','OpenStreetMap','행정안전부·Esri Korea'])assert(received.attributionControl.customAttribution.includes(source));
   assert.equal(host.dataset.basemap,'warm-minimal');
   assert.equal(host.dataset.basemapReady,undefined);
-  events.load();assert.equal(host.dataset.basemapReady,'true');
+  events['style.load']();events.load();assert.equal(host.dataset.basemapReady,'true');
+  context.document.documentElement.dataset.theme='dark';themeEvents['pinmap:theme-changed']();
+  assert.deepEqual(paintChanges.at(-1),['background','background-color','#111111']);
+  context.document.documentElement.dataset.theme='light';themeEvents['pinmap:theme-changed']();
+  assert.deepEqual(paintChanges.at(-1),['background','background-color','#F6F2E9']);
+  events['map:unload']();assert.equal(themeEvents['pinmap:theme-changed'],undefined);
 });
 
 test('warm map style is valid, simplifies background detail and retains orientation labels',()=>{

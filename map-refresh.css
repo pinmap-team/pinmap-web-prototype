@@ -1,5 +1,5 @@
 /* Map-only layout: search/category bar, photo badges, and draggable place sheet. */
-.live-map{--lm-surface:var(--t-card,#fff);--lm-text:var(--t-ink,#111);--lm-muted:#6B6B70;--lm-line:var(--t-line,#E8E8EA);--lm-footer:80px;--lm-actions-sheet-height:162px;font-family:inherit}
+.live-map{--lm-surface:var(--t-card,#fff);--lm-text:var(--t-ink,#111);--lm-muted:var(--color-secondary);--lm-line:var(--t-line,#E8E8EA);--lm-footer:80px;--lm-actions-sheet-height:162px;font-family:inherit}
 .live-map .lm-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .live-map .lm-header{inset:0 0 auto;padding:24px 20px 0;background:var(--lm-surface);border-bottom:1px solid var(--lm-line);z-index:600}
 .lm-search-row{position:relative;display:flex;align-items:center;height:58px;border:1px solid var(--lm-line);border-radius:32px;background:#F4F4F5;padding:0 8px 0 17px;gap:8px}

@@ -1,13 +1,15 @@
 /* Week 9 approved semantic tokens. Light default; Dark uses the same roles. */
 :root{
+  /* Font asset alias; not an additional semantic design token. */
+  --font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;
   --color-neutral:#F4F4F5;--color-surface:#FFFFFF;--color-on-surface:#111111;
   --color-secondary:#6B6B70;--color-border:#6B6B70;--color-primary:#111111;
-  --color-primary-pressed:#333333;--color-disabled:#E8E8EA;--color-error:#B3261E;
-  --type-headline-lg:700 28px/36px Pretendard,sans-serif;
-  --type-headline-md:700 22px/30px Pretendard,sans-serif;
-  --type-body-md:400 16px/24px Pretendard,sans-serif;
-  --type-label-md:600 14px/20px Pretendard,sans-serif;
-  --type-body-sm:400 12px/16px Pretendard,sans-serif;
+  --color-primary-pressed:#333333;--color-disabled:#E8E8EA;--color-error:#D13D3D;
+  --type-headline-lg:700 28px/36px var(--font-family);
+  --type-headline-md:700 22px/30px var(--font-family);
+  --type-body-md:400 16px/24px var(--font-family);
+  --type-label-md:600 14px/20px var(--font-family);
+  --type-body-sm:400 12px/16px var(--font-family);
   --space-xs:4px;--space-sm:8px;--space-md:12px;--space-lg:16px;--space-xl:24px;--space-2xl:32px;
   --rounded-sm:8px;--rounded-md:12px;--rounded-lg:16px;
   --shadow-sm:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
@@ -16,7 +18,7 @@
 [data-theme="dark"]{
   --color-neutral:#111111;--color-surface:#1B1B1D;--color-on-surface:#F4F4F5;
   --color-secondary:#B4B4B8;--color-border:#8A8A8E;--color-primary:#F4F4F5;
-  --color-primary-pressed:#D4D4D8;--color-disabled:#333333;--color-error:#FFB4AB;
+  --color-primary-pressed:#D4D4D8;--color-disabled:#333333;--color-error:#D73535;
   --shadow-sm:0 1px 2px rgba(0,0,0,.24),0 8px 24px rgba(0,0,0,.36);
   --shadow-md:0 12px 40px rgba(0,0,0,.48);
 }

@@ -155,8 +155,8 @@
 .cf-itembody{display:flex;align-items:center;gap:12px;padding:14px 16px 16px}
 .cf-itemtext{min-width:0;flex:1}
 .cf-itemtext h3{margin:0;font-size:16px;font-weight:700;letter-spacing:-.3px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cf-itemdesc{margin:3px 0 0;font-size:13.5px;color:#8A8A8E;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cf-itemmeta{display:flex;align-items:center;gap:4px;margin:8px 0 0;font-size:12.5px;color:#8A8A8E;min-width:0}
+.cf-itemdesc{margin:3px 0 0;font-size:13.5px;color:var(--color-secondary);line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cf-itemmeta{display:flex;align-items:center;gap:4px;margin:8px 0 0;font-size:12.5px;color:var(--color-secondary);min-width:0}
 .cf-itemmeta .icon{flex:none;width:14px;height:14px;color:#6B6B70}
 .cf-itemmeta .icon[viewBox] path{stroke-width:2}
 .cf-itemmeta span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -230,7 +230,7 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 /* 이름 가운데 · 개수는 회색 알약 */
 .cf-meta{flex-direction:column;align-items:center;gap:6px;margin:12px 0 0;text-align:center}
 .cf-title{max-width:100%;font-size:16.5px;font-weight:600}
-.cf-count{padding:2px 10px;border-radius:999px;background:#E9E9EC;font-size:12.5px;font-weight:500;color:#8A8A8E;line-height:1.6}
+.cf-count{padding:2px 10px;border-radius:999px;background:#E9E9EC;font-size:12.5px;font-weight:500;color:var(--color-secondary);line-height:1.6}
 
 /* ---------- v3: 폴더 폭 줄임 · 사진은 폴더 안쪽 · 개수는 이름 옆 · 작은 필터 칩 ---------- */
 .cf-grid{padding:0 24px;column-gap:32px}
@@ -256,7 +256,7 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 .cf-slot2{left:50%;top:8%}
 .cf-meta{position:absolute;left:10%;right:8%;bottom:10%;z-index:7;justify-content:flex-start;align-items:baseline;gap:5px;margin:0;text-align:left}
 .cf-title{font-size:15px;font-weight:600;letter-spacing:-.3px;color:var(--t-ink)}
-.cf-count{font-size:13px;color:#8A8A8E}
+.cf-count{font-size:13px;color:var(--color-secondary)}
 @media(max-width:360px){.cf-grid{column-gap:12px;padding:0 2px}.cf-title{font-size:14px}.cf-count{font-size:12.5px}}
 
 /* ---------- v5: 줄 간격 넓힘 · 사진 작게 · 새 폴더도 같은 유리 폴더 모양 ---------- */
@@ -338,9 +338,9 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 .cfpage .libsearch{height:50px;gap:10px;padding:0 11px 0 14px;border-radius:24px;border:1px solid rgba(255,255,255,.88);background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)}
 .cfpage .libsearch>.icon{width:20px;height:20px;color:#17191B;stroke-width:1.8}
 .cfpage .libsearch input{font-size:13px;color:#292929}
-.cfpage .libsearch input::placeholder{color:#8A8A8E}
+.cfpage .libsearch input::placeholder{color:var(--color-secondary)}
 .cfpage .libsearch .iconbtn{width:28px;height:28px}
-.cfpage .libsearch .iconbtn .icon{width:16px;height:16px;color:#8A8A8E}
+.cfpage .libsearch .iconbtn .icon{width:16px;height:16px;color:var(--color-secondary)}
 .libgo{flex:none;padding:0;border:0;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.62);color:#17191B;box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)}
 .libgo .icon{width:20px;height:20px;stroke-width:1.8}
 .libgo:hover{filter:none;background:#fff}
