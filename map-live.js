@@ -21,28 +21,16 @@
     {id:9, lat:37.7720, lng:128.9470, kind:'walk', image:'img/sea-room.jpg'}  // 바다 앞 작은 숙소 · 강릉 (예시 위치)
   ];
   const cats = [['all','전체'],['eat','맛집'],['cafe','카페'],['event','전시·팝업'],['walk','산책'],['shop','쇼핑']];
-  // Use the same line style as the app navigation on every platform.
-  const categoryPaths = {
-    all: paths.spark,
-    eat: paths.eat,
-    cafe: paths.coffee,
-    event: paths.event,
-    walk: paths.walk,
-    shop: paths.shop
+  // Figma: Pinmap / Category icon (24px, same geometry for both states).
+  // App category keys stay unchanged so existing filters and saved places are preserved.
+  const categoryGlyphs = {
+    eat: "<g class=\"lm-category-face\"><circle cx=\"14\" cy=\"12\" r=\"7\"/></g><path d=\"M4 3v18 M2 3v5a2 2 0 0 0 4 0V3\"/><path class=\"lm-category-detail\" d=\"M14 8a4 4 0 0 1 0 8\"/>",
+    cafe: "<g class=\"lm-category-face\"><path d=\"M4 5h12v9a6 6 0 0 1-12 0Z\"/></g><path d=\"M16 7h2a3 3 0 0 1 0 6h-2 M3 22h15\"/><path class=\"lm-category-detail\" d=\"M7 8h6\"/>",
+    event: "<g class=\"lm-category-face\"><path d=\"M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4Z\"/></g><path class=\"lm-category-detail\" d=\"M16 7v2 M16 11v2 M16 15v2 M7 9h5 M7 13h3\"/>",
+    walk: "<g class=\"lm-category-face\"><path d=\"M12 3a4 4 0 0 0-4 4 4 4 0 0 0 0 8h8a4 4 0 0 0 0-8 4 4 0 0 0-4-4Z\"/></g><path d=\"M12 15v6 M8 21h8\"/><path class=\"lm-category-detail\" d=\"M12 7v6 M9 10l3 2 3-2\"/>",
+    shop: "<g class=\"lm-category-face\"><path d=\"M8 3l-6 4 3 5 3-2v11h8V10l3 2 3-5-6-4a4 4 0 0 1-8 0Z\"/></g><path class=\"lm-category-detail\" d=\"M9 6a5 5 0 0 0 6 0\"/>"
   };
-  const categorySolidPaths = {
-    all: paths.spark,
-    eat: 'M3 3h2v5h1V3h2v5h1V3h2v5a4 4 0 0 1-3 3.87V21H6v-9.13A4 4 0 0 1 3 8V3Z M20 3v18h-2v-8h-3V9c0-3.5 2-6 5-6Z',
-    cafe: 'M4 4h12v1h2a4 4 0 0 1 0 8h-2v1a5 5 0 0 1-10 0V6H4V4Z M16 7v4h2a2 2 0 0 0 0-4h-2Z M3 20h16v2H3Z',
-    event: 'M3 5h18v4a3 3 0 0 0 0 6v4H3v-4a3 3 0 0 0 0-6V5Z M15 7v3h2V7h-2Z M15 11v2h2v-2h-2Z M15 14v3h2v-3h-2Z',
-    walk: 'M11 15H8a4 4 0 0 1-1-7 5 5 0 0 1 10 0 4 4 0 0 1-1 7h-3v7h-2v-7Z',
-    shop: 'M8 8V6a4 4 0 0 1 8 0v2h3l-1 13H6L5 8h3Z M10 8h4V6a2 2 0 0 0-4 0v2Z'
-  };
-  const categoryIcon = (kind, stableShape=false) => {
-    const outline=stableShape ? (categorySolidPaths[kind] || paths.pin) : (categoryPaths[kind] || paths.pin);
-    const solid=stableShape ? outline : (categorySolidPaths[kind] || paths.pin);
-    return `<svg class="lm-category-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="lm-category-line" d="${outline}"/><path class="lm-category-solid" fill-rule="evenodd" d="${solid}"/></svg>`;
-  };
+  const categoryIcon = kind => `<svg class="lm-category-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${kind==='all'?`<path class="lm-category-all" d="${paths.spark}"/>`:categoryGlyphs[kind] || `<path d="${paths.pin}"/>`}</svg>`;
   const localPhoto = kind => PM_ENV.development ? PM_ENV.placeholderImage : ({eat:'img/brunch.jpg',cafe:'img/cafe.jpg',event:'img/exhibit.jpg',walk:'img/park.jpg',shop:'img/lamp.jpg'})[kind] || 'img/park.jpg';
   const categoryLabel = tag => ({station:'역',stop:'정류장',park:'공원',restaurant:'식당',cafe:'카페',museum:'박물관',gallery:'갤러리',shop:'상점',water:'호수',residential:'주거 지역'})[tag] || tag;
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
@@ -64,7 +52,7 @@
         <div class="lm-location-header"><button type="button" class="lm-location-title" data-lm="location-menu" aria-expanded="${locationMenuOpen}" aria-controls="lm-location-menu">${icon('pin')}<span>${safe(mapLocationName ? (settings.placeLabels?.[mapLocationName] || mapLocationName) : '현재 위치')}</span>${icon('chevron')}</button><button type="button" class="lm-header-search" data-lm="toggle-search" aria-label="지도에서 장소 검색" aria-expanded="${searchOpen}">${icon('search')}</button></div>
         <div class="lm-location-menu" id="lm-location-menu" ${locationMenuOpen?'':'hidden'}><button type="button" data-lm="choose-current" class="${mapLocationName?'':'is-active'}">현재 위치</button>${myPlaces().map(name=>`<button type="button" data-lm="choose-saved-location" data-location-name="${safe(name)}" class="${mapLocationName===name?'is-active':''}">${safe(settings.placeLabels?.[name] || name)}<small>${safe(name)}</small></button>`).join('')}<button type="button" data-action="placesheet">위치 추가·수정</button></div>
         <div class="lm-search-row cfpage${searchOpen?' is-open':''}" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><button type="button" class="lm-search-close" data-lm="toggle-search" aria-label="검색창 닫기">${icon('close')}</button><input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="어디로 가고 싶으세요?" value="${safe(searchQuery)}" autocomplete="off" ${searchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button><button type="submit" class="libgo" aria-label="장소 검색">${icon('search')}</button></form></div>
-        <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,cats.findIndex(([id])=>id===category))*100}%">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id,true)}</span><b>${label}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
+        <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,cats.findIndex(([id])=>id===category))*100}%">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
       </header>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
@@ -92,12 +80,13 @@
     const photo=safe(place.image||localPhoto(place.kind));
     return L.divIcon({className:`lm-photo-marker${expanded?' is-selected':''}`,
       html:`<span class="lm-place-badge"><span class="lm-badge-image"><img class="lm-badge-backdrop" src="${photo}" alt=""><img class="lm-badge-photo" src="${photo}" alt=""></span><span class="lm-badge-category">${categoryIcon(place.kind)}</span></span>`,
-      iconSize:expanded?[86,92]:[60,60],iconAnchor:expanded?[43,86]:[30,30]});
+      iconSize:[60,60],iconAnchor:[30,30]});
   }
   function updateMarker(entry,expanded) {
-    entry.marker.setIcon(markerIcon(entry.place,expanded));
+    // Keep the existing photo/SVG nodes and Leaflet anchor so CSS can interpolate.
     entry.marker.setZIndexOffset(expanded?2000:0);
     const element=entry.marker.getElement();
+    element?.classList.toggle('is-selected',expanded);
     element?.setAttribute('aria-label',`${entry.place.title} · ${entry.place.category} · 장소 정보 보기`);
     element?.setAttribute('aria-current',String(expanded));
     element?.setAttribute('aria-controls','lm-selected-place');
@@ -200,7 +189,7 @@
   }
   function expandPlace(place,moveMap=true,scrollCard=true) {
     const key=placeKey(place),entry=markerEntries.get(key);if(!entry)return;
-    clearSelection();expandedKey=key;updateMarker(entry,true);
+    if(expandedKey!==key){clearSelection();expandedKey=key;updateMarker(entry,true);}
     if(scrollCard){
       const card=[...document.querySelectorAll('.lm-carousel-card')].find(node=>node.dataset.placeKey===key);
       card?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
