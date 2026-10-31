@@ -387,7 +387,7 @@
   document.addEventListener('error',event=>{if(event.target.matches?.('.lm-badge-image img'))event.target.hidden=true;},true);
   document.addEventListener('keydown',event=>{if(page==='map'&&event.key===' '&&event.target.closest('.lm-photo-marker')){event.preventDefault();event.target.closest('.lm-photo-marker').click();}});
   document.addEventListener('input',event=>{if(event.target.matches('#lm-search input'))$('#lm-search [data-lm="clear-search"]').hidden=!event.target.value;});
-  document.addEventListener('submit',event => { if(event.target.id==='lm-search'){event.preventDefault();searchPlaces(new FormData(event.target).get('q').trim());} });
+  document.addEventListener('submit',event => { if(event.target.id==='lm-search'){event.preventDefault();const form=event.target;const q=new FormData(form).get('q').trim();window.PinmapButton.run(form.querySelector('[type="submit"]'),()=>searchPlaces(q),'장소 검색 중');} });
   window.addEventListener('pinmap:place-changed',async event=>{
     if(page!=='map'||!liveMap||PM_ENV.development)return;
     const name=event.detail?.name;

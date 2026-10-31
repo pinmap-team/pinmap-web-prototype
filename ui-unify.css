@@ -1,5 +1,5 @@
 /* Shared header rhythm for the map and saved-content pages. */
-.libpage,.live-map{--pm-header-bg:var(--t-bg,#F4F4F5);--pm-header-text:var(--t-ink,#111);--pm-header-muted:var(--t-sub,#8A8A8E);font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif}
+.libpage,.live-map{--pm-header-bg:var(--t-bg,#F4F4F5);--pm-header-text:var(--t-ink,#111);--pm-header-muted:var(--t-sub,#8A8A8E);font-family:var(--font-family)}
 .libpage{color:var(--pm-header-text)}
 .live-map .lm-header{padding:var(--top) var(--gutter) 0;background:var(--pm-header-bg);border-bottom-color:var(--t-line,#E8E8EA)}
 .live-map .lm-header .lm-location-header,.libpage .libhead{height:40px;min-height:40px;margin:0 0 var(--space-md,12px);padding:0 48px 0 0}
@@ -10,9 +10,9 @@
 .cfpage .libsearch,.live-map .lm-header .lm-search-row .libsearch{height:50px;gap:10px;padding:0 11px 0 14px;border-radius:24px;border:1px solid rgba(255,255,255,.88);background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none!important}
 .cfpage .libsearch>.icon,.live-map .lm-header .lm-search-row .libsearch>.icon{width:20px;height:20px;color:#17191B;stroke-width:1.8}
 .cfpage .libsearch input,.live-map .lm-header .lm-search-row .libsearch input{font-size:15px;color:#292929}
-.cfpage .libsearch input::placeholder,.live-map .lm-header .lm-search-row .libsearch input::placeholder{color:#8A8A8E}
+.cfpage .libsearch input::placeholder,.live-map .lm-header .lm-search-row .libsearch input::placeholder{color:var(--color-secondary)}
 .cfpage .libsearch .iconbtn,.live-map .lm-header .lm-search-row .libsearch .iconbtn{width:28px;height:28px}
-.cfpage .libsearch .iconbtn .icon,.live-map .lm-header .lm-search-row .libsearch .iconbtn .icon{width:16px;height:16px;color:#8A8A8E}
+.cfpage .libsearch .iconbtn .icon,.live-map .lm-header .lm-search-row .libsearch .iconbtn .icon{width:16px;height:16px;color:var(--color-secondary)}
 .cfpage .libsearch:focus-within,.live-map .lm-header .lm-search-row .libsearch:focus-within{box-shadow:none!important;outline:1.5px solid var(--t-ink,#111)}
 .cfpage .libsearch .libgo,.live-map .lm-header .lm-search-row .libgo{box-shadow:none!important}
 .live-map .lm-header .lm-search-row .libgo{width:20px;height:20px;min-height:20px;border:0!important;background:transparent!important;border-radius:0;box-shadow:none!important;-webkit-backdrop-filter:none;backdrop-filter:none}
@@ -73,12 +73,12 @@
 .live-map .lm-carousel-top{display:flex;align-items:center;gap:8px;min-width:0}
 .live-map .lm-carousel-top strong{display:block;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:750;line-height:1.3}
 .live-map button.lm-carousel-heart{display:grid;place-items:center;flex:none;width:25px;height:25px;padding:0;color:#2B2B2B;background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;cursor:pointer}
-.live-map button.lm-carousel-heart.is-active{color:#EF4D4D}
+.live-map button.lm-carousel-heart.is-active{color:var(--color-error)}
 .live-map .lm-carousel-heart svg{width:24px;height:24px;stroke-width:1.8}
 .live-map .lm-carousel-heart.is-active svg{fill:currentColor}
 .live-map .lm-carousel-bottom{min-width:0;margin-top:auto;padding-right:25px}
 .live-map .lm-carousel-bottom small,.live-map .lm-carousel-bottom p{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.live-map .lm-carousel-bottom small{color:#868686;font-size:11px;line-height:1.35}
+.live-map .lm-carousel-bottom small{color:var(--color-secondary);font-size:11px;line-height:1.35}
 .live-map .lm-carousel-bottom p{margin:3px 0 0;color:#242424;font-size:12px;font-weight:750;line-height:1.35}
 .live-map .lm-carousel-copy button.lm-carousel-detail{position:absolute;right:10px;bottom:9px;display:grid;place-items:center;width:28px;height:28px;padding:0;background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .live-map .lm-carousel-detail svg{width:16px;height:16px}

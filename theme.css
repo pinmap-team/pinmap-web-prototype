@@ -1,19 +1,19 @@
-/* 핀맵 테마: 블랙 + 화이트 · 심플한 레이아웃 · 반투명 유리 (맨 마지막에 불러와요)
-   이 파일을 index.html에서 빼면 레이아웃 효과는 원래대로 돌아가요. */
+/* Legacy aliases and glass material. tokens.css is the source of design values.
+   design-alignment.css is the final shared UI rule layer in app.html. */
 :root{
-  --t-bg:#F4F4F5;          /* 화면 배경 */
-  --t-card:#FFFFFF;        /* 카드 */
-  --t-ink:#111111;         /* 기본 글자 · 주요 버튼 */
-  --t-sub:#8A8A8E;         /* 보조 글자 */
-  --t-line:#E8E8EA;        /* 구분선 */
-  --t-soft:#EFEFF1;        /* 연한 회색 칸 */
+  --t-bg:var(--color-neutral);          /* 화면 배경 */
+  --t-card:var(--color-surface);        /* 카드 */
+  --t-ink:var(--color-on-surface);         /* 기본 글자 · 주요 버튼 */
+  --t-sub:var(--color-secondary);         /* 보조 글자 */
+  --t-line:var(--color-disabled);        /* 구분선 */
+  --t-soft:var(--color-neutral);        /* 연한 회색 칸 */
   --t-glass:rgba(255,255,255,.72);
   --t-glass-strong:rgba(255,255,255,.86);
   --t-blur:saturate(1.8) blur(20px);
-  --t-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
-  --t-shadow-lg:0 12px 40px rgba(0,0,0,.12);
-  --pm-ink:#111111;--pm-key:#111111;--pm-deep:#111111;--pm-sub:#8A8A8E;--pm-line:#E8E8EA;
-  --md-sys-color-surface:#F4F4F5;--md-sys-color-on-surface:#111111;--md-sys-color-on-surface-variant:#6B6B70;
+  --t-shadow:var(--shadow-sm);
+  --t-shadow-lg:var(--shadow-md);
+  --pm-ink:var(--color-on-surface);--pm-key:var(--color-primary);--pm-deep:var(--color-primary);--pm-sub:var(--color-secondary);--pm-line:var(--color-disabled);
+  --md-sys-color-surface:var(--color-neutral);--md-sys-color-on-surface:var(--color-on-surface);--md-sys-color-on-surface-variant:var(--color-secondary);
 }
 body,#onboarding,.ob-screen{background:var(--t-bg)!important;color:var(--t-ink)}
 .layout{border-inline-color:transparent!important}

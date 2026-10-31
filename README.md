@@ -2,6 +2,10 @@
 
 사용자경험디자인II (26-2) 팀의 모바일 웹 프로토타입입니다. 현재 `main` 브랜치는 [Vercel 공개 화면](https://pinmap-prototype.vercel.app/)으로 자동 배포됩니다.
 
+## 디자인 기준
+
+현재 원본은 [DESIGN.md](DESIGN.md), [tokens.css](tokens.css), [컴포넌트 계약 목차](components/index.md)입니다. 서체는 Pretendard이며 웹 로딩 이름은 Pretendard Variable입니다. 공통 보정은 design-alignment.css, [9주차 적용·검증 기록](docs/wk9-verification.md)에서 로컬 적용·Figma·배포·독립 평가 상태를 구분합니다.
+
 ## 실행
 
 별도 빌드 없이 이 폴더에서 `python3 -m http.server 8080`을 실행하고 `http://localhost:8080/`을 여세요. `index.html`은 402×874 화면 프레임을 제공하고, 실제 앱은 `app.html`에서 실행됩니다.
@@ -23,7 +27,7 @@
 
 ## 검증
 
-`node --test tests/course.test.cjs`로 코스 저장·재편집·새로고침 유지, 기존 데이터 이전, 저장 실패 처리를 확인합니다.
+`node --test tests/*.test.cjs`로 코스 저장·재편집·새로고침 유지, 기존 데이터 이전, 저장 실패 처리를 확인합니다.
 
 
 ## 실제 콘텐츠 실험 브랜치

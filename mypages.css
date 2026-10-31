@@ -27,7 +27,7 @@
 #sheet.confirmpop .handle,#sheet.confirmpop .dialoghead{display:none!important}
 .cfpop{text-align:center}
 .cfpop b{display:block;font-size:18px;font-weight:700;letter-spacing:-.4px}
-.cfpop p{margin:8px 0 20px;font-size:14px;line-height:1.5;color:#8A8A8E;word-break:keep-all}
+.cfpop p{margin:8px 0 20px;font-size:14px;line-height:1.5;color:var(--color-secondary);word-break:keep-all}
 .cfpopbtns{display:flex;gap:8px}
 .cfpopbtns button{flex:1;min-height:50px;border-radius:999px;font-size:15px;font-weight:700}
 .cfok{background:#EBEBED;color:#6B6B70}
@@ -35,7 +35,7 @@
 /* 저장하는 방법 (10/18 밤): 제목 + 서브 문구, 순서 영역 뒤 그라데이션 없이, 버튼 더 높고 덜 둥글게, 알림 버튼 숨김 */
 .howtobody.ob-screen::before,.howtobody.ob-screen::after{display:none!important;content:none!important}
 .howtobody .ob-title{font-size:26px!important;margin:8px 0 6px!important}
-.howtobody .howtosub{margin:0;font-size:15px;color:#8A8A8E}
+.howtobody .howtosub{margin:0;font-size:15px;color:var(--color-secondary)}
 .howtobody .ob-flowcard{background:#fff!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid #ECECEE!important;box-shadow:none!important}
 .howtobody .ob-mock{background:#F6F6F7!important;border:0!important}
 .howtobody .ob-next{min-height:60px!important;border-radius:16px!important}
@@ -53,14 +53,14 @@ body:has(#sharedemo) .bottomnav,body.pushdemo-open .bottomnav{display:none!impor
 .main:has(.profilecard) .profilecard{display:flex;align-items:center;gap:14px;width:100%;min-height:104px;margin:0 0 20px;padding:20px;border:1px solid #E8E8EA;border-radius:24px;background:#fff;box-shadow:none;text-align:left}
 .profilecard .mpinfo{min-width:0;flex:1}
 .profilecard .mpinfo b{font-size:20px}
-.profilecard .mpinfo small{display:block;margin-top:6px;font-size:12px;color:#8A8A8E}
+.profilecard .mpinfo small{display:block;margin-top:6px;font-size:12px;color:var(--color-secondary)}
 .main:has(.profilecard) .my-shortcuts{border:0;margin-bottom:8px}
 .main:has(.profilecard) .my-section{margin:0;padding:14px 0;border:0;border-top:1px solid #DCDCE0;border-radius:0;background:transparent;box-shadow:none}
 .main:has(.profilecard) .my-section .mrow{padding-inline:4px;border:0;background:none;border-radius:0;box-shadow:none;min-height:54px}
 .account-summary{display:flex;align-items:center;gap:14px;padding:12px 0 24px}
 .account-summary .pavatar{width:56px;height:56px;flex:none}
 .account-summary b{display:block;font-size:20px}
-.account-summary small{display:block;margin-top:6px;font-size:13px;color:#8A8A8E}
+.account-summary small{display:block;margin-top:6px;font-size:13px;color:var(--color-secondary)}
 .account-section{border-top:1px solid #DCDCE0;padding:12px 0}
 .account-section .mrow{padding-inline:4px;background:none;box-shadow:none;border-radius:0}
 .account-section .syncbtn{margin-block:8px;box-shadow:none;background:transparent;border-radius:0}

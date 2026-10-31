@@ -1,0 +1,120 @@
+/* Week 9 integration layer. Semantic values live only in tokens.css.
+   Geometry/material exceptions are listed in DESIGN.md; no layout redesign. */
+:root{--gutter:var(--space-xl);--gap-title:var(--space-xl);--gap-section:var(--space-2xl)}
+body{font:var(--type-body-md)}
+button,input,select,textarea,svg text,.libpage,.live-map,#login-screen,.ob-phone{font-family:var(--font-family)}
+:where(input,textarea)::placeholder{color:var(--color-secondary);opacity:1}
+:where(.muted,.hint,.dthint,.eshint,.escount,.nttime,.cf-count,.cf-sortlead,.cf-itemmeta){color:var(--color-secondary)}
+
+/* Five complete type roles: use label-md for compact card titles. */
+.heading h1,.libhead h1,.toptitle,.dt .dthtitle h1,.ob-title{font:var(--type-headline-lg)}
+.live-map .lm-header .lm-location-title,.libpage .libhead h1{font:var(--type-headline-lg)}
+.sectionhead h2,.libsection h2,.mysec>h2,.dtsec>h2,.dtsechead h2,.eshead h2,.nthead h2,.dialoghead h2{font:var(--type-headline-md)}
+.dtsum p,.dtmemobox,.field input,.field textarea,.esinput input,.esinput textarea,.ob-desc{font:var(--type-body-md)}
+.cfpage .libsearch input,.live-map .lm-header .lm-search-row .libsearch input{font:var(--type-body-md)}
+.cf-title,.cf-itemtext h3,.cf-picktext b,.nttext b,.ntsheet .nttext b,.dtcat,.dtact,.dtcol,.dtghost,.dtprimary,.essubmit,.escancel,.eschip,.eslabel,.dtsum h2,.homecategories .prefchip,.cfpage .libchip,.filled,.tonal,.outlined,.textbtn,.my-shortcuts button{font:var(--type-label-md)}
+.cf-count,.cf-itemdesc,.cf-itemmeta,.cf-saved-time,.escount,.eshint,.dthint,.nttime,.ntbody,.ntsheet .ntbody,.dthtitle small,.live-map .lm-location-menu small,.live-map .lm-carousel-bottom small,.home-share-note{font:var(--type-body-sm)}
+.live-map .lm-location-menu button,.live-map .lm-carousel-top strong,.live-map .lm-carousel-bottom p{font:var(--type-label-md)}
+.live-map .lm-header .lm-categories button{color:var(--color-secondary)}
+.live-map .lm-header .lm-categories b{font:var(--type-body-sm)}
+.live-map .lm-header .lm-categories button[aria-pressed="true"]{color:var(--color-primary)}
+.bottomnav .pm-nav-main .navitem>span.pm-nav-label{font:var(--type-body-sm)}
+.mainpick .picktext b{font:var(--type-headline-md)}
+.mainpick .picktext small{font:var(--type-label-md)}
+
+/* Shared internal rhythm; carousel/photo/folder anchor geometry stays intact. */
+.cf-grid{column-gap:var(--space-xl);row-gap:var(--space-xl);padding-inline:var(--space-xs)}
+.cf-items,.esbody{gap:var(--space-xl)}
+.cf-meta,.my-shortcuts button,.live-map .lm-header .lm-location-title{gap:var(--space-sm)}
+.cf-itembody{padding:0 var(--space-lg) var(--space-lg);gap:var(--space-sm)}
+.my-shortcuts{padding:var(--space-lg) 0}
+.live-map .lm-location-menu{padding:var(--space-sm)}
+.live-map .lm-location-menu button{min-height:48px;padding:var(--space-sm) var(--space-md)}
+.live-map .lm-floating-actions{gap:var(--space-md)}
+.live-map .lm-carousel-copy{padding:var(--space-sm) var(--space-md)}
+.live-map .lm-carousel-top{gap:var(--space-xs)}
+.live-map .lm-carousel-bottom{padding-right:44px}
+.live-map .lm-carousel-bottom p{margin:var(--space-xs) 0 0;color:var(--color-on-surface)}
+.live-map .lm-carousel-bottom small{color:var(--color-secondary)}
+.cfpage .libsearch{gap:var(--space-sm);padding:0 var(--space-sm) 0 var(--space-lg)}
+.field input,.field textarea,.esinput.area{padding:var(--space-md)}
+
+/* Regular surfaces use three radii. Pill search, circles and folder silhouettes are geometric exceptions. */
+.libcard,.card,.gcard,.mycard,.infobox,.mgroup,.cf-item,.live-map .lm-carousel-card,.esinput,.esselect{border-radius:var(--rounded-md)}
+.libart,.cf-photo,.cf-pickthumb,.ntthumb,.field input,.field textarea,.field select,.live-map .lm-location-menu button{border-radius:var(--rounded-sm)}
+.forhero,.live-map .lm-location-menu,.live-map .lm-carousel-empty,#sheet.cfcenter,dialog{border-radius:var(--rounded-lg)}
+.libcard{padding:var(--space-sm) var(--space-sm) var(--space-md)}
+.mgroup{padding:var(--space-sm) var(--space-lg)}
+.mgroup>h2{margin:var(--space-md) 0 var(--space-xs)}
+.libcard,.card,.gcard,.mycard,.infobox,.mgroup,.cf-item,.live-map .lm-round,.live-map .lm-course-button{box-shadow:var(--shadow-sm)}
+.live-map .lm-carousel{filter:none}
+.live-map .lm-carousel-card{box-shadow:var(--shadow-sm)}
+.live-map .lm-header{box-shadow:var(--shadow-sm)}
+.live-map .lm-location-menu,.live-map .lm-search-results,#sheet,dialog{box-shadow:var(--shadow-md)}
+.live-map .lm-header .lm-location-title,.live-map .lm-header .lm-header-search{box-shadow:none}
+
+/* Visible icon sizes stay fixed. Real 44px controls, no overlapping pseudo targets. */
+.live-map .lm-header .lm-location-header{height:44px;min-height:44px}
+.live-map .lm-header .lm-header-search,.live-map .lm-header .lm-search-row{width:44px;height:44px}
+.live-map .lm-header .lm-search-row.is-open{width:calc(100% - var(--gutter)*2)}
+.live-map .lm-header .lm-search-row .libsearch{height:44px;gap:var(--space-xs);padding:0 44px 0 0}
+.live-map .lm-header .lm-search-row .libsearch input{height:42px;min-width:0}
+.live-map .lm-header .lm-search-row .lm-search-close{width:44px;height:42px;flex:0 0 44px}
+.live-map .lm-header .lm-search-row .libgo{width:44px;height:44px;right:-.667px;top:-.667px}
+.live-map .lm-header .lm-search-row .lm-search-close{height:44px;position:relative;top:-1px}
+.live-map .lm-header .lm-header-search svg,.live-map .lm-header .lm-search-row .libgo svg{width:24px;height:24px}
+.live-map .lm-header .lm-search-row [data-lm="clear-search"]{min-width:44px;min-height:44px;padding:0}
+.live-map button.lm-carousel-heart{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;margin-top:-8px;margin-bottom:-8px}
+.live-map .lm-carousel-top{align-items:center;min-height:28px}
+.live-map .lm-carousel-top strong{min-width:0;max-height:40px}
+.live-map .lm-carousel-copy button.lm-carousel-detail{width:44px;height:44px;right:0;bottom:0}
+.live-map .lm-carousel-copy button.lm-carousel-detail svg{width:16px;height:16px}
+.live-map .lm-carousel-copy{justify-content:space-between}
+.live-map .lm-carousel-bottom{margin-top:var(--space-xs)}
+.live-map .lm-result-row,.live-map .lm-results-head button,.dtcopy,.dtmemoedit,.dtmap-open,.esclose,.ntclose,.cf-delfolder,.cf-textbtn,.cf-pickbtn,.accsync,.libchip{min-width:44px;min-height:44px}
+.live-map .lm-header .lm-categories button{min-height:75px}
+
+/* Semantic red: icon/badge use only. Text stays dark for readable contrast. */
+.live-map button.lm-carousel-heart.is-active{color:var(--color-error)}
+.strip-item.soon b,.cnbadge.soon,.calbadge.soon{background:var(--color-error);color:var(--color-neutral)}
+:root:not([data-theme="dark"]) .strip-item.soon b,:root:not([data-theme="dark"]) .cnbadge.soon,:root:not([data-theme="dark"]) .calbadge.soon{color:var(--color-on-surface)}
+.error,.eserror{color:var(--color-on-surface);border-inline-start:3px solid var(--color-error);padding-inline-start:var(--space-sm)}
+
+/* Shared interaction states. Native disabled + async guard handle behavior. */
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex="0"]:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+.libsearch:focus-within{outline:2px solid var(--color-primary);outline-offset:2px}
+.libsearch input:focus-visible{outline:none}
+button:disabled,button[aria-disabled="true"],input:disabled,textarea:disabled{cursor:not-allowed;opacity:.55}
+button:disabled:hover{filter:none}
+button:not(:disabled):not([aria-busy="true"]):active{filter:brightness(.90)}
+.filled:not(:disabled):active,.cm-next:not(:disabled):active,.pm-done:not(:disabled):active,.ob-next:not(:disabled):active{background:var(--color-primary-pressed)!important}
+button[aria-busy="true"]{position:relative;cursor:wait;opacity:1}
+button[aria-busy="true"]>svg{visibility:hidden}
+button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto;width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:pm-busy .7s linear infinite}
+@keyframes pm-busy{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){button[aria-busy="true"]::after{animation:none}}
+
+.live-map .lm-header .lm-categories button{gap:var(--space-sm);padding:var(--space-sm) 0 var(--space-md)}
+/* Home controls: keep the 52px strip; reserve a separate, non-overlapping close column. */
+.strip{align-items:center;gap:var(--space-sm);padding:var(--space-xs) var(--gutter);background:var(--color-disabled)}
+.strip-roll,.strip-item{height:44px}
+.strip-item{font:var(--type-label-md)}
+.strip-item b{font:var(--type-body-sm);padding:var(--space-xs) var(--space-sm)}
+.strip-hide{position:static;flex:0 0 112px;min-height:44px;padding:0;font:var(--type-body-sm);color:var(--color-secondary)}
+.homecategories .prefchip,.hwhead .textbtn,.cnrow,.cm-prev,.cm-next,.calnav button{min-height:44px}
+.calnav button{min-width:44px}
+.weekstrip{gap:0}
+.hwhead h2,.calhead h2{font:var(--type-headline-md)}
+.hwhead .textbtn,.cntext{font:var(--type-label-md)}
+.wday small,.cnbadge,.calbadge{font:var(--type-body-sm)}
+.hwidget,.calbox{border-radius:var(--rounded-lg);padding:var(--space-lg);box-shadow:var(--shadow-sm)}
+.calbox .calnav{gap:var(--space-xs)}
+.homecategories{grid-auto-rows:minmax(44px,auto)}
+.live-map .lm-carousel-top strong,.live-map button.lm-carousel-heart,.live-map .lm-carousel-copy button.lm-carousel-detail{color:var(--color-on-surface)}
+.live-map button.lm-carousel-heart.is-active{color:var(--color-error)}
+.filled:disabled,.cm-next:disabled,.pm-done:disabled,.ob-next:disabled{background:var(--color-disabled)!important;color:var(--color-secondary)!important;opacity:1}
+.cfpage .libchip{min-height:44px;height:44px}
+.live-map .lm-header .lm-categories .selected b{font:var(--type-body-sm)}
+.dtdelete{color:var(--color-on-surface);border:1px solid var(--color-error);border-radius:var(--rounded-sm);padding:var(--space-sm) var(--space-lg);min-height:44px}
+
+.error:empty,.eserror:empty{display:none}
