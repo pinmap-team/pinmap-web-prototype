@@ -46,13 +46,13 @@
 .live-map .lm-location-menu small{font-size:11px;color:var(--t-secondary,#777)}
 .live-map .lm-header .lm-search-row{position:absolute;left:auto;right:var(--gutter);top:var(--top);z-index:725;width:40px;height:40px;overflow:hidden;opacity:0;visibility:hidden;pointer-events:none;transform-origin:right center;transition:width .36s cubic-bezier(.22,1,.36,1),opacity .18s ease,visibility 0s linear .36s}
 .live-map .lm-header .lm-search-row.is-open{width:calc(100% - 2 * var(--gutter));opacity:1;visibility:visible;pointer-events:auto;transition:width .36s cubic-bezier(.22,1,.36,1),opacity .18s ease}
-.live-map .lm-header .lm-search-row .libsearch{width:100%;height:40px;gap:8px;padding:0 9px;border:1px solid var(--t-line,#E8E8EA);border-radius:20px;white-space:nowrap}
+.live-map .lm-header .lm-search-row .libsearch{position:relative;width:100%;height:40px;gap:8px;padding:0 46px 0 9px;border:1px solid var(--t-line,#E8E8EA);border-radius:20px;white-space:nowrap}
 .live-map .lm-header .lm-search-row .libsearch:focus-within{outline:none!important;border-color:var(--t-secondary,#6B6B70);box-shadow:none!important}
 .live-map .lm-header .lm-search-row .libsearch input{flex:1;min-width:0;width:100%;height:38px;padding:0!important;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important}
 .live-map .lm-header .lm-search-row .lm-search-close{display:grid;place-items:center;flex:none;width:27px;height:27px;padding:0;border:0!important;border-radius:50%;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important}
 .live-map .lm-header .lm-search-row .lm-search-close svg{width:17px;height:17px}
-.live-map .lm-header .lm-search-row .libgo{flex:none;width:27px;height:27px;min-height:27px}
-.live-map .lm-header .lm-search-row .libgo svg{width:21px;height:21px}
+.live-map .lm-header .lm-search-row .libgo{position:absolute;right:-.667px;top:-.667px;display:grid;place-items:center;width:40px;height:40px;min-height:40px;padding:0}
+.live-map .lm-header .lm-search-row .libgo svg{width:24px;height:24px}
 .live-map .lm-header:has(.lm-search-row.is-open) .lm-header-search{opacity:0;pointer-events:none}
 .live-map .lm-header .lm-header-search{transition:opacity .18s ease}
 .live-map .lm-header .lm-categories{margin-top:5px}
@@ -85,7 +85,7 @@
 .live-map .lm-carousel-empty{margin:0 20px;padding:23px;text-align:center;border-radius:18px;background:#fff;pointer-events:auto}
 .live-map .lm-floating-actions{bottom:calc(126px + var(--lm-carousel-card-height) + env(safe-area-inset-bottom));gap:10px;z-index:690}
 .live-map .lm-floating-actions .lm-course-button{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#222!important;color:#fff!important;box-shadow:0 3px 12px #1112}
-.live-map .lm-floating-actions .lm-course-button svg{width:26px;height:26px}
+.live-map .lm-floating-actions .lm-course-button svg{width:18px;height:18px}
 .live-map.has-selected-place .bottomnav{display:flex!important}
 
 /* Keep the existing glass dock and enlarge its geometry and contents together. */
