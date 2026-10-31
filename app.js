@@ -195,7 +195,16 @@ function render(){
   $('#app').innerHTML=`<div class="layout"><aside class="rail"><a href="#" class="brand" data-page="home"><b class="brandmark">${icon('bookmark')}</b><span>핀맵</span></a><button class="filled" data-action="save">${icon('plus')}<span>새로 저장</span></button><nav aria-label="주 메뉴">${nav()}</nav><div class="railfoot">저장을 다시, 일상으로.<button data-action="intro">사용 방법 알아보기</button><span>Prototype 03</span></div></aside><main class="main"><header class="topbar"><span class="breadcrumb">핀맵 / ${detailId?'콘텐츠 상세':pageName[page]}</span>${page==='my'&&!detailId?'<h1 class="toptitle">마이</h1>':`<a href="#" class="brand mobilebrand" data-page="home"><b class="brandmark">${icon('bookmark')}</b>핀맵</a>`}<div class="topactions">${page==='home'&&!detailId?`<button class="bellbtn searchbtn" data-action="homesearch" aria-label="저장한 콘텐츠 검색">${icon('search')}</button>`:''}${(page === 'home' || page === 'my') && !detailId ? (n=>`<button class="bellbtn" data-action="noti" aria-label="알림${n?` ${n}개 안 읽음`:''}">${icon('bell')}${n?`<span class="belldot">${n}</span>`:''}</button>`)(unreadCount()) : ''}</div></header>${content}<footer class="footer"><span>핀맵 · 저장을 다시, 일상으로.</span><span>예시 데이터로 체험하는 프로토타입</span></footer></main><nav class="bottomnav" aria-label="하단 메뉴">${nav()}</nav></div>`;
 }
 function go(p){page=p;detailId=null;collection=null;filter='전체';query='';render();window.scrollTo(0,0)}
-function openDetail(id){detailId=id;render();window.scrollTo(0,0)}
+let detailReturnTarget=null;
+function openDetail(id,trigger=document.activeElement){
+  detailReturnTarget=trigger?.matches?.('[data-detail],[data-lm="open-place"]') ? {
+    id:trigger.getAttribute('data-detail'),
+    key:trigger.getAttribute('data-place-key'),
+    className:trigger.classList[0]
+  } : null;
+  detailId=id;render();window.scrollTo(0,0);
+  requestAnimationFrame(()=>document.querySelector('[data-action="back"]')?.focus({preventScroll:true}));
+}
 function toast(t){$('#snackbar').textContent=t;$('#snackbar').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#snackbar').classList.remove('show'),3200)}
 function modal(title,body){const d=$('#sheet');d.innerHTML=`<div class="handle"></div><div class="dialoghead"><h2>${title}</h2><button class="iconbtn" data-action="close" aria-label="닫기">${icon('close')}</button></div>${body}`;if(!d.open)d.showModal()}
 
@@ -221,7 +230,15 @@ function locationDialog(){modal('위치 권한',`<p>현재 위치 주변에 저�
 /* ---------- 동작 ---------- */
 const actions = {
   save: saveDialog, intro: () => intro(), close: () => $('#sheet').close(),
-  back: () => { detailId=null; render(); },
+  back: () => {
+    const target=detailReturnTarget;
+    detailId=null;render();detailReturnTarget=null;
+    requestAnimationFrame(()=>{
+      const candidates=document.querySelectorAll('[data-detail],[data-lm="open-place"]');
+      const button=[...candidates].find(el=>target&&el.getAttribute('data-detail')===target.id&&el.getAttribute('data-place-key')===target.key&&el.classList.contains(target.className));
+      button?.focus({preventScroll:true});
+    });
+  },
   clear: () => { query=''; render(); $('#search')?.focus(); },
   resetfilter: () => { query=''; filter='전체'; render(); },
   location: locationDialog,
@@ -240,7 +257,7 @@ document.addEventListener('click',e=>{
   if(!b)return;
   const d=b.dataset;
   if(d.page){e.preventDefault();go(d.page);}
-  else if(d.detail){openDetail(Number(d.detail));}
+  else if(d.detail){openDetail(Number(d.detail),b);}
   else if(d.filter){filter=d.filter;render();}
   else if(d.collection){page='library';detailId=null;collection=d.collection;filter='전체';query='';render();window.scrollTo(0,0);}
   else if(d.pin){selectedPin=Number(d.pin);render();}

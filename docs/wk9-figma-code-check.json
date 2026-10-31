@@ -1,7 +1,7 @@
 {
   "sourceCommit": "a49e0a9e270374be80bb03575b44cdc7c04bc4d5",
   "logicalRoles": 25,
-  "figmaStatus": "blocked by Starter MCP call limit; no live read",
+  "figmaStatus": "verified in native Figma; separate single-mode Light/Dark collections; cloud sync unconfirmed",
   "rows": [
     {
       "css": "--color-neutral",
@@ -9,8 +9,23 @@
       "dark": "#111111",
       "registration": "Variable / COLOR",
       "scopeExpected": "색 역할에 맞는 FILL·STROKE·TEXT_FILL",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--color-neutral",
+          "theme": "light",
+          "variableId": "VariableID:1277:4599",
+          "actual": "#F4F4F5",
+          "status": "PASS"
+        },
+        {
+          "css": "--color-neutral",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4600",
+          "actual": "#111111",
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--color-surface",
@@ -18,8 +33,23 @@
       "dark": "#1B1B1D",
       "registration": "Variable / COLOR",
       "scopeExpected": "색 역할에 맞는 FILL·STROKE·TEXT_FILL",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--color-surface",
+          "theme": "light",
+          "variableId": "VariableID:1277:4601",
+          "actual": "#FFFFFF",
+          "status": "PASS"
+        },
+        {
+          "css": "--color-surface",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4602",
+          "actual": "#1B1B1D",
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--color-on-surface",
@@ -27,8 +57,23 @@
       "dark": "#F4F4F5",
       "registration": "Variable / COLOR",
       "scopeExpected": "색 역할에 맞는 FILL·STROKE·TEXT_FILL",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--color-on-surface",
+          "theme": "light",
+          "variableId": "VariableID:1277:4603",
+          "actual": "#111111",
+          "status": "PASS"
+        },
+        {
+          "css": "--color-on-surface",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4604",
+          "actual": "#F4F4F5",
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--color-secondary",
@@ -36,8 +81,23 @@
       "dark": "#B4B4B8",
       "registration": "Variable / COLOR",
       "scopeExpected": "색 역할에 맞는 FILL·STROKE·TEXT_FILL",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--color-secondary",
+          "theme": "light",
+          "variableId": "VariableID:1277:4605",
+          "actual": "#6B6B70",
+          "status": "PASS"
+        },
+        {
+          "css": "--color-secondary",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4606",
+          "actual": "#B4B4B8",
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--color-border",
@@ -45,8 +105,23 @@
       "dark": "#8A8A8E",
       "registration": "Variable / COLOR",
       "scopeExpected": "색 역할에 맞는 FILL·STROKE·TEXT_FILL",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--color-border",
+          "theme": "light",
+          "variableId": "VariableID:1277:4608",
+          "actual": "#6B6B70",
+          "status": "PASS"
+        },
+        {
+          "css": "--color-border",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4609",
+          "actual": "#8A8A8E",
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--color-primary",
@@ -54,8 +129,23 @@
       "dark": "#F4F4F5",
       "registration": "Variable / COLOR",
       "scopeExpected": "색 역할에 맞는 FILL·STROKE·TEXT_FILL",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--color-primary",
+          "theme": "light",
+          "variableId": "VariableID:1277:4610",
+          "actual": "#111111",
+          "status": "PASS"
+        },
+        {
+          "css": "--color-primary",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4611",
+          "actual": "#F4F4F5",
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--color-primary-pressed",
@@ -63,8 +153,23 @@
       "dark": "#D4D4D8",
       "registration": "Variable / COLOR",
       "scopeExpected": "색 역할에 맞는 FILL·STROKE·TEXT_FILL",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--color-primary-pressed",
+          "theme": "light",
+          "variableId": "VariableID:1277:4614",
+          "actual": "#333333",
+          "status": "PASS"
+        },
+        {
+          "css": "--color-primary-pressed",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4615",
+          "actual": "#D4D4D8",
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--color-disabled",
@@ -72,17 +177,47 @@
       "dark": "#333333",
       "registration": "Variable / COLOR",
       "scopeExpected": "색 역할에 맞는 FILL·STROKE·TEXT_FILL",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--color-disabled",
+          "theme": "light",
+          "variableId": "VariableID:1277:4616",
+          "actual": "#E8E8EA",
+          "status": "PASS"
+        },
+        {
+          "css": "--color-disabled",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4617",
+          "actual": "#333333",
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--color-error",
-      "light": "#EF4D4D",
-      "dark": "#EE3A3A",
+      "light": "#D13D3D",
+      "dark": "#D73535",
       "registration": "Variable / COLOR",
       "scopeExpected": "색 역할에 맞는 FILL·STROKE·TEXT_FILL",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--color-error",
+          "theme": "light",
+          "variableId": "VariableID:1277:4618",
+          "actual": "#D13D3D",
+          "status": "PASS"
+        },
+        {
+          "css": "--color-error",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4619",
+          "actual": "#D73535",
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--space-xs",
@@ -90,8 +225,23 @@
       "dark": "4px",
       "registration": "Variable / FLOAT",
       "scopeExpected": "GAP·패딩",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--space-xs",
+          "theme": "light",
+          "variableId": "VariableID:1277:4631",
+          "actual": 4,
+          "status": "PASS"
+        },
+        {
+          "css": "--space-xs",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4632",
+          "actual": 4,
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--space-sm",
@@ -99,8 +249,23 @@
       "dark": "8px",
       "registration": "Variable / FLOAT",
       "scopeExpected": "GAP·패딩",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--space-sm",
+          "theme": "light",
+          "variableId": "VariableID:1277:4633",
+          "actual": 8,
+          "status": "PASS"
+        },
+        {
+          "css": "--space-sm",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4634",
+          "actual": 8,
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--space-md",
@@ -108,8 +273,23 @@
       "dark": "12px",
       "registration": "Variable / FLOAT",
       "scopeExpected": "GAP·패딩",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--space-md",
+          "theme": "light",
+          "variableId": "VariableID:1277:4635",
+          "actual": 12,
+          "status": "PASS"
+        },
+        {
+          "css": "--space-md",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4636",
+          "actual": 12,
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--space-lg",
@@ -117,8 +297,23 @@
       "dark": "16px",
       "registration": "Variable / FLOAT",
       "scopeExpected": "GAP·패딩",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--space-lg",
+          "theme": "light",
+          "variableId": "VariableID:1277:4637",
+          "actual": 16,
+          "status": "PASS"
+        },
+        {
+          "css": "--space-lg",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4638",
+          "actual": 16,
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--space-xl",
@@ -126,8 +321,23 @@
       "dark": "24px",
       "registration": "Variable / FLOAT",
       "scopeExpected": "GAP·패딩",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--space-xl",
+          "theme": "light",
+          "variableId": "VariableID:1277:4639",
+          "actual": 24,
+          "status": "PASS"
+        },
+        {
+          "css": "--space-xl",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4640",
+          "actual": 24,
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--space-2xl",
@@ -135,8 +345,23 @@
       "dark": "32px",
       "registration": "Variable / FLOAT",
       "scopeExpected": "GAP·패딩",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--space-2xl",
+          "theme": "light",
+          "variableId": "VariableID:1277:4641",
+          "actual": 32,
+          "status": "PASS"
+        },
+        {
+          "css": "--space-2xl",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4642",
+          "actual": 32,
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--rounded-sm",
@@ -144,8 +369,23 @@
       "dark": "8px",
       "registration": "Variable / FLOAT",
       "scopeExpected": "CORNER_RADIUS",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--rounded-sm",
+          "theme": "light",
+          "variableId": "VariableID:1277:4644",
+          "actual": 8,
+          "status": "PASS"
+        },
+        {
+          "css": "--rounded-sm",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4645",
+          "actual": 8,
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--rounded-md",
@@ -153,8 +393,23 @@
       "dark": "12px",
       "registration": "Variable / FLOAT",
       "scopeExpected": "CORNER_RADIUS",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--rounded-md",
+          "theme": "light",
+          "variableId": "VariableID:1277:4646",
+          "actual": 12,
+          "status": "PASS"
+        },
+        {
+          "css": "--rounded-md",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4647",
+          "actual": 12,
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--rounded-lg",
@@ -162,8 +417,23 @@
       "dark": "16px",
       "registration": "Variable / FLOAT",
       "scopeExpected": "CORNER_RADIUS",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--rounded-lg",
+          "theme": "light",
+          "variableId": "VariableID:1277:4649",
+          "actual": 16,
+          "status": "PASS"
+        },
+        {
+          "css": "--rounded-lg",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4650",
+          "actual": 16,
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--type-headline-lg",
@@ -171,8 +441,53 @@
       "dark": "700 28px/36px var(--font-family)",
       "registration": "Text Style",
       "scopeExpected": "글꼴/크기/행간/굵기 조합; 단일 Variable 아님",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--type-headline-lg",
+          "theme": "light",
+          "variableId": "VariableID:1277:4620",
+          "actual": {
+            "id": "S:62208ed4d7a3973ea9493f60b7054364592e05fd,",
+            "name": "Pinmap 25 / typography/headline-lg",
+            "fontName": {
+              "family": "Pretendard Variable",
+              "style": "Bold",
+              "variationSettings": {
+                "wght": 700
+              }
+            },
+            "fontSize": 28,
+            "lineHeight": {
+              "unit": "PIXELS",
+              "value": 36
+            }
+          },
+          "status": "PASS"
+        },
+        {
+          "css": "--type-headline-lg",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4621",
+          "actual": {
+            "id": "S:62208ed4d7a3973ea9493f60b7054364592e05fd,",
+            "name": "Pinmap 25 / typography/headline-lg",
+            "fontName": {
+              "family": "Pretendard Variable",
+              "style": "Bold",
+              "variationSettings": {
+                "wght": 700
+              }
+            },
+            "fontSize": 28,
+            "lineHeight": {
+              "unit": "PIXELS",
+              "value": 36
+            }
+          },
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--type-headline-md",
@@ -180,8 +495,53 @@
       "dark": "700 22px/30px var(--font-family)",
       "registration": "Text Style",
       "scopeExpected": "글꼴/크기/행간/굵기 조합; 단일 Variable 아님",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--type-headline-md",
+          "theme": "light",
+          "variableId": "VariableID:1277:4622",
+          "actual": {
+            "id": "S:8e4c89727513ddcec6c5595b3c90efa21609dce8,",
+            "name": "Pinmap 25 / typography/headline-md",
+            "fontName": {
+              "family": "Pretendard Variable",
+              "style": "Bold",
+              "variationSettings": {
+                "wght": 700
+              }
+            },
+            "fontSize": 22,
+            "lineHeight": {
+              "unit": "PIXELS",
+              "value": 30
+            }
+          },
+          "status": "PASS"
+        },
+        {
+          "css": "--type-headline-md",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4623",
+          "actual": {
+            "id": "S:8e4c89727513ddcec6c5595b3c90efa21609dce8,",
+            "name": "Pinmap 25 / typography/headline-md",
+            "fontName": {
+              "family": "Pretendard Variable",
+              "style": "Bold",
+              "variationSettings": {
+                "wght": 700
+              }
+            },
+            "fontSize": 22,
+            "lineHeight": {
+              "unit": "PIXELS",
+              "value": 30
+            }
+          },
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--type-body-md",
@@ -189,8 +549,53 @@
       "dark": "400 16px/24px var(--font-family)",
       "registration": "Text Style",
       "scopeExpected": "글꼴/크기/행간/굵기 조합; 단일 Variable 아님",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--type-body-md",
+          "theme": "light",
+          "variableId": "VariableID:1277:4625",
+          "actual": {
+            "id": "S:2a850a9a5441123d7cf295ce5044e35cdaa27a5b,",
+            "name": "Pinmap 25 / typography/body-md",
+            "fontName": {
+              "family": "Pretendard Variable",
+              "style": "Regular",
+              "variationSettings": {
+                "wght": 400
+              }
+            },
+            "fontSize": 16,
+            "lineHeight": {
+              "unit": "PIXELS",
+              "value": 24
+            }
+          },
+          "status": "PASS"
+        },
+        {
+          "css": "--type-body-md",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4626",
+          "actual": {
+            "id": "S:2a850a9a5441123d7cf295ce5044e35cdaa27a5b,",
+            "name": "Pinmap 25 / typography/body-md",
+            "fontName": {
+              "family": "Pretendard Variable",
+              "style": "Regular",
+              "variationSettings": {
+                "wght": 400
+              }
+            },
+            "fontSize": 16,
+            "lineHeight": {
+              "unit": "PIXELS",
+              "value": 24
+            }
+          },
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--type-label-md",
@@ -198,8 +603,53 @@
       "dark": "600 14px/20px var(--font-family)",
       "registration": "Text Style",
       "scopeExpected": "글꼴/크기/행간/굵기 조합; 단일 Variable 아님",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--type-label-md",
+          "theme": "light",
+          "variableId": "VariableID:1277:4627",
+          "actual": {
+            "id": "S:128ee6b9f140e5383db1773c725843084dd2c63e,",
+            "name": "Pinmap 25 / typography/label-md",
+            "fontName": {
+              "family": "Pretendard Variable",
+              "style": "SemiBold",
+              "variationSettings": {
+                "wght": 600
+              }
+            },
+            "fontSize": 14,
+            "lineHeight": {
+              "unit": "PIXELS",
+              "value": 20
+            }
+          },
+          "status": "PASS"
+        },
+        {
+          "css": "--type-label-md",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4628",
+          "actual": {
+            "id": "S:128ee6b9f140e5383db1773c725843084dd2c63e,",
+            "name": "Pinmap 25 / typography/label-md",
+            "fontName": {
+              "family": "Pretendard Variable",
+              "style": "SemiBold",
+              "variationSettings": {
+                "wght": 600
+              }
+            },
+            "fontSize": 14,
+            "lineHeight": {
+              "unit": "PIXELS",
+              "value": 20
+            }
+          },
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--type-body-sm",
@@ -207,8 +657,53 @@
       "dark": "400 12px/16px var(--font-family)",
       "registration": "Text Style",
       "scopeExpected": "글꼴/크기/행간/굵기 조합; 단일 Variable 아님",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--type-body-sm",
+          "theme": "light",
+          "variableId": "VariableID:1277:4629",
+          "actual": {
+            "id": "S:5352b14a0f7d69addb4897c15e6050443fa124a0,",
+            "name": "Pinmap 25 / typography/body-sm",
+            "fontName": {
+              "family": "Pretendard Variable",
+              "style": "Regular",
+              "variationSettings": {
+                "wght": 400
+              }
+            },
+            "fontSize": 12,
+            "lineHeight": {
+              "unit": "PIXELS",
+              "value": 16
+            }
+          },
+          "status": "PASS"
+        },
+        {
+          "css": "--type-body-sm",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4630",
+          "actual": {
+            "id": "S:5352b14a0f7d69addb4897c15e6050443fa124a0,",
+            "name": "Pinmap 25 / typography/body-sm",
+            "fontName": {
+              "family": "Pretendard Variable",
+              "style": "Regular",
+              "variationSettings": {
+                "wght": 400
+              }
+            },
+            "fontSize": 12,
+            "lineHeight": {
+              "unit": "PIXELS",
+              "value": 16
+            }
+          },
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--shadow-sm",
@@ -216,8 +711,129 @@
       "dark": "0 1px 2px rgba(0,0,0,.24),0 8px 24px rgba(0,0,0,.36)",
       "registration": "Effect Style",
       "scopeExpected": "DROP_SHADOW; 단일 Variable 아님",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--shadow-sm",
+          "theme": "light",
+          "variableId": "VariableID:1277:4651",
+          "actual": {
+            "id": "S:7ff4809da9a0b6c59274cf138be87672f03c3927,",
+            "name": "Pinmap 25 / shadows/sm/Light",
+            "effects": [
+              {
+                "type": "DROP_SHADOW",
+                "visible": true,
+                "radius": 2,
+                "boundVariables": {
+                  "color": {
+                    "type": "VARIABLE_ALIAS",
+                    "id": "VariableID:1054:3596"
+                  }
+                },
+                "color": {
+                  "r": 0,
+                  "g": 0,
+                  "b": 0,
+                  "a": 0.03999999910593033
+                },
+                "offset": {
+                  "x": 0,
+                  "y": 1
+                },
+                "spread": 0,
+                "blendMode": "NORMAL",
+                "showShadowBehindNode": true
+              },
+              {
+                "type": "DROP_SHADOW",
+                "visible": true,
+                "radius": 24,
+                "boundVariables": {
+                  "color": {
+                    "type": "VARIABLE_ALIAS",
+                    "id": "VariableID:1054:3597"
+                  }
+                },
+                "color": {
+                  "r": 0,
+                  "g": 0,
+                  "b": 0,
+                  "a": 0.05999999865889549
+                },
+                "offset": {
+                  "x": 0,
+                  "y": 8
+                },
+                "spread": 0,
+                "blendMode": "NORMAL",
+                "showShadowBehindNode": true
+              }
+            ]
+          },
+          "status": "PASS"
+        },
+        {
+          "css": "--shadow-sm",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4652",
+          "actual": {
+            "id": "S:dcc7236df818dac706e498ef0047333c2546822a,",
+            "name": "Pinmap 25 / shadows/sm/Dark",
+            "effects": [
+              {
+                "type": "DROP_SHADOW",
+                "visible": true,
+                "radius": 2,
+                "boundVariables": {
+                  "color": {
+                    "type": "VARIABLE_ALIAS",
+                    "id": "VariableID:1054:3599"
+                  }
+                },
+                "color": {
+                  "r": 0,
+                  "g": 0,
+                  "b": 0,
+                  "a": 0.23999999463558197
+                },
+                "offset": {
+                  "x": 0,
+                  "y": 1
+                },
+                "spread": 0,
+                "blendMode": "NORMAL",
+                "showShadowBehindNode": true
+              },
+              {
+                "type": "DROP_SHADOW",
+                "visible": true,
+                "radius": 24,
+                "boundVariables": {
+                  "color": {
+                    "type": "VARIABLE_ALIAS",
+                    "id": "VariableID:1054:3600"
+                  }
+                },
+                "color": {
+                  "r": 0,
+                  "g": 0,
+                  "b": 0,
+                  "a": 0.36000001430511475
+                },
+                "offset": {
+                  "x": 0,
+                  "y": 8
+                },
+                "spread": 0,
+                "blendMode": "NORMAL",
+                "showShadowBehindNode": true
+              }
+            ]
+          },
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     },
     {
       "css": "--shadow-md",
@@ -225,8 +841,165 @@
       "dark": "0 12px 40px rgba(0,0,0,.48)",
       "registration": "Effect Style",
       "scopeExpected": "DROP_SHADOW; 단일 Variable 아님",
-      "figmaObserved": null,
-      "status": "미확인"
+      "figmaObserved": [
+        {
+          "css": "--shadow-md",
+          "theme": "light",
+          "variableId": "VariableID:1277:4653",
+          "actual": {
+            "id": "S:5ff86a119f81d4e4f550bdb91d05e55ca4e431f9,",
+            "name": "Pinmap 25 / shadows/md/Light",
+            "effects": [
+              {
+                "type": "DROP_SHADOW",
+                "visible": true,
+                "radius": 40,
+                "boundVariables": {
+                  "color": {
+                    "type": "VARIABLE_ALIAS",
+                    "id": "VariableID:1054:3602"
+                  }
+                },
+                "color": {
+                  "r": 0,
+                  "g": 0,
+                  "b": 0,
+                  "a": 0.11999999731779099
+                },
+                "offset": {
+                  "x": 0,
+                  "y": 12
+                },
+                "spread": 0,
+                "blendMode": "NORMAL",
+                "showShadowBehindNode": true
+              }
+            ]
+          },
+          "status": "PASS"
+        },
+        {
+          "css": "--shadow-md",
+          "theme": "dark",
+          "variableId": "VariableID:1277:4654",
+          "actual": {
+            "id": "S:fccb88f7026ecf18ff3116242adca16d34071a6c,",
+            "name": "Pinmap 25 / shadows/md/Dark",
+            "effects": [
+              {
+                "type": "DROP_SHADOW",
+                "visible": true,
+                "radius": 40,
+                "boundVariables": {
+                  "color": {
+                    "type": "VARIABLE_ALIAS",
+                    "id": "VariableID:1054:3604"
+                  }
+                },
+                "color": {
+                  "r": 0,
+                  "g": 0,
+                  "b": 0,
+                  "a": 0.47999998927116394
+                },
+                "offset": {
+                  "x": 0,
+                  "y": 12
+                },
+                "spread": 0,
+                "blendMode": "NORMAL",
+                "showShadowBehindNode": true
+              }
+            ]
+          },
+          "status": "PASS"
+        }
+      ],
+      "status": "통과 (Figma 앱 실측)"
     }
-  ]
+  ],
+  "verificationDate": "2026-10-31",
+  "figmaFileKey": "LdXCdWJrA53sBN9aBgQEDy",
+  "collections": [
+    {
+      "id": "VariableCollectionId:1277:4597",
+      "name": "Pinmap / Tokens 25 / Light",
+      "modes": [
+        {
+          "name": "Light",
+          "modeId": "1277:0"
+        }
+      ],
+      "ids": [
+        "VariableID:1277:4599",
+        "VariableID:1277:4601",
+        "VariableID:1277:4603",
+        "VariableID:1277:4605",
+        "VariableID:1277:4608",
+        "VariableID:1277:4610",
+        "VariableID:1277:4614",
+        "VariableID:1277:4616",
+        "VariableID:1277:4618",
+        "VariableID:1277:4620",
+        "VariableID:1277:4622",
+        "VariableID:1277:4625",
+        "VariableID:1277:4627",
+        "VariableID:1277:4629",
+        "VariableID:1277:4631",
+        "VariableID:1277:4633",
+        "VariableID:1277:4635",
+        "VariableID:1277:4637",
+        "VariableID:1277:4639",
+        "VariableID:1277:4641",
+        "VariableID:1277:4644",
+        "VariableID:1277:4646",
+        "VariableID:1277:4649",
+        "VariableID:1277:4651",
+        "VariableID:1277:4653"
+      ]
+    },
+    {
+      "id": "VariableCollectionId:1277:4598",
+      "name": "Pinmap / Tokens 25 / Dark",
+      "modes": [
+        {
+          "name": "Dark",
+          "modeId": "1277:1"
+        }
+      ],
+      "ids": [
+        "VariableID:1277:4600",
+        "VariableID:1277:4602",
+        "VariableID:1277:4604",
+        "VariableID:1277:4606",
+        "VariableID:1277:4609",
+        "VariableID:1277:4611",
+        "VariableID:1277:4615",
+        "VariableID:1277:4617",
+        "VariableID:1277:4619",
+        "VariableID:1277:4621",
+        "VariableID:1277:4623",
+        "VariableID:1277:4626",
+        "VariableID:1277:4628",
+        "VariableID:1277:4630",
+        "VariableID:1277:4632",
+        "VariableID:1277:4634",
+        "VariableID:1277:4636",
+        "VariableID:1277:4638",
+        "VariableID:1277:4640",
+        "VariableID:1277:4642",
+        "VariableID:1277:4645",
+        "VariableID:1277:4647",
+        "VariableID:1277:4650",
+        "VariableID:1277:4652",
+        "VariableID:1277:4654"
+      ]
+    }
+  ],
+  "evidence": "outputs/wk9-badge-contrast-20261031/figma-verified-read.json",
+  "cloudVerification": {
+    "updatedErrorBoardVisible": true,
+    "evidence": "figma-cloud-after.png",
+    "allPendingFileChangesSynced": "unconfirmed; native warning persists"
+  }
 }

@@ -56,6 +56,7 @@ pages.my = function(){
     ${myRow('interests','💡','관심사 · 활용 목적', esc(prefText))}
   </section>
   <section class="mgroup my-section" aria-label="앱 설정">
+    ${myRow('appearance','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>','화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
     ${myRow('notisheet','🔔','알림 설정', settings.push ? `푸시 켜짐 · ${notiOn}개` : '푸시 꺼짐')}
     ${myRow('savesheet','✨','저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
     ${myRow('mapsheet','🗺️','위치 · 지도', esc(MAP_APPS[settings.mapApp].name))}
@@ -94,6 +95,7 @@ $('#sheet').addEventListener('close', () => { mySheet = null; });
 
 /* ---------- 동작 ---------- */
 Object.assign(actions, {
+  appearance: () => PinmapTheme.show(),
   noti: notiSheet,
   readall: () => { markRead(notifications().map(n => n.id)); notiSheet(); render(); },
   notisettings: () => { if (page !== 'my') go('my'); openMySheet(notiSettings); },

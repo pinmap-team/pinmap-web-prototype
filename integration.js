@@ -80,7 +80,32 @@
         attributionControl:{customAttribution:'<a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a> · © <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · 출구 © <a href="https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0" target="_blank" rel="noopener">행정안전부·Esri Korea</a>'}
       }).addTo(map);
       host.dataset.basemap='warm-minimal';
-      layer.getMaplibreMap().on('load',()=>{host.dataset.basemapReady='true';});
+      const vectorMap=layer.getMaplibreMap();
+      let originalPaint=null;
+      const applyAppearance=()=>{
+        if(!originalPaint)return;
+        const dark=document.documentElement.dataset.theme==='dark';
+        for(const entry of originalPaint){
+          for(const [property,value] of Object.entries(entry.paint)){
+            if(!property.endsWith('-color'))continue;
+            let night=value;
+            if(property==='background-color')night='#111111';
+            else if(property==='text-color')night='#B4B4B8';
+            else if(property==='text-halo-color')night='#111111';
+            else if(property==='fill-color')night=/water/.test(entry.id)?'#1B2B33':/park|wood|landcover/.test(entry.id)?'#202B26':'#242426';
+            else if(property==='line-color')night=/water/.test(entry.id)?'#263E49':/boundary/.test(entry.id)?'#626267':'#414145';
+            vectorMap.setPaintProperty(entry.id,property,dark?night:value);
+          }
+          if(entry.type==='raster')vectorMap.setPaintProperty(entry.id,'raster-brightness-max',dark?.3:(entry.paint['raster-brightness-max']??1));
+        }
+      };
+      vectorMap.on('style.load',()=>{
+        originalPaint=vectorMap.getStyle().layers.map(entry=>({id:entry.id,type:entry.type,paint:{...entry.paint}}));
+        applyAppearance();
+      });
+      vectorMap.on('load',()=>{host.dataset.basemapReady='true';});
+      window.addEventListener('pinmap:theme-changed',applyAppearance);
+      map.on('unload',()=>window.removeEventListener('pinmap:theme-changed',applyAppearance));
       return layer;
     } catch(error) {
       // Keep maps usable on devices without WebGL support.

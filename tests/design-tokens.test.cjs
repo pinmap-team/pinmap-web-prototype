@@ -9,6 +9,6 @@ test('25 logical roles, same nine color roles in both modes, all CSS values matc
  const counts=['color','type','space','rounded','shadow'].map(prefix=>[...blocks[0][2].matchAll(new RegExp('--'+prefix+'-[\\w-]+:','g'))].length);assert.deepEqual(counts,[9,5,6,3,2]);
  for(const v of Object.values(values[0]).concat(Object.values(values[1])))assert(md.includes(v),v+' absent in DESIGN.md');
  for(const v of values){assert(contrast(v.secondary,v.surface)>=4.5);assert(contrast(v.secondary,v.neutral)>=4.5)}
- assert(contrast(values[0].error,values[0]['on-surface'])>=4.5);assert(contrast(values[1].error,values[1].neutral)>=4.5);
+ for(const v of values) assert(contrast(v.error,'#FFFFFF')>=4.5,'Urgent badge white text must contrast against its error background');
  assert(!css.includes('Noto'));assert(css.includes('"Pretendard Variable",Pretendard'));
 });
