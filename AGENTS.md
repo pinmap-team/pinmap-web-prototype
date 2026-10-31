@@ -17,4 +17,4 @@ UI를 만들거나 고치기 전에 [DESIGN.md](DESIGN.md)와 [components/index.
 
 - Pretendard가 현재 기준이다. 웹 로드 이름은 Pretendard Variable이며 tokens.css의 --font-family를 사용한다. 과거 Noto Sans KR 조사안은 현재 규칙이 아니다.
 - 디자인 적용의 최종 공통 계층은 design-alignment.css다. 임시 override를 새 파일에 계속 쌓지 않는다. 모양·재질 예외는 DESIGN.md에 기록한다.
-- 검증 기록은 docs/wk9-verification.md에 규칙 / 적용 전 / 적용 후 / 판정 / 근거 / 수정내용으로 남긴다. Figma 수정·로컬 확인·공개 배포·독립 평가를 서로 구분한다.
+- 검증은 규칙 / 적용 전 / 적용 후 / 판정 / 근거 / 수정내용으로 남긴다. docs/wk9-verification.md는 초기 자체 검증, docs/wk9-follow-up.md는 후속 적용 상태, docs/wk9-independent-*.md는 별도 대화 평가다. 과거 판정을 최신 완료 상태로 재사용하지 않는다. Figma 수정·로컬 확인·공개 배포·독립 평가를 서로 구분한다.

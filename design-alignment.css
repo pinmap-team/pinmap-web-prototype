@@ -118,3 +118,36 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 .dtdelete{color:var(--color-on-surface);border:1px solid var(--color-error);border-radius:var(--rounded-sm);padding:var(--space-sm) var(--space-lg);min-height:44px}
 
 .error:empty,.eserror:empty{display:none}
+
+/* Independent review follow-up: win against legacy specificity, not geometry. */
+.bottomnav .pm-nav-main .navitem,.bottomnav .pm-nav-main .navitem *{color:var(--color-secondary)!important}
+.bottomnav .pm-nav-main .navitem.active,.bottomnav .pm-nav-main .navitem.active *{color:var(--color-primary)!important}
+.live-map .lm-header .lm-location-title,.live-map .lm-header .lm-header-search,
+.live-map .lm-header .lm-search-row .libgo,.live-map .lm-floating-actions .lm-round{color:var(--color-on-surface)}
+.cfpage .libsearch input,.live-map .lm-header .lm-search-row .libsearch input{color:var(--color-on-surface)}
+.cfpage .libsearch,.live-map .lm-header .lm-search-row .libsearch{border-radius:999px}
+.cfpage .libsearch>.icon{color:var(--color-on-surface)}
+.cfpage .libchip{color:var(--color-secondary);background:var(--color-surface);border-radius:999px;box-shadow:var(--shadow-sm)}
+.cfpage .libchip[aria-pressed="true"]{color:var(--color-neutral);background:var(--color-primary)}
+.homecategories .prefchip{border-radius:999px;color:var(--color-on-surface)!important;background:var(--color-surface)}
+.homecategories.two-rows{grid-template-rows:repeat(2,44px)}
+.chiprows .prefchips.homecategories{padding-top:var(--space-xs)!important;padding-bottom:var(--space-xs)!important}
+.live-map .lm-floating-actions .lm-course-button{background:var(--color-primary)!important;color:var(--color-neutral)!important;box-shadow:var(--shadow-sm)}
+.live-map .lm-floating-actions .lm-round{background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important}
+.live-map .lm-header .lm-location-title{min-height:44px}
+.live-map .lm-header .lm-categories{margin-top:var(--space-sm)}
+.cfpage .libsearch:focus-within,.live-map .lm-header .lm-search-row .libsearch:focus-within{outline:2px solid var(--color-primary)!important;outline-offset:-2px}
+.calw .cnrow{min-height:44px;gap:var(--space-sm);padding:0 var(--space-sm)}
+.calw .hwhead{margin-bottom:var(--space-sm)}
+.calw .calmore{gap:var(--space-sm);color:var(--color-on-surface)!important}
+.calw .wday{padding:var(--space-xs) 0;gap:var(--space-xs)}
+.calw .wday b,.calw .wday.today b{font:var(--type-label-md)}
+.calw .wday small,.calw .wday.today small{font:var(--type-body-sm)}
+.calw .wday.today{background:var(--color-disabled)!important;color:var(--color-on-surface)!important}
+.calw .wday.today small{color:var(--color-on-surface)!important}
+.calw .wday.today i.on{background:var(--color-primary)!important}
+.calw .calnext{margin-top:var(--space-sm);padding-top:var(--space-xs)}
+.recentw .rwtitle{font:var(--type-headline-md)}
+.recentrow .rcard b{font:var(--type-label-md)}
+.recentrow .rcard small{font:var(--type-body-sm);color:var(--color-secondary)}
+.mainpick .picktext small{opacity:1}
