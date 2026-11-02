@@ -201,9 +201,19 @@ function fitOnboardingViewport(){
   let height = window.innerHeight;
   try { height = Math.min(height, window.parent.innerHeight); } catch {}
   el.style.setProperty('--ob-viewport', `${height}px`);
-  el.style.setProperty('--ob-phone-zoom', height < 640 ? '1.2' : height < 760 ? '1.5' : '2');
+  const stages = [...el.querySelectorAll('.ob-phone-stage')];
+  const imageHeight = stages.length ? Math.min(...stages.map(stage => stage.clientHeight)) : 100;
+  const zoom = Math.max(.6, Math.min(2, imageHeight / 54));
+  el.style.setProperty('--ob-phone-zoom', String(zoom / .82));
 }
 window.addEventListener('resize', fitOnboardingViewport);
+try {
+  if (window.parent !== window) {
+    window.parent.addEventListener('resize', fitOnboardingViewport);
+    window.addEventListener('pagehide', () => window.parent.removeEventListener('resize', fitOnboardingViewport));
+  }
+} catch {}
+document.fonts?.ready.then(fitOnboardingViewport);
 function drawOnboarding() {
   clearTimeout(onboardTimer);
   const el = $('#onboarding');

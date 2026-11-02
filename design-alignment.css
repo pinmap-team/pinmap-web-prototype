@@ -8,7 +8,7 @@ button,input,select,textarea,svg text,.libpage,.live-map,#login-screen,.ob-phone
 
 /* Five complete type roles: use label-md for compact card titles. */
 .heading h1,.libhead h1,.toptitle,.dt .dthtitle h1,.ob-title{font:var(--type-headline-lg)}
-.live-map .lm-header .lm-location-title,.libpage .libhead h1{font:var(--type-headline-lg)}
+.live-map .lm-header .lm-location-title,.libpage .libhead h1,.main>.topbar .toptitle{font:var(--type-headline-md)}
 .sectionhead h2,.libsection h2,.mysec>h2,.dtsec>h2,.dtsechead h2,.eshead h2,.nthead h2,.dialoghead h2{font:var(--type-headline-md)}
 .dtsum p,.dtmemobox,.field input,.field textarea,.esinput input,.esinput textarea,.ob-desc{font:var(--type-body-md)}
 .cfpage .libsearch input,.live-map .lm-header .lm-search-row .libsearch input{font:var(--type-body-md)}
@@ -226,3 +226,40 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 /* External app illustrations retain their own light appearance. */
 [data-theme="dark"] #onboarding .ob-phone{background:#fff!important;color:#111;--ob-ink:#111;--ob-sub:#606060;--ob-key:#111;--ob-on-key:#fff}
 [data-theme="dark"] #onboarding .ob-phone-sheet{color:#111}
+
+/* Onboarding uses the existing 25 design roles; external phone UI remains artwork. */
+#onboarding{--ob-key:var(--color-primary);--ob-key-strong:var(--color-primary);--ob-key-soft:var(--color-disabled);--ob-on-key:var(--color-neutral);--ob-ink:var(--color-on-surface);--ob-sub:var(--color-secondary);--ob-line:var(--color-border)}
+#onboarding .ob-screen:is(.step2,.step3){padding:var(--space-xl)!important;background:var(--color-neutral)!important;color:var(--color-on-surface)}
+#onboarding .ob-top{min-height:44px;flex:none}
+#onboarding .ob-count{font:var(--type-label-md);color:var(--color-secondary);letter-spacing:normal}
+#onboarding .ob-count b{font:inherit;color:var(--color-on-surface)}
+#onboarding .ob-skip{min-width:44px;min-height:44px;padding:0 var(--space-xs);font:var(--type-label-md);color:var(--color-secondary)}
+#onboarding .ob-screen:is(.step2,.step3) .ob-title{margin:var(--space-sm) 0 var(--space-lg)!important;font:var(--type-headline-lg);color:var(--color-on-surface);letter-spacing:normal}
+#onboarding .ob-title em{color:var(--color-on-surface)}
+#onboarding .ob-desc{font:var(--type-body-md);color:var(--color-secondary)}
+#onboarding .ob-actions{padding:var(--space-lg) 0 0!important;background:none!important}
+#onboarding .step2 .ob-next,#onboarding .ob-next,#onboarding .ob-action-back{min-height:56px;font:var(--type-label-md);border-radius:var(--rounded-sm);padding:0 var(--space-lg)}
+#onboarding .ob-next{background:var(--color-primary)!important;color:var(--color-neutral)!important;box-shadow:none}
+#onboarding .ob-action-back{background:var(--color-disabled);color:var(--color-on-surface)}
+#onboarding .ob-next:disabled{background:var(--color-disabled)!important;color:var(--color-secondary)!important;opacity:1}
+/* Illustration height absorbs available space; captions, controls and gaps keep token sizes. */
+#onboarding .ob-screen.step2 .ob-title{margin:var(--space-xs) 0 var(--space-sm)!important}
+#onboarding .step2 .ob-flow{flex:1;min-height:0;margin:0!important;grid-template-rows:minmax(0,1fr) var(--space-sm) minmax(0,1fr) var(--space-sm) minmax(0,1fr);gap:var(--space-xs)}
+#onboarding .step2 .ob-flowcard{min-height:0;align-self:stretch;padding:var(--space-md) var(--space-lg);gap:var(--space-sm);border:1px solid var(--color-disabled)!important;border-radius:var(--rounded-md);background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important}
+#onboarding .step2 .ob-flowtext{flex:none}
+#onboarding .step2 .ob-flowtext h3{margin:0;font:var(--type-label-md);gap:var(--space-sm);color:var(--color-on-surface);letter-spacing:normal}
+#onboarding .step2 .ob-flowtext p{margin:var(--space-xs) 0 0;font:var(--type-body-sm);color:var(--color-secondary)}
+#onboarding .step2 .ob-num{flex:none;width:24px;height:24px;font:var(--type-label-md);border-radius:50%;background:var(--color-primary);color:var(--color-neutral)}
+#onboarding .step2 .ob-arrow{align-self:center;font:var(--type-body-sm);line-height:var(--space-md);color:var(--color-secondary)}
+#onboarding .step2 .ob-phone-stage{flex:1;min-height:0;height:auto;width:100%;align-self:stretch;padding:0;border-radius:var(--rounded-sm);background:var(--color-neutral)}
+#onboarding .step2 .ob-actions{flex:none;margin-top:0!important;padding-top:var(--space-sm)!important}
+#onboarding .ob-phone-crop2 .ob-phone{top:calc(50% - 198px * var(--phone-zoom))}
+#onboarding .ob-phone-crop3 .ob-phone{top:calc(50% - 160px * var(--phone-zoom))}
+/* The interest page shares typography and surfaces without changing its choices. */
+#onboarding .step3 .ob-options{margin-top:var(--space-xl)!important;gap:var(--space-md)!important}
+#onboarding .step3 .ob-option{font:var(--type-label-md);padding:var(--space-lg) var(--space-md)!important;gap:var(--space-md);border:1px solid var(--color-disabled)!important;border-radius:var(--rounded-md);background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important}
+#onboarding .step3 .ob-option .ob-label{font:inherit;letter-spacing:normal}
+#onboarding .step3 .ob-option,#onboarding .step3 .ob-option .ob-label,#onboarding .step3 .ob-option .ob-emoji{color:var(--color-on-surface)!important}
+#onboarding .step3 .ob-option.on{background:var(--color-disabled)!important;border-color:var(--color-primary)!important}
+#onboarding .step3 .ob-option.on::after{content:'✓';position:absolute;top:var(--space-md);right:var(--space-md);font:var(--type-label-md);color:var(--color-on-surface)}
+#onboarding .step3 .ob-actions{gap:var(--space-sm)}
