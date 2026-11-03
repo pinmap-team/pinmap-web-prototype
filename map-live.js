@@ -4,7 +4,7 @@
   let detailMap;
   let liveMap, pinLayer, locationMarker, searchController, placeController;
   let expandedKey=null, sheetStage='peek', sheetDrag=null, suppressSheetClickUntil=0;
-  let mapLocationName=null, locationMenuOpen=false, searchOpen=false;
+  let mapLocationName=null, searchOpen=false;
   let automaticLocation=false;
   const markerEntries=new Map();
   let userPosition = null;
@@ -49,8 +49,7 @@
     return `<section class="live-map" aria-label="지도에서 장소 탐색"><div id="live-map-canvas"></div>
       <header class="lm-header">
         <h1 class="lm-sr-only">지도에서 저장한 장소 찾기</h1>
-        <div class="lm-location-header"><button type="button" class="lm-location-title" data-lm="location-menu" aria-expanded="${locationMenuOpen}" aria-controls="lm-location-menu">${icon('pin')}<span>${safe(mapLocationName ? (settings.placeLabels?.[mapLocationName] || mapLocationName) : '현재 위치')}</span>${icon('chevron')}</button><button type="button" class="lm-header-search" data-lm="toggle-search" aria-label="${searchOpen?'검색창 닫기':'지도에서 장소 검색'}" aria-expanded="${searchOpen}" aria-controls="lm-search-row"><span class="lm-search-open-icon">${icon('search')}</span><span class="lm-search-close-icon">${icon('close')}</span></button></div>
-        <div class="lm-location-menu" id="lm-location-menu" ${locationMenuOpen?'':'hidden'}><button type="button" data-lm="choose-current" class="${mapLocationName?'':'is-active'}">현재 위치</button>${myPlaces().map(name=>`<button type="button" data-lm="choose-saved-location" data-location-name="${safe(name)}" class="${mapLocationName===name?'is-active':''}">${safe(settings.placeLabels?.[name] || name)}<small>${safe(name)}</small></button>`).join('')}<button type="button" data-action="placesheet">위치 추가·수정</button></div>
+        <div class="lm-location-header"><button type="button" class="lm-location-title" data-action="mapaddresses">${icon('pin')}<span>${safe(mapLocationName ? (settings.placeLabels?.[mapLocationName] || mapLocationName) : '현재 위치')}</span>${icon('chevron')}</button><button type="button" class="lm-header-search" data-lm="toggle-search" aria-label="${searchOpen?'검색창 닫기':'지도에서 장소 검색'}" aria-expanded="${searchOpen}" aria-controls="lm-search-row"><span class="lm-search-open-icon">${icon('search')}</span><span class="lm-search-close-icon">${icon('close')}</span></button></div>
         <div class="lm-search-row cfpage${searchOpen?' is-open':''}" id="lm-search-row" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="어디로 가고 싶으세요?" value="${safe(searchQuery)}" autocomplete="off" ${searchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button></form></div>
         <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,cats.findIndex(([id])=>id===category))*100}%">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
       </header>
@@ -352,9 +351,6 @@
     switch(button.dataset.lm){
       case 'new-course':window.startNewCourse?.();break;
       case 'locate':mapLocationName=null;$('#app .lm-location-title span').textContent='현재 위치';locate();break;
-      case 'location-menu':locationMenuOpen=!locationMenuOpen;$('#lm-location-menu').hidden=!locationMenuOpen;button.setAttribute('aria-expanded',String(locationMenuOpen));break;
-      case 'choose-current':mapLocationName=null;locationMenuOpen=false;$('#lm-location-menu').hidden=true;$('#app .lm-location-title span').textContent='현재 위치';$('#app .lm-location-title').setAttribute('aria-expanded','false');locate();break;
-      case 'choose-saved-location':mapLocationName=button.dataset.locationName;locationMenuOpen=false;$('#lm-location-menu').hidden=true;$('#app .lm-location-title span').textContent=settings.placeLabels?.[mapLocationName]||mapLocationName;$('#app .lm-location-title').setAttribute('aria-expanded','false');window.dispatchEvent(new CustomEvent('pinmap:place-changed',{detail:{name:mapLocationName}}));break;
       case 'toggle-search':{
         searchOpen=!searchOpen;
         const row=$('#app .lm-search-row'),input=$('#lm-search input');
@@ -408,19 +404,35 @@
     const current=placeController=new AbortController();
     try{
       const known={성수동:[37.5445,127.043],청파동:[37.5484522,126.9672724]};
-      let point=known[name];
+      const details=settings.placeDetails?.[name];
+      let point=Number.isFinite(details?.lat)&&Number.isFinite(details?.lng) ? [details.lat,details.lng] : ((!details?.address||details.address===dongOf(name).full)&&Object.hasOwn(known,name) ? known[name] : null);
       if(!point){
-        const url='https://photon.komoot.io/api/?q='+encodeURIComponent(name)+'&lat=37.55&lon=126.98&limit=10';
+        const url='https://photon.komoot.io/api/?q='+encodeURIComponent(details?.address || name)+'&lat=37.55&lon=126.98&limit=10';
         const response=await fetch(url,{signal:current.signal});
         if(!response.ok)throw new Error('location lookup failed');
         const features=(await response.json()).features||[];
-        const match=features.find(f=>f.properties?.name===name)||features.find(f=>f.properties?.name?.startsWith(name.replace(/동$/,'')));
-        if(match){const [lng,lat]=match.geometry.coordinates;if(lat>37.4&&lat<37.8&&lng>126.7&&lng<127.3)point=[lat,lng];}
+        const match=details?.address ? features[0] : features.find(f=>f.properties?.name===name)||features.find(f=>f.properties?.name?.startsWith(name.replace(/동$/,'')));
+        if(match){const [lng,lat]=match.geometry.coordinates;if(Number.isFinite(lat)&&Number.isFinite(lng)&&lat>33&&lat<39&&lng>124&&lng<132)point=[lat,lng];}
       }
       if(current!==placeController||!liveMap||page!=='map')return;
       if(point){center=point;zoom=15;liveMap.setView(point,zoom);}
       else toast(`'${name}' 지도 위치를 찾지 못했어요.`);
     }catch(error){if(error.name!=='AbortError'&&current===placeController)toast('선택한 위치로 지도를 이동하지 못했어요.');}
   });
+  // Address settings page shares the existing map selection and location behavior.
+  function chooseAddressOnMap(name){
+    if(name!==null&&!myPlaces().includes(name))return false;
+    mapLocationName=name;searchOpen=false;
+    go('map');
+    if(name)window.dispatchEvent(new CustomEvent('pinmap:place-changed',{detail:{name}}));
+    else locate();
+    requestAnimationFrame(()=>$('#app .lm-location-title')?.focus());
+    return true;
+  }
+  window.PinmapLocation={
+    selected:()=>mapLocationName,
+    choose:chooseAddressOnMap,
+    clear:name=>{if(mapLocationName===name)mapLocationName=null;}
+  };
   render();
 })();

@@ -3,6 +3,7 @@
 
 /* ---------- 프로필 사진 ---------- */
 const avatarHtml = (cls = '') => PM_ENV.development && !settings.avatar ? `<span class="pavatar ${cls}" aria-hidden="true">${icon('user')}</span>` : `<span class="pavatar ${cls}" aria-hidden="true"><img src="${settings.avatar || 'img/profile-demo.png'}" alt=""></span>`;
+let editingProfileName = false;
 const subHead = (title, back = 'my') => `<div class="subhead"><button class="subback" data-page="${back}" aria-label="${back === 'guide' ? '이용 가이드로' : back === 'account' ? '프로필 및 계정으로' : '마이로'} 돌아가기">${icon('back')}</button><h1>${title}</h1></div>`;
 
 pages.profile = function(){
@@ -14,7 +15,7 @@ pages.profile = function(){
     <div class="pfbtns"><label class="tonal small" for="avatarfile">사진 변경</label>${settings.avatar ? '<button class="textbtn" data-action="avatarreset">기본 이미지로</button>' : ''}</div>
     <form id="profilepage" class="pfform">
       <label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label>
-      <p class="hint">위치는 ‘위치 설정’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p>
+      <p class="hint">위치는 ‘위치 관리’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p>
       <button class="filled pfsave" type="submit">저장</button>
     </form>
   </div>`;
@@ -38,7 +39,7 @@ document.addEventListener('submit', e => {
   if (e.target.id !== 'profilepage') return;
   e.preventDefault();
   const nick = e.target.nickname.value.trim(); if (!nick) return;
-  settings.nickname = nick; afterChange(); go('account'); toast('프로필을 저장했어요.');
+  settings.nickname = nick; editingProfileName = false; afterChange(); go('account'); toast('프로필을 저장했어요.');
 });
 
 /* ---------- SNS 계정 연동 ---------- */
@@ -55,7 +56,7 @@ const snsLogo = sns => `<img class="snslogo" src="${SNS[sns].logo}" alt="">`;
 
 pages.accounts = function(){
   const acc = myAccounts(), total = acc.reduce((n, a) => n + accountCount(a), 0);
-  return subHead('SNS 계정 연동', 'account') + `
+  return `<div class="mypage connectionpage">${subHead('연동 계정 관리', 'account')}
   <p class="muted acchint">연동한 계정들의 저장 콘텐츠를 핀맵 한곳에 모아 보여줘요.</p>
   ${syncBtn()}
   <button class="accall" data-page="library"><span><b>모든 계정의 저장 모음 보기</b><small>${acc.length}개 계정 · 저장 ${total}개</small></span>${icon('arrow')}</button>
@@ -64,7 +65,7 @@ pages.accounts = function(){
       : '<p class="hint accnone">연동된 계정이 없어요. 아래에서 추가해 보세요.</p>'}
   </section>
   <button class="padd accadd" data-action="accadd">${icon('plus')} SNS 계정 연동 추가</button>
-  <p class="hint accnote">프로토타입에서는 실제 로그인 없이 연동 과정을 체험해요. 연동을 중지해도 이미 저장한 콘텐츠는 그대로 남아요.</p>`;
+  <p class="hint accnote">프로토타입에서는 실제 로그인 없이 연동 과정을 체험해요. 연동을 중지해도 이미 저장한 콘텐츠는 그대로 남아요.</p>${resetEntry('connections')}</div>`;
 };
 function accAddSheet(sns){
   if (!sns) {
@@ -77,6 +78,9 @@ function accAddSheet(sns){
 actions.accadd = () => accAddSheet();
 actions.accounts = () => go('accounts');
 actions.profile = () => go('profile');
+actions.profilephoto = () => $('#avatarfile')?.click();
+actions.profilename = () => { editingProfileName = true; render(); requestAnimationFrame(() => { const input=$('#profilepage input[name="nickname"]'); input?.focus(); input?.select(); }); };
+actions.profilecancel = () => { editingProfileName = false; render(); requestAnimationFrame(() => $('#app [data-action="profilename"]')?.focus()); };
 actions.avatarreset = () => { delete settings.avatar; afterChange(); render(); toast('기본 이미지로 바꿨어요.'); };
 actions.accoffyes = () => {
   const id = $('#sheet').dataset.acc, acc = myAccounts(), a = acc.find(x => x.id === id);
@@ -131,7 +135,10 @@ function pullAccount(a){
   settings.accSync = {...(settings.accSync || {}), [a.id]: Date.now()};
   return got;
 }
-const syncToast = (n, who) => toast(n ? `${who ? who + '에서 ' : ''}새 저장 콘텐츠 ${n}개를 가져왔어요.` : `${who ? who + '에서 ' : ''}새로 가져올 저장 콘텐츠가 없어요.`);
+// 연동 새로고침 결과 안내는 줄 바꿈 없이 한 줄로 (다른 안내는 기존 그대로)
+const toastBaseSync = toast;
+toast = function(t){ $('#snackbar').classList.remove('oneline'); return toastBaseSync(t); };
+const syncToast = (n, who) => { toast(n ? `${who ? who + '에서 ' : ''}새 저장 콘텐츠 ${n}개를 가져왔어요.` : `${who ? who + '에서 ' : ''}새로 가져올 저장 콘텐츠가 없어요.`); $('#snackbar').classList.add('oneline'); };
 actions.accsync = () => { // 연동한 계정 전체
   if (syncing || syncingAcc) return;
   syncing = true; render();

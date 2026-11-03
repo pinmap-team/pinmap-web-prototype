@@ -46,24 +46,27 @@ pages.my = function(){
   return `
   <button class="mprofile profilecard" data-action="account" aria-label="프로필 및 계정 설정">
     ${avatarHtml()}
-    <span class="mpinfo"><b>${esc(settings.nickname || '프로필 설정')}</b><small>계정 정보 · 데이터 관리</small></span>${icon('chevron')}
+    <span class="mpinfo"><b>${esc(settings.nickname || '프로필 설정')}</b><small>내 계정 관리</small></span>${icon('chevron')}
   </button>
   <button class="sharepromo" data-action="snsdemo"><span aria-hidden="true">📲</span><div><b>SNS에서 바로 저장해보기</b><small>게시물에서 공유 → 핀맵, 저장 과정을 체험해요</small></div>${icon('arrow')}</button>
 
   <section class="mgroup my-section" aria-label="위치와 관심 키워드">
-    ${myRow('placesheet','📍','위치 설정', esc(myPlaces().join(' · ')))}
+    ${myRow('myaddresses','📍','위치 관리', esc(myPlaces().join(' · ')))}
     <button class="mrow" data-page="courses"><span class="mrico" aria-hidden="true">${icon('route')}</span><span class="mrlabel">저장한 코스 보기</span>${icon('chevron')}</button>
     ${myRow('interests','💡','관심사 · 활용 목적', esc(prefText))}
   </section>
   <section class="mgroup my-section" aria-label="앱 설정">
+    ${myRow('savesheet','✨','저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
     ${myRow('appearance','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>','화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
     ${myRow('notisheet','🔔','알림 설정', settings.push ? `푸시 켜짐 · ${notiOn}개` : '푸시 꺼짐')}
-    ${myRow('savesheet','✨','저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
-    ${myRow('mapsheet','🗺️','위치 · 지도', esc(MAP_APPS[settings.mapApp].name))}
+    ${myRow('mapsheet','🗺️','지도 디자인', esc(MAP_APPS[settings.mapApp].name))}
   </section>
   <section class="mgroup my-section" aria-label="도움말">
-    ${myRow('guide','📖','이용 가이드')}
-    ${myRow('appinfo','ℹ️','앱 정보')}
+    ${myRow('guide',interestOf('study').emoji,'이용 가이드')}
+    ${myRow('faq','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7 M12 17h.01"/></svg>','자주 묻는 질문')}
+    ${myRow('notice','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l7 4V6l-7 4z M17 9.5a4 4 0 0 1 0 5"/></svg>','공지사항')}
+    ${myRow('terms','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z M14 3v5h5 M9 12h7 M9 16h7"/></svg>','약관 및 정책')}
+    ${myRow('appinfo','ℹ️','현재 버전','Prototype 03')}
   </section>
   <button class="logout" data-action="logout">로그아웃</button>`;
 };
@@ -85,8 +88,7 @@ function saveSettings(){
   modal('저장 설정', `<div class="mycard settings">${sw('aiDefault','AI 자동 분류 기본 사용','끄면 저장할 때 카테고리를 직접 골라요')}</div>`);
 }
 function mapSettings(){
-  modal('위치 · 지도', `<div class="mycard settings">
-    <button class="setrow" data-action="location"><div><b>위치 권한</b><small>${LOC_PERM[settings.locPerm]}${settings.locPerm==='none'?' · 예시 위치로 체험 중':''}</small></div>${icon('arrow')}</button>
+  modal('지도 디자인', `<div class="mycard settings">
     <div class="setrow col"><div><b>길찾기 지도 앱</b><small>장소 상세의 길찾기 버튼이 이 앱으로 열려요</small></div>
       <div class="segmented" role="radiogroup" aria-label="길찾기 지도 앱">${Object.entries(MAP_APPS).map(([k,v]) => `<button role="radio" aria-checked="${settings.mapApp===k}" class="${settings.mapApp===k?'on':''}" data-mapapp="${k}">${v.name}</button>`).join('')}</div>
     </div></div>`);
@@ -105,9 +107,9 @@ Object.assign(actions, {
   coachagain: () => { go('home'); setTimeout(startCoach, 300); },
   appinfo: () => { modal('앱 정보', `<p>핀맵 Prototype 03</p><p class="hint">예시 데이터로 체험하는 프로토타입이에요. 데이터는 이 브라우저에만 저장돼요.</p>`); $('#sheet').classList.add('bottomsheet'); },
   howto: () => openOnboarding(1),
-  profile: () => { modal('프로필 편집', `<form id="profileform"><label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label><p class="hint">위치는 ‘위치 설정’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장</button></div></form>`); $('#sheet').classList.add('bottomsheet'); },
-  resetask: () => go('resetsettings'),
-  resetdata: () => go('resetsettings'),
+  profile: () => { modal('프로필 편집', `<form id="profileform"><label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label><p class="hint">위치는 ‘위치 관리’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장</button></div></form>`); $('#sheet').classList.add('bottomsheet'); },
+  resetask: () => go('account'),
+  resetdata: () => go('account'),
   logout: () => toast('프로토타입에서는 로그아웃 기능을 제공하지 않아요.')
 });
 

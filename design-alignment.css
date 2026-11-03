@@ -244,7 +244,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 #onboarding .ob-next:disabled{background:var(--color-disabled)!important;color:var(--color-secondary)!important;opacity:1}
 /* Illustration height absorbs available space; captions, controls and gaps keep token sizes. */
 #onboarding .ob-screen.step2 .ob-title{margin:var(--space-xs) 0 var(--space-sm)!important}
-#onboarding .step2 .ob-flow{flex:1;min-height:0;margin:0!important;grid-template-rows:minmax(0,1fr) var(--space-sm) minmax(0,1fr) var(--space-sm) minmax(0,1fr);gap:var(--space-xs)}
+#onboarding .step2 .ob-flow{flex:1;min-height:0;margin:0!important;padding:0 0 var(--space-xl);grid-template-rows:minmax(0,1fr) var(--space-sm) minmax(0,1fr) var(--space-sm) minmax(0,1fr);gap:var(--space-xs)}
 #onboarding .step2 .ob-flowcard{min-height:0;align-self:stretch;padding:var(--space-md) var(--space-lg);gap:var(--space-sm);border:1px solid var(--color-disabled)!important;border-radius:var(--rounded-md);background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important}
 #onboarding .step2 .ob-flowtext{flex:none}
 #onboarding .step2 .ob-flowtext h3{margin:0;font:var(--type-label-md);gap:var(--space-sm);color:var(--color-on-surface);letter-spacing:normal}
@@ -263,3 +263,134 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 #onboarding .step3 .ob-option.on{background:var(--color-disabled)!important;border-color:var(--color-primary)!important}
 #onboarding .step3 .ob-option.on::after{content:'✓';position:absolute;top:var(--space-md);right:var(--space-md);font:var(--type-label-md);color:var(--color-on-surface)}
 #onboarding .step3 .ob-actions{gap:var(--space-sm)}
+
+/* Full-page address settings: existing semantic roles only. */
+.address-page{color:var(--color-on-surface);font:var(--type-body-md)}
+.address-header{display:flex;align-items:center;gap:var(--space-md);margin:0 0 var(--space-2xl)}
+.address-header h1{flex:1;min-width:0;margin:0;font:var(--type-headline-lg);color:var(--color-on-surface);outline:none}
+.address-header>button{display:grid;place-items:center;flex:none;width:44px;height:44px;padding:0;background:transparent;color:var(--color-on-surface);font:var(--type-label-md)}
+.address-header .icon{width:24px;height:24px}
+.address-search{display:flex;align-items:center;gap:var(--space-sm);min-height:56px;padding:0 var(--space-md);border:1px solid var(--color-disabled);border-radius:var(--rounded-md);background:var(--color-surface)}
+.address-search>.icon{width:24px;height:24px;flex:none;color:var(--color-secondary)}
+.address-search input{flex:1;min-width:0;width:100%;height:54px;padding:0;border:0;outline:none;background:transparent;color:var(--color-on-surface);font:var(--type-body-md);box-shadow:none}
+.address-search input::placeholder{color:var(--color-secondary);opacity:1}
+.address-search input::-webkit-search-cancel-button{display:none}
+.address-search:focus-within{outline:2px solid var(--color-primary);outline-offset:2px}
+.address-search>button{display:grid;place-items:center;width:44px;height:44px;flex:none;padding:0;background:transparent;color:var(--color-secondary)}
+.address-search>button[hidden]{display:none}
+.address-search>button .icon{width:20px;height:20px}
+.address-locate,.address-add{display:flex;align-items:center;justify-content:center;gap:var(--space-sm);width:100%;min-height:48px;padding:var(--space-md);border:1px solid var(--color-border);border-radius:var(--rounded-md);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md)}
+.address-locate{margin:var(--space-lg) 0 var(--space-xl)}
+.address-locate .icon,.address-add .icon{width:20px;height:20px;flex:none}
+.address-row{border-bottom:1px solid var(--color-disabled);padding:var(--space-xl) 0}
+.address-select{display:flex;align-items:center;gap:var(--space-md);width:100%;min-height:56px;padding:0;background:transparent;color:var(--color-on-surface);text-align:left}
+.address-row-icon{flex:none;width:24px;display:grid;place-items:center}
+.address-row-icon .icon{width:24px;height:24px}
+.address-copy{display:block;flex:1;min-width:0}
+.address-name{display:flex;align-items:center;flex-wrap:wrap;gap:var(--space-sm)}
+.address-name b{font:var(--type-headline-md);overflow-wrap:anywhere}
+.address-detail{display:block;margin-top:var(--space-xs);font:var(--type-body-md);overflow-wrap:anywhere}
+.address-memo{display:block;margin-top:var(--space-sm);color:var(--color-secondary);font:var(--type-body-sm);white-space:pre-line;overflow-wrap:anywhere}
+.address-badge{padding:var(--space-xs) var(--space-sm);border-radius:var(--rounded-sm);background:var(--color-disabled);color:var(--color-on-surface);font:var(--type-body-sm)}
+.address-check{flex:none;display:grid;place-items:center;width:24px;color:var(--color-primary)}
+.address-check .icon{width:24px;height:24px}
+.address-row-edit{display:flex;justify-content:flex-end;gap:var(--space-sm);margin-top:var(--space-md)}
+.address-row-edit button{display:flex;align-items:center;gap:var(--space-xs);min-height:44px;padding:0 var(--space-md);border:1px solid var(--color-border);border-radius:var(--rounded-sm);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md)}
+.address-row-edit .icon{width:16px;height:16px}
+.address-add{margin-top:var(--space-xl)}
+.address-empty{padding:var(--space-2xl) var(--space-lg);text-align:center}
+.address-empty p{margin:0 0 var(--space-sm);font:var(--type-body-md)}
+.address-empty small,.address-limit{color:var(--color-secondary);font:var(--type-body-sm)}
+.address-limit{margin-top:var(--space-lg)}
+.address-edit-form{display:grid;gap:var(--space-xl)}
+.address-edit-form .field{margin:0;gap:var(--space-sm)}
+.address-edit-form .field>span{font:var(--type-label-md);color:var(--color-on-surface)}
+.address-edit-form .field small{font:var(--type-body-sm);color:var(--color-secondary)}
+.address-edit-form .field input,.address-edit-form .field textarea{width:100%;padding:var(--space-md);border:1px solid var(--color-border);border-radius:var(--rounded-md);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-body-md)}
+.address-edit-form .field input{min-height:48px}
+.address-edit-form .field textarea{resize:vertical}
+.address-save{min-height:56px;border-radius:var(--rounded-sm);font:var(--type-label-md)}
+
+/* Profile settings: direct editing and category-owned reset actions. */
+.accountpage .subhead,.accountaccesspage .subhead,.connectionpage .subhead{margin-bottom:var(--space-xl)}
+.accountpage .subhead h1,.accountaccesspage .subhead h1,.connectionpage .subhead h1{font:var(--type-headline-md)}
+.account-identity{display:flex;flex-direction:column;align-items:center;gap:var(--space-sm);padding:var(--space-xl) 0 var(--space-2xl);text-align:center}
+.account-photo{position:relative;display:block;padding:0;background:transparent;border-radius:50%;color:var(--color-on-surface)}
+.account-photo .pavatar{width:80px;height:80px}
+.account-photo-edit{position:absolute;right:0;bottom:0;display:grid;place-items:center;width:28px;height:28px;border:1px solid var(--color-disabled);border-radius:50%;background:var(--color-surface)}
+.account-photo-edit .icon{width:16px;height:16px}
+.account-name{display:flex;align-items:center;justify-content:center;gap:var(--space-sm);max-width:100%;min-height:44px;padding:0 var(--space-sm);background:transparent;color:var(--color-on-surface)}
+.account-name b{font:var(--type-headline-md);overflow-wrap:anywhere}
+.account-name .icon{flex:none;width:16px;height:16px;color:var(--color-secondary)}
+.account-identity>p{margin:0;color:var(--color-secondary);font:var(--type-body-sm)}
+.account-name-form{display:grid;gap:var(--space-md);width:100%;max-width:100%;text-align:left;margin-top:var(--space-md)}
+.account-name-form .field{margin:0;gap:var(--space-sm)}
+.account-name-form .field>span{font:var(--type-label-md)}
+.account-name-form input{width:100%;min-height:48px;color:var(--color-on-surface);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--rounded-sm);font:var(--type-body-md)}
+.account-name-form>div{display:flex;justify-content:flex-end;gap:var(--space-sm)}
+.account-name-form>div button{min-width:80px;min-height:44px;padding:var(--space-sm) var(--space-lg);border-radius:var(--rounded-sm);font:var(--type-label-md)}
+.accountpage .account-section,.accountaccesspage .account-section{border-top:1px solid var(--color-disabled);padding:var(--space-sm) 0}
+.accountpage .account-section .mrow{min-height:64px;padding:var(--space-lg) 0;gap:var(--space-md);color:var(--color-on-surface);background:transparent;border-radius:0;box-shadow:none}
+.accountpage .mrow .mrlabel{font:var(--type-body-md)}
+.accountpage .mrow .mrval{font:var(--type-body-sm);color:var(--color-secondary)}
+.accountpage .mrow .mrico{width:24px;color:var(--color-secondary)}
+.accountpage .mrow .mrico .icon{width:20px;height:20px}
+.accountpage .mrow>.icon{width:20px;height:20px;color:var(--color-secondary)}
+.accountaccesspage .mpdesc{margin:0 0 var(--space-xl);font:var(--type-body-md);color:var(--color-secondary)}
+.accountaccesspage .setrow{padding:var(--space-xl) 0;gap:var(--space-lg);border-color:var(--color-disabled);background:transparent}
+.accountaccesspage .setrow:last-child{border-bottom:0}
+.accountaccesspage .setrow b{font:var(--type-body-md);color:var(--color-on-surface)}
+.accountaccesspage .setrow small{margin-top:var(--space-xs);font:var(--type-body-sm);color:var(--color-secondary)}
+.accountaccesspage .account-leave b{color:var(--color-error)}
+.setting-reset{margin-top:var(--space-2xl);padding-top:var(--space-lg);border-top:1px solid var(--color-disabled)}
+.setting-reset>button{min-height:44px;padding:var(--space-sm) 0;color:var(--color-secondary);background:transparent;font:var(--type-label-md);text-align:left}
+.setting-reset>p{margin:var(--space-xs) 0 0;color:var(--color-secondary);font:var(--type-body-sm);word-break:keep-all}
+.mypage.settingpage .mycard.settings{padding:0;border:0;border-radius:0;background:transparent!important;box-shadow:none}
+.settingpage .setrow{padding:var(--space-lg) 0;gap:var(--space-md);border-color:var(--color-disabled)}
+.settingpage .setrow b{font:var(--type-label-md)}
+.settingpage .setrow small{font:var(--type-body-sm);margin-top:var(--space-xs)}
+.connectionpage .acchint{margin:0 0 var(--space-xl);font:var(--type-body-md);color:var(--color-secondary)}
+.connectionpage .mgroup{margin-top:var(--space-xl);padding:var(--space-lg);border-radius:var(--rounded-md);background:var(--color-surface);box-shadow:none}
+.connectionpage .mgroup>h2{margin:0 0 var(--space-sm);font:var(--type-label-md)}
+.connectionpage .accnote{margin:var(--space-md) 0 0;font:var(--type-body-sm);color:var(--color-secondary)}
+
+/* 2026-11-03 마이 바로가기 카드 (내 코스 · 연동 새로고침): 기존 25개 토큰만 사용 */
+.my-quick{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-sm);margin:0 0 var(--space-lg)}
+.myq-card{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-xs);min-height:44px;padding:var(--space-lg);border-radius:var(--rounded-md);background:var(--color-surface);box-shadow:var(--shadow-sm);color:var(--color-on-surface);text-align:left}
+.myq-card .myq-ico{display:grid;place-items:center;width:24px;height:24px;margin-bottom:var(--space-xs);color:var(--color-on-surface)}
+.myq-card .myq-ico .icon{width:24px;height:24px}
+.myq-card b{font:var(--type-label-md)}
+.myq-card small{font:var(--type-body-sm);color:var(--color-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.myq-card.on .myq-ico .icon{animation:spin .9s linear infinite}
+@media(prefers-reduced-motion:reduce){.myq-card.on .myq-ico .icon{animation:none}}
+
+/* 2026-11-03 온보딩 2·3번째 화면: 단계 표시(1/2 · 2/2)와 건너뛰기를 space-md만큼 위로. 아래 제목 위치는 그대로 */
+#onboarding .ob-screen:is(.step2,.step3)>.ob-top{margin-top:calc(-1 * var(--space-md));margin-bottom:var(--space-md)}
+
+/* 2026-11-03 위치 편집 페이지: 제목과 등록된 위치 글자를 타입 스케일 한 단계씩 작게 (기존 토큰만 사용).
+   메모·배지는 이미 가장 작은 body-sm이라 그대로 둔다. */
+.address-header h1{font:var(--type-headline-md)}
+.address-name b{font:var(--type-body-md);font-weight:700}
+.address-detail{font:var(--type-label-md);font-weight:400}
+
+/* 2026-11-03 연동 새로고침 결과 안내: 한 줄로 표시 (화면 폭 안에서 가로로 늘어남, 기존 토큰만 사용) */
+#snackbar.oneline{white-space:nowrap;width:max-content;max-width:calc(100% - var(--space-xl))}
+
+/* 2026-11-03 프로필 및 계정: 로그아웃 | 회원 탈퇴를 화면 하단 가운데 작은 회색 글자 버튼으로 (기존 토큰만 사용) */
+.accountpage{display:flex;flex-direction:column;min-height:calc(100dvh - 160px)}
+.accountpage .account-exit{display:flex;align-items:center;justify-content:center;gap:var(--space-xs);margin-top:auto;padding-top:var(--space-2xl);color:var(--color-secondary);font:var(--type-body-sm)}
+.accountpage .account-exit button{min-height:44px;padding:0 var(--space-md);background:transparent;color:var(--color-secondary);font:var(--type-body-sm)}
+
+/* 2026-11-03 온보딩 '마음에 드는 콘텐츠를 발견했다면?': 1·2·3 카드 이미지 세로를 각각 space-2xl만큼 줄여 카드 높이를 낮춤.
+   카드는 남은 높이를 1fr씩 나눠 가지므로, 아래 여백에 3 × space-2xl을 더해 각 카드(=이미지)가 같은 만큼 줄어든다. */
+#onboarding .step2:not(.howtobody) .ob-flow{padding-bottom:calc(var(--space-xl) + 3 * var(--space-2xl))}
+
+/* 2026-11-03 프로필 및 계정: SNS 연동 계정을 프로필 편집 바로 아래에 (기존 토큰만 사용) */
+.accountpage .account-connections{padding:var(--space-xl) 0 0}
+.accountpage .account-connections>.account-sub{margin:0 0 var(--space-xs);font:var(--type-label-md);color:var(--color-on-surface)}
+.accountpage .account-connections .acchint{margin:0 0 var(--space-lg);font:var(--type-body-sm)}
+
+/* 2026-11-03 온보딩 1/2: 제목과 카드 사이 여백 +space-lg, 카드 사이 간격 두 단계(gap space-xs → space-md) */
+#onboarding .step2 .ob-flow{margin-top:var(--space-lg)!important;gap:var(--space-md)}
+/* 늘어난 여백만큼 아래 여백을 덜어 카드·이미지 높이(161/83px)는 그대로 유지 */
+#onboarding .step2:not(.howtobody) .ob-flow{padding-bottom:calc(var(--space-xl) + 3 * var(--space-2xl) - var(--space-lg) - 4 * var(--space-md) + 4 * var(--space-xs))}

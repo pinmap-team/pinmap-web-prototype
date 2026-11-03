@@ -1,6 +1,6 @@
 // Desktop prototype preview of the mobile keyboard. Touch devices use their native keyboard.
 (() => {
-  const isSearch = target => target?.matches?.('#lm-search input, .libpage #search');
+  const isSearch = target => target?.matches?.('#lm-search input, .libpage #search, #address-search');
   const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
   const keyboard = document.createElement('div');
   keyboard.id = 'pm-keyboard-preview';
