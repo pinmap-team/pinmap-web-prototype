@@ -394,3 +394,53 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 #onboarding .step2 .ob-flow{margin-top:var(--space-lg)!important;gap:var(--space-md)}
 /* 늘어난 여백만큼 아래 여백을 덜어 카드·이미지 높이(161/83px)는 그대로 유지 */
 #onboarding .step2:not(.howtobody) .ob-flow{padding-bottom:calc(var(--space-xl) + 3 * var(--space-2xl) - var(--space-lg) - 4 * var(--space-md) + 4 * var(--space-xs))}
+
+/* Collection search shares the map header hierarchy. */
+.cfpage .cf-search-header{position:relative;height:44px;margin-bottom:var(--space-md)}
+.cfpage .cf-search-header .cf-fhead{height:44px;min-height:44px;margin-bottom:0;padding-right:56px}
+.cfpage .cf-header-search{position:absolute;right:0;top:0;z-index:12;width:44px;height:44px;display:grid;place-items:center;padding:0;border:0;background:transparent;color:var(--color-on-surface);box-shadow:none;cursor:pointer}
+.cf-header-search>span{position:absolute;inset:0;display:grid;place-items:center;transition:opacity .24s ease,transform .32s cubic-bezier(.22,1,.36,1)}
+.cf-header-search .lm-search-open-icon{opacity:1;transform:rotate(0) scale(1)}
+.cf-header-search .lm-search-close-icon{opacity:0;transform:rotate(-65deg) scale(.72)}
+.cf-header-search[aria-expanded="true"] .lm-search-open-icon{opacity:0;transform:rotate(65deg) scale(.72)}
+.cf-header-search[aria-expanded="true"] .lm-search-close-icon{opacity:1;transform:rotate(0) scale(1)}
+.cf-header-search .icon{width:24px;height:24px}
+.cfpage .cf-search-row{position:absolute;right:0;top:0;z-index:11;width:44px;height:44px;overflow:hidden;opacity:0;visibility:hidden;pointer-events:none;transform-origin:right center;transition:width .36s cubic-bezier(.22,1,.36,1),opacity .18s ease,visibility 0s linear .36s}
+.cfpage .cf-search-row.is-open{width:100%;opacity:1;visibility:visible;pointer-events:auto;transition:width .36s cubic-bezier(.22,1,.36,1),opacity .18s ease}
+.cfpage .cf-search-row .libsearch{position:relative;width:100%;height:44px;min-height:44px;margin:0;gap:var(--space-xs);padding:0 48px 0 var(--space-md);border:1px solid var(--color-disabled);border-radius:999px;background:var(--color-surface);white-space:nowrap;box-shadow:none}
+.cfpage .cf-search-row .libsearch input{flex:1;width:100%;min-width:0;height:42px;margin:0;padding:0!important;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;font:var(--type-body-md);color:var(--color-on-surface)}
+.cf-search-header .cf-header-search:focus-visible{outline:2px solid var(--color-primary);outline-offset:-2px;border-radius:50%}
+@media(prefers-reduced-motion:reduce){.cfpage .cf-search-row,.cf-header-search>span{transition:none}}
+
+/* Search focus belongs to the rounded container, never the inner text field. */
+:is(.search,.libsearch,.cf-picksearch,.psearch,.cm-search,.lm-search) input,
+:is(.search,.libsearch,.cf-picksearch,.psearch,.cm-search,.lm-search) input:focus,
+:is(.search,.libsearch,.cf-picksearch,.psearch,.cm-search,.lm-search) input:focus-visible{border:0!important;outline:none!important;box-shadow:none!important}
+:is(.search,.cf-picksearch,.psearch,.cm-search):focus-within{outline:2px solid var(--color-primary);outline-offset:-2px}
+
+/* Edit sheet: clean fields without nested rectangular focus lines. */
+#editform :is(input,textarea,select),
+#editform :is(input,textarea,select):focus,
+#editform :is(input,textarea,select):focus-visible{border:0!important;outline:none!important;box-shadow:none!important}
+#editform :is(.esinput,.esselect),
+#editform :is(.esinput,.esselect):focus-within{border-color:transparent!important;outline:none!important;box-shadow:none!important}
+#editform .pm-choice-options{border:0!important;box-shadow:none!important}
+#editform .pm-choice button:focus-visible{outline:none!important;background:var(--color-neutral)}
+#editform .esfoot :is(.escancel,.essubmit){border-radius:100px}
+
+#editform #es-newfolder[hidden]{display:none}
+#editform .pm-choice-group{padding:var(--space-md) var(--space-md) var(--space-xs);color:var(--color-secondary);font:var(--type-body-sm)}
+#editform #es-newfolder .eshint{margin-top:var(--space-sm)}
+
+#editform .esfield>.escount{position:static;display:block;margin-top:var(--space-sm);text-align:right;font:var(--type-body-sm);color:var(--color-secondary)}
+
+.cf-folder-toolbar{display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm);margin:var(--space-sm) 0 0}
+.cf-folder-toolbar>span{font:var(--type-body-sm);color:var(--color-secondary)}
+.cf-folder-toolbar .pm-choice-trigger{background:transparent;border:0;box-shadow:none;padding-inline:0;min-height:44px}
+.cf-folder[data-collection]{-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+
+/* Sort labels sit directly on the page; only the opened options use a surface. */
+.cfpage .libsort.pm-choice .pm-choice-trigger{background:transparent;border:0;box-shadow:none;padding-inline:0}
+
+.cf-folder-toolbar .pm-choice-trigger{color:var(--color-secondary)}
+.cf-folder-toolbar+.cf-grid{margin-top:var(--space-sm)}

@@ -98,6 +98,30 @@ function cfSyncCollections(){
 }
 document.addEventListener('DOMContentLoaded', cfSyncCollections);
 
+/* Folder ordering does not change saved content or content-level sorting. */
+const CF_FOLDER_SORTS=[['new','최근 만든 순'],['old','오래된 생성 순'],['name','이름 오름차순'],['name-desc','이름 내림차순'],['saved','최근 담은 순']];
+function cfOrderFolders(folders){
+  const mode=settings.folderSort||'new',custom=cfCustom();
+  const latest=f=>items.filter(x=>f.attr ? x.collection===f.id : folderOf(x)===f.id).reduce((max,x)=>Math.max(max,savedTimestamp(x)||0),0);
+  return [...folders].sort((a,b)=>{
+    if(mode==='name'||mode==='name-desc')return a.title.localeCompare(b.title,'ko',{numeric:true})*(mode==='name-desc'?-1:1);
+    if(mode==='saved')return latest(b)-latest(a)||a.title.localeCompare(b.title,'ko');
+    const ai=custom.indexOf(a.id),bi=custom.indexOf(b.id);
+    if(ai>=0 && bi>=0)return mode==='old'?ai-bi:bi-ai;
+    if(ai>=0 || bi>=0)return ai>=0?-1:1;
+    return CF_ALL.findIndex(f=>f.id===a.id)-CF_ALL.findIndex(f=>f.id===b.id);
+  });
+}
+function cfFolderToolbar(){
+  return `<div class="cf-folder-toolbar"><label class="libsort"><span class="sr">폴더 정렬</span><select data-folder-sort aria-label="폴더 정렬">${CF_FOLDER_SORTS.map(([value,label])=>`<option value="${value}" ${value===(settings.folderSort||'new')?'selected':''}>${label}</option>`).join('')}</select></label></div>`;
+}
+document.addEventListener('change',e=>{
+  if(!e.target.matches('select[data-folder-sort]'))return;
+  if(!CF_FOLDER_SORTS.some(([key])=>key===e.target.value))return;
+  settings.folderSort=e.target.value;afterChange();render();
+  requestAnimationFrame(()=>document.querySelector('[data-folder-sort]')?.parentElement.querySelector('button')?.focus());
+});
+
 /* ---------- 화면 ---------- */
 const libraryResultCards = resultCards;  // 기존 목록 (참고용으로 남겨둬요)
 const cfQ = () => query.trim().toLowerCase();
@@ -190,9 +214,9 @@ resultCards = function(){
   // 전체: 카테고리 폴더 + 내가 만든 폴더
   const list = cfMatches();
   // 내가 만든 폴더는 가장 최근 것부터 맨 앞(좌측 상단)에, 그 뒤로 카테고리 폴더
-  const mine = q ? [] : [...cfCustom()].reverse().map(n => {
+  const mine = q ? [] : cfCustom().map(n => {
     const inFolder = items.filter(x => x.collection === n);
-    return CollectionFolder({id:n, title:n, icon:'folder', count:inFolder.length, thumbnails:cfThumbs(inFolder), attr:`data-collection="${esc(n)}"`});
+    return {id:n,title:n,icon:'folder',count:inFolder.length,thumbnails:cfThumbs(inFolder),attr:`data-collection="${esc(n)}"`};
   });
   // 새 폴더 추가 타일: 항상 맨 앞(좌측 상단) · 검색 중엔 숨겨요
   const addTile = q ? [] : [`<button type="button" class="cf-folder cf-add" data-action="newfolder" aria-label="새 폴더 만들기">
@@ -203,26 +227,24 @@ resultCards = function(){
       <span class="cf-addplus">${icon('plus')}</span>
     </span>
   </button>`];
-  const folders = [...addTile, ...mine, ...cfFolderData(list).map(CollectionFolder)];
+  const folders = [...addTile, ...cfOrderFolders([...mine, ...cfFolderData(list)]).map(CollectionFolder)];
   const grid = folders.length ? `<div class="cf-grid">${folders.join('')}</div>` : '';
-  if (!q) return grid;
+  if (!q) return cfFolderToolbar() + grid;
   if (!list.length) return cfEmpty('search', '찾는 콘텐츠가 없어요', '다른 키워드나 카테고리로 다시 찾아보세요.', `<button class="tonal" data-action="resetfilter">전체 컬렉션 보기</button>`);
   return grid + cfCards(list, false, false);
 };
 
+let cfSearchOpen = false;
 pages.library = function(){
   cfSyncCollections();
-  const open = cfOpenTitle(), sel = cfSelected();
+  const open = cfOpenTitle();
   // 다른 폴더로 가면 선택 모드는 꺼요
   if (cfSelKey !== open) { cfSel = null; cfSelKey = open; }
-  const chipIc = id => { const f = CF_ALL.find(f => f.id === id); return f ? icon(f.icon) : ''; };
-  const chip = (id, on) => `<button class="libchip ${on ? 'on' : ''}" data-filter="${esc(id)}" aria-pressed="${on}">${chipIc(id)}${esc(id)}</button>`;
-  // 칩은 컬렉션 첫 화면에서만 (폴더 안에서는 숨김)
-  const chips = open ? '' : `<div class="libchips cfchips" role="group" aria-label="카테고리 필터">${chip('전체', !sel.length)}${CF_FOLDERS.map(f => chip(f.id, sel.includes(f.id))).join('')}</div>`;
   // 제목 줄: 높이를 고정해 폴더 안 · 밖, 홈에서 들어온 경우 모두 제목 · 검색창 위치가 같아요
   const back = open
     ? `<button type="button" class="subback cf-back-btn" data-action="cfback" aria-label="컬렉션으로 돌아가기">${icon('back')}</button>`
     : ((typeof backHome !== "undefined" && backHome) ? `<button type="button" class="subback cf-back-btn" data-action="backhome" aria-label="홈으로 돌아가기">${icon('back')}</button>` : '');
+  if(query)cfSearchOpen=true;
   const ph = open ? `${open}에서 찾기` : '저장한 콘텐츠 찾기';
   const n = cfSel?.size || 0;
   const selbar = cfSel ? `<div class="cf-selbar" role="toolbar" aria-label="선택한 콘텐츠">
@@ -231,14 +253,41 @@ pages.library = function(){
       <button type="button" class="cf-seldel" data-action="cfdelete" ${n ? '' : 'disabled'}>${icon('close')}삭제</button>
     </div>` : '';
   return `<div class="libpage cfpage ${open ? 'cf-infolder' : ''} ${cfSel ? 'cf-selecting' : ''}">${CF_DEFS}
+    <div class="cf-search-header">
     <div class="libhead cf-fhead${back ? ' hasback' : ''}">${back}<h1>${esc(open || '컬렉션')}</h1>${open ? `<span class="cf-hcount" aria-label="저장 ${cfTotal()}개">${cfTotal()}</span>` : ''}${collection && cfCustom().includes(collection) && !cfSel ? `<button type="button" class="cf-delfolder" data-action="cfdelfolder" aria-label="‘${esc(collection)}’ 폴더 삭제">${icon('trash')}</button>` : ''}</div>
-    <label class="libsearch">${icon('search')}<input id="search" type="search" enterkeyhint="search" aria-label="${esc(ph)}" placeholder="${esc(ph)}" value="${esc(query)}"><button class="iconbtn" data-action="clear" aria-label="검색 지우기" ${query ? '' : 'hidden'}>${icon('close')}</button></label>
-    ${chips}
+      <div class="cf-search-row${cfSearchOpen?' is-open':''}" id="cf-search-row" aria-hidden="${!cfSearchOpen}" ${cfSearchOpen?'':'inert'}>
+        <label class="libsearch"><input id="search" type="search" enterkeyhint="search" aria-label="${esc(ph)}" placeholder="${esc(ph)}" value="${esc(query)}" ${cfSearchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-action="clear" aria-label="검색 지우기" ${query?'':'hidden'}>${icon('close')}</button></label>
+      </div>
+      <button type="button" class="cf-header-search" data-action="cftogglesearch" aria-label="${cfSearchOpen?'컬렉션 검색창 닫기':'컬렉션에서 콘텐츠 검색'}" aria-expanded="${cfSearchOpen}" aria-controls="cf-search-row"><span class="lm-search-open-icon">${icon('search')}</span><span class="lm-search-close-icon">${icon('close')}</span></button>
+    </div>
     <p id="resultcount" class="sr" role="status">${cfStatus()}</p>
     <div id="results" class="cf-results">${resultCards()}</div>
     ${selbar}
   </div>`;
 };
+
+// Match the map's inline expansion without changing live collection filtering.
+actions.cftogglesearch = () => {
+  cfSearchOpen=!cfSearchOpen;
+  const row=$('#cf-search-row'),input=$('.cf-search-header #search'),toggle=$('.cf-header-search');
+  if(!row || !input || !toggle)return;
+  row.classList.toggle('is-open',cfSearchOpen);
+  row.setAttribute('aria-hidden',String(!cfSearchOpen));row.inert=!cfSearchOpen;
+  input.tabIndex=cfSearchOpen?0:-1;
+  toggle.setAttribute('aria-expanded',String(cfSearchOpen));
+  toggle.setAttribute('aria-label',cfSearchOpen?'컬렉션 검색창 닫기':'컬렉션에서 콘텐츠 검색');
+  if(cfSearchOpen)requestAnimationFrame(()=>input.focus());
+  else {
+    input.blur();input.value='';query='';
+    row.querySelector('[data-action="clear"]').hidden=true;
+    $('#results').innerHTML=resultCards();$('#resultcount').textContent=cfStatus();toggle.focus();
+  }
+};
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape' && cfSearchOpen && e.target.closest('.cf-search-header')){
+    e.preventDefault();actions.cftogglesearch();
+  }
+});
 
 /* ---------- 선택 삭제 ---------- */
 function cfSyncSel(){
@@ -403,8 +452,10 @@ nav = function(){
 document.addEventListener('keydown', e => { if (e.target.id === 'cfpickq' && e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
 
 /* ---------- 내가 만든 폴더 삭제 (콘텐츠는 남아요) ---------- */
-actions.cfdelfolder = () => {
-  const name = collection; if (!name || !cfCustom().includes(name)) return;
+let cfFolderToDelete=null;
+function cfAskDeleteFolder(name){
+  if(!name || !cfCustom().includes(name))return;
+  cfFolderToDelete=name;
   const n = items.filter(x => x.collection === name).length;
   modal('', `<div class="esform delsheet">
     <div class="nthead"><div><h2>‘${esc(name)}’ 폴더를 삭제할까요?</h2><p>${n ? `안에 담긴 콘텐츠 ${n}개는 지워지지 않고 컬렉션에 그대로 남아요.` : '빈 폴더예요.'}</p></div><button type="button" class="ntclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
@@ -412,8 +463,10 @@ actions.cfdelfolder = () => {
   </div>`);
   $('#sheet').classList.add('editsheet');
 };
+actions.cfdelfolder = () => cfAskDeleteFolder(collection);
 actions.cfdelfolderok = () => {
-  const name = collection; if (!name) return;
+  const name = cfFolderToDelete; if (!name || !cfCustom().includes(name)) return;
+  cfFolderToDelete=null;
   settings.customFolders = cfCustom().filter(n => n !== name);
   items.forEach(x => { if (x.collection === name) x.collection = ''; });
   const i = COLLECTIONS.findIndex(c => c[0] === name); if (i >= 0) COLLECTIONS.splice(i, 1);
@@ -421,3 +474,27 @@ actions.cfdelfolderok = () => {
   collection = null; filter = '전체'; query = ''; render(); window.scrollTo(0, 0);
   toast(`‘${name}’ 폴더를 삭제했어요.`);
 };
+
+/* Long press opens confirmation. Scrolling and ordinary taps retain navigation. */
+let cfHoldTimer=null,cfHoldStart=null,cfBlockClick=null;
+function cfCancelHold(){clearTimeout(cfHoldTimer);cfHoldTimer=null;cfHoldStart=null;}
+document.addEventListener('pointerdown',e=>{
+  cfCancelHold();if(e.button!==0)return;
+  const tile=e.target.closest('.cf-folder[data-collection]');
+  if(!tile || !cfCustom().includes(tile.dataset.collection))return;
+  cfHoldStart={x:e.clientX,y:e.clientY};
+  cfHoldTimer=setTimeout(()=>{
+    cfBlockClick={tile,until:Date.now()+1200};cfAskDeleteFolder(tile.dataset.collection);cfCancelHold();
+  },550);
+});
+document.addEventListener('pointermove',e=>{if(cfHoldStart&&Math.hypot(e.clientX-cfHoldStart.x,e.clientY-cfHoldStart.y)>10)cfCancelHold();},{passive:true});
+['pointerup','pointercancel','scroll'].forEach(type=>document.addEventListener(type,cfCancelHold,{capture:true,passive:true}));
+document.addEventListener('click',e=>{
+  if(cfBlockClick&&Date.now()<cfBlockClick.until&&cfBlockClick.tile.contains(e.target)){
+    e.preventDefault();e.stopImmediatePropagation();cfBlockClick=null;
+  }
+},true);
+document.addEventListener('contextmenu',e=>{
+  const tile=e.target.closest('.cf-folder[data-collection]');if(!tile)return;
+  e.preventDefault();cfCancelHold();cfAskDeleteFolder(tile.dataset.collection);
+});

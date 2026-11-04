@@ -84,15 +84,18 @@ actions.fav = () => {
 // app.js의 수정 처리(#editform 제출)를 그대로 쓰도록 입력 이름(type · title · address · memo · collection)을 유지해요.
 function editSheet(){
   const x = items.find(i => i.id === detailId); if (!x) return;
+  const currentFolder=cfCustom().includes(x.collection)?'custom:'+x.collection:'category:'+folderOf(x);
   const label = (ic, text, extra='') => `<div class="eslabel">${icon(ic)}<span>${text}</span>${extra}</div>`;
   modal('', `<form id="editform" class="esform">
-    <div class="eshead"><span class="esicon" aria-hidden="true">${icon('bookmark')}</span><div><h2>저장 정보 수정</h2><p>저장한 콘텐츠의 정보를 수정할 수 있어요.</p></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
+    <div class="eshead"><span class="esicon" aria-hidden="true">${icon('bookmark')}</span><div><h2>저장 정보 수정</h2></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
     <div class="esbody">
-      <label class="esfield">${label('grid','카테고리')}
-        <span class="esselect"><span class="esemoji" aria-hidden="true">${typeOf(x.type).emoji}</span><select name="type" id="es-type">${TYPES.map(t => `<option value="${t.id}" ${t.id===x.type?'selected':''}>${t.id}</option>`).join('')}</select>${icon('chevron')}</span>
-      </label>
+      <div class="esfield">${label('grid','카테고리')}
+        <input type="hidden" name="type" id="es-type" value="${esc(x.type)}">
+        <span class="esselect"><select name="folder" id="es-folder" aria-label="카테고리 및 폴더 선택">${CF_ALL.map(f=>`<option value="category:${esc(f.id)}" data-icon="${esc(f.icon)}" ${currentFolder==='category:'+f.id?'selected':''}>${esc(f.id)}</option>`).join('')}${cfCustom().length?`<optgroup label="내가 만든 폴더">${cfCustom().map(name=>`<option value="custom:${esc(name)}" data-icon="folder" ${currentFolder==='custom:'+name?'selected':''}>${esc(name)}</option>`).join('')}</optgroup>`:''}<option value="new:" data-icon="folderplus">새 폴더 만들기</option></select></span>
+      </div>
+      <div class="esfield" id="es-newfolder" hidden><label for="es-newcol" class="eslabel">${icon('folderplus')}새 폴더 이름</label><span class="esinput"><input id="es-newcol" maxlength="30" placeholder="예: 이번 주말 가고 싶은 곳" autocomplete="off"></span><p class="eshint">수정 완료를 누르면 새 폴더를 만들고 여기에 담아요.</p><p id="es-folder-error" class="eserror" role="alert"></p></div>
       <label class="esfield">${label('text','제목')}
-        <span class="esinput"><input name="title" id="es-title" value="${esc(x.title)}" required maxlength="50"><small class="escount" data-for="es-title"></small></span>
+        <span class="esinput"><input name="title" id="es-title" value="${esc(x.title)}" required maxlength="50"></span><small class="escount" data-for="es-title"></small>
       </label>
       <label class="esfield" id="es-addrwrap" ${typeOf(x.type).place?'':'hidden'}>${label('pin','주소')}
         <span class="esinput withicon">${icon('pin')}<input name="address" id="es-address" value="${esc(x.address||'')}" maxlength="200" placeholder="원본에서 확인한 주소"></span>
@@ -115,6 +118,29 @@ paths.text = 'M5 6V4h14v2 M12 4v16 M9 20h6';
 const esCounts = () => document.querySelectorAll('.esform .escount').forEach(c => {
   const el = document.getElementById(c.dataset.for); if (el) c.textContent = `${el.value.length}/${el.maxLength}`;
 });
+
+// First entry places the caret at the end; later taps can still reposition it.
+const esCaretOnEntry = new WeakSet();
+function esEditable(target){
+  return target?.matches?.('#editform input:not([type="hidden"]), #editform textarea') && typeof target.setSelectionRange === 'function';
+}
+function esCaretToEnd(field){
+  if(document.activeElement !== field)return;
+  field.setSelectionRange(field.value.length,field.value.length);
+  field.scrollLeft=field.scrollWidth;
+}
+document.addEventListener('pointerdown',e=>{
+  if(!esEditable(e.target))return;
+  esCaretOnEntry.delete(e.target);
+  if(document.activeElement!==e.target)esCaretOnEntry.add(e.target);
+},true);
+document.addEventListener('focusin',e=>{
+  if(esEditable(e.target))requestAnimationFrame(()=>esCaretToEnd(e.target));
+});
+document.addEventListener('click',e=>{
+  if(!esEditable(e.target)||!esCaretOnEntry.has(e.target))return;
+  esCaretOnEntry.delete(e.target);esCaretToEnd(e.target);
+});
 $('#sheet').addEventListener('close', () => $('#sheet').classList.remove('editsheet'));
 document.addEventListener('input', e => {
   if (!e.target.closest?.('.esform')) return;
@@ -123,7 +149,19 @@ document.addEventListener('input', e => {
   if (e.target.id === 'es-newcol') { if($('#es-folder'))$('#es-folder').value='new:'; $('#es-col').value = e.target.value.trim(); document.querySelectorAll('[data-escol]').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-pressed','false'); }); }
 });
 document.addEventListener('change', e => {
-  if(e.target.id === 'es-folder'){ $('#es-newcol').hidden=true; return; }
+  if(e.target.id === 'es-folder'){
+    const value=e.target.value,newFolder=value==='new:';
+    $('#es-newfolder').hidden=!newFolder;$('#es-newcol').required=newFolder;
+    $('#es-folder-error').textContent='';
+    if(newFolder){$('#es-col').value=$('#es-newcol').value.trim();$('#es-newcol').focus();}
+    else if(value.startsWith('custom:'))$('#es-col').value=value.slice(7);
+    else if(value.startsWith('category:')){
+      const name=value.slice(9),type=['맛집','카페'].includes(name)?'맛집·카페':name;
+      $('#es-type').value=type;
+      $('#es-addrwrap').hidden=!typeOf(type).place;
+    }
+    return;
+  }
   if (e.target.id !== 'es-type') return;
   const ai = e.target.value === 'ai', t = typeOf(e.target.value);
   const emoji = $('.esform .esemoji'); if(emoji)emoji.textContent = ai ? '✨' : t.emoji;

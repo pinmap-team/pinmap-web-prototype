@@ -276,6 +276,14 @@ document.addEventListener('submit',e=>{
     toast(ai?`저장했어요. AI가 ‘${type}’로 분류했어요.`:'저장했어요. 필요할 때 다시 꺼내보세요.');
   } else if(e.target.id==='editform'){
     e.preventDefault();const data=new FormData(e.target),x=items.find(x=>x.id===detailId);
+    const folderValue=String(data.get('folder')||'');
+    if(folderValue==='new:'){
+      const name=String(data.get('collection')||'').trim();
+      if(!name || ['전체',...CF_ALL.map(f=>f.id)].includes(name)){
+        const error=$('#es-folder-error');if(error)error.textContent=name?'다른 폴더 이름을 입력해 주세요.':'새 폴더 이름을 입력해 주세요.';
+        $('#es-newcol')?.focus();return;
+      }
+    }
     const previousFolder=cfCustom().includes(x.collection)?'custom:'+x.collection:'category:'+folderOf(x), previousCollection=x.collection||'';
     const type=String(data.get('type'));
     if(type!==x.type){delete x.folderCategory;x.aiClassified=false;x.category=shortType(type);x.art=x.art||typeOf(type).art;}

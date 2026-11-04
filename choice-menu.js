@@ -1,7 +1,7 @@
 // Keep the existing select values and change handlers; replace only their UI.
 (() => {
   const categoryIcons = {'맛집·카페':'coffee','전시·팝업':'ticket','여행':'plane','쇼핑':'bag','레시피':'chef','생활 정보':'note','기타':'bookmark',ai:'spark'};
-  const sortIcons = {recent:'clock',old:'clock',near:'pin'};
+  const sortIcons = {recent:'clock',old:'clock',near:'pin',new:'clock',name:'text','name-desc':'text',saved:'bookmark'};
   function closeMenus(except){
     document.querySelectorAll('.pm-choice.is-open').forEach(host => {
       if(host === except)return;
@@ -11,10 +11,10 @@
     });
   }
   function enhance(){
-    document.querySelectorAll('.esselect select, select[data-libsort]').forEach(select => {
+    document.querySelectorAll('.esselect select, select[data-libsort], select[data-folder-sort]').forEach(select => {
       const host=select.parentElement;
       if(host.classList.contains('pm-choice'))return;
-      const isSort=select.hasAttribute('data-libsort');
+      const isSort=select.hasAttribute('data-libsort')||select.hasAttribute('data-folder-sort');
       host.classList.add('pm-choice');
       select.hidden=true;
       [...host.children].filter(el=>el!==select).forEach(el=>el.remove());
@@ -24,7 +24,7 @@
       const panel=document.createElement('div');
       panel.className='pm-choice-options';panel.hidden=true;
       panel.setAttribute('role','group');panel.setAttribute('aria-label',isSort?'정렬 선택':'카테고리 선택');
-      const iconFor=option=>icon((isSort?sortIcons:categoryIcons)[option.value] || 'grid');
+      const iconFor=option=>icon(option.dataset.icon || (isSort?sortIcons:categoryIcons)[option.value] || 'grid');
       const update=()=>{
         const selected=select.selectedOptions[0];if(!selected)return;
         trigger.innerHTML=iconFor(selected)+'<span></span>'+icon('chevron');
@@ -32,7 +32,13 @@
         trigger.setAttribute('aria-label',(isSort?'정렬: ':'카테고리: ')+selected.textContent);
         panel.querySelectorAll('button').forEach((button,i)=>button.setAttribute('aria-pressed',String(select.options[i].selected)));
       };
+      let previousGroup=null;
       [...select.options].forEach(option=>{
+        const group=option.parentElement.tagName==='OPTGROUP'?option.parentElement:null;
+        if(group && group!==previousGroup){
+          const heading=document.createElement('div');heading.className='pm-choice-group';heading.textContent=group.label;panel.append(heading);
+        }
+        previousGroup=group;
         const button=document.createElement('button');button.type='button';
         button.innerHTML=iconFor(option)+'<span></span>'+icon('check');
         button.querySelector('span').textContent=option.textContent;
@@ -57,7 +63,11 @@
           buttons[next]?.focus();
         }
       });
-      host.addEventListener('focusout',()=>queueMicrotask(()=>{if(!host.contains(document.activeElement))closeMenus();}));
+      // Safari may blur the trigger without focusing a pointer-clicked option.
+      // Do not hide that option before its click; outside clicks are handled below.
+      host.addEventListener('focusout',event=>{
+        if(event.relatedTarget && !host.contains(event.relatedTarget))closeMenus();
+      });
       select.addEventListener('change',update);
       host.append(trigger,panel);update();
     });
