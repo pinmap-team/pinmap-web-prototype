@@ -4,16 +4,18 @@
 /* ---------- 홈 관심 키워드 추가 (온보딩 선택지에는 나오지 않아요) ---------- */
 interestOptions.push(
   {id:'cafe', emoji:'☕', label:'카페 갈 때', short:'카페', extra:true},
-  {id:'exhibit', emoji:'🖼', label:'전시·팝업 볼 때', short:'전시·팝업', extra:true},
-  {id:'recipe', emoji:'🍳', label:'요리할 때', short:'요리', extra:true},
+  {id:'exhibit', emoji:'🖼', label:'전시/팝업 볼 때', short:'전시/팝업', extra:true},
+  {id:'recipe', emoji:'🍳', label:'레시피 볼 때', short:'레시피', extra:true},
+  {id:'tips', emoji:'🏠', label:'생활 정보 찾을 때', short:'생활 정보', extra:true},
   {id:'weekend', emoji:'🌳', label:'주말 나들이', short:'주말 나들이', extra:true},
   {id:'due', emoji:'⏰', label:'마감 전에 볼 것', short:'마감 임박', extra:true}
 );
 const listOf = f => () => ({list: items.filter(x => !x.pending && f(x))});
 Object.assign(homeSections, {
-  cafe: listOf(x => x.type === '맛집·카페' && /카페|디저트/.test(x.category || '')),
-  exhibit: listOf(x => x.type === '전시·팝업'),
+  cafe: listOf(x => x.type === '맛집/카페' && /카페|디저트/.test(x.category || '')),
+  exhibit: listOf(x => x.type === '전시/팝업'),
   recipe: listOf(x => x.type === '레시피'),
+  tips: listOf(x => x.type === '생활 정보'),
   weekend: listOf(x => x.collection === '이번 주말 성수'),
   due: listOf(x => x.deadline)
 });
@@ -42,7 +44,7 @@ setInterval(() => {
 actions.striphide = () => {
   stripHidden = true;
   const y = window.scrollY; render(); window.scrollTo(0, y);
-  toast('오늘은 마감 임박 배너를 보지 않아요.');
+  toast('오늘은 마감 임박 배너를 보지 않아요.'); $('#snackbar').classList.add('oneline');
 };
 
 /* ---------- 메인 추천 카드 (크게 · 좌우로 넘기기) ---------- */
@@ -93,7 +95,7 @@ function calWidget(){
   const next = due.slice(0, 2);
   return `<section class="hwidget calw">
     <div class="hwhead"><h2>${calToday.getMonth()+1}월 일정</h2><button class="textbtn calmore" data-action="gocal">전체보기 ${icon('arrow')}</button></div>
-    <div class="weekstrip">${days.map((d, i) => { const k = calKey(d), has = byDay[k]; return `<button class="wday ${i===0?'today':''}" data-calday="${k}" aria-label="${d.getMonth()+1}월 ${d.getDate()}일${has?` · 마감 ${has.length}개`:''}"><small>${W[d.getDay()]}</small><b>${d.getDate()}</b><i class="${has?'on':''}"></i></button>`; }).join('')}</div>
+    <div class="weekstrip">${days.map((d, i) => { const k = calKey(d), has = byDay[k]; return `<button class="wday ${i===0?'today':''}" data-calday="${k}" aria-label="${d.getMonth()+1}월 ${d.getDate()}일${has?`, 마감 ${has.length}개`:''}"><small>${W[d.getDay()]}</small><b>${d.getDate()}</b><i class="${has?'on':''}"></i></button>`; }).join('')}</div>
     ${next.length ? `<div class="calnext">${next.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cnbadge ${calDays(x) <= 3 ? 'soon' : ''}">${dLabel(x)}</span><span class="cntext">${esc(x.title)}</span></button>`).join('')}</div>` : '<p class="hint calnone">다가오는 마감이 없어요.</p>'}
   </section>`;
 }
@@ -162,8 +164,8 @@ pages.home = function(){
 // Android 공유 안내: 실제 설치나 공유 수신이 연결된 것으로 표시하지 않아요.
 actions.sharehelp = () => modal('공유로 저장하기', `<div class="home-share-guide">
   <p>안드로이드에서는 별도의 단축어가 필요 없어요.</p>
-  <ol><li><b>저장할 콘텐츠에서 공유 누르기</b><span>인스타그램·유튜브 등에서 공유 메뉴를 열어요.</span></li><li><b>공유할 앱에서 핀맵 선택하기</b><span>공유받기 기능이 연결된 핀맵 앱을 설치한 뒤 사용할 수 있어요.</span></li><li><b>핀맵에서 내용 확인 후 저장하기</b><span>카테고리와 메모를 확인해 저장해요.</span></li></ol>
-  <p class="home-share-note">현재 웹 미리보기는 앱 설치·공유받기가 연결되지 않았어요. 링크를 복사해 추가창에 붙여넣어 주세요.</p>
+  <ol><li><b>저장할 콘텐츠에서 공유 누르기</b><span>인스타그램/유튜브 등에서 공유 메뉴를 열어요.</span></li><li><b>공유할 앱에서 핀맵 선택하기</b><span>공유받기 기능이 연결된 핀맵 앱을 설치한 뒤 사용할 수 있어요.</span></li><li><b>핀맵에서 내용 확인 후 저장하기</b><span>카테고리와 메모를 확인해 저장해요.</span></li></ol>
+  <p class="home-share-note">현재 웹 미리보기는 앱 설치/공유받기가 연결되지 않았어요. 링크를 복사해 추가창에 붙여넣어 주세요.</p>
   <button type="button" data-action="save">링크 직접 추가하기</button>
 </div>`);
 
@@ -175,8 +177,41 @@ let backHome = false;
 actions.gocal = () => { backHome = true; go('calendar'); };
 actions.golib = () => { backHome = true; go('library'); };
 actions.backhome = () => { backHome = false; go('home'); };
-const homeSearch = actions.homesearch;
-actions.homesearch = () => { backHome = true; (homeSearch || (() => go('library')))(); };
+/* 2026-11-04 홈 검색: 컬렉션처럼 오른쪽 위 돋보기를 누르면 같은 줄에 검색창이 펼쳐져요 (페이지 이동 없음).
+   입력하면 저장한 콘텐츠를 바로 아래에 보여주고, 누르면 상세로 가요. X·Esc로 닫아요. */
+var homeSearchOpen = false, homeQuery = '';
+function homeSearchHits(){
+  const q = homeQuery.trim().toLowerCase(); if (!q) return [];
+  return items.filter(x => [x.title, x.desc, x.category, x.type, x.address, x.memo].some(v => String(v || '').toLowerCase().includes(q))).slice(0, 6);
+}
+function homeSearchList(){
+  if (!homeQuery.trim()) return '';
+  const hits = homeSearchHits();
+  return hits.length ? hits.map(x => `<button type="button" class="hs-row" data-detail="${x.id}"><b>${esc(x.title)}</b><small>${esc([...new Set([shortType(x.type), x.category].filter(Boolean))].join(', '))}</small></button>`).join('')
+    : `<p class="hs-empty">‘${esc(homeQuery)}’와 맞는 저장 콘텐츠가 없어요.</p>`;
+}
+function homeSearchBar(){
+  return `<div class="home-search${homeSearchOpen ? ' is-open' : ''}" id="home-search" aria-hidden="${!homeSearchOpen}" ${homeSearchOpen ? '' : 'inert'}>
+    <label class="libsearch"><input id="homesearchinput" type="search" enterkeyhint="search" aria-label="저장한 콘텐츠 찾기" placeholder="저장한 콘텐츠 찾기" value="${esc(homeQuery)}" ${homeSearchOpen ? '' : 'tabindex="-1"'}></label>
+    <div class="hs-results" role="list" aria-live="polite">${homeSearchList()}</div>
+  </div>`;
+}
+actions.homesearch = () => {
+  homeSearchOpen = !homeSearchOpen; if (!homeSearchOpen) homeQuery = '';
+  const box = $('#home-search'), btn = $('.topbar .searchbtn');
+  if (!box || !btn) { render(); return; }
+  box.classList.toggle('is-open', homeSearchOpen); box.setAttribute('aria-hidden', String(!homeSearchOpen)); box.inert = !homeSearchOpen;
+  const input = $('#homesearchinput'); input.tabIndex = homeSearchOpen ? 0 : -1;
+  if (!homeSearchOpen) { input.value = ''; box.querySelector('.hs-results').innerHTML = ''; }
+  btn.setAttribute('aria-expanded', String(homeSearchOpen)); btn.setAttribute('aria-label', homeSearchOpen ? '검색창 닫기' : '저장한 콘텐츠 검색');
+  homeSearchOpen ? requestAnimationFrame(() => input.focus()) : btn.focus();
+};
+// 결과를 누르면 검색창은 닫고 상세로 가요 (돌아왔을 때 닫힌 상태)
+document.addEventListener('click', e => { if (e.target.closest('#home-search .hs-row')) { homeSearchOpen = false; homeQuery = ''; } }, true);
+const goBeforeHomeSearch = go;
+go = function(p){ if (p !== 'home') { homeSearchOpen = false; homeQuery = ''; } return goBeforeHomeSearch.apply(this, arguments); };
+document.addEventListener('input', e => { if (e.target.id !== 'homesearchinput') return; homeQuery = e.target.value; const r = $('#home-search .hs-results'); if (r) r.innerHTML = homeSearchList(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && homeSearchOpen && e.target.closest('#home-search')) { e.preventDefault(); actions.homesearch(); } else if (e.key === 'Enter' && e.target.id === 'homesearchinput') { e.preventDefault(); e.target.blur(); } });
 document.addEventListener('click', e => { if (e.target.closest('.bottomnav [data-page], .rail [data-page]')) backHome = false; }, true);
 const backBtn = () => backHome ? `<button class="subback pageback" data-action="backhome" aria-label="홈으로 돌아가기">${icon('back')}</button>` : '';
 for (const p of ['calendar', 'library']) { const base = pages[p]; pages[p] = function(){ return backBtn() + base(); }; }
@@ -303,6 +338,8 @@ document.addEventListener('keydown', e => {
 
 /* ---------- 알림: 오른쪽에서 밀려 들어오는 전체 화면 ----------
    noti.js의 목록 · 읽음 처리는 그대로 쓰고, 아래 시트 대신 전체 화면으로 보여줘요 (왼쪽 위 ← 로 닫기) */
+const NOTI_KINDS = [['due', '마감 임박'], ['place', '장소'], ['info', '정보']];
+const notiKind = n => n.id.startsWith('due') ? 'due' : (n.id === 'near' || n.id === 'pending') ? 'place' : 'info';
 function notiPanelHtml(){
   const list = notifications(), isNew = n => !settings.readNoti.includes(n.id);
   const fresh = list.filter(isNew), seen = list.filter(n => !isNew(n));
@@ -313,8 +350,10 @@ function notiPanelHtml(){
       <span class="nttext"><b>${esc(n.title)}</b><span class="nttime">${esc(n.time)}</span><span class="ntbody">${esc(n.body)}</span></span>
       ${unread ? '<i class="ntdot" aria-hidden="true"></i>' : ''}</button>`; };
   const group = (label, arr) => arr.length ? `<section class="ntgroup"><h3>${label}</h3>${arr.map(row).join('')}</section>` : '';
-  const body = list.length ? fresh.map(row).join('') + group('지난 알림', seen)
-    : `<div class="ntempty">${icon('bell')}<b>${allOff ? '알림이 모두 꺼져 있어요' : '새 알림이 없어요'}</b><p>${allOff ? '알림 설정에서 필요한 알림을 켤 수 있어요.' : '마감 임박 · 주변 장소 소식이 생기면 알려드릴게요.'}</p></div>`;
+  // 2026-11-04: 카테고리(마감 임박, 장소, 정보)별로 묶고, 묶음 안에서는 안 읽은 알림을 먼저 보여줘요
+  const byKind = k => [...fresh, ...seen].filter(n => notiKind(n) === k);
+  const body = list.length ? NOTI_KINDS.map(([k, label]) => group(label, byKind(k))).join('')
+    : `<div class="ntempty">${icon('bell')}<b>${allOff ? '알림이 모두 꺼져 있어요' : '새 알림이 없어요'}</b><p>${allOff ? '알림 설정에서 필요한 알림을 켤 수 있어요.' : '마감 임박, 주변 장소 소식이 생기면 알려드릴게요.'}</p></div>`;
   return `<div class="npwrap">
     <header class="nphead"><button type="button" class="subback npback" data-action="notiback" aria-label="뒤로 가기">${icon('back')}</button><h1>알림${fresh.length ? ` <span>${fresh.length}</span>` : ''}</h1>
       ${fresh.length ? '<button type="button" class="npread" data-action="readall">모두 읽음</button>' : ''}</header>

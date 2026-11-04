@@ -16,13 +16,13 @@ const LIB_SORTS = {recent:'최신 저장 순', near:'가까운 순'};
 // 주소에서 동네 이름만 꺼내기 (예: '서울 성동구 성수동 · 예시 장소' → '성수동')
 // 동·읍·면이 없으면 구·시·군으로 (예: '서울 성동구 뚝섬로 273' → '성동구')
 function libArea(x){
-  const words = (x.address || '').split('·')[0].trim().split(/\s+/);
+  const words = (x.address || '').split(/[·,]/)[0].trim().split(/\s+/);
   return [...words].reverse().find(w => /(동|읍|면)$/.test(w)) || [...words].reverse().find(w => /(구|시|군)$/.test(w)) || '';
 }
 
 // 카드 둘째 줄: 기간 또는 저장 시점 + 동네 · 판매처
 function libSub(x){
-  const parts = [x.period ? x.period.replace(' · 예시 기간','') + ' 운영' : `${savedAgo(x)} 저장`];
+  const parts = [x.period ? x.period.replace(', 예시 기간','') + ' 운영' : `${savedAgo(x)} 저장`];
   if (isPlace(x) && !x.pending && libArea(x)) parts.push(libArea(x));
   else if (x.type === '쇼핑' && x.shop) parts.push(x.shop);
   else if (!isPlace(x) && x.type !== '쇼핑' && x.type !== '레시피') parts.push(x.desc);
@@ -35,7 +35,7 @@ function libMeta(x){
     if (x.pending) return libMetaLine('pin', '위치 확인 필요', 'warn');
     return x.distance ? libMetaLine('pin', x.distance) : '';
   }
-  if (x.type === '쇼핑' && x.price) return libMetaLine('bookmark', x.price.replace(' · 예시 가격',''));
+  if (x.type === '쇼핑' && x.price) return libMetaLine('bookmark', x.price.replace(', 예시 가격',''));
   if (x.type === '레시피' && x.recipe) return libMetaLine('clock', x.recipe);
   return '';
 }
@@ -148,8 +148,8 @@ document.addEventListener('change', e => {
 function unsaveSheet(id){
   const x = items.find(i => i.id === id); if (!x) return;
   modal('', `<div class="esform delsheet">
-    <div class="nthead"><div><h2>컬렉션에서 삭제할까요?</h2><p>삭제하면 메모 · 모음 정보도 함께 지워져요.</p></div><button type="button" class="ntclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
-    <div class="esbody"><div class="delitem"><span class="delthumb">${libThumb(x)}</span><span><b>${esc(x.title)}</b><small>${esc(x.type)} · ${esc(savedAgo(x))} 저장</small></span></div>
+    <div class="nthead"><div><h2>컬렉션에서 삭제할까요?</h2><p>삭제하면 메모, 모음 정보도 함께 지워져요.</p></div><button type="button" class="ntclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
+    <div class="esbody"><div class="delitem"><span class="delthumb">${libThumb(x)}</span><span><b>${esc(x.title)}</b><small>${esc(x.type)}, ${esc(savedAgo(x))} 저장</small></span></div>
       <p class="eshint">원본 SNS 게시물은 그대로 남아 있어요.</p></div>
     <div class="esfoot"><button type="button" class="escancel" data-action="close">취소</button><button type="button" class="essubmit deldanger" data-delconfirm="${x.id}">삭제</button></div>
   </div>`);
@@ -167,7 +167,7 @@ document.addEventListener('click', e => {
     $('#sheet').close();
     if (detailId === id) detailId = null;
     const y = scrollY; render(); scrollTo(0, y);
-    toast(`‘${x ? x.title : '콘텐츠'}’을 컬렉션에서 삭제했어요.`);
+    toast(`‘${x ? x.title : '콘텐츠'}’${josa(x ? x.title : '콘텐츠', '을/를').slice((x ? x.title : '콘텐츠').length)} 컬렉션에서 삭제했어요.`);
   }
 }, true);
 // 카드(div)도 키보드 Enter · Space로 열려요

@@ -15,7 +15,7 @@ pages.profile = function(){
     <div class="pfbtns"><label class="tonal small" for="avatarfile">사진 변경</label>${settings.avatar ? '<button class="textbtn" data-action="avatarreset">기본 이미지로</button>' : ''}</div>
     <form id="profilepage" class="pfform">
       <label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label>
-      <p class="hint">위치는 ‘위치 관리’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p>
+      <p class="hint">위치는 ‘위치 편집’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p>
       <button class="filled pfsave" type="submit">저장</button>
     </form>
   </div>`;
@@ -39,7 +39,7 @@ document.addEventListener('submit', e => {
   if (e.target.id !== 'profilepage') return;
   e.preventDefault();
   const nick = e.target.nickname.value.trim(); if (!nick) return;
-  settings.nickname = nick; editingProfileName = false; afterChange(); go('account'); toast('프로필을 저장했어요.');
+  settings.nickname = nick; editingProfileName = false; afterChange(); render(); toast('프로필을 저장했어요.');
 });
 
 /* ---------- SNS 계정 연동 ---------- */
@@ -56,16 +56,15 @@ const snsLogo = sns => `<img class="snslogo" src="${SNS[sns].logo}" alt="">`;
 
 pages.accounts = function(){
   const acc = myAccounts(), total = acc.reduce((n, a) => n + accountCount(a), 0);
-  return `<div class="mypage connectionpage">${subHead('연동 계정 관리', 'account')}
+  return `<div class="mypage connectionpage">${subHead('연동 계정 관리', 'my')}
   <p class="muted acchint">연동한 계정들의 저장 콘텐츠를 핀맵 한곳에 모아 보여줘요.</p>
   ${syncBtn()}
-  <button class="accall" data-page="library"><span><b>모든 계정의 저장 모음 보기</b><small>${acc.length}개 계정 · 저장 ${total}개</small></span>${icon('arrow')}</button>
   <section class="mgroup"><h2>연동된 계정 ${acc.length}개</h2>
-    ${acc.length ? acc.map(a => `<div class="accrow">${snsLogo(a.sns)}<span class="acctext"><b>${esc(a.handle)}</b><small>${SNS[a.sns].name} · 저장 ${accountCount(a)}개 · ${syncingAcc === a.id ? '가져오는 중…' : syncTime(settings.accSync?.[a.id])}</small></span>${accSyncBtn(a)}<button class="accoff" data-acc-off="${a.id}">연동 중지</button></div>`).join('')
+    ${acc.length ? acc.map(a => `<div class="accrow">${snsLogo(a.sns)}<span class="acctext"><b>${esc(a.handle)}</b><small>${SNS[a.sns].name}, 저장 ${accountCount(a)}개, ${syncingAcc === a.id ? '가져오는 중…' : syncTime(settings.accSync?.[a.id])}</small></span>${accSyncBtn(a)}<button class="accoff" data-acc-off="${a.id}">연동 중지</button></div>`).join('')
       : '<p class="hint accnone">연동된 계정이 없어요. 아래에서 추가해 보세요.</p>'}
   </section>
   <button class="padd accadd" data-action="accadd">${icon('plus')} SNS 계정 연동 추가</button>
-  <p class="hint accnote">프로토타입에서는 실제 로그인 없이 연동 과정을 체험해요. 연동을 중지해도 이미 저장한 콘텐츠는 그대로 남아요.</p>${resetEntry('connections')}</div>`;
+${resetEntry('connections')}</div>`;
 };
 function accAddSheet(sns){
   if (!sns) {
@@ -110,17 +109,17 @@ document.addEventListener('submit', e => {
 // 계정마다 아직 반영되지 않은 저장 콘텐츠가 있다고 가정한 예시 (한 번 가져오면 다시 나오지 않아요)
 const SYNC_POOL = PM_ENV.development ? {} : { // SNS마다 아직 안 가져온 저장이 2개씩 있다고 가정해요
   instagram:[
-    {id:101, title:'연남동 골목 와인바', type:'맛집·카페', category:'와인바', ago:'방금', desc:'작은 골목 안 조용한 와인바', memo:'', art:'cafe', distance:'지하철 20분', address:'서울 마포구 연남동 · 예시 장소', aiClassified:true},
+    {id:101, title:'연남동 골목 와인바', type:'맛집/카페', category:'와인바', ago:'방금', desc:'작은 골목 안 조용한 와인바', memo:'', art:'cafe', distance:'지하철 20분', address:'서울 마포구 연남동, 예시 장소', aiClassified:true},
     {id:105, title:'망원동 빈티지 소품샵', type:'쇼핑', category:'소품', ago:'방금', desc:'주말에 들르기 좋은 작은 가게', memo:'', art:'bag', price:'1만 원대', aiClassified:true}],
   youtube:[
     {id:102, title:'10분 아침 스트레칭 루틴', type:'생활 정보', category:'운동', ago:'방금', desc:'출근 전 가볍게 따라 하기', memo:'', art:'tips', aiClassified:true},
     {id:106, title:'원룸 조명 바꾸기 꿀팁', type:'생활 정보', category:'인테리어', ago:'방금', desc:'스탠드 하나로 분위기 바꾸기', memo:'', art:'tips', aiClassified:true}],
   tiktok:[
-    {id:103, title:'편의점 디저트 꿀조합', type:'레시피', category:'디저트', ago:'방금', desc:'5분이면 끝나는 간단 디저트', memo:'', art:'food', recipe:'5분 · 재료 3가지', aiClassified:true},
-    {id:107, title:'에어프라이어 감자칩', type:'레시피', category:'간식', ago:'방금', desc:'기름 없이 바삭하게', memo:'', art:'food', recipe:'20분 · 재료 2가지', aiClassified:true}],
+    {id:103, title:'편의점 디저트 꿀조합', type:'레시피', category:'디저트', ago:'방금', desc:'5분이면 끝나는 간단 디저트', memo:'', art:'food', recipe:'5분, 재료 3가지', aiClassified:true},
+    {id:107, title:'에어프라이어 감자칩', type:'레시피', category:'간식', ago:'방금', desc:'기름 없이 바삭하게', memo:'', art:'food', recipe:'20분, 재료 2가지', aiClassified:true}],
   x:[
-    {id:104, title:'성수 플리마켓 일정 정리', type:'전시·팝업', category:'마켓', ago:'방금', desc:'이번 달 주말 플리마켓 모음', memo:'', art:'exhibit', address:'서울 성동구 성수동 · 예시 장소', distance:'도보 10분', aiClassified:true},
-    {id:108, title:'이번 주 무료 전시 모음', type:'전시·팝업', category:'전시', ago:'방금', desc:'예약 없이 볼 수 있는 곳', memo:'', art:'exhibit', aiClassified:true}]
+    {id:104, title:'성수 플리마켓 일정 정리', type:'전시/팝업', category:'마켓', ago:'방금', desc:'이번 달 주말 플리마켓 모음', memo:'', art:'exhibit', address:'서울 성동구 성수동, 예시 장소', distance:'도보 10분', aiClassified:true},
+    {id:108, title:'이번 주 무료 전시 모음', type:'전시/팝업', category:'전시', ago:'방금', desc:'예약 없이 볼 수 있는 곳', memo:'', art:'exhibit', aiClassified:true}]
 };
 let syncTimer = null;
 function cancelAccountSync(){ clearTimeout(syncTimer); syncTimer = null; syncing = false; syncingAcc = null; }
@@ -137,7 +136,8 @@ function pullAccount(a){
 }
 // 연동 새로고침 결과 안내는 줄 바꿈 없이 한 줄로 (다른 안내는 기존 그대로)
 const toastBaseSync = toast;
-toast = function(t){ $('#snackbar').classList.remove('oneline'); return toastBaseSync(t); };
+// 2026-11-04: 스낵바는 최대한 한 줄, 문장이 여러 개면 문장이 끝날 때마다 줄바꿈
+toast = function(t){ $('#snackbar').classList.remove('oneline'); return toastBaseSync(String(t).replace(/([.!?])\s+(?=\S)/g, '$1\n')); };
 const syncToast = (n, who) => { toast(n ? `${who ? who + '에서 ' : ''}새 저장 콘텐츠 ${n}개를 가져왔어요.` : `${who ? who + '에서 ' : ''}새로 가져올 저장 콘텐츠가 없어요.`); $('#snackbar').classList.add('oneline'); };
 actions.accsync = () => { // 연동한 계정 전체
   if (syncing || syncingAcc) return;
@@ -169,4 +169,4 @@ const navBase = nav;
 nav = function(){ const real = page; if (PARENT_TAB[page]) page = PARENT_TAB[page]; const h = navBase(); page = real; return h; };
 
 /* 홈 검색 버튼: 저장됨 탭의 검색으로 */
-actions.homesearch = () => { backHome = true; go('library'); setTimeout(() => $('#search')?.focus(), 60); };
+// 홈 검색은 home.js에서 같은 줄에 펼쳐지는 검색창으로 열어요 (2026-11-04).

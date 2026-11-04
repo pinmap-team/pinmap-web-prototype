@@ -25,7 +25,7 @@ notiSheet = function(){
   };
   const group = (label, arr) => arr.length ? `<section class="ntgroup"><h3>${label}</h3>${arr.map(row).join('')}</section>` : '';
   const body = list.length ? fresh.map(row).join('') + group('지난 알림', seen)
-    : `<div class="ntempty">${icon('bell')}<b>${allOff ? '알림이 모두 꺼져 있어요' : '새 알림이 없어요'}</b><p>${allOff ? '알림 설정에서 필요한 알림을 켤 수 있어요.' : '마감 임박 · 주변 장소 소식이 생기면 알려드릴게요.'}</p></div>`;
+    : `<div class="ntempty">${icon('bell')}<b>${allOff ? '알림이 모두 꺼져 있어요' : '새 알림이 없어요'}</b><p>${allOff ? '알림 설정에서 필요한 알림을 켤 수 있어요.' : '마감 임박, 주변 장소 소식이 생기면 알려드릴게요.'}</p></div>`;
   modal('', `<div class="esform ntform">
     <div class="nthead"><h2>알림${fresh.length ? ` <span>${fresh.length}</span>` : ''}</h2><button type="button" class="ntclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
     <div class="esbody ntlist">${body}</div>

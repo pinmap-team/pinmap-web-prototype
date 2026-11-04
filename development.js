@@ -10,9 +10,9 @@ if(PM_ENV.development) {
   const originalMy=pages.my;
   pages.my=()=>originalMy().replace('<b></b><small>프로필 편집','<b>프로필 설정</b><small>프로필 편집');
   const originalAccounts=pages.accounts;
-  pages.accounts=()=>originalAccounts().replace('프로토타입에서는 실제 로그인 없이 연동 과정을 체험해요. 연동을 중지해도 이미 저장한 콘텐츠는 그대로 남아요.','아직 연결된 계정이 없어요. 계정 연동은 연결 전 상태입니다.');
+  pages.accounts=()=>originalAccounts().replace('프로토타입에서는 실제 로그인 없이 연동 과정을 체험해요. 연동을 중지해도 이미 저장한 콘텐츠는 그대로 남아요.','아직 연결된 계정이 없어요. 계정을 연동하면 여기에 보여요.');
   const originalAppInfo=pages.appinfo;
-  pages.appinfo=()=>originalAppInfo().replace('예시 데이터로 체험하는 프로토타입이에요. 데이터는 이 브라우저에만 저장돼요.','아직 데이터가 연결되지 않은 초기 화면입니다.');
+  pages.appinfo=()=>originalAppInfo().replace('예시 데이터로 체험하는 프로토타입이에요. 데이터는 이 브라우저에만 저장돼요.','아직 데이터가 연결되지 않은 첫 화면이에요.');
   const originalMapSettings=mapSettings;
   mapSettings=()=>{originalMapSettings();const note=$('#sheet [data-action="location"] small');if(note)note.textContent='연결 전';};
 

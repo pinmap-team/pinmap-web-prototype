@@ -2,7 +2,7 @@
 // 마이에서 누르는 기능은 아래에서 올라오는 시트 대신 새 페이지로 열리고, 왼쪽 위 ← 로 마이로 돌아가요.
 // 현재 위치 · 관심 키워드 · 알림 · 저장 · 위치/지도 · 저장하는 방법 · 앱 정보 · 핀맵 계정 설정
 
-const MY_PAGES = {placeset:'위치 설정', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', mapset:'지도 디자인', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'프로필 및 계정', accountaccess:'로그아웃 · 탈퇴'};
+const MY_PAGES = {placeset:'위치 설정', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', mapset:'지도 디자인', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'프로필 및 계정', accountaccess:'로그아웃, 탈퇴'};
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
 const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
@@ -11,18 +11,18 @@ const myBase = pages.my;
 pages.my = function(){
   return myBase()
     .replace(/<button class="sharepromo"[\s\S]*?<\/button>\s*/, '')
-    .replace('관심사 · 활용 목적', '관심 키워드 설정')
+    .replace('관심사, 활용 목적', '관심 키워드 설정')
     .replace(/<button class="logout"[^>]*>[\s\S]*?<\/button>/, '')
     // 2026-11-03: 코스 · 연동 새로고침을 프로필 아래 둥근 사각형 카드로 (목록의 '저장한 코스 보기'는 중복이라 뺌)
     .replace(/<button class="mrow" data-page="courses">[\s\S]*?<\/button>\s*/, '')
-    .replace(/(<button class="mprofile profilecard"[\s\S]*?<\/button>)/, `$1${myQuickCards()}`);
+    .replace('<!--myprofile-end-->', myQuickCards())
+    // 2026-11-04: 프로필 카드에서 바로 사진·이름을 바꾸므로 로그아웃 | 회원 탈퇴는 마이 맨 아래로
+    + `<nav class="account-exit my-exit" aria-label="로그아웃 및 회원 탈퇴"><button type="button" data-action="logoutask">로그아웃</button><span aria-hidden="true">|</span><button type="button" data-action="leaveask">회원 탈퇴</button></nav>`;
 };
 function myQuickCards(){
-  const busy = typeof syncing !== 'undefined' && syncing;
-  const syncSub = busy ? '가져오는 중…' : (typeof syncLabel === 'function' ? syncLabel() : '');
   return `<div class="my-quick" role="group" aria-label="바로가기">
     <button type="button" class="myq-card" data-page="courses"><span class="myq-ico" aria-hidden="true">${icon('route')}</span><b>내 코스</b><small>저장한 코스 보기</small></button>
-    <button type="button" class="myq-card ${busy ? 'on' : ''}" data-action="accsync" ${busy ? 'aria-busy="true"' : ''}><span class="myq-ico" aria-hidden="true">${icon('sync')}</span><b>연동 새로고침</b><small>${esc(syncSub)}</small></button>
+    <button type="button" class="myq-card" data-action="accounts"><span class="myq-ico" aria-hidden="true">${icon('user')}</span><b>연동 계정 관리</b><small>${myAccounts().length}개 계정 연동</small></button>
   </div>`;
 }
 
@@ -32,13 +32,13 @@ function placeBody(){
   const p = myPlaces();
   const rows = p.map((name, i) => `<div class="prow">
       <button class="pradio ${i===0?'on':''}" data-place-pick="${i}" role="radio" aria-checked="${i===0}" aria-label="${esc(name)} 선택"></button>
-      <button class="pname" data-place-pick="${i}"><b>${esc(name)}</b><small>${esc(dongOf(name).full)}${i===0?' · 현재 위치':''}</small></button>
+      <button class="pname" data-place-pick="${i}"><b>${esc(name)}</b><small>${esc(dongOf(name).full)}${i===0?', 현재 위치':''}</small></button>
       <button class="picon" data-place-edit="${i}" aria-label="${esc(name)} 수정">${icon('edit')}</button>
       <button class="picon" data-place-del="${i}" aria-label="${esc(name)} 삭제" ${p.length===1?'disabled':''}>${icon('close')}</button>
     </div>`).join('');
-  return `<p class="muted psub">최대 ${MAX_PLACES}개의 위치를 선택할 수 있어요.</p>
+  return `
     <div class="mycard plist" role="radiogroup" aria-label="현재 위치">${rows}</div>
-    ${p.length < MAX_PLACES ? `<button class="padd" data-action="placeadd">${icon('plus')} 위치 추가</button>` : `<p class="hint pfull">위치를 바꾸려면 ✎ 수정을 누르거나, 하나를 삭제한 뒤 추가하세요.</p>`}
+    ${p.length < MAX_PLACES ? `<button class="padd" data-action="placeadd">${icon('plus')} 위치 추가</button>` : `<p class="hint pfull">위치를 바꾸려면 ✎ 수정을 누르거나, 하나를 지운 뒤 새로 추가해 주세요.</p>`}
     ${p.length===1 ? '<p class="hint pfull">위치는 최소 1개가 필요해서 삭제할 수 없어요.</p>' : ''}`;
 }
 pages.placeset = () => myPage('위치 설정', placeBody(), 'placepage');
@@ -51,10 +51,10 @@ actions.placesheet = () => { if (page === 'placeset') placeSheet(); else placeSh
 pages.interestset = function(){
   const opts = interestOptions.filter(o => o.id !== 'later');
   return myPage('관심 키워드 설정', `
-    <p class="muted mpdesc">고른 키워드에 맞는 저장 콘텐츠를 홈에서 먼저 보여드려요. 복수 선택이 가능해요</p>
+    <p class="muted mpdesc kwdesc">고른 키워드에 맞는 저장 콘텐츠를 홈에서 먼저 보여드려요.\n아무것도 고르지 않으면 홈에서 랜덤으로 추천해요.</p>
     <div class="kwgrid" role="group" aria-label="관심 키워드">${opts.map(o => { const on = preferences.includes(o.id);
       return `<button class="kwopt ${on ? 'on' : ''}" data-kw="${o.id}" role="checkbox" aria-checked="${on}"><span class="kwico" aria-hidden="true">${o.emoji}</span><span>${o.short}</span></button>`; }).join('')}</div>
-    <p class="hint mpnote">${preferences.length ? `${preferences.length}개 선택됨 · 바로 저장돼요` : '아무것도 고르지 않으면 홈에서 랜덤으로 추천해요'}</p>${resetEntry('keywords')}`);
+`, 'kwpage');
 };
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-kw]'); if (!b) return;
@@ -71,9 +71,12 @@ function pageFromModal(fn){ // my.js의 시트 내용을 그대로 페이지에 
   try { fn(); } finally { modal = realModal; }
   return html;
 }
-pages.notiset = () => myPage('알림 설정', pageFromModal(notiSettings)+resetEntry('notifications'), 'settingpage');
-pages.saveset = () => myPage('저장 설정', pageFromModal(saveSettings)+resetEntry('saving'), 'settingpage');
-pages.mapset = () => myPage('지도 디자인', pageFromModal(mapSettings));
+pages.notiset = () => myPage('알림 설정', pageFromModal(notiSettings), 'settingpage');
+pages.saveset = () => myPage('저장 설정', pageFromModal(saveSettings), 'settingpage');
+// 2026-11-04: 화면 모드도 아래 시트 대신 페이지로 (내용은 PinmapTheme.show()와 같음)
+pages.themeset = () => myPage('화면 모드', pageFromModal(() => PinmapTheme.show()), 'settingpage themepage');
+actions.appearance = () => go('themeset');
+pages.mapset = () => myPage('지도 디자인', pageFromModal(mapSettings), 'mappage');
 Object.assign(actions, {
   placesheetmy: () => go('placeset'),
   notisheet: () => go('notiset'),
@@ -101,21 +104,21 @@ pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
 /* ---------- 자주 묻는 질문 · 공지사항 · 약관 및 정책 (2026-11-03, 마이 하단 도움말) ---------- */
 const infoRows = rows => `<div class="mycard settings">${rows.map(([t, d]) => `<div class="setrow"><div><b>${t}</b><small>${d}</small></div></div>`).join('')}</div>`;
 pages.faq = () => myPage('자주 묻는 질문', infoRows([
-  ['SNS 콘텐츠는 어떻게 저장하나요?', '인스타그램·유튜브 게시물에서 공유하기를 누르고 핀맵을 고르면 바로 저장돼요.'],
+  ['SNS 콘텐츠는 어떻게 저장하나요?', '인스타그램/유튜브 게시물에서 공유하기를 누르고 핀맵을 고르면 바로 저장돼요.'],
   ['저장한 콘텐츠는 어디에서 다시 보나요?', '홈에서 주변 저장 장소와 최근 저장을, 컬렉션에서 전체 목록을 볼 수 있어요.'],
   ['AI 자동 분류가 틀렸어요.', '콘텐츠 상세에서 카테고리를 직접 바꿀 수 있어요. 저장 설정에서 자동 분류를 끌 수도 있어요.'],
-  ['원본 게시물이 삭제되면 어떻게 되나요?', '장소 정보는 그대로 남고, 원본 보기에는 ‘삭제된 게시물입니다’라고 보여요.'],
+  ['원본 게시물이 삭제되면 어떻게 되나요?', '장소 정보는 그대로 남고, 원본 보기에는 ‘삭제된 게시물이에요’라고 보여요.'],
   ['위치 권한은 어디에서 바꾸나요?', '휴대폰의 설정 앱 › 핀맵 › 위치에서 바꿀 수 있어요.']
 ]), 'settingpage');
 pages.notice = () => myPage('공지사항', infoRows([
-  ['핀맵 프로토타입 03 공개', '연동 계정 관리, 위치 관리, 마이 바로가기가 새로 생겼어요.'],
-  ['예시 데이터 안내', '지금은 예시 데이터로 체험하는 프로토타입이에요. 데이터는 이 브라우저에만 저장돼요.']
+  ['핀맵 프로토타입 03 공개', '연동 계정 관리, 위치 편집, 마이 바로가기가 새로 생겼어요.'],
+  ['예시 데이터 안내', '지금은 예시 데이터로 체험하는 프로토타입이에요.\n데이터는 이 브라우저에만 저장돼요.']
 ]), 'settingpage');
 pages.terms = () => myPage('약관 및 정책', infoRows([
   ['서비스 이용약관', '핀맵 서비스 이용에 관한 기본 약속이에요.'],
   ['개인정보 처리방침', '저장한 콘텐츠와 연동 계정 정보를 어떻게 다루는지 안내해요.'],
   ['위치기반서비스 이용약관', '현재 위치로 주변 저장 장소를 보여줄 때 적용돼요.'],
-  ['오픈소스 라이선스', '지도 표시에 Leaflet · MapLibre를 사용해요.']
+  ['오픈소스 라이선스', '지도 표시에 Leaflet, MapLibre를 사용해요.']
 ]), 'settingpage');
 Object.assign(actions, { faq: () => go('faq'), notice: () => go('notice'), terms: () => go('terms') });
 
@@ -138,26 +141,16 @@ pages.howtopage = function(){
     <div class="ob-actions"><button class="filled ob-next" data-action="snsdemo">SNS 저장 체험 해보기</button></div></div>`, 'howtopage', 'guide');
 };
 
-/* ---------- 프로필: 사진/이름 직접 편집 + 바로 아래 SNS 연동 계정 (2026-11-03: '연동 계정 관리' 한 단계 없앰) ---------- */
-// 연동 계정 페이지(pages.accounts)의 내용을 그대로 가져와 제목만 빼고 넣어요. 동작·데이터는 같은 것을 써요.
-function accountConnections(){
-  if (typeof pages.accounts !== 'function') return '';
-  const body = pages.accounts()
-    .replace(/^\s*<div class="mypage connectionpage">/, '')
-    .replace(/<div class="subhead">[\s\S]*?<\/h1><\/div>/, '')
-    .replace(/<\/div>\s*$/, '');
-  return `<section class="account-section account-connections connectionpage" aria-label="SNS 연동 계정"><h2 class="account-sub">SNS 연동 계정</h2>${body}</section>`;
-}
+/* ---------- 프로필: 사진/이름 직접 편집 (2026-11-04: SNS 연동 계정은 마이 바로가기 '연동 계정 관리' 페이지로 분리) ---------- */
 pages.account = () => myPage('프로필 및 계정', `<section class="account-identity" aria-label="프로필">
     <button type="button" class="account-photo" data-action="profilephoto" aria-label="프로필 사진 변경">${avatarHtml()}<span class="account-photo-edit" aria-hidden="true">${icon('image')}</span></button>
     <input type="file" id="avatarfile" accept="image/*" hidden>
     ${editingProfileName?`<form id="profilepage" class="account-name-form"><label class="field"><span>이름</span><input name="nickname" aria-label="프로필 이름" value="${esc(settings.nickname || '')}" required maxlength="12" autocomplete="nickname"></label><div><button type="button" class="textbtn" data-action="profilecancel">취소</button><button type="submit" class="filled">저장</button></div></form>`:`<button type="button" class="account-name" data-action="profilename" aria-label="프로필 이름 변경"><b>${esc(settings.nickname || '이름 설정')}</b>${icon('edit')}</button><p>사진이나 이름을 눌러 수정해요</p>`}
   </section>
-  ${accountConnections()}
   <nav class="account-exit" aria-label="로그아웃 및 회원 탈퇴">
     <button type="button" data-action="logoutask">로그아웃</button><span aria-hidden="true">|</span><button type="button" data-action="leaveask">회원 탈퇴</button>
   </nav>`, 'accountpage');
-pages.accountaccess = () => myPage('로그아웃 · 탈퇴', `<p class="mpdesc">계정 이용을 잠시 쉬거나 종료할 수 있어요.</p>
+pages.accountaccess = () => myPage('로그아웃, 탈퇴', `<p class="mpdesc">계정 이용을 잠시 쉬거나 종료할 수 있어요.</p>
   <section class="account-section access-options" aria-label="계정 이용 관리">
     <button type="button" class="setrow" data-action="logoutask"><div><b>로그아웃</b><small>이 기기에서 계정 이용을 종료해요.</small></div>${icon('chevright')}</button>
     <button type="button" class="setrow account-leave" data-action="leaveask"><div><b>탈퇴하기</b><small>저장한 콘텐츠와 설정이 모두 삭제돼요.</small></div>${icon('chevright')}</button>
@@ -168,12 +161,13 @@ actions.accountaccess = () => go('accountaccess');
 const RESET_OPTIONS = {
   connections: {label:'연동 초기화', description:'SNS 계정 연결과 연동 기록만 초기화해요. 이미 저장한 콘텐츠는 유지돼요.'},
   keywords: {label:'키워드 초기화', description:'선택한 관심 키워드만 해제해요. 저장한 카테고리와 콘텐츠는 유지돼요.'},
-  notifications: {label:'알림 설정 초기화', description:'푸시와 마감·주변·리마인드 알림을 꺼요.'},
-  saving: {label:'저장 설정 초기화', description:'AI 자동 분류 설정을 기본값으로 되돌려요.'}
+  notifications: {label:'알림 설정 초기화', description:'푸시와 마감/주변/리마인드 알림을 꺼요.'},
 };
+// '저장 설정 초기화' → '저장 설정을 초기화했어요.' (받침에 따라 을/를)
+function resetDoneText(label){ const base = label.replace(/\s*초기화$/, ''), c = base.charCodeAt(base.length - 1) - 0xAC00; return `${base}${c >= 0 && c % 28 ? '을' : '를'} 초기화했어요.`; }
 function resetEntry(key){
   const option=RESET_OPTIONS[key];
-  return `<section class="setting-reset" aria-label="${option.label}"><button type="button" data-action="resetask-${key}">${option.label}</button><p>${option.description}</p></section>`;
+  return `<section class="setting-reset" aria-label="${option.label}"><button type="button" data-action="resetask-${key}">${option.label}</button></section>`;
 }
 function partialResetState(key, currentSettings, currentPreferences){
   const next = {settings:{...currentSettings}, preferences:[...currentPreferences]};
@@ -193,12 +187,12 @@ function applyPartialReset(key){
   try {
     localStorage.setItem(STORAGE, JSON.stringify({items, preferences:next.preferences, onboardDone, settings:next.settings}));
   } catch {
-    toast('변경 내용을 저장하지 못했어요. 초기화하지 않았습니다.'); return;
+    toast('변경 내용을 저장하지 못해서 초기화하지 않았어요. 다시 시도해 주세요.'); return;
   }
   if (key === 'connections') cancelAccountSync();
   settings = next.settings; preferences = next.preferences;
   if (key === 'keywords') homeViewIds = null;
-  $('#sheet').close(); render(); toast(`${RESET_OPTIONS[key].label}를 완료했어요.`);
+  $('#sheet').close(); render(); toast(resetDoneText(RESET_OPTIONS[key].label));
 }
 Object.entries(RESET_OPTIONS).forEach(([key, option]) => {
   actions[`resetask-${key}`] = () => confirmPop(`${option.label}를 진행할까요?`, option.description, `resetdo-${key}`, '초기화', '취소');

@@ -41,7 +41,7 @@ function initRealMap(){
         html:`<span class="map-photo-marker-inner">${image}<span class="map-photo-copy"><b>${esc(place.title)}</b><small>${esc(mapPlaceLabel(place))}</small></span></span>`,
         iconSize:[172,52],iconAnchor:[86,58]
       }),
-      title:`${place.title} · ${mapPlaceLabel(place)}`
+      title:`${place.title}, ${mapPlaceLabel(place)}`
     }).addTo(realMap);
     realMapMarkers.push({place,marker});
     marker.on('click',()=>{if(mapPickMode)return;selectedPin=place.id;mapSheetState='peek';mapMenuOpen=false;mapSearchOpen=false;mapSearchQuery='';render();});
@@ -50,7 +50,7 @@ function initRealMap(){
   realMap.on('click',event=>{
     if(!mapPickMode)return;
     const lat=Number(event.latlng.lat.toFixed(6)), lng=Number(event.latlng.lng.toFixed(6));
-    modal('새로운 장소 추가',`<p class="hint">지도에서 선택한 위치에 저장돼요. 장소 이름과 주소를 직접 입력해 주세요.</p><form id="map-place-form"><input type="hidden" name="lat" value="${lat}"><input type="hidden" name="lng" value="${lng}"><label class="field"><span>장소 이름</span><input name="title" maxlength="80" required placeholder="예: 다시 가고 싶은 카페"></label><label class="field"><span>주소 또는 위치 설명</span><input name="address" maxlength="200" required placeholder="예: 서울 성동구 성수동"></label><label class="field"><span>장소 유형</span><select name="type">${TYPES.filter(t=>t.place).map(t=>`<option value="${esc(t.id)}">${t.emoji} ${esc(t.id)}</option>`).join('')}</select></label><label class="field"><span>내 메모 · 선택</span><textarea name="memo" maxlength="300" rows="2" placeholder="이 장소에 가고 싶은 이유"></textarea></label><p class="hint">직접 지정한 위치와 주소입니다. 실제 방문 전에 확인해 주세요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">지도에 추가</button></div></form>`);
+    modal('새로운 장소 추가',`<p class="hint">지도에서 선택한 위치에 저장돼요. 장소 이름과 주소를 직접 입력해 주세요.</p><form id="map-place-form"><input type="hidden" name="lat" value="${lat}"><input type="hidden" name="lng" value="${lng}"><label class="field"><span>장소 이름</span><input name="title" maxlength="80" required placeholder="예: 다시 가고 싶은 카페"></label><label class="field"><span>주소 또는 위치 설명</span><input name="address" maxlength="200" required placeholder="예: 서울 성동구 성수동"></label><label class="field"><span>장소 유형</span><select name="type">${TYPES.filter(t=>t.place).map(t=>`<option value="${esc(t.id)}">${t.emoji} ${esc(t.id)}</option>`).join('')}</select></label><label class="field"><span>내 메모, 선택</span><textarea name="memo" maxlength="300" rows="2" placeholder="이 장소에 가고 싶은 이유"></textarea></label><p class="hint">직접 지정한 위치와 주소예요. 방문 전에 한 번 더 확인해 주세요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">지도에 추가</button></div></form>`);
   });
   requestAnimationFrame(()=>realMap?.invalidateSize());
 }
@@ -66,7 +66,7 @@ function updateMapSearchResults(){
   if(mapSearchIndex>=matches.length)mapSearchIndex=0;
   host.hidden=!mapSearchOpen;
   if(input){input.setAttribute('aria-expanded',String(mapSearchOpen));input.setAttribute('aria-activedescendant',mapSearchOpen&&matches.length?`map-search-result-${matches[mapSearchIndex].id}`:'');}
-  host.innerHTML=matches.length?matches.map((x,i)=>`<button type="button" id="map-search-result-${x.id}" role="option" aria-selected="${i===mapSearchIndex}" class="${i===mapSearchIndex?'active':''}" data-map-result="${x.id}"><span class="map-result-photo">${libThumb(x)}</span><span><b>${esc(x.title)}</b><small>${readyPlaces().some(p=>p.id===x.id)?esc(mapPlaceLabel(x)):'위치 확인 필요'} · ${esc(x.type)}</small></span></button>`).join(''):'<p>저장한 장소 중 검색 결과가 없어요.</p>';
+  host.innerHTML=matches.length?matches.map((x,i)=>`<button type="button" id="map-search-result-${x.id}" role="option" aria-selected="${i===mapSearchIndex}" class="${i===mapSearchIndex?'active':''}" data-map-result="${x.id}"><span class="map-result-photo">${libThumb(x)}</span><span><b>${esc(x.title)}</b><small>${readyPlaces().some(p=>p.id===x.id)?esc(mapPlaceLabel(x)):'위치 확인 필요'}, ${esc(x.type)}</small></span></button>`).join(''):'<p>저장한 장소 중 검색 결과가 없어요.</p>';
   filterMapMarkers();
 }
 actions.mapplace=()=>{mapMenuOpen=false;mapSheetState='closed';mapSearchQuery='';page='map';detailId=null;mapPickMode=true;render();};

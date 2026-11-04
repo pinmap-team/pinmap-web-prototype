@@ -16,12 +16,12 @@ let ps = {list:[], timer:null, clock:null};
 function pushFor(scene){
   const near = readyPlaces().filter(scene.match);
   if (!near.length) return null;
-  const pref = x => (preferences.includes('food') && x.type==='맛집·카페') || (preferences.includes('plan') && (x.type==='여행' || x.deadline)) || (preferences.includes('nearby')) ? 0 : 1;
+  const pref = x => (preferences.includes('food') && x.type==='맛집/카페') || (preferences.includes('plan') && (x.type==='여행' || x.deadline)) || (preferences.includes('nearby')) ? 0 : 1;
   const due = settings.notiDeadline ? near.filter(x => x.deadline) : [];
   const pick = due[0] || [...near].sort((a,b) => pref(a)-pref(b) || distanceOf(a)-distanceOf(b))[0];
-  const more = near.length > 1 ? ` · 근처에 저장한 곳 ${near.length-1}개 더` : '';
-  if (pick.deadline) return {id:pick.id, title:`⏰ 근처에 저장한 콘텐츠가 ${pick.deadline}에 마감돼요`, body:`‘${pick.title}’ · ${scene.dist(pick)}. 지나가는 길에 들러볼까요?${more}`};
-  return {id:pick.id, title:`📍 ${scene.place}에 저장해둔 곳이 있어요`, body:`‘${pick.title}’ · ${scene.dist(pick)}${pick.memo?` · “${pick.memo}”`:''}${more}`};
+  const more = near.length > 1 ? `, 근처에 저장한 곳 ${near.length-1}개 더` : '';
+  if (pick.deadline) return {id:pick.id, title:`⏰ 근처에 저장한 콘텐츠가 ${pick.deadline}에 마감돼요`, body:`‘${pick.title}’, ${scene.dist(pick)}. 지나가는 길에 들러볼까요?${more}`};
+  return {id:pick.id, title:`📍 ${scene.place}에 저장해둔 곳이 있어요`, body:`‘${pick.title}’, ${scene.dist(pick)}${pick.memo?`, “${pick.memo}”`:''}${more}`};
 }
 // 알림이 오지 않는 이유 (설정 상태)
 function pushBlocker(){
@@ -61,7 +61,7 @@ function drawPushDemo(){
   const el = $('#pushdemo'); if (!el) return;
   const block = pushBlocker();
   el.innerHTML = `<div class="ls-screen">
-    <div class="ls-top"><span class="ls-tag">잠금화면 · 앱이 꺼진 상태</span><button class="ls-exit" data-ps="exit">체험 끝내기 ${icon('close')}</button></div>
+    <div class="ls-top"><span class="ls-tag">잠금화면, 앱이 꺼진 상태</span><button class="ls-exit" data-ps="exit">체험 끝내기 ${icon('close')}</button></div>
     <div class="ls-clock"><small>${dateText()}</small><div class="ls-time">${clockText()}</div></div>
     <div class="ls-notis" aria-live="polite">${ps.list.map((n,i) => n.waiting
       ? `<div class="ls-noti waiting"><span class="ls-spin" aria-hidden="true"></span>${esc(n.text)}</div>`
@@ -71,7 +71,7 @@ function drawPushDemo(){
       ${block ? `<div class="ls-block"><p>${block.text}</p><button data-action="${block.act}">${block.btn}</button></div>` : ''}
       <p class="ls-q">어디로 이동해볼까요? <small>앱을 켜지 않은 채 위치만 바뀌어요</small></p>
       <div class="ls-scenes">${PUSH_SCENES.map(s => `<button data-ps-scene="${s.id}"><span aria-hidden="true">${s.emoji}</span>${s.label}</button>`).join('')}</div>
-      <p class="ls-foot">설정: 푸시 ${settings.push?'허용':'꺼짐'} · 위치 ${LOC_PERM[settings.locPerm]} · 위치 기반 추천 ${settings.notiNearby?'켜짐':'꺼짐'}</p>
+      <p class="ls-foot">설정: 푸시 ${settings.push?'허용':'꺼짐'}, 위치 ${LOC_PERM[settings.locPerm]}, 위치 기반 추천 ${settings.notiNearby?'켜짐':'꺼짐'}</p>
     </div>
   </div>`;
 }
@@ -80,13 +80,13 @@ function moveTo(id){
   clearTimeout(ps.timer);
   ps.list = ps.list.filter(n => !n.waiting && !n.none);
   const block = pushBlocker();
-  if (block) { ps.list.unshift({none:true, text:`${scene.label} · 알림이 오지 않았어요`}); drawPushDemo(); return; }
-  ps.list.unshift({waiting:true, text:`${scene.label} · 위치 확인 중…`});
+  if (block) { ps.list.unshift({none:true, text:`${scene.label}, 알림이 오지 않았어요`}); drawPushDemo(); return; }
+  ps.list.unshift({waiting:true, text:`${scene.label}, 위치 확인 중…`});
   drawPushDemo();
   ps.timer = setTimeout(() => {
     ps.list = ps.list.filter(n => !n.waiting);
     const n = pushFor(scene);
-    ps.list.unshift(n || {none:true, text:`${scene.label} · 근처에 저장한 콘텐츠가 없어 알림을 보내지 않았어요`});
+    ps.list.unshift(n || {none:true, text:`${scene.label}, 근처에 저장한 콘텐츠가 없어 알림을 보내지 않았어요`});
     drawPushDemo();
     if (n) navigator.vibrate?.(80);
   }, 1300);

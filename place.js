@@ -1,7 +1,7 @@
 // 홈과 지도 상단 '내 동네' (최대 2개)
 // 메인 동네는 검정 큰 글씨, 서브 동네는 회색 작은 글씨. 서브를 누르면 서로 자리가 바뀌어요.
 // 메인 동네를 누르면 '내 동네 설정' 시트가 올라와 추가 · 삭제 · 수정할 수 있어요.
-const MAX_PLACES = 2;
+const MAX_PLACES = Infinity; // 2026-11-04: 저장 위치 개수 제한 없음
 // 검색용 동네 목록 (예시)
 const DONGS = (PM_ENV.development ? [] : [
   ['성수동','서울 성동구'],['성수1가1동','서울 성동구'],['성수2가3동','서울 성동구'],['행당동','서울 성동구'],['왕십리동','서울 성동구'],['금호동','서울 성동구'],['옥수동','서울 성동구'],
@@ -34,8 +34,8 @@ function placebar(){
   const mainLabel = settings.placeLabels?.[main] || main;
   const swapped = placeSwapped; placeSwapped = false;
   return `<div class="placebar${swapped ? ' swapped' : ''}" role="group" aria-label="현재 위치">
-    <button class="placemain" data-action="placesheet" aria-label="현재 위치 설정 · ${esc(mainLabel)} · ${esc(main)}">${icon('pin')}<b>${esc(mainLabel)}</b>${others.length ? '' : icon('chevron')}</button>
-    ${others.map((name,index) => `<button class="placesub" data-place-swap="${index+1}" aria-label="${esc(settings.placeLabels?.[name] || name)} · ${esc(name)} 위치 선택">${esc(settings.placeLabels?.[name] || name)}</button>`).join('')}
+    <button class="placemain" data-action="placesheet" aria-label="현재 위치 설정, ${esc(mainLabel)}, ${esc(main)}">${icon('pin')}<b>${esc(mainLabel)}</b>${others.length ? '' : icon('chevron')}</button>
+    ${others.map((name,index) => `<button class="placesub" data-place-swap="${index+1}" aria-label="${esc(settings.placeLabels?.[name] || name)}, ${esc(name)} 위치 선택">${esc(settings.placeLabels?.[name] || name)}</button>`).join('')}
   </div>`;
 }
 paths.chevron = 'm6 9 6 6 6-6';
@@ -47,7 +47,7 @@ function setMain(i){
   const [picked] = p.splice(i, 1); p.unshift(picked); placeSwapped = true;
   afterChange(); render();
   window.dispatchEvent(new CustomEvent('pinmap:place-changed',{detail:{name:picked}}));
-  toast(`위치를 '${settings.placeLabels?.[picked] || picked}'(으)로 변경했어요.`);
+  toast(`위치를 '${settings.placeLabels?.[picked] || picked}'${josa(settings.placeLabels?.[picked] || picked, '으로/로').slice(String(settings.placeLabels?.[picked] || picked).length)} 변경했어요.`);
 }
 
 /* ---------- 현재 위치 설정 시트 ---------- */
@@ -55,13 +55,13 @@ function placeSheet(){
   const p = myPlaces();
   const rows = p.map((name, i) => `<div class="prow">
       <button class="pradio ${i===0?'on':''}" data-place-pick="${i}" role="radio" aria-checked="${i===0}" aria-label="${esc(name)} 선택"></button>
-      <button class="pname" data-place-pick="${i}"><b>${esc(settings.placeLabels?.[name] || name)}</b><small>${esc(dongOf(name).full)}${i===0?' · 현재 위치':''}</small></button><button class="picon plabel-edit" data-place-label="${i}" aria-label="${esc(name)} 이름 지정">이름</button>
+      <button class="pname" data-place-pick="${i}"><b>${esc(settings.placeLabels?.[name] || name)}</b><small>${esc(dongOf(name).full)}${i===0?', 현재 위치':''}</small></button><button class="picon plabel-edit" data-place-label="${i}" aria-label="${esc(name)} 이름 지정">이름</button>
       <button class="picon" data-place-edit="${i}" aria-label="${esc(name)} 수정">${icon('edit')}</button>
       <button class="picon" data-place-del="${i}" aria-label="${esc(name)} 삭제" ${p.length===1?'disabled':''}>${icon('close')}</button>
     </div>`).join('');
-  modal('현재 위치 설정', `<p class="muted psub">최대 ${MAX_PLACES}개의 위치를 선택할 수 있어요.</p>
+  modal('현재 위치 설정', `
     <div class="plist" role="radiogroup" aria-label="현재 위치">${rows}</div>
-    ${p.length < MAX_PLACES ? `<button class="padd" data-action="placeadd">${icon('plus')} 위치 추가</button>` : `<p class="hint pfull">위치를 바꾸려면 ✎ 수정을 누르거나, 하나를 삭제한 뒤 추가하세요.</p>`}
+    ${p.length < MAX_PLACES ? `<button class="padd" data-action="placeadd">${icon('plus')} 위치 추가</button>` : `<p class="hint pfull">위치를 바꾸려면 ✎ 수정을 누르거나, 하나를 지운 뒤 새로 추가해 주세요.</p>`}
     ${p.length===1 ? '<p class="hint pfull">위치는 최소 1개가 필요해서 삭제할 수 없어요.</p>' : ''}`);
   $('#sheet').classList.add('bottomsheet');
 }
@@ -71,7 +71,7 @@ let labelPlaceIndex = -1;
 function placeLabelSheet(index){
   const name=myPlaces()[index];if(!name)return;
   labelPlaceIndex=index;
-  modal('위치 이름 지정', `<form id="place-label-form"><p class="muted psub">${esc(name)}에 표시할 이름을 입력하세요. 예: 집, 학교</p><label class="psearch"><input name="label" aria-label="위치 이름" maxlength="12" placeholder="집, 학교 등" value="${esc(settings.placeLabels?.[name] || '')}"></label><div class="dialogactions"><button type="submit" class="primary">저장</button></div></form>`);
+  modal('위치 이름 지정', `<form id="place-label-form"><p class="muted psub">${esc(name)}에 붙일 이름을 정해 주세요. 예: 집, 학교</p><label class="psearch"><input name="label" aria-label="위치 이름" maxlength="12" placeholder="집, 학교 등" value="${esc(settings.placeLabels?.[name] || '')}"></label><div class="dialogactions"><button type="submit" class="primary">저장</button></div></form>`);
   $('#sheet').classList.add('bottomsheet');
 }
 
@@ -107,7 +107,7 @@ function choosePlace(name){
   settings.recentPlaces = [...new Set([before, ...(settings.recentPlaces||[])].filter(n => n && !p.includes(n)))].slice(0,5);
   afterChange(); $('#sheet').close(); render();
   if(placeMode.type==='add'||placeMode.index===0)window.dispatchEvent(new CustomEvent('pinmap:place-changed',{detail:{name:myPlaces()[0]}}));
-  toast(placeMode.type === 'edit' ? `'${before}'을(를) '${name}'(으)로 수정했어요.` : `위치를 '${name}'(으)로 변경했어요.`);
+  toast(placeMode.type === 'edit' ? `'${before}'${josa(before, '을/를').slice(String(before).length)} '${name}'${josa(name, '으로/로').slice(String(name).length)} 수정했어요.` : `위치를 '${name}'${josa(name, '으로/로').slice(String(name).length)} 변경했어요.`);
 }
 
 Object.assign(actions, {
@@ -128,7 +128,7 @@ document.addEventListener('click', e => {
     const [gone] = p.splice(Number(del.dataset.placeDel), 1);
     if(settings.placeLabels)delete settings.placeLabels[gone];
     settings.recentPlaces = [gone, ...(settings.recentPlaces||[]).filter(n => n !== gone)].slice(0,5);
-    afterChange(); render(); placeSheet(); toast(`'${gone}'을(를) 위치 목록에서 삭제했어요.`);
+    afterChange(); render(); placeSheet(); toast(`'${gone}'${josa(gone, '을/를').slice(String(gone).length)} 위치 목록에서 삭제했어요.`);
     return;
   }
   const ch = e.target.closest('[data-place-choose]');

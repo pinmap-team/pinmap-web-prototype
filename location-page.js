@@ -2,7 +2,7 @@
 (() => {
   PARENT_TAB.addresses='map'; PARENT_TAB.addressedit='map';
   pageName.addresses='위치 편집'; pageName.addressedit='주소 편집';
-  // 마이 > 위치 관리: 같은 주소 정보·화면을 쓰는 별도 페이지. 뒤로 가면 마이로 돌아가요.
+  // 마이 > 위치 편집: 같은 주소 정보·화면을 쓰는 별도 페이지. 뒤로 가면 마이로 돌아가요.
   PARENT_TAB.myaddresses='my'; PARENT_TAB.myaddressedit='my';
   pageName.myaddresses='위치 편집'; pageName.myaddressedit='주소 편집';
   let queryText='', editing=false, editKey=null, pendingDelete=null, origin='map';
@@ -33,7 +33,7 @@
     <form id="address-search-form" class="address-search" role="search">${icon('search')}<input id="address-search" type="search" name="q" aria-label="저장 주소 검색" placeholder="도로명, 건물명, 지번 또는 이름으로 검색" value="${esc(queryText)}" enterkeyhint="search" autocomplete="off"><button type="button" data-action="addressclear" aria-label="주소 검색어 지우기" ${queryText?'':'hidden'}>${icon('close')}</button></form>
     <button type="button" class="address-locate" data-action="addresscurrent">${icon('target')} 현재 위치로 찾기</button>
     <div id="address-results" aria-label="저장한 주소 목록">${listBody()}</div>
-    ${myPlaces().length<MAX_PLACES?`<button type="button" class="address-add" data-action="addressadd">${icon('plus')} 주소 추가</button>`:editing?`<p class="address-limit">저장 위치는 최대 ${MAX_PLACES}개예요. 기존 주소를 수정하거나 삭제한 뒤 추가할 수 있어요.</p>`:''}
+    <button type="button" class="address-add" data-action="addressadd">${icon('plus')} 주소 추가</button>
   </section>`;
   pages.myaddresses=()=>pages.addresses();
   pages.addressedit=()=>{
@@ -84,7 +84,9 @@
     const remove=event.target.closest('[data-address-delete]');
     if(remove&&!remove.disabled){
       pendingDelete=remove.dataset.addressDelete;
-      modal('주소 삭제',`<p>‘${esc(recordOf(pendingDelete).label)}’ 주소를 삭제할까요? 저장한 콘텐츠는 유지돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button type="button" class="filled" data-action="addressdeleteconfirm">주소 삭제</button></div>`);
+      // 2026-11-04: 아래 시트 대신 화면 가운데 확인 팝업 (로그아웃·탈퇴와 같은 모양)
+      if(typeof confirmPop==='function')confirmPop(`‘${esc(recordOf(pendingDelete).label)}’ 주소를 삭제할까요?`,'저장한 콘텐츠는 그대로 있어요.','addressdeleteconfirm','삭제','취소');
+      else modal('주소 삭제',`<p>‘${esc(recordOf(pendingDelete).label)}’ 주소를 삭제할까요? 저장한 콘텐츠는 유지돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button type="button" class="filled" data-action="addressdeleteconfirm">주소 삭제</button></div>`);
     }
   });
   document.addEventListener('submit',event=>{

@@ -5,58 +5,58 @@
  background:var(--pm-glass)!important;border:1px solid var(--pm-glass-border)!important;box-shadow:var(--pm-glass-shadow)!important;
  -webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8)
 }
-.bottomnav .navitem,.bottomnav .navitem *{color:#8b8b8b!important}
-.bottomnav .navitem.active,.bottomnav .navitem.active *{color:#242424!important}
+.bottomnav .navitem,.bottomnav .navitem *{color:var(--color-secondary)!important}
+.bottomnav .navitem.active,.bottomnav .navitem.active *{color:var(--color-on-surface)!important}
 .bottomnav .navitem.active .navicon{width:38px!important;height:38px!important;background:#ffffff9e!important;box-shadow:inset 0 1px 0 #fff!important}
 .bottomnav svg.pm-solid,.bottomnav svg.pm-solid path{fill:currentColor!important;stroke:none!important}
-.bottomnav .pm-nav-add{color:#555!important}
+.bottomnav .pm-nav-add{color:var(--color-secondary)!important}
 .bottomnav .pm-nav-add svg{width:23px;height:23px}
 body:has(.dt) .bottomnav,body:has(.cf-selecting) .bottomnav{display:none!important}
 .rail{display:none!important}
 body.live-map-page:before,body:has(.coursepage):before{display:none!important}
 .pm-basemap{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:210;pointer-events:none}
-.live-map .lm-search{top:18px;left:18px;right:18px;min-height:48px;padding:10px 14px}
+.live-map .lm-search{top:18px;left:18px;right:18px;min-height:48px;padding:var(--space-md) var(--space-lg)}
 .live-map .lm-search>svg{display:block;width:20px;height:20px;flex:none}
-.live-map .lm-search input{font-size:13px;color:#292929;outline:none}
+.live-map .lm-search input{font:var(--type-body-sm);color:var(--color-on-surface);outline:none}
 .live-map .lm-search button{width:28px;height:28px;border-radius:50%;display:grid;place-items:center}
 .live-map .lm-bottom{bottom:76px}
 .live-map .lm-area{position:absolute;bottom:105px;left:22px;right:18px;pointer-events:none}
 .live-map .lm-area>div{display:none}
 .live-map .lm-area .lm-round{margin-left:auto;pointer-events:auto;width:42px;height:42px}
 .live-map .lm-bottom:before{inset:-8px -20px -95px;background:linear-gradient(transparent,#ffffff22);backdrop-filter:none}
-.live-map .lm-categories{gap:5px;margin:0 -6px 4px}
-.live-map .lm-categories button{min-width:0;flex:1;padding:7px 2px;border-radius:18px;gap:4px}
-.live-map .lm-categories .selected{background:rgba(255,255,255,.87)!important;border-color:white!important}
+.live-map .lm-categories{gap:var(--space-xs);margin:0 calc(-1 * var(--space-sm)) var(--space-xs)}
+.live-map .lm-categories button{min-width:0;flex:1;padding:var(--space-sm) 2px;border-radius:var(--rounded-lg);gap:var(--space-xs)}
+.live-map .lm-categories .selected{background:rgba(255,255,255,.87)!important;border-color:var(--color-surface)!important}
 .live-map .lm-categories .lm-emoji{font-size:24px}
-.live-map .lm-categories b{font-size:9px}
+.live-map .lm-categories b{font:var(--type-body-sm)}
 .live-map .leaflet-top{top:84px;right:18px}
 .live-map .leaflet-control-zoom{border-radius:20px;box-shadow:none;background:transparent}
 .live-map .leaflet-control-zoom a{color:#333;width:36px;height:36px;line-height:34px;font-size:23px;border-radius:50%;margin-bottom:7px}
 .live-map .leaflet-control-attribution{font-size:7px!important}
-.live-map .lm-status{top:76px;left:18px;max-width:calc(100% - 80px);background:#ffffffe8;color:#555;font-size:11px}
+.live-map .lm-status{top:76px;left:18px;max-width:calc(100% - 80px);background:#ffffffe8;color:var(--color-secondary);font:var(--type-body-sm)}
 .live-map .lm-search-results{top:76px;right:62px;max-height:360px}
 .lm-emoji-marker{background:none;border:0}
 .lm-emoji-pin{display:grid;place-items:center;width:46px;height:46px;font-size:35px;line-height:1;filter:drop-shadow(0 3px 4px #0004);cursor:pointer;transition:transform .15s}
 .lm-emoji-marker:hover .lm-emoji-pin,.lm-emoji-marker:focus .lm-emoji-pin{transform:translateY(-4px) scale(1.1)}
-.lm-location-dot{display:block;width:20px;height:20px;border:3px solid white;border-radius:50%;background:#2789ef;box-shadow:0 0 0 9px #2789ef24,0 2px 7px #0003}
-.lm-location-dot.is-demo{background:#777;box-shadow:0 0 0 9px #7772,0 2px 7px #0003}
-.lm-location-label{background:#ffffffe0;border:1px solid #fff;border-radius:12px;color:#555;font-size:10px;box-shadow:0 2px 9px #0002}
-.coursepage{color:#292929;background:#fff}
-.course-body{color:#292929}
-.course-eyebrow,.course-days .course-day-add,.course-card-foot label,.is-editing .course-edit-bar>span:after{color:#737373}
-.course-title-row>div input{color:#252525}
-.course-title-row>label,.course-card-head small,.course-day-heading span,.course-note,.course-option small{color:#8b8b8b}
-.course-title-row>label input,.course-card-foot input{color:#555;background:#f2f2f2;border-color:#e5e5e5}
-.course-days button{color:#8b8b8b;border-color:#e5e5e5}
-.course-days button.selected,.course-edit-bar button{background:#555;border-color:#555;color:#fff}
-.course-timeline:before{background:#e4e4e4}
-.course-card{box-shadow:0 7px 27px #0000000d;border-color:#eee}
-.course-card-foot{border-color:#eee}.course-card-foot>span{color:#737373}
-.course-remove{background:#666;box-shadow:0 2px 8px #0002}
-.is-editing .course-card{border-color:#aaa}.course-picker{background:#f5f5f5}
-.course-picker-heading button,.course-option>button{background:#e9e9e9;color:#555}
-.course-option{border-color:#e6e6e6}.course-add-place{color:#555!important;background:#f3f3f3!important;border-color:#ddd!important}
-.course-edit-bar,.course-empty{color:#8b8b8b}
+.lm-location-dot{display:block;width:20px;height:20px;border:3px solid var(--color-surface);border-radius:50%;background:var(--color-secondary);box-shadow:0 0 0 9px #2789ef24,0 2px 7px #0003}
+.lm-location-dot.is-demo{background:var(--color-secondary);box-shadow:0 0 0 9px #7772,0 2px 7px #0003}
+.lm-location-label{background:#ffffffe0;border:1px solid var(--color-surface);border-radius:var(--rounded-md);color:var(--color-secondary);font:var(--type-body-sm);box-shadow:var(--shadow-sm)}
+.coursepage{color:var(--color-on-surface);background:var(--color-surface)}
+.course-body{color:var(--color-on-surface)}
+.course-eyebrow,.course-days .course-day-add,.course-card-foot label,.is-editing .course-edit-bar>span:after{color:var(--color-secondary)}
+.course-title-row>div input{color:var(--color-on-surface)}
+.course-title-row>label,.course-card-head small,.course-day-heading span,.course-note,.course-option small{color:var(--color-secondary)}
+.course-title-row>label input,.course-card-foot input{color:var(--color-secondary);background:var(--color-neutral);border-color:var(--color-disabled)}
+.course-days button{color:var(--color-secondary);border-color:var(--color-disabled)}
+.course-days button.selected,.course-edit-bar button{background:var(--color-secondary);border-color:var(--color-border);color:#fff}
+.course-timeline:before{background:var(--color-disabled)}
+.course-card{box-shadow:var(--shadow-sm);border-color:var(--color-disabled)}
+.course-card-foot{border-color:var(--color-disabled)}.course-card-foot>span{color:var(--color-secondary)}
+.course-remove{background:var(--color-secondary);box-shadow:var(--shadow-sm)}
+.is-editing .course-card{border-color:var(--color-border)}.course-picker{background:var(--color-neutral)}
+.course-picker-heading button,.course-option>button{background:var(--color-disabled);color:var(--color-secondary)}
+.course-option{border-color:var(--color-disabled)}.course-add-place{color:var(--color-secondary)!important;background:var(--color-neutral)!important;border-color:var(--color-disabled)!important}
+.course-edit-bar,.course-empty{color:var(--color-secondary)}
 
 /* Hide the embedded viewer controls outside the app viewport; retain our visible attribution. */
 .pm-basemap{inset:-80px;width:calc(100% + 160px);height:calc(100% + 160px)}
@@ -65,7 +65,7 @@ body.live-map-page:before,body:has(.coursepage):before{display:none!important}
 .lm-emoji-marker:focus-visible{outline:3px solid #444;border-radius:18px;outline-offset:3px}
 /* One navigation component across every content route, including details. */
 body:has(.dt) .bottomnav{display:flex!important}
-body:has(.dt) .dtbar{bottom:80px;left:50%;right:auto;transform:translateX(-50%);width:min(100%,402px);padding:10px 20px;border-radius:20px 20px 0 0}
+body:has(.dt) .dtbar{bottom:80px;left:50%;right:auto;transform:translateX(-50%);width:min(100%,402px);padding:var(--space-md) var(--space-xl);border-radius:var(--rounded-lg) var(--rounded-lg) 0 0}
 body:has(.dt) .dt{padding-bottom:176px}
 body.onboarding-open .bottomnav,body.login-open .bottomnav,body:has(dialog[open]) .bottomnav,body:has(.cf-selecting) .bottomnav{display:none!important}
 
@@ -92,54 +92,54 @@ body:has(.main .strip)::before{display:none!important}
 /* Map control spacing and larger category targets. */
 .live-map .lm-search{top:28px}
 .live-map .lm-search-results,.live-map .lm-status{top:86px}
-.live-map .lm-categories button{padding:8px 2px;gap:5px;min-height:72px}
+.live-map .lm-categories button{padding:var(--space-sm) 2px;gap:var(--space-xs);min-height:72px}
 .live-map .lm-categories .lm-emoji{font-size:32px}
-.live-map .lm-categories b{font-size:11px}
+.live-map .lm-categories b{font:var(--type-body-sm)}
 /* Extend the soft backdrop above the course action without covering map input. */
 .live-map .lm-bottom:before{top:-108px;background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.31) 32%,rgba(255,255,255,.52) 65%,rgba(255,255,255,.60));mask-image:linear-gradient(transparent,#000 32%);-webkit-mask-image:linear-gradient(transparent,#000 32%)}
 
 /* Compact course editor: photos, place names and a centered add control. */
 .course-edit-bar[hidden]{display:none!important}
 .course-edit-bar{justify-content:flex-end}
-.course-add-place{display:flex!important;align-items:center;justify-content:center;width:48px!important;height:48px;min-height:48px;padding:0!important;border-radius:50%!important;margin:20px auto!important}
+.course-add-place{display:flex!important;align-items:center;justify-content:center;width:48px!important;height:48px;min-height:48px;padding:0!important;border-radius:50%!important;margin:var(--space-xl) auto!important}
 .course-add-place svg{width:24px;height:24px}
 
 .course-add-place{box-shadow:none!important;filter:none!important}
-.course-share{position:absolute;top:18px;right:18px;z-index:500;display:grid;place-items:center;width:44px;height:44px;border:1px solid #ffffffdd;border-radius:50%;background:#ffffffed;color:#111;cursor:pointer;backdrop-filter:blur(18px)}
+.course-share{position:absolute;top:18px;right:18px;z-index:500;display:grid;place-items:center;width:44px;height:44px;border:1px solid #ffffffdd;border-radius:50%;background:#ffffffed;color:var(--color-on-surface);cursor:pointer;backdrop-filter:blur(18px)}
 .course-share svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .course-map-title{right:76px}
-.course-share-sheet{padding:24px;color:#222}
-.course-share-sheet h2{font-size:19px}.course-share-sheet p{font-size:13px;color:#777}
-.course-share-sheet textarea{width:100%;min-height:220px;padding:14px;border:1px solid #ddd;border-radius:16px;background:#f6f6f6;font:inherit;font-size:13px;line-height:1.6}
-.course-share-sheet>div{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
-.course-share-sheet button{border:0;padding:10px 20px;border-radius:20px;background:#eee;color:#222}
-.course-share-sheet [data-course-share-copy]{background:#222;color:#fff}
+.course-share-sheet{padding:var(--space-xl);color:var(--color-on-surface)}
+.course-share-sheet h2{font:var(--type-body-md)}.course-share-sheet p{font:var(--type-body-sm);color:var(--color-secondary)}
+.course-share-sheet textarea{width:100%;min-height:220px;padding:var(--space-lg);border:1px solid var(--color-disabled);border-radius:var(--rounded-lg);background:var(--color-neutral);font:var(--type-body-sm)}
+.course-share-sheet>div{display:flex;justify-content:flex-end;gap:var(--space-sm);margin-top:var(--space-lg)}
+.course-share-sheet button{border:0;padding:var(--space-md) var(--space-xl);border-radius:var(--rounded-lg);background:var(--color-disabled);color:var(--color-on-surface)}
+.course-share-sheet [data-course-share-copy]{background:var(--color-primary);color:var(--color-neutral)}
 
 /* Schedule header above the map, with companion and share actions. */
-.course-header{padding:16px 20px 18px;background:#fff}
-.course-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.course-header-actions{display:flex;gap:10px}
-.course-header .course-close,.course-header .course-share{position:static;display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;background:transparent;box-shadow:none;color:#292929;cursor:pointer}
+.course-header{padding:var(--space-lg) var(--space-xl) var(--space-lg);background:var(--color-surface)}
+.course-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-lg)}
+.course-header-actions{display:flex;gap:var(--space-md)}
+.course-header .course-close,.course-header .course-share{position:static;display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;background:transparent;box-shadow:none;color:var(--color-on-surface);cursor:pointer}
 .course-header-actions svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .course-header .course-title-row{margin-bottom:0}
-.course-header .course-title-row>div input{font-size:22px}
+.course-header .course-title-row>div input{font:var(--type-headline-md)}
 .course-map-wrap{height:200px}
-.course-card-head img{width:64px;height:64px;border-radius:10px}
-.course-body{padding-top:22px;padding-bottom:180px}
-.course-add-place{position:fixed!important;left:50%;bottom:84px;transform:translateX(-50%);z-index:700;width:52px!important;height:52px!important;margin:0!important;background:#333!important;color:#fff!important;border:1px solid #fff!important;box-shadow:none!important}
+.course-card-head img{width:64px;height:64px;border-radius:var(--rounded-sm)}
+.course-body{padding-top:var(--space-xl);padding-bottom:180px}
+.course-add-place{position:fixed!important;left:50%;bottom:84px;transform:translateX(-50%);z-index:700;width:52px!important;height:52px!important;margin:0!important;background:var(--color-primary-pressed)!important;color:var(--color-neutral)!important;border:1px solid var(--color-surface)!important;box-shadow:none!important}
 .course-add-place svg{stroke:#fff!important;fill:none!important}
-.course-share-sheet label{display:grid;gap:10px;font-size:13px}
-.course-share-sheet input{padding:12px;border:1px solid #ddd;border-radius:12px}
+.course-share-sheet label{display:grid;gap:var(--space-md);font:var(--type-body-sm)}
+.course-share-sheet input{padding:var(--space-md);border:1px solid var(--color-disabled);border-radius:var(--rounded-md)}
 /* Route title editing, place summaries and a timeline ending at the final stop. */
 .course-title-row>div{display:flex;align-items:center;flex:0 1 auto;gap:2px}
 .course-title-row>div input{field-sizing:content;width:auto;min-width:3ch;max-width:170px;flex:0 1 auto}
 .course-title-row>div input[readonly]{cursor:default}
-.course-title-edit{display:grid;place-items:center;flex:none;width:29px;height:29px;padding:0;border:0;background:transparent;color:#555;box-shadow:none;cursor:pointer}
+.course-title-edit{display:grid;place-items:center;flex:none;width:29px;height:29px;padding:0;border:0;background:transparent;color:var(--color-secondary);box-shadow:none;cursor:pointer}
 .course-title-edit svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .course-header .course-title-row>label{font-size:0}
 .course-header .course-title-row>label input{margin-top:0}
 .course-timeline:before{display:none}
-.course-row:not(:last-child):before{content:'';position:absolute;left:2px;top:31px;bottom:-21px;width:2px;background:#dedede}
+.course-row:not(:last-child):before{content:'';position:absolute;left:2px;top:31px;bottom:-21px;width:2px;background:var(--color-disabled)}
 /* The dock avatar uses the same markup and saved photo as the My page. */
 .bottomnav .navitem .pm-nav-avatar{box-sizing:border-box;width:28px;height:28px;min-width:28px;border-radius:50%;font-size:12px;line-height:1;background:#111!important;color:#fff!important;overflow:hidden}
 .bottomnav .navitem .pm-nav-avatar img{width:100%;height:100%;object-fit:cover;display:block}
@@ -147,17 +147,17 @@ body:has(.main .strip)::before{display:none!important}
 
 
 /* Align page headings with the map title; the visible home banner retains its own space. */
-:root{--top:28px}
+:root{--top:var(--space-2xl)}
 body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:none!important}
-.layout .main:not(:has(.strip)):has(.homebrand){padding-top:34px!important}
-.layout .main:has(>.topbar .toptitle){padding-top:36px!important}
+.layout .main:not(:has(.strip)):has(.homebrand){padding-top:var(--space-2xl)!important}
+.layout .main:has(>.topbar .toptitle){padding-top:var(--space-2xl)!important}
 
 /* Map search header: solid white through the bottom of the search field. */
 .live-map::before{display:none}
-.live-map .lm-search{top:28px;left:20px;right:20px;background:#f5f5f5!important;border:1px solid #ededed!important;box-shadow:none!important;backdrop-filter:none;-webkit-backdrop-filter:none}
+.live-map .lm-search{top:28px;left:20px;right:20px;background:var(--color-neutral)!important;border:1px solid var(--color-disabled)!important;box-shadow:none!important;backdrop-filter:none;-webkit-backdrop-filter:none}
 .live-map .lm-search-results,.live-map .lm-status{top:106px}
 .live-map .lm-search-results{right:20px}
-.lm-expanded-pin{position:relative;display:flex;align-items:center;gap:10px;width:240px;height:88px;padding:12px 24px 12px 8px;border:2px solid #fff;border-radius:19px;background:#fff;box-shadow:0 5px 20px #14251e38;cursor:pointer;text-align:left;animation:pin-expand .16s ease-out;transform-origin:23px center}
+.lm-expanded-pin{position:relative;display:flex;align-items:center;gap:var(--space-md);width:240px;height:88px;padding:var(--space-md) var(--space-xl) var(--space-md) var(--space-sm);border:2px solid var(--color-surface);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);cursor:pointer;text-align:left;animation:pin-expand .16s ease-out;transform-origin:23px center}
 .lm-pin-symbol{flex:none;width:28px;font-size:25px;text-align:center}
 .lm-pin-copy{min-width:0;flex:1;display:grid;gap:3px}
 .lm-pin-copy b{font-size:13px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#222}
@@ -170,69 +170,69 @@ body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:no
 .course-row{align-items:center}
 .course-badge{margin-top:0}
 .course-row:not(:last-child):before{top:50%;bottom:calc(-50% - 14px)}
-.course-card{padding:10px 12px}
+.course-card{padding:var(--space-md) var(--space-md)}
 .course-card-head img{width:56px;height:56px}
-.course-header .course-save{align-self:center;min-height:40px;padding:8px 17px;border:0;border-radius:21px;background:#222;color:#fff;font-size:13px;font-weight:700;cursor:pointer}
-.course-list-page h1{font-size:24px;letter-spacing:-.6px;margin:0 0 8px;font-weight:700}
-.course-list-page .course-header>p{font-size:13px;color:#777;line-height:1.5;margin:0}
-.course-list-body{padding:6px 20px 120px}
-.course-new{width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:15px;background:#222;color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.course-header .course-save{align-self:center;min-height:40px;padding:var(--space-sm) var(--space-lg);border:0;border-radius:var(--rounded-lg);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);cursor:pointer}
+.course-list-page h1{font:var(--type-headline-md);letter-spacing:-.6px;margin:0 0 var(--space-sm)}
+.course-list-page .course-header>p{font:var(--type-body-sm);color:var(--color-secondary);margin:0}
+.course-list-body{padding:var(--space-sm) var(--space-xl) 120px}
+.course-new{width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;gap:var(--space-sm);border:0;border-radius:var(--rounded-lg);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);cursor:pointer}
 .course-new svg,.course-resume svg,.course-saved-card>svg,.course-saved-placeholder svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;flex:none}
-.course-resume{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:14px;border:1px solid #e8e8e8;border-radius:14px;background:#f7f7f7;color:#555;font-size:12px;text-align:left;cursor:pointer}
-.course-list-heading{margin:28px 0 12px;font-size:13px;font-weight:650;color:#666}
-.course-saved-card{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:12px;padding:14px;border:1px solid #e8e8e8;border-radius:17px;background:#fff;color:#222;text-align:left;cursor:pointer}
-.course-saved-card>img,.course-saved-placeholder{flex:none;width:58px;height:58px;border-radius:11px;object-fit:cover;background:#f1f1f1}
+.course-resume{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);margin-top:var(--space-md);padding:var(--space-lg);border:1px solid var(--color-disabled);border-radius:var(--rounded-md);background:var(--color-neutral);color:var(--color-secondary);font:var(--type-body-sm);text-align:left;cursor:pointer}
+.course-list-heading{margin:var(--space-2xl) 0 var(--space-md);font:var(--type-label-md);color:var(--color-secondary)}
+.course-saved-card{display:flex;align-items:center;gap:var(--space-md);width:100%;margin-bottom:var(--space-md);padding:var(--space-lg);border:1px solid var(--color-disabled);border-radius:var(--rounded-lg);background:var(--color-surface);color:var(--color-on-surface);text-align:left;cursor:pointer}
+.course-saved-card>img,.course-saved-placeholder{flex:none;width:58px;height:58px;border-radius:var(--rounded-md);object-fit:cover;background:var(--color-neutral)}
 .course-saved-placeholder{display:grid;place-items:center}
 .course-saved-card>span:not(.course-saved-placeholder){min-width:0;flex:1}
-.course-saved-card b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px}
-.course-saved-card small{display:block;margin-top:5px;font-size:11px;color:#777}
-.course-saved-stops{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;color:#888;margin-top:7px}
-.course-list-empty{text-align:center;padding:50px 10px;color:#888;font-size:13px;line-height:1.8}
-.coursepage button:focus-visible{outline:2px solid #444;outline-offset:3px}
+.course-saved-card b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-body-md)}
+.course-saved-card small{display:block;margin-top:var(--space-xs);font:var(--type-body-sm);color:var(--color-secondary)}
+.course-saved-stops{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:var(--type-body-sm);color:var(--color-secondary);margin-top:var(--space-sm)}
+.course-list-empty{text-align:center;padding:50px var(--space-md);color:var(--color-secondary);font:var(--type-body-sm)}
+.coursepage button:focus-visible{outline:2px solid var(--color-border);outline-offset:3px}
 
 /* Reuse the collection title/search component, including its 44/16/50px rhythm. */
-.live-map .lm-header{position:absolute;inset:0 0 auto;z-index:401;padding:var(--top) var(--gutter) 16px;background:var(--t-bg,#F4F4F5)}
+.live-map .lm-header{position:absolute;inset:0 0 auto;z-index:401;padding:var(--top) var(--gutter) 16px;background:var(--t-bg,var(--color-neutral))}
 .live-map .lm-header .cf-fhead{position:relative;padding-right:52px}
 .live-map .lm-header .libsearch{margin-bottom:0}
 .live-map .lm-header input{font-family:inherit}
-.live-map .lm-header .libgo{border:0;flex:none;width:28px;height:28px;padding:0;border-radius:50%;display:grid;place-items:center;color:#17191b;background:rgba(255,255,255,.62);box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)}
+.live-map .lm-header .libgo{border:0;flex:none;width:28px;height:28px;padding:0;border-radius:50%;display:grid;place-items:center;color:var(--color-on-surface);background:rgba(255,255,255,.62);box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)}
 .live-map .lm-header .libgo svg{width:20px;height:20px}
 .live-map .lm-search-results,.live-map .lm-status{top:calc(var(--top) + 122px)}
 /* A separate six-dot grip makes the existing reorder interaction visible. */
-.course-row{gap:10px}
-.course-drag-handle{display:grid;place-items:center;align-self:center;flex:0 0 28px;width:28px;height:48px;border:0;border-radius:8px;padding:0;background:transparent;color:#999;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.course-row{gap:var(--space-md)}
+.course-drag-handle{display:grid;place-items:center;align-self:center;flex:0 0 28px;width:28px;height:48px;border:0;border-radius:var(--rounded-sm);padding:0;background:transparent;color:var(--color-secondary);cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .course-drag-handle svg{width:16px;height:24px;fill:currentColor;stroke:none;pointer-events:none}
-.course-drag-handle:hover,.course-drag-handle:focus-visible{color:#444;background:#f2f2f2}
+.course-drag-handle:hover,.course-drag-handle:focus-visible{color:var(--color-secondary);background:var(--color-neutral)}
 .course-drag-handle:active{cursor:grabbing}
 
 /* Editing controls must not shift the rows while a grip is being dragged. */
 .course-body{position:relative}
 .course-edit-bar{position:absolute;right:20px;top:-48px;margin:0;z-index:410}
 
-.lm-expanded-pin{flex-direction:row;align-items:center;gap:10px;width:240px;height:88px;padding:12px 24px 12px 8px;overflow:hidden;transform-origin:23px center}
+.lm-expanded-pin{flex-direction:row;align-items:center;gap:var(--space-md);width:240px;height:88px;padding:var(--space-md) var(--space-xl) var(--space-md) var(--space-sm);overflow:hidden;transform-origin:23px center}
 .lm-pin-photo,.lm-pin-photo-placeholder{display:block;width:60px;height:60px;flex:0 0 60px;object-fit:cover;border-radius:11px}
 .lm-pin-photo-placeholder{display:grid;place-items:center;font-size:28px;background:var(--t-soft,#EFEFF1)}
 .lm-expanded-pin .lm-pin-copy{padding:0;gap:3px}
 .lm-pin-collapse{display:grid;place-items:center;width:16px;height:16px;right:6px;top:7px;background:transparent;color:#888;font-size:16px;box-shadow:none}
 
 /* Saved-course previews show the route and its ordered stops. */
-.course-saved-card>.course-saved-map{display:block;position:relative;flex:0 0 112px!important;width:112px;height:88px;border-radius:11px;overflow:hidden;pointer-events:none;background:#e9e9e9}
+.course-saved-card>.course-saved-map{display:block;position:relative;flex:0 0 112px!important;width:112px;height:88px;border-radius:var(--rounded-md);overflow:hidden;pointer-events:none;background:var(--color-disabled)}
 .course-thumbnail-marker i{display:grid;place-items:center;width:19px;height:19px;border:1.5px solid #fff;border-radius:50%;font-family:inherit;font-size:11px;font-weight:700;line-height:1;font-style:normal;color:#fff;box-shadow:0 1px 4px #0004}
-.course-map-credit{margin:4px 0 0;text-align:right;font-size:9px;color:#888}
+.course-map-credit{margin:var(--space-xs) 0 0;text-align:right;font:var(--type-body-sm);color:var(--color-secondary)}
 .course-map-credit a{color:inherit}
 
 
-.coursepage.course-list-page,.course-list-page .course-header{background:var(--t-bg,#F4F4F5)}
+.coursepage.course-list-page,.course-list-page .course-header{background:var(--t-bg,var(--color-neutral))}
 
 /* Location sits below search. */
 .live-map .lm-locate-top{position:absolute;top:calc(var(--top) + 138px);right:var(--gutter);z-index:400}
-.live-map .lm-locate-top .lm-round{width:42px;height:42px;box-shadow:0 2px 10px #0001}
+.live-map .lm-locate-top .lm-round{width:42px;height:42px;box-shadow:var(--shadow-sm)}
 
 /* 지도 헤더: 기존 제목 자리에 홈에서 옮긴 현위치 바 */
-.live-map .lm-header .placebar{flex:1;min-width:0;min-height:40px;gap:10px;margin:0;padding:0;align-items:center}
+.live-map .lm-header .placebar{flex:1;min-width:0;min-height:40px;gap:var(--space-md);margin:0;padding:0;align-items:center}
 .live-map .lm-header .placemain,.live-map .lm-header .placesub{min-width:0;padding:0;background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;white-space:nowrap}
-.live-map .lm-header .placemain{font-size:24px;font-weight:700;line-height:1.35;letter-spacing:-.6px;color:var(--t-ink,#111)}
+.live-map .lm-header .placemain{font:var(--type-headline-md);letter-spacing:-.6px;color:var(--t-ink,var(--color-on-surface))}
 .live-map .lm-header .placemain b{overflow:hidden;text-overflow:ellipsis}
 .live-map .lm-header .placemain>.icon{flex:none;width:22px;height:22px;fill:currentColor;stroke:#fff;stroke-width:1.6}
 .live-map .lm-header .placemain>.icon:last-child:not(:first-child){width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}
-.live-map .lm-header .placesub{flex-shrink:0;max-width:40%;overflow:hidden;text-overflow:ellipsis;font-size:22px;font-weight:600;letter-spacing:-.5px;color:#B4B4B8}
+.live-map .lm-header .placesub{flex-shrink:0;max-width:40%;overflow:hidden;text-overflow:ellipsis;font:var(--type-headline-md);letter-spacing:-.5px;color:var(--color-secondary)}

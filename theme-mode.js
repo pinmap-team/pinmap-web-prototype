@@ -20,7 +20,7 @@
     apply();
   }
   window.PinmapTheme={set,get mode(){return mode;},label:()=>labels[mode],show(){
-    modal('화면 모드',`<p class="muted">편하게 볼 수 있는 화면을 선택해 주세요.</p><div class="pm-theme-options" role="group" aria-label="화면 모드">${Object.entries(labels).map(([value,label])=>`<button type="button" data-theme-choice="${value}" aria-pressed="${mode===value}">${label}</button>`).join('')}</div><p class="hint">기기 설정을 선택하면 기기의 밝은 화면·어두운 화면 설정을 따라가요.</p>`);
+    modal('화면 모드',`<p class="muted">편하게 볼 수 있는 화면을 선택해 주세요.</p><div class="pm-theme-options" role="group" aria-label="화면 모드">${Object.entries(labels).map(([value,label])=>`<button type="button" data-theme-choice="${value}" aria-pressed="${mode===value}">${label}</button>`).join('')}</div><p class="hint">기기 설정을 선택하면 기기의 밝은 화면/어두운 화면 설정을 따라가요.</p>`);
   }};
   document.addEventListener('click',event=>{const button=event.target.closest('[data-theme-choice]');if(button)set(button.dataset.themeChoice);});
   media.addEventListener('change',()=>{if(mode==='system')apply();});

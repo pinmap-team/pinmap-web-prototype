@@ -1,44 +1,44 @@
 /* 마이 하위 페이지 (mypages.js) */
-.mypage .subhead{margin-bottom:16px}
-.mypage .mycard.settings{background:#fff;border-radius:22px;padding:4px 16px;box-shadow:var(--t-shadow,none)}
+.mypage .subhead{margin-bottom:var(--space-lg)}
+.mypage .mycard.settings{background:var(--color-surface);border-radius:var(--rounded-lg);padding:var(--space-xs) var(--space-lg);box-shadow:var(--t-shadow,none)}
 .mypage .setrow{width:100%;text-align:left}
-.mypage .setrow.danger b{color:#D23B3B}
-.mpdesc{margin:-6px 0 16px;font-size:14px;line-height:1.5}
-.mpnote{margin-top:14px}
+.mypage .setrow.danger b{color:var(--color-error)}
+.mpdesc{margin:calc(-1 * var(--space-sm)) 0 var(--space-lg);font:var(--type-body-sm)}
+.mpnote{margin-top:var(--space-lg)}
 /* 현재 위치 */
-.placepage .plist{background:#fff;border-radius:22px;padding:4px 12px;margin:12px 0}
-.placepage .psub{margin:-6px 0 0}
+.placepage .plist{background:var(--color-surface);border-radius:var(--rounded-lg);padding:var(--space-xs) var(--space-md);margin:var(--space-md) 0}
+.placepage .psub{margin:calc(-1 * var(--space-sm)) 0 0}
 /* 관심 키워드: 2열 카드 · 고르면 반투명 회색 칠 */
-.kwgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.kwopt{display:flex;align-items:center;gap:10px;min-height:56px;padding:0 16px;border-radius:18px;background:#fff;color:#3A3A3A;font-size:15px;font-weight:600;text-align:left;transition:background-color .15s}
+.kwgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)}
+.kwopt{display:flex;align-items:center;gap:var(--space-md);min-height:56px;padding:0 var(--space-lg);border-radius:var(--rounded-lg);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md);text-align:left;transition:background-color .15s}
 .kwopt .kwico{display:grid;place-items:center;width:22px}
 .kwopt .kwico .icon{width:20px;height:20px}
-.kwopt.on{background:rgba(17,17,17,.12);color:#111}
+.kwopt.on{background:rgba(17,17,17,.12);color:var(--color-on-surface)}
 /* 저장하는 방법: 온보딩 2번째 화면 내용만 (위 단계 표시 · 건너뛰기 없이) */
 .howtopage .subhead{margin-bottom:0}
 .howtopage .subhead h1:empty{display:none}
 .howtobody.ob-screen{min-height:auto!important;padding:0!important;background:none!important;animation:none!important}
-.howtobody .ob-title{margin-top:8px}
-.howtobody .ob-flow{margin-top:24px!important}
-.howtobody .ob-actions{position:static!important;margin-top:28px!important;padding:0!important;background:none!important}
+.howtobody .ob-title{margin-top:var(--space-sm)}
+.howtobody .ob-flow{margin-top:var(--space-xl)!important}
+.howtobody .ob-actions{position:static!important;margin-top:var(--space-2xl)!important;padding:0!important;background:none!important}
 .howtobody .ob-next{width:100%}
 /* 확인 팝업: 화면 가운데 · 확인(회색 왼쪽) / 유지하기(검정 오른쪽) */
-#sheet.confirmpop{margin:auto!important;width:calc(100% - 48px)!important;max-width:340px!important;border-radius:24px!important;padding:26px 20px 18px!important}
+#sheet.confirmpop{margin:auto!important;width:calc(100% - 48px)!important;max-width:340px!important;border-radius:var(--rounded-lg)!important;padding:var(--space-xl) var(--space-xl) var(--space-lg)!important}
 #sheet.confirmpop .handle,#sheet.confirmpop .dialoghead{display:none!important}
 .cfpop{text-align:center}
-.cfpop b{display:block;font-size:18px;font-weight:700;letter-spacing:-.4px}
-.cfpop p{margin:8px 0 20px;font-size:14px;line-height:1.5;color:var(--color-secondary);word-break:keep-all}
-.cfpopbtns{display:flex;gap:8px}
-.cfpopbtns button{flex:1;min-height:50px;border-radius:999px;font-size:15px;font-weight:700}
-.cfok{background:#EBEBED;color:#6B6B70}
-.cfkeep{background:#111;color:#fff}
+.cfpop b{display:block;font:var(--type-headline-md);letter-spacing:-.4px}
+.cfpop p{margin:var(--space-sm) 0 var(--space-xl);font:var(--type-body-sm);color:var(--color-secondary);word-break:keep-all}
+.cfpopbtns{display:flex;gap:var(--space-sm)}
+.cfpopbtns button{flex:1;min-height:50px;border-radius:999px;font:var(--type-label-md)}
+.cfok{background:var(--color-disabled);color:var(--color-secondary)}
+.cfkeep{background:var(--color-primary);color:var(--color-neutral)}
 /* 저장하는 방법 (10/18 밤): 제목 + 서브 문구, 순서 영역 뒤 그라데이션 없이, 버튼 더 높고 덜 둥글게, 알림 버튼 숨김 */
 .howtobody.ob-screen::before,.howtobody.ob-screen::after{display:none!important;content:none!important}
-.howtobody .ob-title{font-size:26px!important;margin:8px 0 6px!important}
-.howtobody .howtosub{margin:0;font-size:15px;color:var(--color-secondary)}
-.howtobody .ob-flowcard{background:#fff!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid #ECECEE!important;box-shadow:none!important}
+.howtobody .ob-title{font:var(--type-headline-md) !important;margin:var(--space-sm) 0 var(--space-sm)!important}
+.howtobody .howtosub{margin:0;font:var(--type-body-md);color:var(--color-secondary)}
+.howtobody .ob-flowcard{background:var(--color-surface)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid var(--color-disabled)!important;box-shadow:none!important}
 .howtobody .ob-mock{background:#F6F6F7!important;border:0!important}
-.howtobody .ob-next{min-height:60px!important;border-radius:16px!important}
+.howtobody .ob-next{min-height:60px!important;border-radius:var(--rounded-lg)!important}
 .main:has(.howtopage)>.topbar .bellbtn{display:none!important}
 
 /* 컬렉션 > 카테고리(폴더) 안: 오른쪽 위 알림 버튼 숨김 */
@@ -50,25 +50,25 @@ body:has(#sharedemo) .bottomnav,body.pushdemo-open .bottomnav{display:none!impor
 .sd-apps .pinapp img{width:58%;height:58%;object-fit:contain;display:block}
 
 /* 마이: 프로필 한 장과 구분선으로 이어지는 설정 목록 */
-.main:has(.profilecard) .profilecard{display:flex;align-items:center;gap:14px;width:100%;min-height:104px;margin:0 0 20px;padding:20px;border:1px solid #E8E8EA;border-radius:24px;background:#fff;box-shadow:none;text-align:left}
+.main:has(.profilecard) .profilecard{display:flex;align-items:center;gap:var(--space-lg);width:100%;min-height:104px;margin:0 0 var(--space-xl);padding:var(--space-xl);border:1px solid var(--color-disabled);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:none;text-align:left}
 .profilecard .mpinfo{min-width:0;flex:1}
-.profilecard .mpinfo b{font-size:20px}
-.profilecard .mpinfo small{display:block;margin-top:6px;font-size:12px;color:var(--color-secondary)}
-.main:has(.profilecard) .my-shortcuts{border:0;margin-bottom:8px}
-.main:has(.profilecard) .my-section{margin:0;padding:14px 0;border:0;border-top:1px solid #DCDCE0;border-radius:0;background:transparent;box-shadow:none}
-.main:has(.profilecard) .my-section .mrow{padding-inline:4px;border:0;background:none;border-radius:0;box-shadow:none;min-height:54px}
-.account-summary{display:flex;align-items:center;gap:14px;padding:12px 0 24px}
+.profilecard .mpinfo b{font:var(--type-headline-md)}
+.profilecard .mpinfo small{display:block;margin-top:var(--space-sm);font:var(--type-body-sm);color:var(--color-secondary)}
+.main:has(.profilecard) .my-shortcuts{border:0;margin-bottom:var(--space-sm)}
+.main:has(.profilecard) .my-section{margin:0;padding:var(--space-lg) 0;border:0;border-top:1px solid var(--color-disabled);border-radius:0;background:transparent;box-shadow:none}
+.main:has(.profilecard) .my-section .mrow{padding-inline:var(--space-xs);border:0;background:none;border-radius:0;box-shadow:none;min-height:54px}
+.account-summary{display:flex;align-items:center;gap:var(--space-lg);padding:var(--space-md) 0 var(--space-xl)}
 .account-summary .pavatar{width:56px;height:56px;flex:none}
-.account-summary b{display:block;font-size:20px}
-.account-summary small{display:block;margin-top:6px;font-size:13px;color:var(--color-secondary)}
-.account-section{border-top:1px solid #DCDCE0;padding:12px 0}
-.account-section .mrow{padding-inline:4px;background:none;box-shadow:none;border-radius:0}
-.account-section .syncbtn{margin-block:8px;box-shadow:none;background:transparent;border-radius:0}
-.account-leave{color:#C53C34}
-.account-leave .mrlabel{font-size:14px}
-.reset-options .setrow{padding:18px 0;border-top:1px solid #DCDCE0;gap:16px}
-.reset-options .setrow small{white-space:normal;line-height:1.6;margin-top:6px}
-.reset-options .setrow>.icon{flex:none;width:18px;height:18px;color:#9A9AA0}
+.account-summary b{display:block;font:var(--type-headline-md)}
+.account-summary small{display:block;margin-top:var(--space-sm);font:var(--type-body-sm);color:var(--color-secondary)}
+.account-section{border-top:1px solid var(--color-disabled);padding:var(--space-md) 0}
+.account-section .mrow{padding-inline:var(--space-xs);background:none;box-shadow:none;border-radius:0}
+.account-section .syncbtn{margin-block:var(--space-sm);box-shadow:none;background:transparent;border-radius:0}
+.account-leave{color:var(--color-error)}
+.account-leave .mrlabel{font:var(--type-body-sm)}
+.reset-options .setrow{padding:var(--space-lg) 0;border-top:1px solid var(--color-disabled);gap:var(--space-lg)}
+.reset-options .setrow small{white-space:normal;line-height:1.6;margin-top:var(--space-sm)}
+.reset-options .setrow>.icon{flex:none;width:18px;height:18px;color:var(--color-secondary)}
 
 .account-section .mrico>.icon{width:20px;height:20px;vertical-align:middle}
 .reset-options .setrow{border-bottom:0}

@@ -8,18 +8,18 @@ function notifications(){
   const list = [];
   // 홈 띠배너의 마감 임박 콘텐츠는 알림 목록에도 항상 보여줘요 (설정은 휴대폰 푸시 알림에만 적용)
   items.filter(x => x.deadline).sort((a,b) => dueNum(a) - dueNum(b)).forEach(x => list.push({
-    id:'due-'+x.id, emoji:'⏰', title:`마감 ${x.deadline} · ${x.title}`,
-    body:`${x.period ? x.period.replace(' · 예시 기간','')+' 운영 · ' : ''}끝나기 전에 다녀오세요.`, time:'오늘 오전 9:00', detail:x.id
+    id:'due-'+x.id, emoji:'⏰', title:`마감 ${x.deadline}, ${x.title}`,
+    body:`${x.period ? x.period.replace(', 예시 기간','')+' 운영, ' : ''}끝나기 전에 다녀오세요.`, time:'오늘 오전 9:00', detail:x.id
   }));
   if (settings.notiNearby) {
     const near = readyPlaces().filter(x => distanceOf(x) < 999).sort((a,b) => distanceOf(a)-distanceOf(b));
-    if (near.length) list.push({id:'near', emoji:'📍', title:`성수동 근처에 저장한 장소 ${near.length}곳`, body:`${near[0].title} 외 · 지금 가까이에 있어요.`, time:'1시간 전', page:'map'});
+    if (near.length) list.push({id:'near', emoji:'📍', title:`성수동 근처에 저장한 장소 ${near.length}곳`, body:`${near[0].title} 외, 지금 가까이에 있어요.`, time:'1시간 전', page:'map'});
   }
   const pending = items.filter(x => isPlace(x) && (x.pending || !x.address));
   if (pending.length) list.push({id:'pending', emoji:'🔎', title:`장소 확인이 필요한 콘텐츠 ${pending.length}개`, body:'AI가 위치를 확정하지 못했어요. 주소를 확인해 주세요.', time:'어제', detail:pending[0].id});
   if (settings.notiReminder && items.length) {
     const old = items[items.length-1];
-    list.push({id:'remind-'+old.id, emoji:'🔖', title:'잊고 있던 저장, 다시 볼까요?', body:`${old.title} · ${savedAgo(old)} 저장`, time:'2일 전', detail:old.id});
+    list.push({id:'remind-'+old.id, emoji:'🔖', title:'잊고 있던 저장, 다시 볼까요?', body:`${old.title}, ${savedAgo(old)} 저장`, time:'2일 전', detail:old.id});
   }
   return list;
 }
@@ -28,7 +28,7 @@ unreadCount = () => notifications().filter(n => !settings.readNoti.includes(n.id
 function notiSheet(){
   const list = notifications(), allOff = !settings.notiDeadline && !settings.notiNearby && !settings.notiReminder;
   const rows = list.map(n => { const unread = !settings.readNoti.includes(n.id);
-    return `<button class="notirow ${unread?'unread':''}" data-noti="${esc(n.id)}"><span class="notiemoji" aria-hidden="true">${n.emoji}</span><div><b>${esc(n.title)}</b><p>${esc(n.body)}</p><small>${n.time}${unread?' · 새 알림':''}</small></div></button>`; }).join('');
+    return `<button class="notirow ${unread?'unread':''}" data-noti="${esc(n.id)}"><span class="notiemoji" aria-hidden="true">${n.emoji}</span><div><b>${esc(n.title)}</b><p>${esc(n.body)}</p><small>${n.time}${unread?', 새 알림':''}</small></div></button>`; }).join('');
   modal('알림', `${rows ? `<div class="notilist">${rows}</div>` : `<div class="empty small"><p class="muted">${allOff?'알림이 모두 꺼져 있어요.':'새 알림이 없어요.'}</p></div>`}
     <div class="dialogactions">${list.some(n=>!settings.readNoti.includes(n.id))?'<button class="textbtn" data-action="readall">모두 읽음</button>':''}<button class="tonal" data-action="notisettings">알림 설정</button></div>`);
 }
@@ -44,21 +44,24 @@ pages.my = function(){
   const prefText = prefs.length ? (prefs.length > 1 ? `${prefs[0]} 외 ${prefs.length-1}개` : prefs[0]) : '선택 안 함';
   const notiOn = ['notiNearby','notiDeadline','notiReminder'].filter(k => settings[k]).length;
   return `
-  <button class="mprofile profilecard" data-action="account" aria-label="프로필 및 계정 설정">
-    ${avatarHtml()}
-    <span class="mpinfo"><b>${esc(settings.nickname || '프로필 설정')}</b><small>내 계정 관리</small></span>${icon('chevron')}
-  </button>
+  <div class="mprofile profilecard myprofile" role="group" aria-label="프로필">
+    <button type="button" class="myprofile-photo" data-action="profilephoto" aria-label="프로필 사진 변경">${avatarHtml()}<span class="account-photo-edit" aria-hidden="true">${icon('image')}</span></button>
+    <input type="file" id="avatarfile" accept="image/*" hidden>
+    ${typeof editingProfileName !== 'undefined' && editingProfileName
+      ? `<form id="profilepage" class="myprofile-form"><input name="nickname" aria-label="프로필 이름" value="${esc(settings.nickname || '')}" required maxlength="12" autocomplete="nickname"><button type="button" class="textbtn" data-action="profilecancel">취소</button><button type="submit" class="filled">저장</button></form>`
+      : `<button type="button" class="myprofile-name" data-action="profilename" aria-label="프로필 이름 변경"><b>${esc(settings.nickname || '이름 설정')}</b>${icon('edit')}</button>`}
+  </div><!--myprofile-end-->
   <button class="sharepromo" data-action="snsdemo"><span aria-hidden="true">📲</span><div><b>SNS에서 바로 저장해보기</b><small>게시물에서 공유 → 핀맵, 저장 과정을 체험해요</small></div>${icon('arrow')}</button>
 
   <section class="mgroup my-section" aria-label="위치와 관심 키워드">
-    ${myRow('myaddresses','📍','위치 관리', esc(myPlaces().join(' · ')))}
+    ${myRow('myaddresses','📍','위치 편집', esc(myPlaces().join(', ')))}
     <button class="mrow" data-page="courses"><span class="mrico" aria-hidden="true">${icon('route')}</span><span class="mrlabel">저장한 코스 보기</span>${icon('chevron')}</button>
-    ${myRow('interests','💡','관심사 · 활용 목적', esc(prefText))}
+    ${myRow('interests','💡','관심사, 활용 목적', esc(prefText))}
   </section>
   <section class="mgroup my-section" aria-label="앱 설정">
     ${myRow('savesheet','✨','저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
     ${myRow('appearance','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>','화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
-    ${myRow('notisheet','🔔','알림 설정', settings.push ? `푸시 켜짐 · ${notiOn}개` : '푸시 꺼짐')}
+    ${myRow('notisheet','🔔','알림 설정', settings.push ? `푸시 켜짐, ${notiOn}개` : '푸시 꺼짐')}
     ${myRow('mapsheet','🗺️','지도 디자인', esc(MAP_APPS[settings.mapApp].name))}
   </section>
   <section class="mgroup my-section" aria-label="도움말">
@@ -79,9 +82,8 @@ function notiSettings(){
     ${sw('push','푸시 알림 허용', settings.push ? '앱을 켜지 않아도 휴대폰 알림으로 받아요' : '꺼져 있으면 앱 밖에서는 알림이 오지 않아요')}
     ${sw('notiNearby','현재 위치 기반 추천 알림','앱을 켜지 않아도 지금 있는 곳 근처의 저장 콘텐츠를 알려드려요')}
     ${settings.notiNearby && settings.push && settings.locPerm!=='always' ? `<button class="setwarn" data-action="location">⚠️ 앱을 켜지 않았을 때도 위치에 맞춰 알려드리려면 위치 권한을 ‘항상 허용’으로 바꿔주세요 ›</button>` : ''}
-    ${sw('notiDeadline','마감 임박 알림','전시·팝업이 끝나기 3일 전에 알려드려요')}
+    ${sw('notiDeadline','마감 임박 알림','전시/팝업이 끝나기 3일 전에 알려드려요')}
     ${sw('notiReminder','다시 보기 리마인드','잊고 있던 저장 콘텐츠를 가끔 꺼내드려요')}
-    <button class="setrow" data-action="pushdemo"><div><b>앱 밖 알림 미리보기</b><small>앱을 끈 상태에서 위치에 따라 알림이 오는 모습을 체험해요</small></div>${icon('arrow')}</button>
   </div>`);
 }
 function saveSettings(){
@@ -107,10 +109,10 @@ Object.assign(actions, {
   coachagain: () => { go('home'); setTimeout(startCoach, 300); },
   appinfo: () => { modal('앱 정보', `<p>핀맵 Prototype 03</p><p class="hint">예시 데이터로 체험하는 프로토타입이에요. 데이터는 이 브라우저에만 저장돼요.</p>`); $('#sheet').classList.add('bottomsheet'); },
   howto: () => openOnboarding(1),
-  profile: () => { modal('프로필 편집', `<form id="profileform"><label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label><p class="hint">위치는 ‘위치 관리’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장</button></div></form>`); $('#sheet').classList.add('bottomsheet'); },
+  profile: () => { modal('프로필 편집', `<form id="profileform"><label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label><p class="hint">위치는 ‘위치 편집’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장</button></div></form>`); $('#sheet').classList.add('bottomsheet'); },
   resetask: () => go('account'),
   resetdata: () => go('account'),
-  logout: () => toast('프로토타입에서는 로그아웃 기능을 제공하지 않아요.')
+  logout: () => actions.logoutask?.()
 });
 
 document.addEventListener('click', e => {
@@ -124,7 +126,7 @@ document.addEventListener('click', e => {
     return;
   }
   const m = e.target.closest('[data-mapapp]');
-  if (m) { settings.mapApp = m.dataset.mapapp; afterChange(); render(); mySheet?.(); toast(`길찾기는 ${MAP_APPS[settings.mapApp].name}으로 열려요.`); }
+  if (m) { settings.mapApp = m.dataset.mapapp; afterChange(); render(); mySheet?.(); toast(`길찾기는 ${josa(MAP_APPS[settings.mapApp].name, '으로/로')} 열려요.`); $('#snackbar').classList.add('oneline'); }
 });
 document.addEventListener('change', e => {
   const key = e.target.dataset?.setting;

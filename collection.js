@@ -16,7 +16,7 @@ Object.assign(paths, {
 const CF_FOLDERS = [
   {id:'맛집', icon:'fork'},
   {id:'카페', icon:'coffee'},
-  {id:'전시·팝업', icon:'ticket'},
+  {id:'전시/팝업', icon:'ticket'},
   {id:'여행', icon:'plane'},
   {id:'쇼핑', icon:'bag'},
   {id:'레시피', icon:'chef'}
@@ -30,11 +30,11 @@ const CF_GALLERY = new Set(['쇼핑', '레시피', '기타']); // 장소가 아�
 const cfIsCafe = x => /카페|커피|cafe|coffee|디저트|베이커리/i.test(`${x.category||''} ${x.title||''}`);
 function folderOf(x){
   if (CF_ALL.some(f=>f.id===x.folderCategory)) return x.folderCategory;
-  if (x.type === '맛집·카페') return cfIsCafe(x) ? '카페' : '맛집';
+  if (x.type === '맛집/카페') return cfIsCafe(x) ? '카페' : '맛집';
   return CF_FOLDERS.some(f => f.id === x.type) ? x.type : '기타';
 }
 // 다른 화면에서 넘어온 필터(예: 홈의 '맛집·카페')도 폴더로 바꿔요
-const CF_ALIAS = {'맛집·카페':['맛집','카페'], '생활 정보':['기타']};
+const CF_ALIAS = {'맛집/카페':['맛집','카페'], '생활 정보':['기타']};
 const cfSelected = () => filter === '전체' ? [] : (CF_ALIAS[filter] || (CF_ALL.some(f => f.id === filter) ? [filter] : []));
 
 // 검색어와 선택한 폴더에 맞는 콘텐츠 (items는 최신 저장 순)
@@ -162,12 +162,12 @@ function cfMetaLine(x){
     if (x.pending) parts.push('위치 확인 필요');
     else { if (libArea(x)) parts.push(libArea(x)); if (x.distance) parts.push(x.distance); }
   } else if (x.type === '쇼핑') {
-    if (x.price) parts.push(x.price.replace(' · 예시 가격', ''));
+    if (x.price) parts.push(x.price.replace(', 예시 가격', ''));
     if (x.shop) parts.push(x.shop);
-  } else if (x.type === '레시피' && x.recipe) { ic = 'clock'; parts.push(x.recipe.split(' · ')[0]); }
+  } else if (x.type === '레시피' && x.recipe) { ic = 'clock'; parts.push(x.recipe.split(', ')[0]); }
   if (x.deadline) parts.push(x.deadline);
   if (!parts.length) return '';
-  return `<p class="cf-itemmeta${x.pending ? ' warn' : ''}">${ic ? icon(ic) : ''}<span>${parts.map(esc).join('<i aria-hidden="true">·</i>')}</span></p>`;
+  return `<p class="cf-itemmeta${x.pending ? ' warn' : ''}">${ic ? icon(ic) : ''}<span>${parts.map(esc).join('<i aria-hidden="true">, </i>')}</span></p>`;
 }
 function cfItem(x){
   const on = cfSel?.has(x.id);
@@ -249,7 +249,7 @@ pages.library = function(){
   const n = cfSel?.size || 0;
   const selbar = cfSel ? `<div class="cf-selbar" role="toolbar" aria-label="선택한 콘텐츠">
       <button type="button" class="cf-selall" data-action="cfselall">${cfOpenList().length && cfOpenList().every(x => cfSel.has(x.id)) ? '선택 해제' : '전체 선택'}</button>
-      <span class="cf-selcount" aria-live="polite">${n ? `${n}개 선택` : '콘텐츠를 선택하세요'}</span>
+      <span class="cf-selcount" aria-live="polite">${n ? `${n}개 선택` : '콘텐츠를 골라 주세요'}</span>
       <button type="button" class="cf-seldel" data-action="cfdelete" ${n ? '' : 'disabled'}>${icon('close')}삭제</button>
     </div>` : '';
   return `<div class="libpage cfpage ${open ? 'cf-infolder' : ''} ${cfSel ? 'cf-selecting' : ''}">${CF_DEFS}
@@ -292,7 +292,7 @@ document.addEventListener('keydown',e=>{
 /* ---------- 선택 삭제 ---------- */
 function cfSyncSel(){
   const n = cfSel?.size || 0, list = cfOpenList();
-  const c = $('.cf-selcount'); if (c) c.textContent = n ? `${n}개 선택` : '콘텐츠를 선택하세요';
+  const c = $('.cf-selcount'); if (c) c.textContent = n ? `${n}개 선택` : '콘텐츠를 골라 주세요';
   const d = $('.cf-seldel'); if (d) d.disabled = !n;
   const all = $('.cf-selall'); if (all) all.textContent = list.length && list.every(x => cfSel.has(x.id)) ? '선택 해제' : '전체 선택';
 }
@@ -306,7 +306,7 @@ actions.cfselall = () => {
 actions.cfdelete = () => {
   const n = cfSel?.size || 0; if (!n) return;
   modal('', `<div class="esform delsheet">
-    <div class="nthead"><div><h2>콘텐츠 ${n}개를 삭제할까요?</h2><p>삭제하면 메모 · 폴더 정보도 함께 지워져요.</p></div><button type="button" class="ntclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
+    <div class="nthead"><div><h2>콘텐츠 ${n}개를 삭제할까요?</h2><p>삭제하면 메모, 폴더 정보도 함께 지워져요.</p></div><button type="button" class="ntclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
     <div class="esbody"><p class="eshint">원본 SNS 게시물은 그대로 남아 있어요.</p></div>
     <div class="esfoot"><button type="button" class="escancel" data-action="close">취소</button><button type="button" class="essubmit deldanger" data-action="cfdelconfirm">${n}개 삭제</button></div>
   </div>`);
@@ -363,7 +363,7 @@ actions.cfpick = () => {
   modal(`‘${esc(name)}’에 담기`, `<form id="cfpickform" class="cf-form">
     <label class="cf-picksearch">${icon('search')}<input id="cfpickq" type="search" enterkeyhint="search" autocomplete="off" aria-label="담을 콘텐츠 찾기" placeholder="담을 콘텐츠 찾기"></label>
     <div class="cf-pick">${items.map(x => `<label class="cf-pickrow" data-q="${esc(words(x))}"><input type="checkbox" name="pick" value="${x.id}" ${x.collection === name ? 'checked' : ''}>
-      <span class="cf-pickthumb">${libThumb(x)}</span><span class="cf-picktext"><b>${esc(x.title)}</b><small>${esc(folderOf(x))}${x.collection && x.collection !== name ? ` · ${esc(x.collection)}에 담겨 있음` : ''}</small></span></label>`).join('')}
+      <span class="cf-pickthumb">${libThumb(x)}</span><span class="cf-picktext"><b>${esc(x.title)}</b><small>${esc(folderOf(x))}${x.collection && x.collection !== name ? `, ${esc(x.collection)}에 담겨 있음` : ''}</small></span></label>`).join('')}
       <p class="cf-picknone" hidden>찾는 콘텐츠가 없어요.</p></div>
     <p class="hint">다른 폴더에 담긴 콘텐츠를 고르면 이 폴더로 옮겨져요.</p>
     <div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit" id="cfpickok">담기</button></div>

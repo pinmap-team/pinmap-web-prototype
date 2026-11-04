@@ -27,9 +27,9 @@ detail = function(){
   if (t.place) info += ready
     ? `<section class="dtsec"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><div class="dtaddress">${icon('pin')}<span>${esc(x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div><div class="dtmap-preview"><div id="detail-map-canvas" role="img" aria-label="${esc(x.title)} 저장 위치 지도"></div><p class="dtmap-fallback" id="detail-map-fallback" hidden>지도를 불러오지 못했어요. 지도에서 위치를 확인해 주세요.</p><button type="button" class="dtmap-open" data-action="dtgomap" aria-label="핀맵 지도에서 위치 보기">지도에서 보기${icon('arrow')}</button></div>${factRow}</section>`
     : `<section class="dtsec"><h2>장소 정보</h2><div class="dtwarn"><b>장소 확인 필요</b><p>위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.</p><button class="dtsmall" data-action="edit">장소 직접 입력</button></div></section>`;
-  if (x.type === '쇼핑') info += `<section class="dtsec"><h2>구매 정보</h2><div class="dtrow">${icon('bookmark')}<span>${esc(x.price || '가격 정보 없음')}</span></div><p class="dthint">${esc(x.shop || '판매처 정보 없음')} · 가격과 재고는 원본에서 다시 확인하세요.</p></section>`;
+  if (x.type === '쇼핑') info += `<section class="dtsec"><h2>구매 정보</h2><div class="dtrow">${icon('bookmark')}<span>${esc(x.price || '가격 정보 없음')}</span></div><p class="dthint">${esc(x.shop || '판매처 정보 없음')}, 가격과 재고는 원본에서 한 번 더 확인해 주세요.</p></section>`;
   if (x.type === '레시피') info += `<section class="dtsec"><h2>간단 정보</h2><div class="dtrow">${icon('clock')}<span>${esc(x.recipe || '정보 없음')}</span></div><p class="dthint">자세한 조리법은 원본 콘텐츠에서 확인해요.</p></section>`;
-  if (x.deleted) info += `<section class="dtsec"><h2>원본 콘텐츠</h2><div class="dtgone"><b>삭제된 게시물입니다.</b><p>원본을 열 수 없지만 ${t.place ? '장소 정보와 ' : ''}내 메모는 그대로 남아 있어요.</p></div></section>`;
+  if (x.deleted) info += `<section class="dtsec"><h2>원본 콘텐츠</h2><div class="dtgone"><b>삭제된 게시물이에요.</b><p>원본을 열 수 없지만 ${t.place ? '장소 정보와 ' : ''}내 메모는 그대로 남아 있어요.</p></div></section>`;
 
   // 아래 고정 버튼: 길찾기 · 원본 보기 (장소가 아니면 원본 보기만)
   const bottom = [];
@@ -48,7 +48,7 @@ detail = function(){
       <div class="dtsrc dthtitle">
         <span class="dthpill">${esc(x.category || shortType(x.type))}</span>
         <h1>${esc(x.title)}</h1>
-        <small>${esc(src)} · ${esc(savedAgo(x))} 저장</small>
+        <small>${esc(src)}, ${esc(savedAgo(x))} 저장</small>
       </div>
     </div>
     <div class="dtsheet">
@@ -156,7 +156,7 @@ document.addEventListener('change', e => {
     if(newFolder){$('#es-col').value=$('#es-newcol').value.trim();$('#es-newcol').focus();}
     else if(value.startsWith('custom:'))$('#es-col').value=value.slice(7);
     else if(value.startsWith('category:')){
-      const name=value.slice(9),type=['맛집','카페'].includes(name)?'맛집·카페':name;
+      const name=value.slice(9),type=['맛집','카페'].includes(name)?'맛집/카페':name;
       $('#es-type').value=type;
       $('#es-addrwrap').hidden=!typeOf(type).place;
     }
@@ -166,7 +166,7 @@ document.addEventListener('change', e => {
   const ai = e.target.value === 'ai', t = typeOf(e.target.value);
   const emoji = $('.esform .esemoji'); if(emoji)emoji.textContent = ai ? '✨' : t.emoji;
   const folderSelect = $('#es-folder');
-  if(folderSelect){ const folder = t.id==='맛집·카페' ? '카페' : CF_FOLDERS.some(f=>f.id===t.id) ? t.id : '기타'; folderSelect.value='category:'+folder; }
+  if(folderSelect){ const folder = t.id==='맛집/카페' ? '카페' : CF_FOLDERS.some(f=>f.id===t.id) ? t.id : '기타'; folderSelect.value='category:'+folder; }
   const addr = $('#es-addrwrap'); if (addr) addr.hidden = !t.place;
 });
 document.addEventListener('click', e => {

@@ -5,10 +5,10 @@ const LEGACY_KEYS = PM_ENV.development ? [] : ['pinmap.v2', 'pinmap.v1'];
 // 온보딩 3단계에서 고르는 관심사 · 활용 목적 (홈 구성에 사용)
 const interestOptions = [
   {id:'nearby', emoji:'📍', label:'주변에 갈 곳을 찾을 때', short:'주변 장소'},
-  {id:'plan',   emoji:'🗓️', label:'여행이나 약속을 계획할 때', short:'여행·약속'},
+  {id:'plan',   emoji:'🗓️', label:'여행이나 약속을 계획할 때', short:'여행'},
   {id:'shop',   emoji:'🛍️', label:'사고 싶은 것을 찾을 때', short:'쇼핑'},
   {id:'food',   emoji:'🍴', label:'먹을 곳을 찾을 때', short:'맛집'},
-  {id:'study',  emoji:'📚', label:'공부/자료를 찾을 때', short:'공부·자료'},
+  {id:'study',  emoji:'📚', label:'공부/자료를 찾을 때', short:'공부/자료'},
   {id:'idea',   emoji:'💡', label:'아이디어를 찾을 때', short:'아이디어'},
   {id:'later',  emoji:'🔖', label:'그 외 다른 목적으로 찾을 때', short:'나중에 보기'}
 ];
@@ -21,12 +21,14 @@ let preferences = [], onboardStep = 0, onboardDone = false, onboardDraft = [], o
 // 이전 유형(장소·상품·글·영상)을 새 저장 카테고리로 바꿉니다.
 function migrateType(x){
   if (typeIds.includes(x.type)) return x.type;
-  if (x.type === '장소') return /전시|팝업/.test(x.category) ? '전시·팝업' : /산책|여행|숙소/.test(x.category) ? '여행' : '맛집·카페';
-  return {'상품':'쇼핑','글·영상':'생활 정보'}[x.type] || (x.type === '레시피' ? '레시피' : '기타');
+  if (x.type === '장소') return /전시|팝업/.test(x.category) ? '전시/팝업' : /산책|여행|숙소/.test(x.category) ? '여행' : '맛집/카페';
+  return {'상품':'쇼핑','글/영상':'생활 정보'}[x.type] || (x.type === '레시피' ? '레시피' : '기타');
 }
+// 2026-11-04: 유형 이름의 가운데점(맛집·카페)을 슬래시(맛집/카페)로 바꿨어요. 예전에 저장한 데이터도 같은 이름으로 읽어요.
+const fixDots = raw => typeof raw === 'string' ? raw.replace(/(맛집|전시|공부|여행|글)·(카페|팝업|자료|약속|영상)/g, '$1/$2') : raw;
 const validItems = list => Array.isArray(list) && list.every(x => x && Number.isFinite(x.id) && typeof x.title === 'string');
 try {
-  const saved = PM_ENV.development ? null : JSON.parse(localStorage.getItem(STORAGE));
+  const saved = PM_ENV.development ? null : JSON.parse(fixDots(localStorage.getItem(STORAGE)));
   if (saved && validItems(saved.items) && saved.items.every(x => typeIds.includes(x.type))) {
     items = saved.items;
     preferences = Array.isArray(saved.preferences) ? saved.preferences.filter(x => interestIds.includes(x)).slice(0, MAX_INTERESTS) : [];
@@ -35,7 +37,7 @@ try {
   } else {
     // 이전 버전의 저장 콘텐츠는 유지하고, 예시 콘텐츠의 새 정보(가격·기간 등)를 채웁니다.
     for (const key of LEGACY_KEYS) {
-      const old = JSON.parse(localStorage.getItem(key));
+      const old = JSON.parse(fixDots(localStorage.getItem(key)));
       if (!old || !validItems(old.items)) continue;
       const samples = new Map(items.map(x => [x.id, x]));
       const migrated = old.items.map(x => {
@@ -55,7 +57,7 @@ function persist() {
   items.forEach(x => normalizeSavedAt(x));
   if(PM_ENV.development)return;
   try { localStorage.setItem(STORAGE, JSON.stringify({items,preferences,onboardDone,settings})); }
-  catch { toast('브라우저 저장 공간을 사용할 수 없어 현재 화면에서만 보관합니다.'); }
+  catch { toast('브라우저 저장 공간을 쓸 수 없어서 지금 화면에서만 보관해요.'); }
 }
 afterChange = persist;
 
@@ -70,7 +72,7 @@ const homeSections = {
     list: nearPlaces()
   }),
   plan: () => ({
-    title:'계획에 바로 쓰는 콘텐츠', sub:'마감이 있는 일정과 주말·여행 후보',
+    title:'계획에 바로 쓰는 콘텐츠', sub:'마감이 있는 일정과 주말/여행 후보',
     more:'data-collection="이번 주말 성수"', moreLabel:'모음',
     hero:{title:'주말엔 저장해둔 성수로', desc:'카페부터 전시까지, 모아둔 후보로 하루를 계획해요.', btn:'모아둔 콘텐츠 보기', attr:'data-collection="이번 주말 성수"'},
     list: items.filter(x => !x.pending && (x.collection==='이번 주말 성수' || x.type==='여행' || x.deadline)).sort((a,b) => (b.deadline?1:0)-(a.deadline?1:0))
@@ -82,13 +84,13 @@ const homeSections = {
     list: items.filter(x => x.type==='쇼핑')
   }),
   food: () => ({
-    title:'오늘 뭐 먹지?', sub:'저장한 맛집·카페와 레시피',
-    more:'data-libfilter="맛집·카페"', moreLabel:'맛집·카페',
-    hero:{title:'나만의 맛집 리스트', desc:'저장한 맛집·카페와 레시피를 모았어요.', btn:'맛집·카페 보기', attr:'data-libfilter="맛집·카페"'},
-    list: items.filter(x => !x.pending && (x.type==='맛집·카페' || x.type==='레시피'))
+    title:'오늘 뭐 먹지?', sub:'저장한 맛집/카페와 레시피',
+    more:'data-libfilter="맛집/카페"', moreLabel:'맛집/카페',
+    hero:{title:'나만의 맛집 리스트', desc:'저장한 맛집/카페와 레시피를 모았어요.', btn:'맛집/카페 보기', attr:'data-libfilter="맛집/카페"'},
+    list: items.filter(x => !x.pending && (x.type==='맛집/카페' || x.type==='레시피'))
   }),
   study: () => ({
-    title:'다시 볼 공부·자료', sub:'저장해둔 생활 정보와 레퍼런스',
+    title:'다시 볼 공부/자료', sub:'저장해둔 생활 정보와 레퍼런스',
     more:'data-libfilter="생활 정보"', moreLabel:'생활 정보', gallery:true,
     hero:{title:'공부 자료 모아뒀어요', desc:'나중에 보려던 글과 영상을 다시 꺼내보세요.', btn:'자료 보기', attr:'data-libfilter="생활 정보"'},
     list: items.filter(x => x.type==='생활 정보' || x.type==='기타')
@@ -112,7 +114,7 @@ function dueBar() {
   const due = items.filter(x => x.deadline).sort((a,b) => dday(a)-dday(b));
   if (!due.length || dueDismissed) return '';
   const x = due[0];
-  return `<div class="duebar" role="status"><button class="duemain" data-detail="${x.id}"><span class="duebadge">${esc(x.deadline)}</span><span class="duetext"><b>${esc(x.title)}</b><small>마감이 얼마 남지 않았어요${due.length>1?` · 외 ${due.length-1}개`:''}</small></span>${icon('arrow')}</button><button class="dueclose" data-action="duedismiss" aria-label="마감 임박 알림 닫기">${icon('close')}</button></div>`;
+  return `<div class="duebar" role="status"><button class="duemain" data-detail="${x.id}"><span class="duebadge">${esc(x.deadline)}</span><span class="duetext"><b>${esc(x.title)}</b><small>마감이 얼마 남지 않았어요${due.length>1?`, 외 ${due.length-1}개`:''}</small></span>${icon('arrow')}</button><button class="dueclose" data-action="duedismiss" aria-label="마감 임박 알림 닫기">${icon('close')}</button></div>`;
 }
 // 홈에서 지금 보고 있는 관심사 (저장하지 않아요 · 앱을 다시 열면 기본값으로 돌아와요)
 let homeViewIds = null;
@@ -171,24 +173,45 @@ function onboardPhone(stage){
     <div class="ob-phone-options"><span><img src="img/logo-instagram.png" alt=""><small>Instagram</small></span><span class="ob-phone-selected"><img src="img/pinmap-symbol-splash.svg" alt=""><small>핀맵</small></span><span>${icon('more')}<small>더보기</small></span></div><div class="ob-phone-copy">${icon('link')} 링크 복사</div></div>` : '';
   return `<div class="ob-phone-stage ob-phone-crop ob-phone-crop${stage}" aria-hidden="true"><div class="ob-phone"><div class="ob-phone-status"><b>9:41</b><i></i><span>▮▮ ▰</span></div><div class="ob-phone-feed">${feed}</div>${sharing}<i class="ob-phone-home"></i></div></div>`;
 }
+const OB_SLIDES = [
+  ['콘텐츠 발견', 'SNS를 보다가 마음에 드는 콘텐츠를 발견해요'],
+  ['공유하기', '게시물 아래의 공유하기 버튼을 눌러요'],
+  ['핀맵으로 보내기', '[핀맵]을 고르면 바로 저장돼요']
+];
+// 가로 카드: 지금 보이는 카드 번호, 다음 카드로 넘기기, 점 표시 갱신
+function obSlideIndex(list){ const slides = list.querySelectorAll('.ob-slide'); if (slides.length < 2) return 0; const step = slides[1].offsetLeft - slides[0].offsetLeft; return Math.max(0, Math.min(slides.length - 1, Math.round(list.scrollLeft / step))); }
+function obSyncDots(list){ const i = obSlideIndex(list); list.closest('.ob-carousel')?.querySelectorAll('.ob-dots i').forEach((d, n) => d.classList.toggle('on', n === i)); }
+function obSlideNext(){
+  const list = document.querySelector('#onboarding .ob-slides'); if (!list) return false;
+  const slides = list.querySelectorAll('.ob-slide'), i = obSlideIndex(list);
+  if (i >= slides.length - 1) return false;
+  const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  list.scrollTo({left: slides[i + 1].offsetLeft - slides[0].offsetLeft, behavior: reduce ? 'auto' : 'smooth'});
+  return true;
+}
+document.addEventListener('scroll', e => { if (e.target?.classList?.contains('ob-slides')) obSyncDots(e.target); }, true);
 function onboardScreen() {
   const s = onboardStep;
   // 첫 화면: 로고만 심플하게 (화면을 누르면 바로 다음 단계)
   if (s === 0) return `<button class="ob-splash" data-ob="next" aria-label="핀맵 시작"><img src="${PM_IMG.splash}" alt="Pinmap"></button>`;
+  // 2026-11-04: 세 단계를 세로 카드 대신 가로로 넘기는 큰 카드(레퍼런스: 라벨 칩 + 큰 이미지 + 점 표시)로 보여줘요.
   if (s === 1) return `
-    <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를 <em>발견</em>했다면?</h1>
-    <ol class="ob-flow">
-      <li class="ob-flowcard">${onboardPhone(1)}<div class="ob-flowtext"><h3><span class="ob-num">1</span>콘텐츠 발견</h3><p>SNS를 보다가 마음에 드는 콘텐츠 발견!</p></div></li>
-      <li class="ob-arrow" aria-hidden="true">↓</li>
-      <li class="ob-flowcard">${onboardPhone(2)}<div class="ob-flowtext"><h3><span class="ob-num">2</span>공유하기</h3><p>하단의 공유하기 버튼 클릭하기</p></div></li>
-      <li class="ob-arrow" aria-hidden="true">↓</li>
-      <li class="ob-flowcard">${onboardPhone(3)}<div class="ob-flowtext"><h3><span class="ob-num">3</span>핀맵으로 보내기</h3><p>[핀맵]을 선택하면 저장 완료!</p></div></li>
-    </ol>
+    <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를<br><em>발견</em>했다면?</h1>
+    <div class="ob-carousel">
+      <ol class="ob-slides" tabindex="0" aria-label="저장하는 방법, 옆으로 넘겨 보세요">
+        ${OB_SLIDES.map(([title, desc], i) => `<li class="ob-slide" aria-label="3단계 중 ${i + 1}단계, ${title}">
+          <span class="ob-chip"><span class="ob-num">${i + 1}</span>${title}</span>
+          ${onboardPhone(i + 1)}
+          <p class="ob-slide-desc">${desc}</p>
+        </li>`).join('')}
+      </ol>
+      <div class="ob-dots" aria-hidden="true">${OB_SLIDES.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>
+    </div>
     <div class="ob-actions"><button class="filled ob-next" data-ob="next">다음</button></div>`;
   if (s === 2) return `
-    <h1 class="ob-title" tabindex="-1">저장한 콘텐츠를<br><em>언제 다시 찾아보나요?</em></h1>
-    <p class="ob-desc">복수 선택이 가능해요</p>
-    <div class="ob-options" role="group" aria-label="관심사 · 활용 목적">
+    <h1 class="ob-title ob-mixtitle" tabindex="-1"><b>저장한 콘텐츠</b>를<br>언제 다시 찾아보나요?</h1>
+    <p class="ob-desc">여러 개를 골라도 돼요<span class="ob-pickcount" aria-live="polite">${onboardDraft.length ? `${onboardDraft.length}개 선택` : ''}</span></p>
+    <div class="ob-options" role="group" aria-label="관심사, 활용 목적">
       ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${o.emoji}</span><span class="ob-label">${o.label}</span></button>`; }).join('')}
     </div>
     <div class="ob-actions"><button class="ob-action-back" data-ob="back">이전</button><button class="filled ob-next" data-ob="next">시작하기</button></div>`;
@@ -205,6 +228,9 @@ function fitOnboardingViewport(){
   const imageHeight = stages.length ? Math.min(...stages.map(stage => stage.clientHeight)) : 100;
   const zoom = Math.max(.6, Math.min(2, imageHeight / 54));
   el.style.setProperty('--ob-phone-zoom', String(zoom / .82));
+  // 가로 카드 안의 휴대폰은 잘라내지 않고 이미지 영역 높이에 맞춰 통째로 보여줘요 (휴대폰 원본 높이 246px 기준).
+  const slideStage = el.querySelector('.ob-slide .ob-phone-stage');
+  if (slideStage) el.style.setProperty('--ob-slide-zoom', String(Math.max(.8, Math.min(1.8, (slideStage.clientHeight - 24) / 246))));
 }
 window.addEventListener('resize', fitOnboardingViewport);
 try {
@@ -282,6 +308,7 @@ document.addEventListener('click',e=>{
     onboardDraft=onboardDraft.includes(id)?onboardDraft.filter(v=>v!==id):[...onboardDraft,id];
     const on=onboardDraft.includes(id);
     choice.classList.toggle('on',on);choice.setAttribute('aria-checked',on);
+    const count=document.querySelector('#onboarding .ob-pickcount');if(count)count.textContent=onboardDraft.length?`${onboardDraft.length}개 선택`:'';
     
     
     return;
@@ -292,6 +319,7 @@ document.addEventListener('click',e=>{
   if(v==='skip'){if(onboardFull&&!onboardPreview)preferences=[...onboardDraft];homeViewIds=null;finishOnboarding();return;}
   if(v==='back'){onboardStep=Math.max(1,onboardStep-1);drawOnboarding();return;}
   if(v==='next'){
+    if(onboardStep===1&&obSlideNext())return;
     if(onboardStep===2){if(!onboardPreview){preferences=[...onboardDraft];homeViewIds=null;}finishOnboarding();return;}
     onboardStep=Math.min(2,onboardStep+1);drawOnboarding();
   }

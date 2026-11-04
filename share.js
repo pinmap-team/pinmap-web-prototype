@@ -6,7 +6,7 @@ const demoPost = PM_ENV.development ? null : {
   caption:'성수동 골목 안, 오후 햇살 가득한 창가 자리 ☕ 디저트도 맛있어요. 주말엔 웨이팅 있어요!',
   art:'cafe',
   // AI가 게시물에서 추출했다고 가정한 정보 (예시)
-  ai:{title:'창가 자리가 예쁜 성수 카페', type:'맛집·카페', category:'카페', address:'서울 성동구 성수동 · 예시 주소', distance:'도보 6분'}
+  ai:{title:'창가 자리가 예쁜 성수 카페', type:'맛집/카페', category:'카페', address:'서울 성동구 성수동, 예시 주소', distance:'도보 6분'}
 };
 let sd = {step:'post', item:null, aiOn:true, newCol:false, banner:null, bannerTimer:null, closeTimer:null};
 
@@ -37,9 +37,9 @@ const sdSaved = () => sd.item && items.includes(sd.item);
 
 function sdCoach(){
   if (sd.step === 'snsSheet') return '② ‘공유 대상…’을 눌러 다른 앱으로 보내요';
-  if (sd.step === 'osSheet') return '③ 앱 목록에서 <b>핀맵</b>을 선택하세요';
+  if (sd.step === 'osSheet') return '③ 앱 목록에서 <b>핀맵</b>을 골라 주세요';
   if (sd.step === 'save') return '';
-  if (sdSaved()) return `저장 완료! <button class="sd-coachbtn" data-sd="view">핀맵에서 보기</button>`;
+  if (sdSaved()) return `저장했어요. <button class="sd-coachbtn" data-sd="view">핀맵에서 보기</button>`;
   return '① 게시물 아래 <b>공유 버튼</b>을 눌러보세요';
 }
 function sdLayer(){
@@ -58,7 +58,7 @@ function sdLayer(){
     </div>`;
   if (p === 'osSheet') return `<div class="sd-dim" data-sd="dismiss"></div>
     <div class="sd-sheet os" role="dialog" aria-label="공유 대상">
-      <div class="sd-oshead"><div class="sd-osthumb">${art(demoPost.art)}</div><div><b>${demoPost.author}님의 게시물</b><small>sns.example · 예시</small></div><button class="sd-x" data-sd="dismiss" aria-label="닫기">${icon('close')}</button></div>
+      <div class="sd-oshead"><div class="sd-osthumb">${art(demoPost.art)}</div><div><b>${demoPost.author}님의 게시물</b><small>sns.example, 예시</small></div><button class="sd-x" data-sd="dismiss" aria-label="닫기">${icon('close')}</button></div>
       <div class="sd-apps">
         <button data-sd="nope"><i>${icon('comment')}</i>메시지</button>
         <button data-sd="nope"><i>${icon('mail')}</i>메일</button>
@@ -86,7 +86,7 @@ function sdSaveSheet(){ // 공유 체험용 저장 시트 (detail.js의 saveShee
       <label class="pm-toggle"><span>AI 자동 분류</span><input type="checkbox" role="switch" data-sd-ai ${sd.aiOn?'checked':''}><i aria-hidden="true"></i></label>
     </div>
     <p class="pm-result" aria-live="polite">${sd.aiOn
-      ? `✨ AI가 <b>${t.emoji} ${esc(x.type)}</b>로 분류했어요 · 📍 ${esc(demoPost.ai.distance)}`
+      ? `✨ AI가 <b>${t.emoji} ${esc(x.type)}</b>로 분류했어요, 📍 ${esc(demoPost.ai.distance)}`
       : `직접 고른 <b>${t.emoji} ${esc(x.type)}</b>로 저장돼요`}</p>
     <div class="pm-label">카테고리</div>
     <div class="pm-chips">
@@ -109,7 +109,7 @@ function drawShareDemo(){
   const el = $('#sharedemo'); if (!el) return;
   const coach = sdCoach();
   el.innerHTML = `<div class="sd-screen">
-    <div class="sd-top"><span class="sd-label">SNS · 예시 화면</span><button class="sd-exit" data-sd="exit">체험 끝내기 ${icon('close')}</button></div>
+    <div class="sd-top"><span class="sd-label">SNS, 예시 화면</span><button class="sd-exit" data-sd="exit">체험 끝내기 ${icon('close')}</button></div>
     <article class="sd-post">
       <header><span class="sd-avatar" aria-hidden="true">S</span><b>${demoPost.author}</b><span class="sd-more" aria-hidden="true">${icon('more')}</span></header>
       <div class="sd-img">${art(demoPost.art)}</div>
@@ -133,7 +133,7 @@ function sdCreateItem(){
   if(PM_ENV.development)return;
   if (sdSaved()) return;
   const a = demoPost.ai;
-  sd.item = {id:Date.now(), title:a.title, type:a.type, category:a.category, source:'SNS · '+demoPost.author, ago:'방금', savedAt:new Date().toISOString(), desc:'공유하기로 저장한 콘텐츠', memo:'', art:demoPost.art, distance:a.distance, address:a.address, collection:'', aiClassified:true, sample:true};
+  sd.item = {id:Date.now(), title:a.title, type:a.type, category:a.category, source:'SNS, '+demoPost.author, ago:'방금', savedAt:new Date().toISOString(), desc:'공유하기로 저장한 콘텐츠', memo:'', art:demoPost.art, distance:a.distance, address:a.address, collection:'', aiClassified:true, sample:true};
   // 마이 > 설정에서 AI 자동 분류 기본 사용을 끄면 ‘기타’로 시작해 직접 고르게 합니다.
   sd.aiOn = settings.aiDefault;
   if (!sd.aiOn) Object.assign(sd.item, {type:'기타', category:'기타', aiClassified:false});
@@ -152,7 +152,7 @@ function sdFinish(){
   const x = sd.item; afterChange();
   sd.step = 'post'; sd.newCol = false;
   const what = x.collection ? `‘${esc(x.collection)}’ 모음에 저장됨` : (x.aiClassified ? `✨ ${esc(x.type)}로 저장됨` : `${typeOf(x.type).emoji} ${esc(x.type)}로 저장됨`);
-  sd.banner = {text:`<b>핀맵</b> · ${what}`};
+  sd.banner = {text:`<b>핀맵</b>, ${what}`};
   drawShareDemo();
   clearTimeout(sd.bannerTimer);
   sd.bannerTimer = setTimeout(() => { sd.banner = null; drawShareDemo(); }, 5000);

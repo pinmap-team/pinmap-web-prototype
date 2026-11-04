@@ -1,8 +1,8 @@
 // 온보딩이 끝난 뒤 홈 화면 코치마크 튜토리얼 (3단계)
 const COACH_STEPS = [
-  {sel:'.mainpick', title:'관심사 추천 콘텐츠', text:'관심사에 맞는 저장 콘텐츠를 보여줘요. 좌우로 넘기거나 눌러서 상세 내용을 확인하세요.'},
-  {sel:'.chiprows', title:'저장한 카테고리 보기', text:'저장한 콘텐츠가 있는 카테고리만 보여요. 카테고리를 누르면 해당 저장 목록을 볼 수 있어요.'},
-  {sel:'.bottomnav', title:'홈 · 지도 · 컬렉션 · 마이', text:'저장한 장소는 지도에서 확인하세요. 모든 저장 콘텐츠는 컬렉션에서 볼 수 있어요.'}
+  {sel:'.mainpick', title:'관심사 추천 콘텐츠', text:'관심사에 맞는 저장 콘텐츠를 보여줘요.\n좌우로 넘기거나 눌러서 자세히 볼 수 있어요.'},
+  {sel:'.chiprows', title:'저장한 카테고리 보기', text:'저장한 콘텐츠가 있는 카테고리만 보여요.\n카테고리를 누르면 해당 저장 목록을 볼 수 있어요.'},
+  {sel:'.bottomnav', title:'홈, 지도, 컬렉션, 마이', text:'저장한 장소는 지도에서 볼 수 있어요.\n모든 저장 콘텐츠는 컬렉션에서 볼 수 있어요.'}
 ];
 let coachStep = 0;
 function startCoach(){
@@ -44,7 +44,9 @@ function placeCoach(){
   // area가 있으면 그 요소들만 감싸서 강조해요 (예: 위치 이름만, 검색 · 알림 아이콘은 빼고)
   const parts = COACH_STEPS[coachStep].area ? [...document.querySelectorAll(COACH_STEPS[coachStep].area)].map(el => el.getBoundingClientRect()) : [];
   const r = parts.length ? (() => { const L = Math.min(...parts.map(x => x.left)), T = Math.min(...parts.map(x => x.top)), R = Math.max(...parts.map(x => x.right)), B = Math.max(...parts.map(x => x.bottom)); return {left:L, top:T, right:R, bottom:B, width:R-L, height:B-T}; })() : target.getBoundingClientRect(), pad = 6, hole = c.querySelector('.cm-hole'), tip = c.querySelector('.cm-tip');
-  Object.assign(hole.style, {left:`${r.left-pad}px`, top:`${r.top-pad}px`, width:`${r.width+pad*2}px`, height:`${r.height+pad*2}px`});
+  // 강조 영역은 화면 안쪽(좌우 space-sm)까지만: 넓은 캐러셀도 양끝 모서리가 잘리지 않게 보여요
+  const edge = 8, hl = Math.max(edge, r.left - pad), hr = Math.min(window.innerWidth - edge, r.right + pad);
+  Object.assign(hole.style, {left:`${hl}px`, top:`${r.top-pad}px`, width:`${hr-hl}px`, height:`${r.height+pad*2}px`});
   const tw = Math.min(320, window.innerWidth - 32), th = tip.offsetHeight;
   const below = r.bottom + pad + 14 + th < window.innerHeight;
   const left = Math.max(16, Math.min(r.left + r.width/2 - tw/2, window.innerWidth - tw - 16));

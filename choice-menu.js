@@ -1,6 +1,6 @@
 // Keep the existing select values and change handlers; replace only their UI.
 (() => {
-  const categoryIcons = {'맛집·카페':'coffee','전시·팝업':'ticket','여행':'plane','쇼핑':'bag','레시피':'chef','생활 정보':'note','기타':'bookmark',ai:'spark'};
+  const categoryIcons = {'맛집/카페':'coffee','전시/팝업':'ticket','여행':'plane','쇼핑':'bag','레시피':'chef','생활 정보':'note','기타':'bookmark',ai:'spark'};
   const sortIcons = {recent:'clock',old:'clock',near:'pin',new:'clock',name:'text','name-desc':'text',saved:'bookmark'};
   function closeMenus(except){
     document.querySelectorAll('.pm-choice.is-open').forEach(host => {

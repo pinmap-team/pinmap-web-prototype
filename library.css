@@ -1,84 +1,84 @@
 /* 저장함 화면 리디자인 (Figma 시안) · 색은 아래 변수에서 한 번에 바꿀 수 있어요 */
 :root{
-  --pm-ink:#1E1E1E;        /* 제목 글자 */
-  --pm-sub:#747474;        /* 보조 글자 */
-  --pm-deep:#111111;       /* 선택된 칩 · 북마크 */
-  --pm-mint:#EEEEEE;       /* 카테고리 태그 · 개수 배지 · 하단 메뉴 선택 */
-  --pm-mint-strong:#E3E3E3;/* 저장하기 버튼 */
-  --pm-mint-ink:#111111;   /* 민트 위 글자 */
-  --pm-line:#E4EAE6;       /* 테두리 */
-  --pm-card:#FFFFFF;
+  --pm-ink:var(--color-on-surface);        /* 제목 글자 */
+  --pm-sub:var(--color-secondary);        /* 보조 글자 */
+  --pm-deep:var(--color-primary);       /* 선택된 칩 · 북마크 */
+  --pm-mint:var(--color-disabled);       /* 카테고리 태그 · 개수 배지 · 하단 메뉴 선택 */
+  --pm-mint-strong:var(--color-disabled);/* 저장하기 버튼 */
+  --pm-mint-ink:var(--color-on-surface);   /* 민트 위 글자 */
+  --pm-line:var(--color-disabled);       /* 테두리 */
+  --pm-card:var(--color-surface);
 }
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.libpage{padding-bottom:40px;color:var(--pm-ink)}
+.libpage{padding-bottom:var(--space-2xl);color:var(--pm-ink)}
 
 /* 간격 기준: 제목→검색 20 · 검색→칩 12 · 칩→모음 8 · 모음→목록 24 · 목록 머리→카드 12 */
 /* 제목 */
 .libhead{margin:0 0 var(--gap-title);padding-right:48px}
-.libhead p{margin:4px 0 0;font-size:15px;color:var(--pm-sub)}
+.libhead p{margin:var(--space-xs) 0 0;font:var(--type-body-md);color:var(--pm-sub)}
 
 /* 검색 */
-.libsearch{display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 18px;margin-bottom:12px;border:1px solid var(--pm-line);border-radius:27px;background:var(--pm-card)}
-.libsearch>.icon{color:#525252}
-.libsearch input{flex:1;min-width:0;border:0;outline:0;background:none;font-size:16px;color:inherit}
-.libsearch input::placeholder{color:#A8A8A8}
+.libsearch{display:flex;align-items:center;gap:var(--space-md);height:52px;padding:0 var(--space-sm) 0 var(--space-lg);margin-bottom:var(--space-md);border:1px solid var(--pm-line);border-radius:var(--rounded-lg);background:var(--pm-card)}
+.libsearch>.icon{color:var(--color-secondary)}
+.libsearch input{flex:1;min-width:0;border:0;outline:0;background:none;font:var(--type-body-md);color:inherit}
+.libsearch input::placeholder{color:var(--color-secondary)}
 .libsearch:focus-within{border-color:var(--pm-deep);box-shadow:0 0 0 3px #11111114}
 .libsearch .iconbtn{width:42px;height:42px;color:var(--pm-sub)}
 .libsearch .iconbtn[hidden]{display:none}
 
 /* 카테고리 칩 */
-.libchips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--gutter));padding:2px var(--gutter) 4px}
+.libchips{display:flex;gap:var(--space-sm);overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--gutter));padding:2px var(--gutter) 4px}
 .libchips::-webkit-scrollbar{display:none}
-.libchip{flex:none;min-height:40px;padding:0 16px;border-radius:20px;border:1px solid var(--pm-line);background:var(--pm-card);font-size:15px;color:#454545;white-space:nowrap}
-.libchip.on{background:var(--pm-deep);border-color:var(--pm-deep);color:#fff;font-weight:700}
+.libchip{flex:none;min-height:40px;padding:0 var(--space-lg);border-radius:20px;border:1px solid var(--pm-line);background:var(--pm-card);font:var(--type-body-md);color:var(--color-secondary);white-space:nowrap}
+.libchip.on{background:var(--pm-deep);border-color:var(--pm-deep);color:var(--color-neutral);font-weight:700}
 
 /* 내 모음 바로가기 */
-.libcols{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:8px calc(-1 * var(--gutter)) 0;padding:0 var(--gutter)}
+.libcols{display:flex;gap:var(--space-sm);overflow-x:auto;scrollbar-width:none;margin:8px calc(-1 * var(--gutter)) 0;padding:0 var(--gutter)}
 .libcols::-webkit-scrollbar{display:none}
-.libcol{flex:none;display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 12px;border-radius:16px;background:#F3F6F4;font-size:13px;color:#525252;white-space:nowrap}
+.libcol{flex:none;display:inline-flex;align-items:center;gap:var(--space-xs);min-height:32px;padding:0 var(--space-md);border-radius:var(--rounded-lg);background:var(--color-neutral);font:var(--type-body-sm);color:var(--color-secondary);white-space:nowrap}
 .libcol .icon{width:15px;height:15px}
 .libcol span{color:var(--pm-mint-ink);font-weight:700}
 
 /* 목록 머리 */
-.libsection{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:var(--gap-section) 0 12px}
-.libsection h2{display:flex;align-items:center;gap:8px;letter-spacing:-.6px}
-.libcount{min-width:30px;padding:2px 10px;border-radius:14px;background:var(--pm-mint);color:var(--pm-mint-ink);font-size:14px;font-weight:700;text-align:center;letter-spacing:0}
-.libsort{position:relative;display:inline-flex;align-items:center;color:var(--pm-sub);font-size:14px}
-.libsort select{appearance:none;-webkit-appearance:none;border:0;background:none;padding:8px 20px 8px 4px;font:inherit;color:inherit;cursor:pointer}
-.libsort select:focus-visible{outline:2px solid var(--pm-deep);border-radius:8px}
+.libsection{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);margin:var(--gap-section) 0 12px}
+.libsection h2{display:flex;align-items:center;gap:var(--space-sm);letter-spacing:-.6px}
+.libcount{min-width:30px;padding:2px var(--space-md);border-radius:var(--rounded-md);background:var(--pm-mint);color:var(--pm-mint-ink);font:var(--type-label-md);text-align:center;letter-spacing:0}
+.libsort{position:relative;display:inline-flex;align-items:center;color:var(--pm-sub);font:var(--type-body-sm)}
+.libsort select{appearance:none;-webkit-appearance:none;border:0;background:none;padding:var(--space-sm) var(--space-xl) var(--space-sm) var(--space-xs);font:inherit;color:inherit;cursor:pointer}
+.libsort select:focus-visible{outline:2px solid var(--pm-deep);border-radius:var(--rounded-sm)}
 .libsort .icon{position:absolute;right:0;width:16px;height:16px;pointer-events:none}
 
 /* 카드 목록 */
-.libgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.libgrid.gallerymode{display:block;columns:2;column-gap:12px}
-.libgrid.gallerymode .libcard{break-inside:avoid;margin-bottom:12px}
+.libgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-md)}
+.libgrid.gallerymode{display:block;columns:2;column-gap:var(--space-md)}
+.libgrid.gallerymode .libcard{break-inside:avoid;margin-bottom:var(--space-md)}
 .libgrid .empty{grid-column:1/-1}
-.libcard{display:flex;flex-direction:column;width:100%;min-width:0;padding:6px 6px 10px;border:1px solid #EEF0EE;border-radius:18px;background:#fff;text-align:left;transition:transform .15s}
+.libcard{display:flex;flex-direction:column;width:100%;min-width:0;padding:var(--space-sm) var(--space-sm) var(--space-md);border:1px solid var(--color-disabled);border-radius:var(--rounded-lg);background:var(--color-surface);text-align:left;transition:transform .15s}
 .libcard{cursor:pointer}
 .libcard:hover{filter:none;transform:translateY(-2px)}
-.libcard:focus-visible{outline:3px solid var(--pm-key,#111111);outline-offset:2px}
+.libcard:focus-visible{outline:3px solid var(--pm-key,var(--color-primary));outline-offset:2px}
 .libmark{border:0;padding:0;cursor:pointer;transition:transform .15s,background-color .15s}
 .libmark:hover{filter:none;transform:scale(1.08)}
-.libmark:focus-visible{outline:2px solid var(--pm-key,#111111);outline-offset:2px}
-.libart{position:relative;width:100%;max-width:100%;border-radius:13px;overflow:hidden;background:#EEF2EF}
+.libmark:focus-visible{outline:2px solid var(--pm-key,var(--color-primary));outline-offset:2px}
+.libart{position:relative;width:100%;max-width:100%;border-radius:var(--rounded-md);overflow:hidden;background:var(--color-neutral)}
 .libart svg{width:100%;height:100%;display:block}
-.libmark{position:absolute;top:7px;right:7px;width:28px;height:28px;border-radius:50%;background:#fff;display:grid;place-items:center;color:var(--pm-deep);box-shadow:0 1px 4px #0000001a}
+.libmark{position:absolute;top:7px;right:7px;width:28px;height:28px;border-radius:50%;background:var(--color-surface);display:grid;place-items:center;color:var(--pm-deep);box-shadow:var(--shadow-sm)}
 .libmark .icon{width:14px;height:14px;fill:currentColor}
-.libbody{flex:1;display:flex;flex-direction:column;padding:12px 6px 0;min-width:0}
+.libbody{flex:1;display:flex;flex-direction:column;padding:var(--space-md) var(--space-sm) 0;min-width:0}
 .libart img{width:100%;height:100%;object-fit:cover;display:block}
-.libtags{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto;padding-top:10px}
-.libpill{padding:4px 10px;border-radius:999px;border:1px solid #E3E7E4;background:#fff;color:var(--pm-key,#111111);font-size:10px;font-weight:500;letter-spacing:0;line-height:1.4}
-.libpill.due{color:#626262}
-.libbody h3{margin:0 0 4px;font-size:15px;font-weight:600;letter-spacing:-.3px;line-height:1.35;color:var(--pm-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.libsub{margin:0;font-size:12.5px;color:#8F8F8F;letter-spacing:-.1px;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.libsep{display:inline-block;width:1px;height:9px;margin:0 7px;background:#D3D8D5;vertical-align:0}
-.libmeta{display:flex;align-items:center;gap:4px;margin:7px 0 0;font-size:12.5px;color:#8F8F8F;letter-spacing:-.1px}
-.libmeta .icon{flex:none;width:15px;height:15px;color:#828282}
+.libtags{display:flex;flex-wrap:wrap;gap:var(--space-xs);margin-top:auto;padding-top:var(--space-md)}
+.libpill{padding:var(--space-xs) var(--space-md);border-radius:999px;border:1px solid var(--color-disabled);background:var(--color-surface);color:var(--pm-key,var(--color-on-surface));font:var(--type-body-sm);letter-spacing:0}
+.libpill.due{color:var(--color-secondary)}
+.libbody h3{margin:0 0 var(--space-xs);font:var(--type-label-md);letter-spacing:-.3px;color:var(--pm-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.libsub{margin:0;font:var(--type-body-sm);color:var(--color-secondary);letter-spacing:-.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.libsep{display:inline-block;width:1px;height:9px;margin:0 var(--space-sm);background:var(--color-disabled);vertical-align:0}
+.libmeta{display:flex;align-items:center;gap:var(--space-xs);margin:var(--space-sm) 0 0;font:var(--type-body-sm);color:var(--color-secondary);letter-spacing:-.1px}
+.libmeta .icon{flex:none;width:15px;height:15px;color:var(--color-secondary)}
 .libmeta span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-.libmeta.warn{color:#111111}.libmeta.warn .icon{color:#111111}
+.libmeta.warn{color:var(--color-on-surface)}.libmeta.warn .icon{color:var(--color-on-surface)}
 /* 위치 아이콘은 속이 찬 핀 */
 .libmeta.m-pin .icon path{fill:currentColor;fill-rule:evenodd;stroke:none}
 
-@media(max-width:370px){.libhead h1{font-size:28px}.libbody h3{font-size:15px}}
+@media(max-width:370px){.libhead h1{font:var(--type-headline-md)}.libbody h3{font:var(--type-body-md)}}
 @media(prefers-reduced-motion:reduce){.libcard{transition:none}}
