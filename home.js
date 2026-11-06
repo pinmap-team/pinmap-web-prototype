@@ -204,7 +204,7 @@ actions.homesearch = () => {
   const input = $('#homesearchinput'); input.tabIndex = homeSearchOpen ? 0 : -1;
   if (!homeSearchOpen) { input.value = ''; box.querySelector('.hs-results').innerHTML = ''; }
   btn.setAttribute('aria-expanded', String(homeSearchOpen)); btn.setAttribute('aria-label', homeSearchOpen ? '검색창 닫기' : '저장한 콘텐츠 검색');
-  homeSearchOpen ? requestAnimationFrame(() => input.focus()) : btn.focus();
+  homeSearchOpen ? input.focus({preventScroll:true}) : btn.focus();
 };
 // 결과를 누르면 검색창은 닫고 상세로 가요 (돌아왔을 때 닫힌 상태)
 document.addEventListener('click', e => { if (e.target.closest('#home-search .hs-row')) { homeSearchOpen = false; homeQuery = ''; } }, true);

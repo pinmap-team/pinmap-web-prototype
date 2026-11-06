@@ -68,7 +68,7 @@ let items = PM_ENV.development ? [] : [
 let page='home', filter='전체', query='', detailId=null, selectedPin=1, collection=null, locationAllowed=false, toastTimer;
 // 마이 > 프로필 · 설정 (pinmap.js가 브라우저에 저장합니다)
 let settings = PM_ENV.development ? {nickname:'',area:'',notiDeadline:false,notiNearby:false,notiReminder:false,aiDefault:false,mapApp:'naver',readNoti:[],push:false,locPerm:'none',places:[],recentPlaces:[],accounts:[],calSeeded:true} : {nickname:'서연', area:'성수동', notiDeadline:true, notiNearby:true, notiReminder:false, aiDefault:true, mapApp:'naver', readNoti:[], push:false, locPerm:'none', places:['성수동','청파동'], recentPlaces:['한남동','연남동','잠실3동']};
-const LOC_PERM = {none:'허용 안 함', using:'앱을 사용하는 동안', always:'항상 허용'};
+const LOC_PERM = {always:'항상 허용', using:'앱을 사용하는 동안', none:'허용 안 함'};
 const MAP_APPS = {
   naver:{name:'네이버 지도', url:q=>`https://map.naver.com/p/search/${q}`},
   kakao:{name:'카카오맵', url:q=>`https://map.kakao.com/?q=${q}`},
@@ -227,7 +227,7 @@ function saveDialog(){modal('새로 저장',`<button class="sharecta" data-actio
 function editDialog(){const x=items.find(x=>x.id===detailId);modal('저장 정보 수정',`<form id="editform"><label class="field"><span>카테고리</span><select name="type">${TYPES.map(t=>`<option value="${t.id}" ${t.id===x.type?'selected':''}>${t.emoji} ${t.id}</option>`).join('')}</select></label><label class="field"><span>제목 / 장소명</span><input name="title" value="${esc(x.title)}" required maxlength="80"></label><label class="field"><span>주소, 맛집/카페, 전시/팝업, 여행에만 사용</span><input name="address" value="${esc(x.address||'')}" maxlength="200" placeholder="원본에서 확인한 주소"></label><label class="field"><span>내 메모</span><textarea name="memo" maxlength="300">${esc(x.memo||'')}</textarea></label><label class="field"><span>모음</span><input name="collection" list="collectionlist" value="${esc(x.collection||'')}" maxlength="80" placeholder="나중에 정리"><datalist id="collectionlist">${collectionNames().map(c=>`<option value="${esc(c)}">`).join('')}</datalist></label><p class="hint">직접 바꾼 카테고리는 ‘직접 분류’로 표시돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">수정 내용 저장</button></div></form>`)}
 function intro(){modal('핀맵',`<p class="muted">저장한 콘텐츠를 필요한 순간 다시 꺼내보세요.</p><div class="dialogactions"><button class="filled" data-action="close">확인</button></div>`)}
 // 위치 권한 (프로토타입: 실제 위치는 요청하지 않고 성수동 예시 위치를 사용)
-function locationDialog(){modal('위치 권한',`<p>현재 위치 주변에 저장한 장소를 찾을 때 사용해요.</p><div class="permopts" role="radiogroup" aria-label="위치 권한">${Object.entries(LOC_PERM).map(([k,v])=>`<button role="radio" aria-checked="${settings.locPerm===k}" class="permopt ${settings.locPerm===k?'on':''}" data-locperm="${k}"><b>${v}</b><small>${{none:'예시 위치(성수동)로만 체험해요',using:'앱을 켜 두었을 때 주변 장소를 보여줘요',always:'앱을 켜지 않아도 근처 저장 콘텐츠를 알려드려요'}[k]}</small></button>`).join('')}</div><p class="hint">프로토타입에서는 실제 위치를 요청하지 않아요.</p>`)}
+function locationDialog(){modal('위치 권한',`<p>현재 위치 주변에 저장한 장소를 찾을 때<br>사용해요.</p><div class="permopts" role="radiogroup" aria-label="위치 권한">${Object.entries(LOC_PERM).map(([k,v])=>`<button role="radio" aria-checked="${settings.locPerm===k}" class="permopt ${settings.locPerm===k?'on':''}" data-locperm="${k}"><b>${v}</b><small>${{none:'예시 위치(성수동)로만 체험해요',using:'앱을 켜 두었을 때 주변 장소를 보여줘요',always:'앱을 켜지 않아도 근처 저장 콘텐츠를 알려드려요'}[k]}</small></button>`).join('')}</div>`)}
 
 /* ---------- 동작 ---------- */
 const actions = {

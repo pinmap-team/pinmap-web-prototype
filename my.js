@@ -69,7 +69,7 @@ pages.my = function(){
     ${myRow('faq','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7 M12 17h.01"/></svg>','자주 묻는 질문')}
     ${myRow('notice','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l7 4V6l-7 4z M17 9.5a4 4 0 0 1 0 5"/></svg>','공지사항')}
     ${myRow('terms','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z M14 3v5h5 M9 12h7 M9 16h7"/></svg>','약관 및 정책')}
-    ${myRow('appinfo','ℹ️','현재 버전','Prototype 03')}
+    ${myRow('appinfo','ℹ️','앱 정보','Prototype 03')}
   </section>
   <button class="logout" data-action="logout">로그아웃</button>`;
 };
@@ -80,8 +80,8 @@ function openMySheet(fn){ mySheet = fn; fn(); $('#sheet').classList.add('bottoms
 function notiSettings(){
   modal('알림 설정', `<div class="mycard settings">
     ${sw('push','푸시 알림 허용', settings.push ? '앱을 켜지 않아도 휴대폰 알림으로 받아요' : '꺼져 있으면 앱 밖에서는 알림이 오지 않아요')}
-    ${sw('notiNearby','현재 위치 기반 추천 알림','앱을 켜지 않아도 지금 있는 곳 근처의 저장 콘텐츠를 알려드려요')}
-    ${settings.notiNearby && settings.push && settings.locPerm!=='always' ? `<button class="setwarn" data-action="location">⚠️ 앱을 켜지 않았을 때도 위치에 맞춰 알려드리려면 위치 권한을 ‘항상 허용’으로 바꿔주세요 ›</button>` : ''}
+    ${sw('notiNearby','현재 위치 기반 추천 알림','앱을 켜지 않아도 근처의 저장 콘텐츠를 알려드려요')}
+    ${settings.notiNearby && settings.push && settings.locPerm!=='always' ? `<button class="setwarn" data-action="location"><span>앱을 켜지 않았을 때도 위치에 맞춰 알려드리려면<br>위치 권한을 ‘항상 허용’으로 바꿔주세요</span>${icon('chevright')}</button>` : ''}
     ${sw('notiDeadline','마감 임박 알림','전시/팝업이 끝나기 3일 전에 알려드려요')}
     ${sw('notiReminder','다시 보기 리마인드','잊고 있던 저장 콘텐츠를 가끔 꺼내드려요')}
   </div>`);
@@ -89,11 +89,16 @@ function notiSettings(){
 function saveSettings(){
   modal('저장 설정', `<div class="mycard settings">${sw('aiDefault','AI 자동 분류 기본 사용','끄면 저장할 때 카테고리를 직접 골라요')}</div>`);
 }
+function mapAppPreview(){
+ const key=settings.mapApp||'naver',name=MAP_APPS[key].name;
+ const colors={naver:['#edf2e8','#c5e8b8','#03c75a'],kakao:['#f5f0df','#d4e6bb','#fee500'],google:['#f1f3f4','#cde6ce','#4285f4']}[key]||['#f1f3f4','#cde6ce','#4285f4'];
+ return `<figure class="map-app-preview"><svg viewBox="0 0 360 220" role="img" aria-label="${esc(name)} 지도 화면 예시"><rect width="360" height="220" fill="${colors[0]}"/><path d="M0 155 Q120 95 220 170 T360 160V220H0" fill="#b9dcf2"/><path d="M230 5h110v90H230zM12 20h65v45H12z" fill="${colors[1]}"/><path d="M0 100H360M110 0V220M0 25L330 220" stroke="white" stroke-width="14"/><path d="M110 150V100H245V65" fill="none" stroke="${colors[2]}" stroke-width="6"/><circle cx="245" cy="65" r="12" fill="${colors[2]}" stroke="#333" stroke-width="2"/><text x="160" y="55" font-size="14" fill="#333">저장한 장소</text><text x="270" y="125" font-size="12" fill="#555">공원</text></svg></figure>`;
+}
 function mapSettings(){
   modal('지도 디자인', `<div class="mycard settings">
     <div class="setrow col"><div><b>길찾기 지도 앱</b><small>장소 상세의 길찾기 버튼이 이 앱으로 열려요</small></div>
       <div class="segmented" role="radiogroup" aria-label="길찾기 지도 앱">${Object.entries(MAP_APPS).map(([k,v]) => `<button role="radio" aria-checked="${settings.mapApp===k}" class="${settings.mapApp===k?'on':''}" data-mapapp="${k}">${v.name}</button>`).join('')}</div>
-    </div></div>`);
+    ${mapAppPreview()}</div></div>`);
 }
 $('#sheet').addEventListener('close', () => { mySheet = null; });
 
@@ -106,7 +111,7 @@ Object.assign(actions, {
   notisheet: () => openMySheet(notiSettings),
   savesheet: () => openMySheet(saveSettings),
   mapsheet: () => openMySheet(mapSettings),
-  coachagain: () => { go('home'); setTimeout(startCoach, 300); },
+  coachagain: () => { go('home'); setTimeout(() => {if(page==='home')startCoach(true);}, 300); },
   appinfo: () => { modal('앱 정보', `<p>핀맵 Prototype 03</p><p class="hint">예시 데이터로 체험하는 프로토타입이에요. 데이터는 이 브라우저에만 저장돼요.</p>`); $('#sheet').classList.add('bottomsheet'); },
   howto: () => openOnboarding(1),
   profile: () => { modal('프로필 편집', `<form id="profileform"><label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label><p class="hint">위치는 ‘위치 편집’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장</button></div></form>`); $('#sheet').classList.add('bottomsheet'); },

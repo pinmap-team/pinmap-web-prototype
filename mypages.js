@@ -74,7 +74,7 @@ function pageFromModal(fn){ // my.js의 시트 내용을 그대로 페이지에 
 pages.notiset = () => myPage('알림 설정', pageFromModal(notiSettings), 'settingpage');
 pages.saveset = () => myPage('저장 설정', pageFromModal(saveSettings), 'settingpage');
 // 2026-11-04: 화면 모드도 아래 시트 대신 페이지로 (내용은 PinmapTheme.show()와 같음)
-pages.themeset = () => myPage('화면 모드', pageFromModal(() => PinmapTheme.show()), 'settingpage themepage');
+pages.themeset = () => { PinmapTheme.beginPreview(); return myPage('화면 모드', pageFromModal(() => PinmapTheme.show()), 'settingpage themepage'); };
 actions.appearance = () => go('themeset');
 pages.mapset = () => myPage('지도 디자인', pageFromModal(mapSettings), 'mappage');
 Object.assign(actions, {
@@ -104,9 +104,9 @@ pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
 /* ---------- 자주 묻는 질문 · 공지사항 · 약관 및 정책 (2026-11-03, 마이 하단 도움말) ---------- */
 const infoRows = rows => `<div class="mycard settings">${rows.map(([t, d]) => `<div class="setrow"><div><b>${t}</b><small>${d}</small></div></div>`).join('')}</div>`;
 pages.faq = () => myPage('자주 묻는 질문', infoRows([
-  ['SNS 콘텐츠는 어떻게 저장하나요?', '인스타그램/유튜브 게시물에서 공유하기를 누르고 핀맵을 고르면 바로 저장돼요.'],
+  ['SNS 콘텐츠는 어떻게 저장하나요?', '인스타그램/유튜브 게시물에서 공유하기를 누르고 핀맵을 고르면<br>바로 저장돼요.'],
   ['저장한 콘텐츠는 어디에서 다시 보나요?', '홈에서 주변 저장 장소와 최근 저장을, 컬렉션에서 전체 목록을 볼 수 있어요.'],
-  ['AI 자동 분류가 틀렸어요.', '콘텐츠 상세에서 카테고리를 직접 바꿀 수 있어요. 저장 설정에서 자동 분류를 끌 수도 있어요.'],
+  ['AI 자동 분류가 틀렸어요.', '콘텐츠 상세에서 카테고리를 직접 바꿀 수 있어요.<br>저장 설정에서 자동 분류를 끌 수도 있어요.'],
   ['원본 게시물이 삭제되면 어떻게 되나요?', '장소 정보는 그대로 남고, 원본 보기에는 ‘삭제된 게시물이에요’라고 보여요.'],
   ['위치 권한은 어디에서 바꾸나요?', '휴대폰의 설정 앱 › 핀맵 › 위치에서 바꿀 수 있어요.']
 ]), 'settingpage');
@@ -159,7 +159,6 @@ actions.accountaccess = () => go('accountaccess');
 
 /* ---------- 항목별 초기화: 저장 콘텐츠와 코스는 보존 ---------- */
 const RESET_OPTIONS = {
-  connections: {label:'연동 초기화', description:'SNS 계정 연결과 연동 기록만 초기화해요. 이미 저장한 콘텐츠는 유지돼요.'},
   keywords: {label:'키워드 초기화', description:'선택한 관심 키워드만 해제해요. 저장한 카테고리와 콘텐츠는 유지돼요.'},
   notifications: {label:'알림 설정 초기화', description:'푸시와 마감/주변/리마인드 알림을 꺼요.'},
 };
@@ -216,3 +215,7 @@ Object.assign(actions, {
 
 /* ---------- 온보딩 다시 보기: 처음 온보딩과 따로 · 고른 관심사는 반영하지 않고 끝나면 마이로 ---------- */
 actions.intro = () => openOnboardingPreview();
+
+// Apply the previewed choice when leaving the theme page, including its back button.
+const goBeforeThemePreview = go;
+go = function(next){ if(page==='themeset'&&next!=='themeset')PinmapTheme.commitPreview();return goBeforeThemePreview.apply(this,arguments); };

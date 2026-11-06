@@ -60,11 +60,11 @@ pages.accounts = function(){
   <p class="muted acchint">연동한 계정들의 저장 콘텐츠를 핀맵 한곳에 모아 보여줘요.</p>
   ${syncBtn()}
   <section class="mgroup"><h2>연동된 계정 ${acc.length}개</h2>
-    ${acc.length ? acc.map(a => `<div class="accrow">${snsLogo(a.sns)}<span class="acctext"><b>${esc(a.handle)}</b><small>${SNS[a.sns].name}, 저장 ${accountCount(a)}개, ${syncingAcc === a.id ? '가져오는 중…' : syncTime(settings.accSync?.[a.id])}</small></span>${accSyncBtn(a)}<button class="accoff" data-acc-off="${a.id}">연동 중지</button></div>`).join('')
+    ${acc.length ? acc.map(a => `<div class="accrow">${snsLogo(a.sns)}<span class="acctext"><b>${esc(a.handle)}</b><small>저장 ${accountCount(a)}개, ${syncingAcc === a.id ? '가져오는 중…' : syncTime(settings.accSync?.[a.id])}</small></span>${accSyncBtn(a)}<button class="accoff" data-acc-off="${a.id}">연동 중지</button></div>`).join('')
       : '<p class="hint accnone">연동된 계정이 없어요. 아래에서 추가해 보세요.</p>'}
   </section>
   <button class="padd accadd" data-action="accadd">${icon('plus')} SNS 계정 연동 추가</button>
-${resetEntry('connections')}</div>`;
+</div>`;
 };
 function accAddSheet(sns){
   if (!sns) {
@@ -78,7 +78,7 @@ actions.accadd = () => accAddSheet();
 actions.accounts = () => go('accounts');
 actions.profile = () => go('profile');
 actions.profilephoto = () => $('#avatarfile')?.click();
-actions.profilename = () => { editingProfileName = true; render(); requestAnimationFrame(() => { const input=$('#profilepage input[name="nickname"]'); input?.focus(); input?.select(); }); };
+actions.profilename = () => { editingProfileName = true; render(); const input=$('#profilepage input[name="nickname"]'); input?.focus({preventScroll:true}); input?.select(); };
 actions.profilecancel = () => { editingProfileName = false; render(); requestAnimationFrame(() => $('#app [data-action="profilename"]')?.focus()); };
 actions.avatarreset = () => { delete settings.avatar; afterChange(); render(); toast('기본 이미지로 바꿨어요.'); };
 actions.accoffyes = () => {

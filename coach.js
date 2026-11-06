@@ -5,8 +5,10 @@ const COACH_STEPS = [
   {sel:'.bottomnav', title:'홈, 지도, 컬렉션, 마이', text:'저장한 장소는 지도에서 볼 수 있어요.\n모든 저장 콘텐츠는 컬렉션에서 볼 수 있어요.'}
 ];
 let coachStep = 0;
-function startCoach(){
+let coachFromGuide = false;
+function startCoach(fromGuide = false){
   if (page !== 'home' || detailId) return;
+  coachFromGuide = fromGuide === true;
   coachStep = 0;
   window.scrollTo(0, 0);
   lockScroll(true);
@@ -14,7 +16,7 @@ function startCoach(){
   if (!el) { el = document.createElement('div'); el.id = 'coach'; el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-label','핀맵 사용 안내'); document.body.append(el); }
   drawCoach();
 }
-function endCoach(){ $('#coach')?.remove(); window.removeEventListener('resize', placeCoach); lockScroll(false); }
+function endCoach(){ $('#coach')?.remove(); window.removeEventListener('resize', placeCoach); lockScroll(false); if(coachFromGuide){coachFromGuide=false;go('guide');} }
 // 튜토리얼 중에는 사용자가 스크롤할 수 없게 막고, 강조할 위치로만 자동 이동해요
 const SCROLL_KEYS = ['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '];
 const blockScroll = e => { if (e.type !== 'keydown' || SCROLL_KEYS.includes(e.key)) e.preventDefault(); };
@@ -29,9 +31,9 @@ function drawCoach(){
   const fixed = getComputedStyle(target).position === 'fixed';
   if (!fixed) { const r = target.getBoundingClientRect(); window.scrollTo(0, Math.max(0, window.scrollY + r.top - window.innerHeight/2 + r.height/2 - 60)); }
   const last = coachStep === COACH_STEPS.length-1;
-  $('#coach').innerHTML = `<button class="cm-close" data-coach="skip" aria-label="튜토리얼 건너뛰기">건너뛰기</button><div class="cm-hole"></div><div class="cm-tip" aria-live="polite">
+  $('#coach').innerHTML = `${coachFromGuide ? '<button class="cm-close" data-coach="exit" aria-label="튜토리얼 종료하기">종료하기</button>' : '<button class="cm-close" data-coach="skip" aria-label="튜토리얼 건너뛰기">건너뛰기</button>'}<div class="cm-hole"></div><div class="cm-tip" aria-live="polite">
       <span class="cm-step">${coachStep+1} / ${COACH_STEPS.length}</span><b>${s.title}</b><p>${s.text}</p>
-      <div class="cm-btns"><button class="cm-prev" data-coach="prev" ${coachStep===0?'disabled':''}>이전</button><button class="cm-next" data-coach="next">${last?'시작하기':'다음'}</button></div>
+      <div class="cm-btns"><button class="cm-prev" data-coach="prev" ${coachStep===0?'disabled':''}>이전</button><button class="cm-next" data-coach="next">${last?(coachFromGuide?'튜토리얼 종료하기':'시작하기'):'다음'}</button></div>
     </div>`;
   requestAnimationFrame(placeCoach);
   window.addEventListener('resize', placeCoach);
@@ -57,7 +59,7 @@ function placeCoach(){
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-coach]');
   if (!b) return;
-  if (b.dataset.coach === 'skip') { endCoach(); return; }
+  if (b.dataset.coach === 'skip' || b.dataset.coach === 'exit') { endCoach(); return; }
   if (b.dataset.coach === 'prev') { if (coachStep > 0) { coachStep--; drawCoach(); } return; }
   if (coachStep < COACH_STEPS.length-1) { coachStep++; drawCoach(); } else { endCoach(); window.scrollTo(0,0); }
 });

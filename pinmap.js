@@ -196,7 +196,7 @@ function onboardScreen() {
   if (s === 0) return `<button class="ob-splash" data-ob="next" aria-label="핀맵 시작"><img src="${PM_IMG.splash}" alt="Pinmap"></button>`;
   // 2026-11-04: 세 단계를 세로 카드 대신 가로로 넘기는 큰 카드(레퍼런스: 라벨 칩 + 큰 이미지 + 점 표시)로 보여줘요.
   if (s === 1) return `
-    <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를<br><em>발견</em>했다면?</h1>
+    <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를<br><em>발견</em>했나요?</h1>
     <div class="ob-carousel">
       <ol class="ob-slides" tabindex="0" aria-label="저장하는 방법, 옆으로 넘겨 보세요">
         ${OB_SLIDES.map(([title, desc], i) => `<li class="ob-slide" aria-label="3단계 중 ${i + 1}단계, ${title}">
@@ -210,11 +210,11 @@ function onboardScreen() {
     <div class="ob-actions"><button class="filled ob-next" data-ob="next">다음</button></div>`;
   if (s === 2) return `
     <h1 class="ob-title ob-mixtitle" tabindex="-1"><b>저장한 콘텐츠</b>를<br>언제 다시 찾아보나요?</h1>
-    <p class="ob-desc">여러 개를 골라도 돼요<span class="ob-pickcount" aria-live="polite">${onboardDraft.length ? `${onboardDraft.length}개 선택` : ''}</span></p>
+    <p class="ob-desc">여러 개를 골라도 돼요<span class="ob-pickcount" aria-live="polite">${onboardDraft.length ? `${onboardDraft.length}개 선택했어요` : ''}</span></p>
     <div class="ob-options" role="group" aria-label="관심사, 활용 목적">
       ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${o.emoji}</span><span class="ob-label">${o.label}</span></button>`; }).join('')}
     </div>
-    <div class="ob-actions"><button class="ob-action-back" data-ob="back">이전</button><button class="filled ob-next" data-ob="next">시작하기</button></div>`;
+    <div class="ob-actions"><button class="ob-action-back" data-ob="back">이전</button><button class="filled ob-next" data-ob="next">${onboardPreview ? '종료하기' : '시작하기'}</button></div>`;
   // 마지막 화면: 문구 없이, 저장 카드에서 핀맵으로 점이 하나씩 채워지며 이어지는 애니메이션
   return '';
 }
@@ -230,7 +230,7 @@ function fitOnboardingViewport(){
   el.style.setProperty('--ob-phone-zoom', String(zoom / .82));
   // 가로 카드 안의 휴대폰은 잘라내지 않고 이미지 영역 높이에 맞춰 통째로 보여줘요 (휴대폰 원본 높이 246px 기준).
   const slideStage = el.querySelector('.ob-slide .ob-phone-stage');
-  if (slideStage) el.style.setProperty('--ob-slide-zoom', String(Math.max(.8, Math.min(1.8, (slideStage.clientHeight - 24) / 246))));
+  if (slideStage) el.style.setProperty('--ob-slide-zoom', String(Math.max(.8, Math.min(1.8, (slideStage.clientHeight - 24) / 240))));
 }
 window.addEventListener('resize', fitOnboardingViewport);
 try {
@@ -245,10 +245,10 @@ function drawOnboarding() {
   const el = $('#onboarding');
   if (!el) return;
   const bare = onboardStep === 0; // 첫 화면은 위쪽 단계 표시 없이
-  el.innerHTML = `<div class="ob-screen step${onboardStep+1}${bare ? ' bare' : ''}">
+  el.innerHTML = `<div class="ob-screen step${onboardStep+1}${bare ? ' bare' : ''}${onboardPreview ? ' ob-preview' : ''}">
     <div class="ob-top">
       <div class="ob-topleft"><span class="ob-count" aria-label="${onboardStep}단계, 전체 2단계"><b>${onboardStep}</b> / 2</span></div>
-      ${'<button class="ob-skip" data-ob="skip">건너뛰기</button>'}
+      ${onboardPreview ? '<button class="ob-skip" data-ob="exit">종료하기</button>' : '<button class="ob-skip" data-ob="skip">건너뛰기</button>'}
     </div>
     ${onboardScreen()}
   </div>`;
@@ -308,7 +308,7 @@ document.addEventListener('click',e=>{
     onboardDraft=onboardDraft.includes(id)?onboardDraft.filter(v=>v!==id):[...onboardDraft,id];
     const on=onboardDraft.includes(id);
     choice.classList.toggle('on',on);choice.setAttribute('aria-checked',on);
-    const count=document.querySelector('#onboarding .ob-pickcount');if(count)count.textContent=onboardDraft.length?`${onboardDraft.length}개 선택`:'';
+    const count=document.querySelector('#onboarding .ob-pickcount');if(count)count.textContent=onboardDraft.length?`${onboardDraft.length}개 선택했어요`:'';
     
     
     return;
@@ -316,6 +316,7 @@ document.addEventListener('click',e=>{
   const step=e.target.closest('[data-ob]');
   if(!step)return;
   const v=step.dataset.ob;
+  if(v==='exit'&&onboardPreview){finishOnboarding();return;}
   if(v==='skip'){if(onboardFull&&!onboardPreview)preferences=[...onboardDraft];homeViewIds=null;finishOnboarding();return;}
   if(v==='back'){onboardStep=Math.max(1,onboardStep-1);drawOnboarding();return;}
   if(v==='next'){

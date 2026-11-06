@@ -1,6 +1,6 @@
 // Desktop prototype preview of the mobile keyboard. Touch devices use their native keyboard.
 (() => {
-  const isSearch = target => target?.matches?.('#lm-search input, .libpage #search, #address-search');
+  const isSearch = target => target?.matches?.('#lm-search input, .libpage #search, #address-search, #address-new-query, #homesearchinput, #profilepage input[name="nickname"]');
   const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
   const keyboard = document.createElement('div');
   keyboard.id = 'pm-keyboard-preview';
@@ -18,6 +18,7 @@
   document.addEventListener('focusin', event => {
     if (!isSearch(event.target)) return;
     field = event.target;
+    keyboard.querySelector('[data-key="search"]').textContent = field.name === 'nickname' ? '완료' : '검색';
     keyboard.setAttribute('aria-hidden', 'false');
     document.body.classList.add('pm-keyboard-open');
   });
@@ -42,5 +43,6 @@
     field.dispatchEvent(new Event('input', {bubbles:true}));
     field.focus();
   });
+  new MutationObserver(() => { if(field && !field.isConnected) hide(); }).observe(document.getElementById('app'), {childList:true, subtree:true});
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && field) field.blur(); });
 })();
