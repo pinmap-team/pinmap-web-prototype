@@ -2,7 +2,7 @@
 (() => {
   const originalRender = render;
   let detailMap;
-  let liveMap, pinLayer, locationMarker, searchController, placeController;
+  let liveMap, pinLayer, locationMarker, searchController, placeController, mapProviderController;
   let expandedKey=null, sheetStage='peek', sheetDrag=null, suppressSheetClickUntil=0;
   let mapLocationName=null, searchOpen=false;
   let automaticLocation=false;
@@ -53,7 +53,8 @@
         <div class="lm-search-row cfpage${searchOpen?' is-open':''}" id="lm-search-row" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="어디로 가고 싶으세요?" value="${safe(searchQuery)}" autocomplete="off" ${searchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button></form></div>
         <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,cats.findIndex(([id])=>id===category))*100}%">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
       </header>
-      <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">ⓘ</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p class="lm-map-credits-vector"><a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>, © <a href="https://openmaptiles.org/" target="_blank" rel="noopener noreferrer">OpenMapTiles</a>, © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></p><p class="lm-map-credits-fallback">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></p><p>지하철 출입구 © <a href="https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0" target="_blank" rel="noopener noreferrer">행정안전부·Esri Korea</a></p></div></details>
+      <div class="lm-map-provider-control"><button type="button" class="lm-map-provider-toggle" data-lm="toggle-map-provider" aria-expanded="false" aria-controls="lm-map-provider-options">지도 종류 <span class="lm-map-provider-current">기본 지도</span>${icon('chevron')}</button><div class="lm-map-provider-options" id="lm-map-provider-options" role="group" aria-label="지도 종류 선택" hidden><button type="button" data-lm="select-map-provider" data-provider="openfree" aria-pressed="true">기본 지도</button><button type="button" data-lm="select-map-provider" data-provider="google" aria-pressed="false" disabled>구글 지도</button></div></div>
+      <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">ⓘ</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p class="lm-map-credits-vector"><a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>, © <a href="https://openmaptiles.org/" target="_blank" rel="noopener noreferrer">OpenMapTiles</a>, © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></p><p class="lm-map-credits-fallback">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></p><p class="lm-map-credits-google">지도 © Google</p><p class="lm-map-credits-subway">지하철 출입구 © <a href="https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0" target="_blank" rel="noopener noreferrer">행정안전부·Esri Korea</a></p></div></details>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
       <div class="lm-floating-actions"><button type="button" class="lm-course-button" data-lm="new-course" aria-label="새 코스 만들기" title="새 코스 만들기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="4.2" cy="4.2" r="2.1"/><path d="M6.3 4.2h9.2a5.1 5.1 0 0 1 0 10.2H10a3.2 3.2 0 0 0 0 6.4h7.7"/><circle cx="19.8" cy="20.8" r="2.1"/></svg></button>${round('현재 위치로 이동','target')}</div>
@@ -61,6 +62,27 @@
       <nav class="bottomnav lm-shared-nav" aria-label="하단 메뉴">${nav()}</nav></section>`;
   }
   function status(message) { const el = $('#app .lm-status'); if (el) { el.textContent = message; el.hidden = !/못|실패|입력|확인|검색하고/.test(message); } }
+  function hideProviderOptions() {
+    const control=$('#app .lm-map-provider-control');
+    if(!control)return;
+    control.querySelector('.lm-map-provider-options').hidden=true;
+    control.querySelector('.lm-map-provider-toggle').setAttribute('aria-expanded','false');
+  }
+  function updateProviderUi(state) {
+    const control=$('#app .lm-map-provider-control');
+    if(!control)return;
+    control.querySelector('.lm-map-provider-current').textContent=state.labels[state.current];
+    control.querySelectorAll('[data-provider]').forEach(option=>{
+      option.disabled=!state.available[option.dataset.provider];
+      option.setAttribute('aria-pressed',String(option.dataset.provider===state.current));
+    });
+    const notice=$('#app .lm-status');
+    if(state.error){notice.textContent=state.error;notice.hidden=false;}
+    else if(notice && /^구글 지도/.test(notice.textContent)){
+      notice.textContent='';
+      notice.hidden=true;
+    }
+  }
   function selectCategory(next) {
     category=next;
     const bar=document.querySelector('.lm-categories');
@@ -213,6 +235,7 @@
     if (!window.L) { status('지도 라이브러리를 불러오지 못했어요.'); return; }
     liveMap = L.map('live-map-canvas',{zoomControl:false,zoomAnimation:false}).setView(center,zoom);
     window.attachPinmapBasemap(liveMap);
+    mapProviderController=window.PinmapMapProviders?.attach(liveMap,updateProviderUi);
     pinLayer = L.layerGroup().addTo(liveMap); markers(); drawLocation();
     if(!PM_ENV.development&&!mapLocationName){automaticLocation=true;locate();automaticLocation=false;}
     if(!PM_ENV.development&&typeof window.DeviceOrientationEvent?.requestPermission!=='function')startOrientation();
@@ -247,7 +270,7 @@
     window.unmountCourseMap?.();
     window.unmountCourseThumbnails?.();
     stopLocation();
-    if (liveMap) { liveMap.remove(); liveMap=null; locationMarker=null; }
+    if (liveMap) { liveMap.remove(); liveMap=null; mapProviderController=null; locationMarker=null; }
     const isMap = page === 'map' && !detailId;
     document.body.classList.toggle('live-map-page',isMap);
     // 상세 페이지 '지도에서 보기' → 그 장소로 이동해 핀을 펼쳐요
@@ -341,6 +364,8 @@
     finally { if(current===searchController && input) input.disabled=false; }
   }
   document.addEventListener('click',event => {
+    const providerControl=$('#app .lm-map-provider-control');
+    if(providerControl && !providerControl.contains(event.target))hideProviderOptions();
     const card=event.target.closest('.lm-carousel-card');
     if(card&&!event.target.closest('button')){if(card.closest('.just-dragged'))return;const place=markerEntries.get(card.dataset.placeKey)?.place;if(place)expandPlace(place);return;}
     const result=event.target.closest('[data-result]');
@@ -349,6 +374,17 @@
     if(cat){selectCategory(cat.dataset.lmCat);markers();showResults();return;}
     const button=event.target.closest('[data-lm]'); if(!button)return;
     switch(button.dataset.lm){
+      case 'toggle-map-provider':{
+        const menu=$('#app .lm-map-provider-options');
+        menu.hidden=!menu.hidden;
+        button.setAttribute('aria-expanded',String(!menu.hidden));
+        break;
+      }
+      case 'select-map-provider':{
+        hideProviderOptions();
+        mapProviderController?.select(button.dataset.provider,true).catch(error=>status(error.message));
+        break;
+      }
       case 'new-course':window.startNewCourse?.();break;
       case 'locate':mapLocationName=null;$('#app .lm-location-title span').textContent='현재 위치';locate();break;
       case 'toggle-search':{
@@ -385,6 +421,7 @@
   });
   document.addEventListener('error',event=>{if(event.target.matches?.('.lm-badge-image img'))event.target.hidden=true;},true);
   document.addEventListener('keydown',event=>{if(page==='map'&&event.key===' '&&event.target.closest('.lm-photo-marker')){event.preventDefault();event.target.closest('.lm-photo-marker').click();}});
+  document.addEventListener('keydown',event=>{if(page==='map'&&event.key==='Escape')hideProviderOptions();});
   document.addEventListener('input',event=>{if(event.target.matches('#lm-search input'))$('#lm-search [data-lm="clear-search"]').hidden=!event.target.value;});
   document.addEventListener('submit',event => {
     if(event.target.id!=='lm-search')return;
