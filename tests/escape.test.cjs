@@ -18,14 +18,14 @@ const FIELDS=['title','memo','collection','address','desc','url','source','categ
 const ALLOWED=new Map([
   // counts and predicates — numbers/booleans, not field values
   ['app.js address 542fabeecaa5','map-app URL is constructed with encodeURIComponent'],
-  ['app.js collection 100174a49790','count predicate renders a number'],
+  ['app.js collection cb7fd22493bf','count predicate renders a number'],
   ['library.js collection f455917b56a6','count predicate renders a number'],
   ['collection.js collection 22d2a02a7127','checked state renders a fixed string'],
-  ['collection.js collection bcc6639fa2e0','condition only; collection text is escaped in the nested template'],
+  ['collection.js collection 5f0232918980','condition only; collection text is escaped in the nested template'],
   // transformed values that are escaped at render time
-  ['library.js title 278f1e10795f','toast writes textContent'],
-  ['my.js title 0693840f8b9d','notification text is escaped when rendered'],
-  ['my.js period dc6f68dc79ea','notification body is escaped when rendered'],
+  ['library.js title 353d511dd3d1','toast writes textContent'],
+  ['my.js title 22ee3f364199','notification text is escaped when rendered'],
+  ['my.js period c85493135c6c','notification body is escaped when rendered'],
   ['detail.js desc d7c542d1eaff','condition only; description is escaped when rendered'],
   ['detail.js address 80d05f3cdda3','toast writes textContent'],
   ['collection.js title 75a5731d4d77','regex source, not HTML output'],

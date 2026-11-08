@@ -19,7 +19,7 @@ function editor(folder,collection,overrides={}){
     cfCustom:()=>settings.customFolders,
     folderOf:x=>x.folderCategory||x.type,
     CF_ALL:['맛집','카페','여행','전시·팝업','쇼핑','레시피','기타'].map(id=>({id})),
-    shortType:x=>x,typeOf:()=>({art:'sea'}),isPlace:x=>['여행','맛집·카페','전시·팝업'].includes(x.type),
+    shortType:x=>x,typeOf:()=>({art:'sea'}),isPlace:x=>['여행','맛집/카페','전시·팝업'].includes(x.type),
     cfSyncCollections:()=>synced++,render(){},toast(){},afterChange:()=>saved++,
     $:selector=>selector==='#sheet'?{close:()=>closed++}:selector==='#es-folder-error'?{set textContent(value){error=value;}}:{focus(){}}
   };
@@ -45,5 +45,5 @@ test('empty and reserved folder names reject submission before mutating saved da
 });
 test('moving from a custom folder to a category clears the collection and fixes cafe classification',()=>{
   const r=editor('category:카페','내 장소',{collection:'내 장소'});
-  assert.equal(r.item.folderCategory,'카페');assert.equal(r.item.type,'맛집·카페');assert.equal(r.item.collection,'');
+  assert.equal(r.item.folderCategory,'카페');assert.equal(r.item.type,'맛집/카페');assert.equal(r.item.collection,'');
 });
