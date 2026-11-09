@@ -150,7 +150,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 .live-map:has(#live-map-canvas[data-map-provider="kakao"]) .lm-map-credits-kakao{display:block}
 .live-map:has(#live-map-canvas[data-map-provider="naver"]) .lm-map-credits-naver{display:block}
 .live-map:has(#live-map-canvas[data-map-provider]:not([data-map-provider="openfree"])) :is(.lm-map-credits-vector,.lm-map-credits-fallback,.lm-map-credits-subway){display:none}
-#live-map-canvas .pm-native-map{position:absolute;left:0;right:0;top:170px;bottom:220px;z-index:0;overflow:hidden;pointer-events:none}
+#live-map-canvas .pm-native-map{position:absolute;left:0;right:0;top:170px;bottom:0;z-index:0;overflow:hidden;pointer-events:none}
 #live-map-canvas .pm-native-map-surface{width:100%;height:100%}
 #live-map-canvas .leaflet-map-pane{z-index:1}
 #live-map-canvas[data-map-provider]:not([data-map-provider="openfree"]) .leaflet-tile-pane{visibility:hidden}
