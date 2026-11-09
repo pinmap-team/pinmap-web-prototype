@@ -58,3 +58,7 @@
 현재 테마는 `map-style.json`에 저장한 OpenFreeMap Positron 기반의 Pinmap Warm Minimal입니다. 미색 배경에 저채도 녹지·물을 사용하고 도로 번호·작은 도로명·철도 표시를 숨깁니다. 건물은 확대 수준 16부터 표시하며 지명은 현지 이름 한 줄로 표현합니다. 수정 후 JSON 콘텐츠 해시에 맞춰 `integration.js`의 스타일 URL 버전을 갱신하세요.
 
 지하철·철도역은 배경의 실제 `poi` 데이터에서 표시합니다. 확대 수준 12부터 역 아이콘과 한국어 우선 이름을 보여주며, 출입구·버스 정류장·일반 상점은 추가하지 않습니다. 겹치는 역 표시는 지도 충돌 배치로 줄입니다.
+
+## Portfolio embed
+
+The portfolio embeds the production `app.html?mode=prototype&portfolio-demo=1` directly. Keep this app on the Pinmap origin so root-relative APIs and map SDK domain authorization continue to work. `portfolio-embed.js` loads the cursor tour only when embedded by `https://ji-hyeon-jeong.vercel.app` with that explicit flag; ordinary app visits are unaffected. Tour messages validate both origin and sender.
