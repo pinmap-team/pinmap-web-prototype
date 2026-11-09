@@ -50,12 +50,10 @@
         if(!native || disposed)return;
         const canvas=host.getBoundingClientRect();
         const header=document.querySelector('.live-map .lm-header')?.getBoundingClientRect();
-        const cards=document.querySelector('.live-map .lm-selected-host')?.getBoundingClientRect();
         const top=Math.max(0,Math.round((header?.bottom ?? canvas.top+170)-canvas.top));
-        const bottom=Math.max(top+100,Math.round((cards?.top ?? canvas.bottom-200)-canvas.top));
         nativeHost.style.top=top+'px';
-        nativeHost.style.bottom=Math.max(0,Math.round(canvas.height-bottom))+'px';
-        const center=map.containerPointToLatLng([canvas.width/2,(top+bottom)/2]);
+        nativeHost.style.bottom='0px';
+        const center=map.containerPointToLatLng([canvas.width/2,(top+canvas.height)/2]);
         const zoom=map.getZoom();
         try {
           if(current==='google') {
