@@ -49,9 +49,9 @@
 
 ## 지도 배경
 
-지도 페이지의 **지도 종류** 버튼에서 기본 지도(OpenFreeMap)와 구글 지도를 선택할 수 있습니다. 기본 지도는 키 없이 사용합니다. 배포 환경에서는 Vercel의 `GOOGLE_MAPS_BROWSER_KEY`, `PINMAP_MAP_PROVIDER`를 `api/map-config.js`가 브라우저용 설정으로 전달합니다. `PINMAP_MAP_PROVIDER`는 `openfree` 또는 `google`입니다. 키가 없으면 구글 지도를 선택할 수 없으며 지도 SDK를 불러오지 못하면 기본 지도로 돌아갑니다. 선택은 해당 브라우저에 보관됩니다. 지도 종류를 바꾸어도 저장한 장소 데이터와 사진 마커는 유지합니다.
+지도 페이지의 **지도 종류** 버튼에서 기본 지도(OpenFreeMap)와 구글·카카오·네이버 지도를 선택할 수 있습니다. 기본 지도는 키 없이 사용합니다. 배포 환경에서는 Vercel의 `GOOGLE_MAPS_BROWSER_KEY`, `KAKAO_MAP_JAVASCRIPT_KEY`, `NAVER_MAP_CLIENT_ID`, `PINMAP_MAP_PROVIDER`를 `api/map-config.js`가 브라우저용 설정으로 전달합니다. `PINMAP_MAP_PROVIDER`는 `openfree`, `google`, `kakao`, `naver` 중 하나이며 현재 기본값은 네이버입니다. 해당 키가 없으면 선택지를 비활성화하고 지도 SDK를 불러오지 못하면 기본 지도로 돌아갑니다. 선택은 해당 브라우저에 보관됩니다. 지도 종류를 바꾸어도 저장한 장소 데이터와 사진 마커는 유지합니다.
 
-`GOOGLE_MAPS_BROWSER_KEY`는 Google Maps JavaScript API의 브라우저 키입니다. 키는 브라우저 네트워크 요청에 포함되므로 Google Cloud에서 배포 도메인과 필요한 지도 API로 사용 범위를 제한해야 합니다. `python3 -m http.server` 로컬 실행에서는 `/api/map-config`가 없어 기본 지도만 사용합니다. Vercel Functions가 실행되는 환경에서만 구글 지도 설정이 로드됩니다.
+세 지도 키는 모두 브라우저 SDK에서 쓰는 공개 식별자입니다. 브라우저 네트워크 요청에 포함되므로 각 지도 제공자 콘솔에서 배포 도메인과 필요한 지도 API로 사용 범위를 제한해야 합니다. `python3 -m http.server` 로컬 실행에서는 `/api/map-config`가 없어 기본 지도만 사용합니다. Vercel Functions가 실행되는 환경에서만 외부 지도 설정이 로드됩니다.
 
 장소 지도·코스 편집·코스 미리보기는 API 키 없이 OpenFreeMap의 Positron 벡터 지도를 사용합니다. MapLibre GL JS 5.21.0과 Leaflet 연결 모듈 0.1.4를 `vendor/`에 고정해 포함했습니다. 지도 데이터 출처는 OpenMapTiles와 OpenStreetMap이며 화면의 출처 표기를 유지합니다. 지도는 지하철역과 함께 15배율부터 주요 버스정류장, 16배율부터 번호가 붙은 지하철 출입구, 17배율부터 더 많은 정류장과 이름을 표시합니다. 출구 번호는 [행정안전부 주소제공서비스 자료를 게시한 Esri Korea 공개 레이어](https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0)의 2026-04-30 기준 스냅샷입니다. 자료에 없는 서울 신림선과 울산·부산 동해선 일부 출구는 표시되지 않을 수 있습니다. `python3 scripts/update-subway-exits.py`로 스냅샷을 갱신한 다음 `python3 scripts/refresh-asset-versions.py`로 버전을 갱신합니다. WebGL을 지원하지 않는 기기는 기존 OpenStreetMap 배경으로 대체합니다. 장소 검색과 위치 권한 동작은 변경하지 않습니다.
 
