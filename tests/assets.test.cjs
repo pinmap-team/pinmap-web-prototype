@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const crypto=require('node:crypto');
 test('every local CSS/JS asset uses its current content version',()=>{
-  for(const page of ['app.html','index.html','entry.html']) {
+  for(const page of ['app.html','index.html','entry.html','auth.html']) {
     const html=fs.readFileSync(page,'utf8');
     const assets=[...html.matchAll(/(?:href|src)="([^"?]+\.(?:css|js))(?:\?v=([^"?]+))?"/g)];
     assert(assets.length,page);

@@ -62,3 +62,9 @@
 ## Portfolio embed
 
 The portfolio embeds the production `app.html?mode=prototype&portfolio-demo=1` directly. Keep this app on the Pinmap origin so root-relative APIs and map SDK domain authorization continue to work. `portfolio-embed.js` loads the cursor tour only when embedded by `https://ji-hyeon-jeong.vercel.app` with that explicit flag; ordinary app visits are unaffected. Tour messages validate both origin and sender.
+
+## 실제 이메일 · 카카오 로그인 (로컬 구현)
+
+`auth.html`에서 Supabase 기반 이메일 가입·인증·로그인·비밀번호 재설정과 카카오 로그인을 연결한다. 인증 후 빈 개발 모드 앱으로 진입하며 프로토타입 체험과 기존 저장 데이터는 유지한다. 계정별 콘텐츠 동기화는 별도 작업이다.
+
+Vercel에 `SUPABASE_URL`과 `SUPABASE_PUBLISHABLE_KEY`를 등록한다. 로컬에서는 `.env.local`에 값을 넣고 `node --env-file=.env.local scripts/dev-auth-server.cjs`를 실행한다. 일반 정적 서버는 인증 설정 API를 실행하지 않는다. 상세 설정은 [로그인 연결 안내](docs/auth-setup.md), 현재 기준과 검사 결과는 [로그인 검증 기록](docs/auth-verification.md)을 참고한다.

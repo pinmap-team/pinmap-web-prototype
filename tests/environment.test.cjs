@@ -28,6 +28,12 @@ test('prototype retains the 13 seeded items and original default profile',()=>{
   assert.equal(app.value('COLLECTIONS.length'),3);
   assert.equal(app.value('STORAGE'),'pinmap.v3');
 });
+test('only the explicit post-login app requires authentication; previews remain open',()=>{
+  assert.equal(boot('development').value('PM_ENV.requiresAuth'),false);
+  assert.equal(boot('prototype').value('PM_ENV.requiresAuth'),false);
+  assert.equal(boot('development&auth=required').value('PM_ENV.requiresAuth'),true);
+  assert.equal(boot('prototype&auth=required').value('PM_ENV.requiresAuth'),false);
+});
 test('initial development screens ignore stored data without changing or deleting any saved records',()=>{
   const payload=JSON.stringify({items:[{id:1,title:'Existing content',type:'기타'}],settings:{nickname:'Existing user',calSeeded:true}});
   const entries={'pinmap.v3':payload,'pinmap.v2':payload,'pinmap.dev.v1':payload};
@@ -85,6 +91,13 @@ test('refresh always returns to version selection, including old links with a mo
   assert.equal(first.src,'app.html?mode=development');
   assert.deepEqual(first.replacements,['/index.html?v=review']);
   assert.equal(route('?v=review','reload').src,'entry.html');
+});
+test('post-login auth flag reaches only the development frame and is removed from the top URL',()=>{
+  const result=route('?mode=development&auth=required');
+  assert.equal(result.src,'app.html?mode=development&auth=required');
+  assert.deepEqual(result.replacements,['/index.html']);
+  assert.equal(route('?mode=prototype&auth=required').src,'app.html?mode=prototype');
+  assert.equal(route('?mode=development&auth=required','reload').src,'entry.html');
 });
 
 test('disconnected development keeps the existing page layouts and blocks data creation',()=>{
