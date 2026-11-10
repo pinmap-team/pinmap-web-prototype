@@ -99,9 +99,10 @@ function cfSyncCollections(){
 document.addEventListener('DOMContentLoaded', cfSyncCollections);
 
 /* Folder ordering does not change saved content or content-level sorting. */
-const CF_FOLDER_SORTS=[['new','최근 만든 순'],['old','오래된 생성 순'],['name','이름 오름차순'],['name-desc','이름 내림차순'],['saved','최근 담은 순']];
+// 2026-11-10 정렬은 세 가지로만: 최근 담은 순(기본) · 이름 오름차순 · 이름 내림차순
+const CF_FOLDER_SORTS=[['saved','최근 담은 순'],['name','이름 오름차순'],['name-desc','이름 내림차순']];
 function cfOrderFolders(folders){
-  const mode=settings.folderSort||'new',custom=cfCustom();
+  const mode=CF_FOLDER_SORTS.some(([k])=>k===settings.folderSort)?settings.folderSort:'saved',custom=cfCustom();
   const latest=f=>items.filter(x=>f.attr ? x.collection===f.id : folderOf(x)===f.id).reduce((max,x)=>Math.max(max,savedTimestamp(x)||0),0);
   return [...folders].sort((a,b)=>{
     if(mode==='name'||mode==='name-desc')return a.title.localeCompare(b.title,'ko',{numeric:true})*(mode==='name-desc'?-1:1);
@@ -113,7 +114,7 @@ function cfOrderFolders(folders){
   });
 }
 function cfFolderToolbar(){
-  return `<div class="cf-folder-toolbar"><label class="libsort"><span class="sr">폴더 정렬</span><select data-folder-sort aria-label="폴더 정렬">${CF_FOLDER_SORTS.map(([value,label])=>`<option value="${value}" ${value===(settings.folderSort||'new')?'selected':''}>${label}</option>`).join('')}</select></label></div>`;
+  return `<div class="cf-folder-toolbar"><label class="libsort"><span class="sr">폴더 정렬</span><select data-folder-sort aria-label="폴더 정렬">${CF_FOLDER_SORTS.map(([value,label])=>`<option value="${value}" ${value===(CF_FOLDER_SORTS.some(([k])=>k===settings.folderSort)?settings.folderSort:'saved')?'selected':''}>${label}</option>`).join('')}</select></label></div>`;
 }
 document.addEventListener('change',e=>{
   if(!e.target.matches('select[data-folder-sort]'))return;
@@ -137,17 +138,17 @@ function cfStatus(){
   return `콘텐츠 ${cfOpenList().length}개`;
 }
 /* ---------- 폴더 안 콘텐츠: 1단 카드 리스트 ---------- */
-// 정렬: 최신 저장 순(기본) · 오래된 순 · 가까운 순(장소 폴더에서만)
-const CF_SORTS = {recent:'최신 저장 순', old:'오래된 저장 순', near:'가까운 순'};
+// 정렬: 최근 담은 순(기본) · 이름 오름차순 · 이름 내림차순 (2026-11-10)
+const CF_SORTS = {recent:'최근 담은 순', name:'이름 오름차순', 'name-desc':'이름 내림차순'};
 const cfHasPlaces = list => list.some(x => isPlace(x) && !x.pending && x.address);
 // 날짜 미상은 마지막에 두고 실제 저장 시각으로 정렬합니다.
 function cfSort(list){
-  if (libSort === 'near' && cfHasPlaces(list)) return [...list].sort((a,b) => distanceOf(a) - distanceOf(b));
+  if (libSort === 'name' || libSort === 'name-desc') return [...list].sort((a,b) => String(a.title).localeCompare(String(b.title),'ko',{numeric:true}) * (libSort === 'name-desc' ? -1 : 1));
   return [...list].sort((a,b) => {
     const left = savedTimestamp(a), right = savedTimestamp(b);
     if (left === null) return right === null ? 0 : 1;
     if (right === null) return -1;
-    return libSort === 'old' ? left - right : right - left;
+    return right - left;
   });
 }
 // 선택 모드: null이면 꺼짐, Set이면 선택한 콘텐츠 id
@@ -162,7 +163,7 @@ function cfMetaLine(x){
     if (x.pending) parts.push('위치 확인 필요');
     else { if (libArea(x)) parts.push(libArea(x)); if (x.distance) parts.push(x.distance); }
   } else if (x.type === '쇼핑') {
-    if (x.price) parts.push(x.price.replace(', 예시 가격', ''));
+    if (x.price) parts.push(x.price.replace(/, (예시|참고) 가격/, ''));
     if (x.shop) parts.push(x.shop);
   } else if (x.type === '레시피' && x.recipe) { ic = 'clock'; parts.push(x.recipe.split(', ')[0]); }
   if (x.deadline) parts.push(x.deadline);
@@ -180,19 +181,19 @@ function cfItem(x){
   </div>`;
 }
 function cfCards(list, pick, canSelect){
-  const sorts = Object.entries(CF_SORTS).filter(([k]) => k !== 'near' || cfHasPlaces(list));
+  const sorts = Object.entries(CF_SORTS);
   if (!sorts.some(([k]) => k === libSort)) libSort = 'recent';
   const selBtn = canSelect ? (cfSel
     ? `<button type="button" class="cf-textbtn" data-action="cfselectoff">취소</button>`
     : `<button type="button" class="cf-textbtn" data-action="cfselect">선택</button>`) : '';
   // 폴더 안에서는 개수를 제목 옆에 보여주고, 여기에는 정렬 · 선택만 (검색 결과일 때만 개수 표시)
   const lead = canSelect
-    ? (cfSel ? `<span class="cf-selhint">삭제할 콘텐츠를 골라주세요</span>` : `<label class="libsort cf-sortlead"><span class="sr">정렬</span><select data-libsort>${sorts.map(([k,v]) => `<option value="${k}" ${libSort===k?'selected':''}>${v}</option>`).join('')}</select>${icon('chevron')}</label>`)
+    ? (cfSel ? `<span class="cf-selhint">삭제할 콘텐츠를 골라 주세요</span>` : '')
     : `<h2 class="cf-resulthead">검색 결과 <span>${list.length}</span></h2>`;
   return `<div class="libsection cf-sec">
       ${lead}
       <div class="cf-tools">${pick && !cfSel ? `<button type="button" class="cf-pickbtn" data-action="cfpick">${icon('plus')}담기</button>` : ''}
-      ${cfSel || canSelect ? '' : `<label class="libsort"><span class="sr">정렬</span><select data-libsort>${sorts.map(([k,v]) => `<option value="${k}" ${libSort===k?'selected':''}>${v}</option>`).join('')}</select>${icon('chevron')}</label>`}${selBtn}</div>
+      ${cfSel ? '' : `<label class="libsort"><span class="sr">정렬</span><select data-libsort>${sorts.map(([k,v]) => `<option value="${k}" ${libSort===k?'selected':''}>${v}</option>`).join('')}</select>${icon('chevron')}</label>`}${selBtn}</div>
     </div>
     <div class="cf-items">${cfSort(list).map(cfItem).join('')}</div>`;
 }
@@ -206,10 +207,10 @@ resultCards = function(){
     if (list.length) {
       return cfCards(list, !!collection, true);
     }
-    if (q) return cfEmpty('search', '찾는 콘텐츠가 없어요', '다른 키워드로 다시 찾아보세요.', `<button class="tonal" data-action="clear">검색 지우기</button>`);
+    if (q) return cfEmpty('search', '찾는 콘텐츠가 없어요', '다른 키워드로 다시 찾아 보세요.', `<button class="tonal" data-action="clear">검색 지우기</button>`);
     return collection
-      ? cfEmpty('folder', '아직 담긴 콘텐츠가 없어요', '저장한 콘텐츠를 골라 이 폴더에 담아보세요.', `<button class="tonal" data-action="cfpick">콘텐츠 담기</button>`)
-      : cfEmpty('bookmark', '아직 저장한 콘텐츠가 없어요', 'SNS에서 공유 → 핀맵으로 담아보세요.', `<button class="tonal" data-action="save">새로 저장</button>`);
+      ? cfEmpty('folder', '아직 담긴 콘텐츠가 없어요', '저장한 콘텐츠를 골라 이 폴더에 담아 보세요.', `<button class="tonal" data-action="cfpick">콘텐츠 담기</button>`)
+      : cfEmpty('bookmark', '아직 저장한 콘텐츠가 없어요', 'SNS에서 공유 → 핀맵으로 담아 보세요.', `<button class="tonal" data-action="save">새로 저장</button>`);
   }
   // 전체: 카테고리 폴더 + 내가 만든 폴더
   const list = cfMatches();
@@ -230,7 +231,7 @@ resultCards = function(){
   const folders = [...addTile, ...cfOrderFolders([...mine, ...cfFolderData(list)]).map(CollectionFolder)];
   const grid = folders.length ? `<div class="cf-grid">${folders.join('')}</div>` : '';
   if (!q) return cfFolderToolbar() + grid;
-  if (!list.length) return cfEmpty('search', '찾는 콘텐츠가 없어요', '다른 키워드나 카테고리로 다시 찾아보세요.', `<button class="tonal" data-action="resetfilter">전체 컬렉션 보기</button>`);
+  if (!list.length) return cfEmpty('search', '찾는 콘텐츠가 없어요', '다른 키워드나 카테고리로 다시 찾아 보세요.', `<button class="tonal" data-action="resetfilter">전체 컬렉션 보기</button>`);
   return grid + cfCards(list, false, false);
 };
 

@@ -18,14 +18,15 @@
   for(const key of ['addressmanage','myaddressmanage','addresssearch','myaddresssearch']){PARENT_TAB[key]=key.startsWith('my')?'my':'map';pageName[key]=key.endsWith('manage')?'위치 편집':'위치 검색';}
   function currentSelection(){return window.PinmapLocation?.selected()??null;}
   function listBody(){
-    const all=myPlaces().map(recordOf),q=queryText.trim().toLocaleLowerCase();
+    const selectedName=currentSelection();
+    const all=myPlaces().map(recordOf).sort((a,b)=>Number(b.name===selectedName)-Number(a.name===selectedName)),q=queryText.trim().toLocaleLowerCase();
     const list=all.filter(record=>[record.label,record.name,record.address,record.memo].join(' ').toLocaleLowerCase().includes(q));
     if(!list.length)return `<div class="address-empty"><p>${q?'일치하는 저장 위치가 없어요.':'아직 저장한 위치가 없어요.'}</p><small>${q?'다른 이름이나 위치로 검색해 보세요.':'자주 가는 위치를 위치로 저장해 보세요.'}</small></div>`;
     return list.map(record=>{const selected=currentSelection()===record.name;return `<article class="address-row">
       <button type="button" class="address-select" data-address-select="${esc(record.name)}" aria-pressed="${selected}">
         <span class="address-row-icon" aria-hidden="true">${icon(/집|home/i.test(record.label)?'home':'pin')}</span>
-        <span class="address-copy"><span class="address-name"><b>${esc(record.label)}</b>${selected?'<span class="address-badge">현재 설정된 위치</span>':''}</span><span class="address-detail">${esc(record.address)}</span>${record.memo?`<span class="address-memo">${esc(record.memo)}</span>`:''}</span>
-        ${selected?`<span class="address-check" aria-hidden="true">${icon('check')}</span>`:''}
+        <span class="address-copy"><span class="address-name"><b>${esc(record.label)}</b></span><span class="address-detail">${esc(record.address)}</span>${record.memo?`<span class="address-memo">${esc(record.memo)}</span>`:''}</span>
+        ${selected?'<span class="address-badge">현재 설정된 위치</span>':''}
       </button>
       ${editing?`<div class="address-row-edit"><button type="button" data-address-edit="${esc(record.name)}" aria-label="${esc(record.label)} 위치 수정">${icon('edit')} 수정</button><button type="button" data-address-delete="${esc(record.name)}" aria-label="${esc(record.label)} 위치 삭제" ${all.length===1?'disabled':''}>${icon('trash')} 삭제</button></div>`:''}
     </article>`;}).join('');
@@ -51,7 +52,7 @@
 
   pages.addressmanage=()=>`<section class="address-page address-manage address-slide"><header class="address-header"><button data-action="addressmanageback" aria-label="위치 페이지로 돌아가기">${icon('back')}</button><h1 tabindex="-1">위치 편집</h1></header><div id="address-results">${listBody()}</div></section>`;
   pages.myaddressmanage=pages.addressmanage;
-  pages.addresssearch=()=>`<section class="address-page address-slide"><header class="address-header"><button data-action="addresslist" aria-label="위치 목록으로 돌아가기">${icon('back')}</button><h1>위치 검색</h1></header><h2 class="address-intro">자주 가는 곳의 위치를<br>찾아볼까요?</h2><form id="address-new-search" class="address-search">${icon('search')}<input id="address-new-query" type="search" aria-label="추가할 위치 검색" placeholder="장소 이름이나 동네로 검색" enterkeyhint="search" autocomplete="off"><button type="submit" aria-label="위치 찾기">${icon('arrow')}</button></form><div class="address-help"><b>자주 가는 곳을 찾아보세요</b><p>장소 이름 · 숙명여대, 서울역<br>동네 이름 · 성수동, 연남동<br>더 정확히 찾고 싶다면 도로명으로도 검색할 수 있어요.</p></div><button class="address-locate" data-action="addressnewcurrent">${icon('target')} 현재 위치로 찾기</button><div id="address-new-results" aria-live="polite"></div></section>`;
+  pages.addresssearch=()=>`<section class="address-page address-slide"><header class="address-header"><button data-action="addresslist" aria-label="위치 목록으로 돌아가기">${icon('back')}</button><h1>위치 검색</h1></header><h2 class="address-intro">자주 가는 곳의 위치를<br>찾아 볼까요?</h2><form id="address-new-search" class="address-search">${icon('search')}<input id="address-new-query" type="search" aria-label="추가할 위치 검색" placeholder="장소 이름이나 동네로 검색" enterkeyhint="search" autocomplete="off"><button type="submit" aria-label="위치 찾기">${icon('arrow')}</button></form><div class="address-help"><b>자주 가는 곳을 등록해 보세요</b><p>주변에 저장한 콘텐츠를 다시 찾기 쉬워져요.<br>학교, 회사, 자주 가는 동네로 검색해 보세요.</p></div><button class="address-locate" data-action="addressnewcurrent">${icon('target')} 현재 위치로 찾기</button><div id="address-new-results" aria-live="polite"></div></section>`;
   pages.myaddresssearch=pages.addresssearch;
   actions.addressmanageback=()=>{editing=false;showList();};
   let confirmMap=null, confirmHost=null, geoVersion=0;

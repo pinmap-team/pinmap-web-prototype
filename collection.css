@@ -25,7 +25,7 @@
 .cf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--space-2xl);row-gap:var(--space-2xl);margin-top:var(--space-xl);padding:0 var(--space-lg)}
 /* 새 폴더 추가 타일: 폴더 박스와 같은 크기의 점선 상자 */
 .cf-add{align-self:start}
-.cf-add .cf-addbox{position:relative;display:block;aspect-ratio:100/64;margin-top:16%;padding:var(--space-md) var(--space-lg);overflow:hidden;border:1.5px dashed var(--color-disabled);border-radius:var(--rounded-lg);background:rgba(255,255,255,.5);transition:transform .2s ease,border-color .2s}
+.cf-add .cf-addbox{position:relative;display:block;aspect-ratio:100/64;margin-top:16%;padding:var(--space-md) var(--space-lg);overflow:hidden;border:1.5px dashed var(--color-disabled);border-radius:var(--rounded-lg);background:color-mix(in srgb,var(--color-surface) 50%,transparent);transition:transform .2s ease,border-color .2s}
 .cf-addtext{display:grid;gap:2px}
 .cf-addtext b{font:var(--type-label-md);letter-spacing:-.4px;color:var(--t-ink)}
 .cf-addtext small{font:var(--type-body-sm);color:var(--color-secondary)}
@@ -119,8 +119,8 @@
 /* 화면 가운데 떠 있던 + 버튼은 하단 메뉴 오른쪽 버튼으로 옮겼어요 */
 .heading>.filled,.libfab{display:none!important}
 .bottomnav{gap:var(--space-md)!important;padding:0!important;height:64px!important;align-items:stretch;background:none!important;border:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}
-.bottomnav .navcap{flex:1;min-width:0;display:flex;gap:var(--space-xs);padding:var(--space-sm);border-radius:32px;background:var(--cf-nav);border:1px solid rgba(255,255,255,.06);box-shadow:0 12px 32px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.06)}
-.bottomnav .navfab{flex:none;width:64px;height:64px;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--cf-nav);color:#fff;border:1px solid rgba(255,255,255,.06);box-shadow:0 12px 32px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.08);transition:transform .15s}
+.bottomnav .navcap{flex:1;min-width:0;display:flex;gap:var(--space-xs);padding:var(--space-sm);border-radius:32px;background:var(--cf-nav);border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.06)}
+.bottomnav .navfab{flex:none;width:64px;height:64px;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--cf-nav);color:#fff;border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.08);transition:transform .15s}
 .bottomnav .navfab svg.icon{width:26px;height:26px;stroke:#fff;stroke-width:2}
 .bottomnav .navfab:hover{filter:none}
 .bottomnav .navfab:active{transform:scale(.94)}
@@ -131,7 +131,7 @@
 .bottomnav .navitem.active{background:none!important;box-shadow:none!important}
 .bottomnav .navitem.active,.bottomnav .navitem.active *{color:#fff!important}
 .bottomnav .navitem.active svg.icon{stroke:#fff!important;stroke-width:2.1!important}
-.bottomnav .navitem.active .navicon{width:min(100%,76px)!important;height:50px!important;border-radius:25px!important;background:rgba(255,255,255,.15)!important;-webkit-backdrop-filter:blur(12px) saturate(1.4);backdrop-filter:blur(12px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.35)!important}
+.bottomnav .navitem.active .navicon{width:min(100%,76px)!important;height:50px!important;border-radius:25px!important;background:rgba(255,255,255,.15)!important;-webkit-backdrop-filter:blur(12px) saturate(1.4);backdrop-filter:blur(12px) saturate(1.4);box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.28),inset 0 -1px 0 rgba(255,255,255,.05) !important}
 .bottomnav .navitem:focus-visible{outline:2px solid var(--color-surface)!important;outline-offset:-4px}
 @media(hover:hover){.bottomnav .navitem:not(.active):hover,.bottomnav .navitem:not(.active):hover *{color:#fff!important}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.bottomnav{background:none!important}.bottomnav .navitem.active .navicon{background:var(--color-primary-pressed)!important}}
@@ -166,7 +166,7 @@
 .cf-check{flex:none;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--color-disabled);display:grid;place-items:center;color:transparent;transition:background-color .15s,border-color .15s}
 .cf-check .icon{width:14px;height:14px;stroke-width:3}
 .cf-item.on .cf-check{background:var(--t-ink);border-color:var(--t-ink);color:var(--color-neutral)}
-.cf-item.on{box-shadow:0 0 0 2px var(--t-ink),0 6px 18px rgba(0,0,0,.06)}
+.cf-item.on{box-shadow:var(--shadow-sm),0 0 0 2px var(--t-ink)}
 .cf-selecting .cf-item:hover{transform:none}
 
 /* 선택 모드 하단 바: 하단 메뉴 자리를 대신해요 */
@@ -181,10 +181,10 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 @media(prefers-reduced-motion:reduce){.cf-item,.cf-check{transition:none}}
 
 /* ---------- 새 폴더 · 담기 시트: 흰 유리 ---------- */
-#sheet.cfsheet{background:rgba(255,255,255,.9)!important;-webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);box-shadow:0 -10px 40px rgba(0,0,0,.12),inset 0 1px 0 #fff}
+#sheet.cfsheet{background:color-mix(in srgb,var(--color-surface) 90%,transparent)!important;-webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);box-shadow:var(--shadow-sm),inset 0 1px 0 #fff}
 #sheet.cfsheet::backdrop{background:rgba(17,17,17,.22)}
 #sheet.cfsheet .dialoghead h2{font:var(--type-headline-md);letter-spacing:-.6px}
-#sheet.cfsheet .dialoghead .iconbtn{width:40px;height:40px;background:rgba(0,0,0,.05)}
+#sheet.cfsheet .dialoghead .iconbtn{width:40px;height:40px;background:color-mix(in srgb,var(--color-on-surface) 5%,transparent)}
 #sheet.cfsheet .dialoghead .iconbtn:focus-visible{outline:2px solid var(--t-ink);outline-offset:2px}
 .cf-picksearch{display:flex;align-items:center;gap:var(--space-sm);height:44px;margin:0 0 var(--space-md);padding:0 var(--space-lg);border-radius:var(--rounded-lg);background:rgba(0,0,0,.045)}
 .cf-picksearch .icon{width:18px;height:18px;color:var(--color-secondary);stroke-width:2}
@@ -212,7 +212,7 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 /* 폴더 삭제 버튼: 제목 줄 오른쪽 (알림 버튼 왼쪽) */
 .cf-delfolder{flex:none;margin-left:auto;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--color-secondary)}
 .cf-delfolder .icon{width:20px;height:20px;stroke-width:1.8}
-.cf-delfolder:hover{filter:none;background:rgba(0,0,0,.05);color:var(--color-error)}
+.cf-delfolder:hover{filter:none;background:color-mix(in srgb,var(--color-on-surface) 5%,transparent);color:var(--color-error)}
 /* 담기 목록: 검색해도 시트 높이가 바뀌지 않게 고정 */
 .cf-pick{height:min(46dvh,400px);max-height:none;align-content:start}
 
@@ -224,8 +224,8 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 /* 앞판: 더 하얀 반투명 유리 */
 .cf-front{background:linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(248,248,250,.78) 45%,rgba(240,240,243,.9) 100%);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4)}
 /* 앞판 아래쪽 얇은 홈 두 줄 */
-.cf-lip{position:absolute;left:7%;right:7%;bottom:9%;z-index:7;height:5px;border-top:1px solid rgba(0,0,0,.06);border-bottom:1px solid rgba(255,255,255,.9);pointer-events:none}
-.cf-lip::after{content:'';position:absolute;left:0;right:0;top:3px;border-top:1px solid rgba(0,0,0,.05)}
+.cf-lip{position:absolute;left:7%;right:7%;bottom:9%;z-index:7;height:5px;border-top:1px solid color-mix(in srgb,var(--color-on-surface) 6%,transparent);border-bottom:1px solid color-mix(in srgb,var(--color-surface) 90%,transparent);pointer-events:none}
+.cf-lip::after{content:'';position:absolute;left:0;right:0;top:3px;border-top:1px solid color-mix(in srgb,var(--color-on-surface) 5%,transparent)}
 .cf-back{filter:drop-shadow(0 1px 2px rgba(0,0,0,.05)) drop-shadow(0 14px 24px rgba(0,0,0,.10))}
 /* 이름 가운데 · 개수는 회색 알약 */
 .cf-meta{flex-direction:column;align-items:center;gap:var(--space-sm);margin:var(--space-md) 0 0;text-align:center}
@@ -240,7 +240,7 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 .cf-meta{flex-direction:row;justify-content:center;align-items:baseline;gap:var(--space-xs)}
 .cf-count{padding:0;border-radius:0;background:none;font:var(--type-body-sm);color:var(--color-secondary)}
 .cfpage .libchip{display:inline-flex;align-items:center;gap:var(--space-xs);min-height:32px;height:32px;padding:0 var(--space-md);font:var(--type-body-sm)}
-.cfpage .libchip.on{font-weight:600}
+.cfpage .libchip.on{font-weight:var(--weight-semibold)}
 .cfpage .libchip svg.icon{width:15px;height:15px;stroke-width:1.9}
 .cf-addtext small{font:var(--type-body-sm)}
 .cf-addplus{width:28px;height:28px;right:9px;bottom:9px}
@@ -293,7 +293,7 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 .cf-itemmeta .icon{color:rgba(255,255,255,.85)}
 .cf-itemmeta i{color:rgba(255,255,255,.45)}
 .cf-itemmeta.warn{color:#fff}
-.cf-check{border-color:rgba(255,255,255,.85);background:rgba(0,0,0,.15)}
+.cf-check{border-color:color-mix(in srgb,var(--color-surface) 85%,transparent);background:rgba(0,0,0,.15)}
 .cf-item.on .cf-check{background:var(--color-surface);border-color:var(--color-surface);color:var(--t-ink)}
 .cf-itemimg::after{background:linear-gradient(180deg,rgba(0,0,0,0) 20%,rgba(0,0,0,.35) 50%,rgba(0,0,0,.8) 100%)}
 /* v3: 조금 더 높게 · 제목/설명 위계 강화 */
@@ -322,8 +322,8 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 @media(prefers-reduced-motion:reduce){#sheet.cfcenter{animation:none}}
 #sheet.cfcenter .error:empty{display:none}
 /* 빈 화면 (검색 결과 없음 · 담긴 콘텐츠 없음): 폴더 앞판 같은 반투명 유리 카드 */
-.cf-list>.empty{position:relative;overflow:hidden;isolation:isolate;padding:var(--space-2xl) var(--space-xl) var(--space-2xl);border-radius:var(--rounded-lg);border:1px solid rgba(255,255,255,.85);background:linear-gradient(180deg,rgba(255,255,255,.72) 0%,rgba(248,248,250,.55) 100%);-webkit-backdrop-filter:blur(16px) saturate(1.5);backdrop-filter:blur(16px) saturate(1.5);box-shadow:0 1px 2px rgba(0,0,0,.04),0 14px 30px rgba(0,0,0,.08),inset 0 1px 0 #fff}
-.cf-list>.empty>.icon{width:52px;height:52px;padding:14px;border-radius:50%;background:#fff;color:var(--t-ink);stroke-width:1.8;box-shadow:0 1px 2px rgba(0,0,0,.06),0 6px 14px rgba(0,0,0,.08)}
+.cf-list>.empty{position:relative;overflow:hidden;isolation:isolate;padding:var(--space-2xl) var(--space-xl) var(--space-2xl);border-radius:var(--rounded-lg);border:1px solid color-mix(in srgb,var(--color-surface) 85%,transparent);background:linear-gradient(180deg,rgba(255,255,255,.72) 0%,rgba(248,248,250,.55) 100%);-webkit-backdrop-filter:blur(16px) saturate(1.5);backdrop-filter:blur(16px) saturate(1.5);box-shadow:var(--shadow-sm),inset 0 1px 0 #fff}
+.cf-list>.empty>.icon{width:52px;height:52px;padding:14px;border-radius:50%;background:#fff;color:var(--t-ink);stroke-width:1.8;box-shadow:var(--shadow-sm)}
 .cf-list>.empty h3{margin-top:var(--space-lg);font:var(--type-body-md);letter-spacing:-.4px}
 .cf-list>.empty p{margin:var(--space-sm) 0 var(--space-lg);font:var(--type-body-sm)}
 .cf-list>.empty .tonal{min-height:42px;padding:0 var(--space-xl);background:var(--t-ink);color:var(--color-neutral);box-shadow:var(--shadow-sm)}
@@ -335,16 +335,16 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 .cf-list>.empty{background:linear-gradient(180deg,rgba(255,255,255,.5) 0%,rgba(250,250,251,.72) 40%,rgba(246,246,248,.86) 100%)}
 .cf-list:has(>.empty){margin-top:var(--space-lg)}.cf-list:has(>.empty)::before{border-top-left-radius:0}
 /* 저장함 검색창: 지도 검색창과 같은 모양 (반투명 흰 유리 · 높이 50) */
-.cfpage .libsearch{height:50px;gap:var(--space-md);padding:0 var(--space-md) 0 var(--space-lg);border-radius:var(--rounded-lg);border:1px solid rgba(255,255,255,.88);background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)}
+.cfpage .libsearch{height:50px;gap:var(--space-md);padding:0 var(--space-md) 0 var(--space-lg);border-radius:var(--rounded-lg);border:1px solid color-mix(in srgb,var(--color-surface) 88%,transparent);background:color-mix(in srgb,var(--color-surface) 62%,transparent);-webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.9)}
 .cfpage .libsearch>.icon{width:20px;height:20px;color:var(--color-on-surface);stroke-width:1.8}
 .cfpage .libsearch input{font:var(--type-body-sm);color:var(--color-on-surface)}
 .cfpage .libsearch input::placeholder{color:var(--color-secondary)}
 .cfpage .libsearch .iconbtn{width:28px;height:28px}
 .cfpage .libsearch .iconbtn .icon{width:16px;height:16px;color:var(--color-secondary)}
-.libgo{flex:none;padding:0;border:0;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.62);color:var(--color-on-surface);box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)}
+.libgo{flex:none;padding:0;border:0;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--color-surface) 62%,transparent);color:var(--color-on-surface);box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.9)}
 .libgo .icon{width:20px;height:20px;stroke-width:1.8}
 .libgo:hover{filter:none;background:var(--color-surface)}
-.cfpage .libsearch:focus-within{border-color:rgba(255,255,255,.88);box-shadow:0 0 0 1.5px var(--t-ink),0 8px 28px rgba(32,32,32,.133)}
+.cfpage .libsearch:focus-within{border-color:color-mix(in srgb,var(--color-surface) 88%,transparent);box-shadow:var(--shadow-sm),0 0 0 1.5px var(--t-ink)}
 .cf-add .cf-addplus,.cf-add:hover .cf-addplus{background:var(--t-ink);color:var(--color-neutral);box-shadow:var(--shadow-sm)}
 
 /* v7 (10/19): 위아래 폴더 간격 1/3 줄임(좌우 그대로) · 새 폴더: 채우지 않은 + 가운데, 이름 없음 */
@@ -363,7 +363,7 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 .cf-itemimg .cf-glass{position:absolute;top:12px;right:12px;left:auto;bottom:auto;z-index:3;width:34px;height:34px;padding:0;border-radius:50%;display:grid;place-items:center;
   background:linear-gradient(145deg,rgba(255,255,255,.38) 0%,rgba(255,255,255,.14) 100%);border:1px solid rgba(255,255,255,.5);color:#fff;
   -webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.12),0 4px 14px rgba(0,0,0,.18)}
+  box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.12)}
 .cf-itemimg .libmark.cf-glass .icon{width:15px;height:15px;fill:#fff;stroke:#fff}
 .cf-itemimg .libmark.cf-glass:hover{transform:scale(1.06);background:linear-gradient(145deg,rgba(255,255,255,.48) 0%,rgba(255,255,255,.2) 100%)}
 .cf-itemimg .cf-check.cf-glass{color:transparent;transition:background .15s,color .15s,border-color .15s}
@@ -375,11 +375,11 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 .cf-saved-time{position:absolute;top:12px;right:12px;left:auto;z-index:2;padding:var(--space-xs) var(--space-sm);border-radius:var(--rounded-sm);background:var(--color-surface);color:var(--color-secondary);font:var(--type-body-sm);pointer-events:none}
 
 /* Saved-time glass capsule: dark translucent scrim keeps white text readable. */
-.cf-saved-time{padding:6px 10px;border-radius:100px;background:rgba(17,17,17,.68);border:1px solid rgba(255,255,255,.4);color:#fff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 2px 8px rgba(0,0,0,.12)}
+.cf-saved-time{padding:6px 10px;border-radius:100px;background:rgba(17,17,17,.68);border:1px solid rgba(255,255,255,.4);color:#fff;font-weight:var(--weight-semibold);text-shadow:0 1px 2px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.18)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.cf-saved-time{background:rgba(17,17,17,.88)}}
 
 /* Reference glass: light translucent material with a thin white rim. */
-.cf-saved-time{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.55);color:#fff;border-radius:100px;-webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);text-shadow:0 1px 3px rgba(0,0,0,.65);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 2px 6px rgba(0,0,0,.08)}
+.cf-saved-time{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.55);color:#fff;border-radius:100px;-webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);text-shadow:0 1px 3px rgba(0,0,0,.65);box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.22)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.cf-saved-time{background:rgba(255,255,255,.3)}}
 
 .cf-saved-time{text-shadow:none}

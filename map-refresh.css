@@ -14,7 +14,7 @@
 .live-map .lm-header .lm-categories .lm-category-svg{width:26px;height:26px;stroke-width:1.5}
 .live-map .lm-header .lm-categories b{font:var(--type-label-md);white-space:nowrap}
 .live-map .lm-header .lm-categories .selected{color:var(--lm-text)}
-.live-map .lm-header .lm-categories .selected b{text-decoration:none;font-weight:600}
+.live-map .lm-header .lm-categories .selected b{text-decoration:none;font-weight:var(--weight-semibold)}
 /* Shared geometry from the editable category icon library; only paint changes. */
 .lm-category-svg .lm-category-face{fill:transparent;transition:fill .22s ease}
 .lm-category-svg .lm-category-detail{stroke:currentColor;transition:stroke .22s ease}
@@ -126,7 +126,7 @@
 .live-map .lm-header .lm-search-row .libsearch input{height:auto;font:var(--type-body-sm)}
 .live-map .lm-header .lm-search-row .iconbtn{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .live-map .lm-header .lm-search-row .iconbtn[hidden]{display:none!important}
-.live-map .lm-header .lm-search-row .libgo{width:28px;height:28px;min-height:28px;padding:0;border-radius:50%;background:rgba(255,255,255,.62)!important;box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)!important}
+.live-map .lm-header .lm-search-row .libgo{width:28px;height:28px;min-height:28px;padding:0;border-radius:50%;background:color-mix(in srgb,var(--color-surface) 62%,transparent)!important;box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.9) !important}
 .live-map .lm-search-results,.live-map .lm-status{top:220px}
 .live-map .leaflet-top{top:227px}
 @media(max-width:360px){.live-map .lm-header .lm-location-header .placemain{font:var(--type-headline-md)}.live-map .lm-header .lm-location-header .placesub{font:var(--type-body-sm)}}
@@ -186,10 +186,10 @@
 .bottomnav .pm-nav-main .navitem .pm-nav-avatar{color:#fff!important}
 .bottomnav .pm-nav-main .navitem.active .navicon{background:transparent!important;box-shadow:none!important}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  .bottomnav .pm-nav-main::before{background:rgba(255,255,255,.82)}
+  .bottomnav .pm-nav-main::before{background:color-mix(in srgb,var(--color-surface) 82%,transparent)}
 }
 @media(prefers-reduced-transparency:reduce){
-  .bottomnav .pm-nav-main::before,.bottomnav .pm-nav-main[data-refraction="true"]::before{background:rgba(255,255,255,.94);-webkit-backdrop-filter:none;backdrop-filter:none}
+  .bottomnav .pm-nav-main::before,.bottomnav .pm-nav-main[data-refraction="true"]::before{background:color-mix(in srgb,var(--color-surface) 94%,transparent);-webkit-backdrop-filter:none;backdrop-filter:none}
 }
 @media(prefers-reduced-motion:reduce){
   .bottomnav .pm-nav-main,.bottomnav .pm-nav-main .pm-nav-indicator{transition:none}

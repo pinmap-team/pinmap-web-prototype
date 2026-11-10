@@ -26,9 +26,25 @@ function migrateType(x){
 }
 // 2026-11-04: 유형 이름의 가운데점(맛집·카페)을 슬래시(맛집/카페)로 바꿨어요. 예전에 저장한 데이터도 같은 이름으로 읽어요.
 const fixDots = raw => typeof raw === 'string' ? raw.replace(/(맛집|전시|공부|여행|글)·(카페|팝업|자료|약속|영상)/g, '$1/$2') : raw;
+// 2026-11-10 AI 요약 예시 문구를 해요체로 바꿨어요. 이미 저장된 데이터도 같이 바꿔요.
+const AI_SUMMARY_FIX = [
+  ['큰 창 옆에서 커피 한 잔, 느긋한 오후.','큰 창 옆에서 커피 한 잔과 함께 느긋한 오후를 보내기 좋아요.'],
+  ['공간의 분위기를 바꾸는 작은 빛.','공간의 분위기를 바꿔 주는 작은 조명이에요.'],
+  ['퇴근 후에도 가볍게 만드는 한 접시.','퇴근 후에도 가볍게 만들 수 있는 한 접시예요.'],
+  ['식물과 일상의 사물을 새롭게 보는 시간.','식물과 일상의 사물을 새롭게 볼 수 있는 전시예요.'],
+  ['좋아하는 것을 모으고 나만의 언어로.','좋아하는 것을 모아 나만의 언어로 기록하는 방법이에요.'],
+  ['도시 한가운데에서 만나는 초록.','도시 한가운데에서 초록을 만날 수 있는 곳이에요.'],
+  ['주말 아침, 천천히 먹는 한 접시.','주말 아침에 천천히 먹기 좋은 한 접시예요.'],
+  ['창문을 열면 바로 바다가 보이는 곳.','창문을 열면 바로 바다가 보이는 숙소예요.'],
+  ['노트북도 들어가는 넉넉한 크기.','노트북도 들어가는 넉넉한 크기예요.'],
+  ['좁은 방을 넓게 쓰는 선반 배치.','좁은 방을 넓게 쓰는 선반 배치 방법이에요.'],
+  ['학기당 200만 원, 포트폴리오 제출','학기당 200만 원을 지원하고, 포트폴리오를 제출해야 해요.'],
+  ['리빙 브랜드 12곳이 모인 2주 팝업','리빙 브랜드 12곳이 2주 동안 모이는 팝업이에요.']
+];
+const fixSummary = raw => typeof raw === 'string' ? AI_SUMMARY_FIX.reduce((t, [a, b]) => t.split(JSON.stringify(a).slice(1, -1)).join(JSON.stringify(b).slice(1, -1)), raw) : raw;
 const validItems = list => Array.isArray(list) && list.every(x => x && Number.isFinite(x.id) && typeof x.title === 'string');
 try {
-  const saved = PM_ENV.development ? null : JSON.parse(fixDots(localStorage.getItem(STORAGE)));
+  const saved = PM_ENV.development ? null : JSON.parse(fixSummary(fixDots(localStorage.getItem(STORAGE))));
   if (saved && validItems(saved.items) && saved.items.every(x => typeIds.includes(x.type))) {
     items = saved.items;
     preferences = Array.isArray(saved.preferences) ? saved.preferences.filter(x => interestIds.includes(x)).slice(0, MAX_INTERESTS) : [];
@@ -92,7 +108,7 @@ const homeSections = {
   study: () => ({
     title:'다시 볼 공부/자료', sub:'저장해둔 생활 정보와 레퍼런스',
     more:'data-libfilter="생활 정보"', moreLabel:'생활 정보', gallery:true,
-    hero:{title:'공부 자료 모아뒀어요', desc:'나중에 보려던 글과 영상을 다시 꺼내보세요.', btn:'자료 보기', attr:'data-libfilter="생활 정보"'},
+    hero:{title:'공부 자료 모아뒀어요', desc:'나중에 보려던 글과 영상을 다시 꺼내 보세요.', btn:'자료 보기', attr:'data-libfilter="생활 정보"'},
     list: items.filter(x => x.type==='생활 정보' || x.type==='기타')
   }),
   idea: () => ({
@@ -212,7 +228,7 @@ function onboardScreen() {
     <h1 class="ob-title ob-mixtitle" tabindex="-1"><b>저장한 콘텐츠</b>를<br>언제 다시 찾아보나요?</h1>
     <p class="ob-desc">여러 개를 골라도 돼요<span class="ob-pickcount" aria-live="polite">${onboardDraft.length ? `${onboardDraft.length}개 선택했어요` : ''}</span></p>
     <div class="ob-options" role="group" aria-label="관심사, 활용 목적">
-      ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${o.emoji}</span><span class="ob-label">${o.label}</span></button>`; }).join('')}
+      ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${window.obIcon ? obIcon(o.id, on) : o.emoji}</span><span class="ob-label">${o.label}</span></button>`; }).join('')}
     </div>
     <div class="ob-actions"><button class="ob-action-back" data-ob="back">이전</button><button class="filled ob-next" data-ob="next">${onboardPreview ? '종료하기' : '시작하기'}</button></div>`;
   // 마지막 화면: 문구 없이, 저장 카드에서 핀맵으로 점이 하나씩 채워지며 이어지는 애니메이션
@@ -308,6 +324,7 @@ document.addEventListener('click',e=>{
     onboardDraft=onboardDraft.includes(id)?onboardDraft.filter(v=>v!==id):[...onboardDraft,id];
     const on=onboardDraft.includes(id);
     choice.classList.toggle('on',on);choice.setAttribute('aria-checked',on);
+    const pictogram=choice.querySelector('.ob-emoji');if(pictogram&&window.obIcon)pictogram.innerHTML=obIcon(id,on);
     const count=document.querySelector('#onboarding .ob-pickcount');if(count)count.textContent=onboardDraft.length?`${onboardDraft.length}개 선택했어요`:'';
     
     

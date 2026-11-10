@@ -57,7 +57,7 @@ body{background:var(--color-surface)}
 .eshead,.esbody,.esfoot{padding-left:var(--gutter);padding-right:var(--gutter)}
 
 /* 하단 메뉴: 떠 있는 글래스 캡슐 · 아이콘만 (모든 화면 공통) */
-.bottomnav{position:fixed!important;left:50%!important;right:auto!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;width:calc(min(100%,480px) - 2 * var(--gutter))!important;height:64px!important;padding:var(--space-sm)!important;display:flex!important;gap:var(--space-xs);border-radius:32px;border:1px solid #ffffffb3!important;background:#ffffff8c!important;-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);box-shadow:0 10px 30px #1111111f,inset 0 1px 0 #ffffffcc;z-index:5}
+.bottomnav{position:fixed!important;left:50%!important;right:auto!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;width:calc(min(100%,480px) - 2 * var(--gutter))!important;height:64px!important;padding:var(--space-sm)!important;display:flex!important;gap:var(--space-xs);border-radius:32px;border:1px solid #ffffffb3!important;background:#ffffff8c!important;-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);box-shadow:var(--shadow-sm),inset 0 1px 0 #ffffffcc;z-index:5}
 .bottomnav .navitem{flex:1;min-width:0;height:100%!important;padding:0!important;display:grid!important;place-items:center;border-radius:26px!important;background:none!important;color:var(--color-on-surface)}
 .bottomnav .navitem>span:not(.navicon){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .bottomnav .navitem .navicon{width:100%!important;height:100%!important;display:grid;place-items:center;border-radius:26px!important;padding:0!important;background:none!important;transition:background-color .2s}
@@ -83,4 +83,4 @@ body:has(.dt) .bottomnav{display:none!important}
 
 /* 상태 표시줄 자리: 스크롤해도 내용이 시간 · 배터리 아이콘과 겹치지 않게 (온보딩 · 상세 사진은 제외) */
 body:not(.onboarding-open):not(:has(.dt))::before{content:"";position:fixed;inset:0 0 auto;height:var(--status);background:var(--t-bg,var(--color-neutral));z-index:30;pointer-events:none}
-.ob-screen{padding-top:calc(var(--status) + 4px)}
+.ob-screen{padding-top:calc(var(--status) + var(--space-xs))}

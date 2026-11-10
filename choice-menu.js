@@ -24,7 +24,9 @@
       const panel=document.createElement('div');
       panel.className='pm-choice-options';panel.hidden=true;
       panel.setAttribute('role','group');panel.setAttribute('aria-label',isSort?'정렬 선택':'카테고리 선택');
-      const iconFor=option=>icon(option.dataset.icon || (isSort?sortIcons:categoryIcons)[option.value] || 'grid');
+      // 2026-11-10 정렬 선택은 앞 픽토그램 없이 글자만(카테고리 선택은 그대로)
+      const iconFor=option=>isSort?'':icon(option.dataset.icon || categoryIcons[option.value] || 'grid');
+      if(isSort)host.classList.add('pm-choice-sort');
       const update=()=>{
         const selected=select.selectedOptions[0];if(!selected)return;
         trigger.innerHTML=iconFor(selected)+'<span></span>'+icon('chevron');

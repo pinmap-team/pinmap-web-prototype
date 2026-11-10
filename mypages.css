@@ -67,7 +67,7 @@ body:has(#sharedemo) .bottomnav,body.pushdemo-open .bottomnav{display:none!impor
 .account-leave{color:var(--color-error)}
 .account-leave .mrlabel{font:var(--type-body-sm)}
 .reset-options .setrow{padding:var(--space-lg) 0;border-top:1px solid var(--color-disabled);gap:var(--space-lg)}
-.reset-options .setrow small{white-space:normal;line-height:1.6;margin-top:var(--space-sm)}
+.reset-options .setrow small{white-space:normal;margin-top:var(--space-sm)}
 .reset-options .setrow>.icon{flex:none;width:18px;height:18px;color:var(--color-secondary)}
 
 .account-section .mrico>.icon{width:20px;height:20px;vertical-align:middle}

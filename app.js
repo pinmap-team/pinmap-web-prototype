@@ -41,6 +41,8 @@ const typeIds = TYPES.map(t => t.id);
 const categories = ['전체', ...typeIds];
 const typeOf = id => TYPES.find(t => t.id === id) || TYPES[TYPES.length-1];
 const isPlace = x => !!typeOf(x.type).place;
+// 2026-11-10 날짜 표기 통일: 11.14 (금). Date 또는 'YYYY-MM-DD'를 받아요.
+const fmtDay = v => { const d = v instanceof Date ? v : new Date(`${v}T00:00:00`); if (isNaN(d)) return String(v || ''); return `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} (${'일월화수목금토'[d.getDay()]})`; };
 // 2026-11-04 조사 고르기: 받침에 맞춰 을/를, 이/가, 은/는, 으로/로 (ㄹ받침은 로)
 const josa = (word, pair) => { const w = String(word), c = w.charCodeAt(w.length - 1) - 0xAC00, has = c >= 0 && c <= 11171 ? c % 28 : (/[0-9]$/.test(w) ? '013678'.includes(w.slice(-1)) ? 1 : 0 : 0), [a, b] = pair.split('/'); if (pair === '으로/로') return w + (has && has !== 8 ? '으로' : '로'); return w + (has ? a : b); };
 const shortType = id => id.split(/[·/]/)[0].trim();
@@ -53,17 +55,17 @@ const collectionNames = () => [...new Set([...COLLECTIONS.map(c => c[0]), ...ite
 
 // 예시 데이터 · 실제 SNS 계정과 연결되지 않습니다.
 let items = PM_ENV.development ? [] : [
-  {id:1,title:'햇살이 머무는 성수 카페',type:'맛집/카페',category:'카페',source:'Instagram',ago:'2일 전',desc:'큰 창 옆에서 커피 한 잔, 느긋한 오후.',memo:'성수에서 친구 만나기 전에 들러보기. 창가 자리!',art:'cafe',distance:'도보 5분',collection:'이번 주말 성수',address:'서울 성동구 성수동, 예시 장소',saves:128,aiClassified:true},
-  {id:2,title:'작은 방을 바꾸는 조명',type:'쇼핑',category:'조명',source:'Instagram',ago:'어제',desc:'공간의 분위기를 바꾸는 작은 빛.',memo:'책상 옆에 두고 싶은 따뜻한 조명.',art:'lamp',collection:'나의 작은 공간',price:'49,000원, 예시 가격',shop:'예시 리빙 스토어',aiClassified:true},
-  {id:3,title:'15분, 바질 토마토 파스타',type:'레시피',category:'파스타',source:'YouTube',ago:'3일 전',desc:'퇴근 후에도 가볍게 만드는 한 접시.',memo:'방울토마토, 바질, 파스타면만 준비하면 끝.',art:'food',collection:'일상에 영감',recipe:'15분, 재료 4가지, 1인분',saves:96,aiClassified:true},
-  {id:4,title:'초록 사이, 주말의 전시',type:'전시/팝업',category:'전시',source:'Instagram',ago:'4일 전',desc:'식물과 일상의 사물을 새롭게 보는 시간.',memo:'이번 주말 성수에 가면 같이 보기.',art:'exhibit',distance:'도보 12분',collection:'이번 주말 성수',deadline:'D-3',period:'10.1 – 10.8, 예시 기간',address:'서울 성동구 성수동, 예시 전시',deleted:true,saves:74,aiClassified:true},
-  {id:5,title:'취향을 기록하는 방법',type:'생활 정보',category:'기록',source:'YouTube',ago:'5일 전',desc:'좋아하는 것을 모으고 나만의 언어로.',memo:'기록이 막힐 때 다시 꺼내보기.',art:'book',collection:'일상에 영감',aiClassified:true},
-  {id:6,title:'서울숲에서 잠깐 쉬어가기',type:'여행',category:'산책',source:'Instagram',ago:'1주 전',desc:'도시 한가운데에서 만나는 초록.',memo:'커피를 마신 뒤 가볍게 산책하기.',art:'park',distance:'도보 9분',collection:'이번 주말 성수',address:'서울 성동구 뚝섬로 273',mapQuery:'서울숲',aiClassified:false},
-  {id:7,title:'댓글에서 발견한 카페',type:'맛집/카페',category:'카페',source:'Instagram',ago:'방금',desc:'위치를 확인하고 지도에 담아보세요.',memo:'원본에서 주소 확인하기',art:'cafe',collection:'이번 주말 성수',pending:true,aiClassified:true},
-  {id:8,title:'골목 안 작은 브런치 식당',type:'맛집/카페',category:'맛집',source:'Instagram',ago:'6일 전',desc:'주말 아침, 천천히 먹는 한 접시.',memo:'주말 브런치 약속 장소 후보.',art:'food',distance:'도보 7분',collection:'이번 주말 성수',address:'서울 성동구 성수동, 예시 맛집',mapQuery:'성수동 브런치',saves:61,aiClassified:true},
-  {id:9,title:'바다 앞 작은 숙소',type:'여행',category:'숙소',source:'Instagram',ago:'2주 전',desc:'창문을 열면 바로 바다가 보이는 곳.',memo:'가을 휴가 후보. 일출 보기!',art:'sea',distance:'차로 약 3시간',address:'강원 강릉시, 예시 여행지',mapQuery:'강릉 바다',aiClassified:true},
-  {id:10,title:'매일 드는 캔버스 토트백',type:'쇼핑',category:'가방',source:'Instagram',ago:'1주 전',desc:'노트북도 들어가는 넉넉한 크기.',memo:'세일하면 사기.',art:'bag',collection:'나의 작은 공간',price:'32,000원, 예시 가격',shop:'예시 패션 스토어',aiClassified:true},
-  {id:11,title:'원룸 수납 정리 아이디어',type:'생활 정보',category:'수납',source:'Instagram',ago:'3주 전',desc:'좁은 방을 넓게 쓰는 선반 배치.',memo:'이사 가면 참고하기.',art:'tips',collection:'일상에 영감',saves:142,aiClassified:true}
+  {id:1,title:'햇살이 머무는 성수 카페',type:'맛집/카페',category:'카페',source:'Instagram',ago:'2일 전',desc:'큰 창 옆에서 커피 한 잔과 함께 느긋한 오후를 보내기 좋아요.',memo:'성수에서 친구 만나기 전에 들러보기. 창가 자리!',art:'cafe',distance:'도보 5분',collection:'이번 주말 성수',address:'서울 성동구 성수동, 예시 장소',saves:128,aiClassified:true},
+  {id:2,title:'작은 방을 바꾸는 조명',type:'쇼핑',category:'조명',source:'Instagram',ago:'어제',desc:'공간의 분위기를 바꿔 주는 작은 조명이에요.',memo:'책상 옆에 두고 싶은 따뜻한 조명.',art:'lamp',collection:'나의 작은 공간',price:'49,000원, 참고 가격',shop:'예시 리빙 스토어',aiClassified:true},
+  {id:3,title:'15분, 바질 토마토 파스타',type:'레시피',category:'파스타',source:'YouTube',ago:'3일 전',desc:'퇴근 후에도 가볍게 만들 수 있는 한 접시예요.',memo:'방울토마토, 바질, 파스타면만 준비하면 끝.',art:'food',collection:'일상에 영감',recipe:'15분, 재료 4가지, 1인분',saves:96,aiClassified:true},
+  {id:4,title:'초록 사이, 주말의 전시',type:'전시/팝업',category:'전시',source:'Instagram',ago:'4일 전',desc:'식물과 일상의 사물을 새롭게 볼 수 있는 전시예요.',memo:'이번 주말 성수에 가면 같이 보기.',art:'exhibit',distance:'도보 12분',collection:'이번 주말 성수',deadline:'D-3',period:'10.01 (목) – 10.08 (목), 예시 기간',address:'서울 성동구 성수동, 예시 전시',deleted:true,saves:74,aiClassified:true},
+  {id:5,title:'취향을 기록하는 방법',type:'생활 정보',category:'기록',source:'YouTube',ago:'5일 전',desc:'좋아하는 것을 모아 나만의 언어로 기록하는 방법이에요.',memo:'기록이 막힐 때 다시 꺼내보기.',art:'book',collection:'일상에 영감',aiClassified:true},
+  {id:6,title:'서울숲에서 잠깐 쉬어가기',type:'여행',category:'산책',source:'Instagram',ago:'1주 전',desc:'도시 한가운데에서 초록을 만날 수 있는 곳이에요.',memo:'커피를 마신 뒤 가볍게 산책하기.',art:'park',distance:'도보 9분',collection:'이번 주말 성수',address:'서울 성동구 뚝섬로 273',mapQuery:'서울숲',aiClassified:false},
+  {id:7,title:'댓글에서 발견한 카페',type:'맛집/카페',category:'카페',source:'Instagram',ago:'방금',desc:'위치를 확인하고 지도에 담아 보세요.',memo:'원본에서 주소 확인하기',art:'cafe',collection:'이번 주말 성수',pending:true,aiClassified:true},
+  {id:8,title:'골목 안 작은 브런치 식당',type:'맛집/카페',category:'맛집',source:'Instagram',ago:'6일 전',desc:'주말 아침에 천천히 먹기 좋은 한 접시예요.',memo:'주말 브런치 약속 장소 후보.',art:'food',distance:'도보 7분',collection:'이번 주말 성수',address:'서울 성동구 성수동, 예시 맛집',mapQuery:'성수동 브런치',saves:61,aiClassified:true},
+  {id:9,title:'바다 앞 작은 숙소',type:'여행',category:'숙소',source:'Instagram',ago:'2주 전',desc:'창문을 열면 바로 바다가 보이는 숙소예요.',memo:'가을 휴가 후보. 일출 보기!',art:'sea',distance:'차로 약 3시간',address:'강원 강릉시, 예시 여행지',mapQuery:'강릉 바다',aiClassified:true},
+  {id:10,title:'매일 드는 캔버스 토트백',type:'쇼핑',category:'가방',source:'Instagram',ago:'1주 전',desc:'노트북도 들어가는 넉넉한 크기예요.',memo:'세일하면 사기.',art:'bag',collection:'나의 작은 공간',price:'32,000원, 참고 가격',shop:'예시 패션 스토어',aiClassified:true},
+  {id:11,title:'원룸 수납 정리 아이디어',type:'생활 정보',category:'수납',source:'Instagram',ago:'3주 전',desc:'좁은 방을 넓게 쓰는 선반 배치 방법이에요.',memo:'이사 가면 참고하기.',art:'tips',collection:'일상에 영감',saves:142,aiClassified:true}
 ];
 let page='home', filter='전체', query='', detailId=null, selectedPin=1, collection=null, locationAllowed=false, toastTimer;
 // 마이 > 프로필 · 설정 (pinmap.js가 브라우저에 저장합니다)
@@ -135,7 +137,7 @@ sea:'<rect width="400" height="230" fill="#CFE3EA"/><circle cx="300" cy="62" r="
 // 콘텐츠 유형별로 카드에 보여줄 한 줄 정보
 function infoLine(x){
   if(isPlace(x)){ if(x.pending) return '📍 위치 확인 필요'; if(x.period) return '🗓 '+x.period.replace(', 예시 기간',''); return x.distance?'📍 '+x.distance:''; }
-  if(x.type==='쇼핑') return x.price?'💳 '+x.price.replace(', 예시 가격',''):'';
+  if(x.type==='쇼핑') return x.price?'💳 '+x.price.replace(/, (예시|참고) 가격/,''):'';
   if(x.type==='레시피') return x.recipe?'⏱ '+x.recipe:'';
   return '';
 }
@@ -156,13 +158,13 @@ function filtered(){const q=query.toLowerCase();return items.filter(x=>(filter==
 const galleryMode = () => !collection && filter!=='전체' && !typeOf(filter).place;
 
 /* ---------- 화면 ---------- */
-pages.home = function(){return locbar()+head('저장한 취향이, 오늘의 일상으로.','잊고 있던 좋은 것들을 다시 꺼내볼까요?',false)+`<div class="grid">${items.slice(0,4).map(card).join('')}</div>`};
+pages.home = function(){return locbar()+head('저장한 취향이, 오늘의 일상으로.','잊고 있던 좋은 것들을 다시 꺼내 볼까요?',false)+`<div class="grid">${items.slice(0,4).map(card).join('')}</div>`};
 
 pages.library = function(){
   const sub = collection?'하나의 계획으로 연결되는 다양한 취향.':`지금까지 담아둔 ${items.length}개의 콘텐츠를 한곳에서.`;
   return head(esc(collection)||'내 저장함',sub)+`${collection?`<button class="back" data-page="library">${icon('back')} 전체 저장함</button>`:''}<label class="search">${icon('search')}<input id="search" aria-label="저장 콘텐츠 검색" placeholder="제목, 키워드, 저장한 이유로 찾기" value="${esc(query)}"><button class="iconbtn" data-action="clear" aria-label="검색 지우기">${icon('close')}</button></label>${collection?'':`<div class="colstrip" aria-label="내 모음">${collectionNames().map(n=>`<button class="colpill" data-collection="${esc(n)}">📁 ${esc(n)} <span>${items.filter(x=>x.collection===n).length}</span></button>`).join('')}</div>`}${chips()}<div class="sectionhead"><span id="resultcount" class="muted">${filtered().length}개의 콘텐츠</span><span class="hint">${galleryMode()?'갤러리 보기, ':''}최근 저장순</span></div><div id="results" class="${galleryMode()?'gallery':'grid'}">${resultCards()}</div>`;
 };
-function resultCards(){const list=filtered();return list.map(galleryMode()?gcard:card).join('')||`<div class="empty">${icon('search')}<h3>아직 찾는 콘텐츠가 없어요</h3><p class="muted">다른 키워드나 유형으로 다시 찾아보세요.</p><button class="tonal" data-action="resetfilter">전체 콘텐츠 보기</button></div>`}
+function resultCards(){const list=filtered();return list.map(galleryMode()?gcard:card).join('')||`<div class="empty">${icon('search')}<h3>아직 찾는 콘텐츠가 없어요</h3><p class="muted">다른 키워드나 유형으로 다시 찾아 보세요.</p><button class="tonal" data-action="resetfilter">전체 콘텐츠 보기</button></div>`}
 
 const readyPlaces = () => items.filter(x=>isPlace(x)&&x.address&&!x.pending);
 const distanceOf = x => /도보/.test(x.distance||'') ? Number(String(x.distance).replace(/\D/g,''))||99 : 999;
@@ -225,7 +227,7 @@ function guessType(text){
 /* ---------- 대화상자 ---------- */
 function saveDialog(){modal('새로 저장',`<button class="sharecta" data-action="snsdemo"><span class="bigemoji" aria-hidden="true">📲</span><div><b>SNS에서 공유로 저장하기</b><small>SNS 게시물에서 공유 → 핀맵을 누르는 저장 과정을 체험해요</small></div>${icon('arrow')}</button><div class="divider"><span>또는 링크 붙여넣기</span></div><form id="saveform"><label class="field"><span>콘텐츠 링크</span><input type="url" name="url" placeholder="https://" required></label><button type="button" class="textbtn" data-action="sample">예시 링크로 채우기 ${icon('arrow')}</button><label class="field"><span>제목</span><input name="title" placeholder="다시 찾기 쉬운 이름" required maxlength="80"></label><label class="field"><span>카테고리</span><select name="type"><option value="ai" ${settings.aiDefault?'selected':''}>✨ AI 자동 분류</option>${TYPES.map(t=>`<option value="${t.id}" ${!settings.aiDefault&&t.id==='기타'?'selected':''}>${t.emoji} ${t.id}</option>`).join('')}</select></label><label class="field"><span>모음, 선택</span><select name="collection"><option value="">나중에 정리</option>${collectionNames().map(c=>`<option>${esc(c)}</option>`).join('')}</select></label><label class="field"><span>저장한 이유, 선택</span><textarea name="memo" rows="2" maxlength="300" placeholder="어떤 순간에 다시 보고 싶나요?"></textarea></label><p class="hint">이 브라우저에 저장돼요. AI 분류는 프로토타입용 간단한 규칙이에요.</p><p class="error" id="saveerror"></p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">${icon('bookmark')} 저장하기</button></div></form>`)}
 function editDialog(){const x=items.find(x=>x.id===detailId);modal('저장 정보 수정',`<form id="editform"><label class="field"><span>카테고리</span><select name="type">${TYPES.map(t=>`<option value="${t.id}" ${t.id===x.type?'selected':''}>${t.emoji} ${t.id}</option>`).join('')}</select></label><label class="field"><span>제목 / 장소명</span><input name="title" value="${esc(x.title)}" required maxlength="80"></label><label class="field"><span>주소, 맛집/카페, 전시/팝업, 여행에만 사용</span><input name="address" value="${esc(x.address||'')}" maxlength="200" placeholder="원본에서 확인한 주소"></label><label class="field"><span>내 메모</span><textarea name="memo" maxlength="300">${esc(x.memo||'')}</textarea></label><label class="field"><span>모음</span><input name="collection" list="collectionlist" value="${esc(x.collection||'')}" maxlength="80" placeholder="나중에 정리"><datalist id="collectionlist">${collectionNames().map(c=>`<option value="${esc(c)}">`).join('')}</datalist></label><p class="hint">직접 바꾼 카테고리는 ‘직접 분류’로 표시돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">수정 내용 저장</button></div></form>`)}
-function intro(){modal('핀맵',`<p class="muted">저장한 콘텐츠를 필요한 순간 다시 꺼내보세요.</p><div class="dialogactions"><button class="filled" data-action="close">확인</button></div>`)}
+function intro(){modal('핀맵',`<p class="muted">저장한 콘텐츠를 필요한 순간 다시 꺼내 보세요.</p><div class="dialogactions"><button class="filled" data-action="close">확인</button></div>`)}
 // 위치 권한 (프로토타입: 실제 위치는 요청하지 않고 성수동 예시 위치를 사용)
 function locationDialog(){modal('위치 권한',`<p>현재 위치 주변에 저장한 장소를 찾을 때<br>사용해요.</p><div class="permopts" role="radiogroup" aria-label="위치 권한">${Object.entries(LOC_PERM).map(([k,v])=>`<button role="radio" aria-checked="${settings.locPerm===k}" class="permopt ${settings.locPerm===k?'on':''}" data-locperm="${k}"><b>${v}</b><small>${{none:'예시 위치(성수동)로만 체험해요',using:'앱을 켜 두었을 때 주변 장소를 보여줘요',always:'앱을 켜지 않아도 근처 저장 콘텐츠를 알려드려요'}[k]}</small></button>`).join('')}</div>`)}
 
@@ -250,7 +252,7 @@ const actions = {
   duedismiss: () => { dueDismissed = true; render(); },
   sample: () => { const f=$('#saveform'); f.url.value='https://www.youtube.com/watch?v=sample-prototype'; f.elements.namedItem('title').value='주말에 만들어볼 토마토 파스타 레시피'; f.type.value='ai'; f.collection.value='일상에 영감'; f.memo.value='토요일 점심에 만들어보기'; },
   original: () => { const x=items.find(x=>x.id===detailId); const url=x.url&&!x.sample?x.url:null;
-    modal('원본 콘텐츠 보기',url?`<p>저장한 링크를 새 탭에서 엽니다.</p><div class="dialogactions"><a class="filled" target="_blank" rel="noopener noreferrer" href="${esc(url)}">원본 열기 ${icon('external')}</a></div>`:`<p>‘${esc(x.title)}’은 체험용 콘텐츠예요.</p><p class="muted">실제 서비스에서는 이 단계에서 저장한 ${esc(x.source)} 게시물로 이동합니다.</p><div class="dialogactions"><button class="filled" data-action="close">확인</button></div>`); }
+    modal('원본 콘텐츠 보기',url?`<p>저장한 링크를 새 탭에서 엽니다.</p><div class="dialogactions"><a class="filled" target="_blank" rel="noopener noreferrer" href="${esc(url)}">원본 열기 ${icon('external')}</a></div>`:`<p>‘${esc(x.title)}’은 체험용 콘텐츠예요.</p><p class="muted">실제 서비스에서는 이 단계에서 저장한 ${esc(x.source)} 게시물로 이동해요.</p><div class="dialogactions"><button class="filled" data-action="close">확인</button></div>`); }
 };
 function action(a){ (actions[a]||(()=>{}))(); }
 
@@ -275,7 +277,7 @@ document.addEventListener('submit',e=>{
     const x={id:Date.now(),title,type,category:shortType(type),source:sample?'YouTube':u.hostname.replace(/^www\./,''),ago:'방금',savedAt:new Date().toISOString(),desc:PM_ENV.development?'':'새롭게 담아둔 나의 취향',memo:f.memo.value,art:typeOf(type).art,collection:f.collection.value,url:u.href,sample,aiClassified:ai};
     if(typeOf(type).place)x.pending=true;
     items.unshift(x);afterChange();$('#sheet').close();page='library';openDetail(x.id);
-    toast(ai?`저장했어요. AI가 ‘${type}’로 분류했어요.`:'저장했어요. 필요할 때 다시 꺼내보세요.');
+    toast(ai?`저장했어요. AI가 ‘${type}’로 분류했어요.`:'저장했어요. 필요할 때 다시 꺼내 보세요.');
   } else if(e.target.id==='editform'){
     e.preventDefault();const data=new FormData(e.target),x=items.find(x=>x.id===detailId);
     const folderValue=String(data.get('folder')||'');

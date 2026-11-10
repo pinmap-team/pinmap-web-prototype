@@ -9,12 +9,12 @@
 .notirow b{font:var(--type-body-sm);display:block;word-break:keep-all}
 .notirow p{margin:2px 0 var(--space-xs);font:var(--type-body-sm);color:var(--md-sys-color-on-surface-variant);word-break:keep-all}
 .notirow small{font:var(--type-body-sm);color:var(--md-sys-color-on-surface-variant)}
-.notirow.unread small{color:var(--color-on-surface);font-weight:600}
+.notirow.unread small{color:var(--color-on-surface);font-weight:var(--weight-semibold)}
 
 /* 저장함 모음 바로가기 */
 .colstrip{display:flex;gap:var(--space-sm);overflow:auto;scrollbar-width:none;margin:calc(-1 * var(--space-xs)) 0 var(--space-md);padding-bottom:2px}
 .colpill{flex:none;min-height:36px;padding:0 var(--space-lg);border-radius:var(--rounded-lg);background:var(--md-sys-color-surface-container);font:var(--type-body-sm);white-space:nowrap}
-.colpill span{margin-left:2px;color:var(--color-on-surface);font-weight:700}
+.colpill span{margin-left:2px;color:var(--color-on-surface);font-weight:var(--weight-bold)}
 
 /* 마이 */
 .profile{display:flex;align-items:center;gap:var(--space-lg);padding:var(--space-lg);border-radius:var(--rounded-lg);background:linear-gradient(135deg,#EFEFEF,#FAFAFA)}
@@ -29,7 +29,7 @@
 .mycard{padding:var(--space-lg);border-radius:var(--rounded-lg);background:var(--md-sys-color-surface-container-low);border:1px solid var(--md-sys-color-outline-variant)}
 .rowhead{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-sm)}
 .rowhead h3{font:var(--type-body-md)}.rowhead p{margin:var(--space-xs) 0 0}
-.rowhead .textbtn{min-height:36px;padding:0 var(--space-sm);color:var(--color-on-surface);font-weight:700}
+.rowhead .textbtn{min-height:36px;padding:0 var(--space-sm);color:var(--color-on-surface);font-weight:var(--weight-bold)}
 .myprefs{list-style:none;padding:0;margin:var(--space-lg) 0 0;display:grid;gap:var(--space-sm)}
 .myprefs li{display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md) var(--space-lg);border-radius:var(--rounded-md);background:var(--color-surface);border:1.5px solid var(--color-primary);font:var(--type-label-md)}
 .rank{width:22px;height:22px;flex:none;border-radius:50%;background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);display:grid;place-items:center}
@@ -56,7 +56,7 @@
 .setrow input:focus-visible+.sw{outline:3px solid var(--color-primary);outline-offset:2px}
 .segmented{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-xs);padding:var(--space-xs);border-radius:var(--rounded-md);background:var(--md-sys-color-surface-container-high);margin-top:var(--space-md)}
 .segmented button{min-height:38px;border-radius:var(--rounded-sm);font:var(--type-body-sm);color:var(--md-sys-color-on-surface-variant)}
-.segmented .on{background:var(--color-surface);color:#FFFFFF;font-weight:700;box-shadow:var(--shadow-sm)}
+.segmented .on{background:var(--color-surface);color:#FFFFFF;font-weight:var(--weight-bold);box-shadow:var(--shadow-sm)}
 .logout{display:block;margin:24px auto 0;min-height:44px;padding:0 16px;font-size:13px;color:var(--md-sys-color-on-surface-variant);text-decoration:underline;text-underline-offset:3px}
 .filled.danger{background:var(--color-secondary);color:#fff}
 .mysec .grid.plans{gap:var(--space-sm)}.mysec .collection{min-height:0;flex-direction:row;align-items:center;justify-content:flex-start;gap:var(--space-lg);padding:var(--space-lg) var(--space-lg);border-radius:var(--rounded-lg)}.mysec .collection .icon{width:26px;height:26px;flex:none}.mysec .collection p{margin:2px 0}

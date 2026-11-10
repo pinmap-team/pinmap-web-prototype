@@ -14,8 +14,8 @@
 .calcell:hover{filter:none}
 .calcell:hover span{background:var(--color-neutral)}
 .calcell.past{color:var(--color-secondary)}
-.calcell.sel span{box-shadow:inset 0 0 0 1.5px var(--pm-key);color:var(--pm-key);font-weight:600}
-.calcell.today span{background:var(--pm-key)!important;color:var(--color-neutral);font-weight:700;box-shadow:none}
+.calcell.sel span{box-shadow:inset 0 0 0 1.5px var(--pm-key);color:var(--pm-key);font-weight:var(--weight-semibold)}
+.calcell.today span{background:var(--pm-key)!important;color:var(--color-neutral);font-weight:var(--weight-bold);box-shadow:none}
 .caldot{position:absolute;bottom:1px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--pm-key)}
 .calcell:focus-visible{outline:none}
 .calcell:focus-visible span{outline:2px solid var(--pm-key);outline-offset:1px}
@@ -47,21 +47,20 @@
 .calcell span{position:relative;z-index:1;width:40px;height:40px;border-radius:50%}
 .calcell:hover span{background:var(--t-soft)}
 /* 지난 날짜: 연한 회색 + 취소선 */
-.calcell.past{color:var(--color-secondary);font-weight:400}
+.calcell.past{color:var(--color-secondary);font-weight:var(--weight-regular)}
 .calcell.past span{text-decoration:line-through;text-decoration-thickness:1px}
 /* 마감이 있는 날: 굵게 + 점 */
-.calcell.hasdue{font-weight:700}
+.calcell.hasdue{font-weight:var(--weight-bold)}
 .caldot{bottom:2px;z-index:2;width:4px;height:4px;margin-left:-2px;background:var(--t-ink)}
 /* 오늘 → 고른 날짜 띠 */
 /* 오늘 · 고른 날: 검정 원 */
-.calcell.sel span,.calcell.today span{background:var(--t-ink)!important;color:var(--color-neutral)!important;font-weight:700;box-shadow:none}
+.calcell.sel span,.calcell.today span{background:var(--t-ink)!important;color:var(--color-neutral)!important;font-weight:var(--weight-bold);box-shadow:none}
 .calcell.today:not(.sel) span{background:var(--color-surface)!important;color:var(--t-ink)!important;box-shadow:inset 0 0 0 1.5px var(--t-ink)!important}
 .calcell.sel .caldot,.calcell.today.sel .caldot{background:var(--color-surface);bottom:7px}
 
 /* 섹션 제목: 크고 굵게 · 개수는 회색 */
 .calsec{margin:var(--space-2xl) 0 var(--space-md)}
 .calsec h2{font:var(--type-headline-md);letter-spacing:-.5px}
-.calsec h2 span{margin-left:var(--space-sm);color:var(--color-secondary)}
 /* 목록: 흰 카드 · 그림자 · 화면 밖으로 넘치지 않게 */
 .callist{grid-template-columns:minmax(0,1fr);gap:var(--space-md)}
 .calrow{min-width:0;gap:var(--space-lg);padding:var(--space-md) var(--space-lg) var(--space-md) var(--space-md);border:0;border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:var(--t-shadow)}
@@ -72,7 +71,7 @@
 .caltext small{font:var(--type-body-sm);color:var(--t-sub)}
 .calbadge{padding:var(--space-sm) var(--space-md);background:var(--t-soft);color:var(--t-ink);font:var(--type-body-sm)}
 .calbadge.soon{background:var(--color-error);color:#fff}
-.calempty{padding:var(--space-lg);border-radius:var(--rounded-lg);background:rgba(255,255,255,.6);font:var(--type-body-sm);color:var(--t-sub);text-align:center}
+.calempty{padding:var(--space-lg);border-radius:var(--rounded-lg);background:color-mix(in srgb,var(--color-surface) 60%,transparent);font:var(--type-body-sm);color:var(--t-sub);text-align:center}
 
 /* ---------- v3: 제목 줄 (← + 제목) · 유리 캘린더 · 월 선택 ---------- */
 .main:has(.calbox) .pageback{display:none}
@@ -85,14 +84,14 @@
 .main:has(.calbox)>.topbar{margin-bottom:0}
 
 /* 유리 캘린더: 가까운 마감 콘텐츠 사진을 아주 흐리게 깔고, 그 위에 반투명 흰 유리 */
-.calbox{position:relative;isolation:isolate;overflow:hidden;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.9);-webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);box-shadow:0 1px 2px rgba(0,0,0,.04),0 16px 36px rgba(0,0,0,.08),inset 0 1px 0 #fff}
+.calbox{position:relative;isolation:isolate;overflow:hidden;background:color-mix(in srgb,var(--color-surface) 62%,transparent);border:1px solid color-mix(in srgb,var(--color-surface) 90%,transparent);-webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);box-shadow:var(--shadow-sm),inset 0 1px 0 #fff}
 .calbg{position:absolute;inset:-40px;z-index:-2;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;filter:blur(36px) saturate(1.3);opacity:.5;pointer-events:none}
 .calbox::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.72) 100%);pointer-events:none}
-.calnav button{background:rgba(255,255,255,.7);box-shadow:var(--shadow-sm)}
+.calnav button{background:color-mix(in srgb,var(--color-surface) 70%,transparent);box-shadow:var(--shadow-sm)}
 .calnav button:hover{background:var(--color-surface)}
 .calweek span{color:var(--color-secondary)}
 .calcell.past{color:var(--color-secondary)}
-.calcell:hover span{background:rgba(255,255,255,.8)}
+.calcell:hover span{background:color-mix(in srgb,var(--color-surface) 80%,transparent)}
 .calcell.today:not(.sel) span{background:var(--color-surface)!important}
 
 /* 월 이름 버튼 → 월 선택 */
@@ -103,7 +102,7 @@
 .caltitle span .icon{width:20px;height:20px;stroke-width:2.2;transition:transform .2s}
 .caltitle[aria-expanded="true"] span .icon{transform:rotate(180deg)}
 .calmonths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-sm);padding:var(--space-xs) 2px var(--space-sm)}
-.calmon{height:52px;border-radius:var(--rounded-lg);background:rgba(255,255,255,.7);font:var(--type-label-md);color:var(--t-ink);box-shadow:var(--shadow-sm)}
+.calmon{height:52px;border-radius:var(--rounded-lg);background:color-mix(in srgb,var(--color-surface) 70%,transparent);font:var(--type-label-md);color:var(--t-ink);box-shadow:var(--shadow-sm)}
 .calmon:hover{filter:none;background:var(--color-surface)}
 .calmon.now{box-shadow:inset 0 0 0 1.5px var(--t-ink)}
 .calmon.on{background:var(--t-ink);color:var(--color-neutral);box-shadow:none}
@@ -127,7 +126,7 @@
 .calmon{position:relative;height:44px;border-radius:var(--rounded-lg);background:none;box-shadow:none!important;font:var(--type-body-md);color:var(--t-ink)}
 .calmon:hover{background:var(--t-soft)}
 .calmon small{position:absolute;left:0;right:0;bottom:2px;font:var(--type-body-sm);color:var(--t-sub)}
-.calmon.on{background:var(--t-ink);color:var(--color-neutral);font-weight:700}
+.calmon.on{background:var(--t-ink);color:var(--color-neutral);font-weight:var(--weight-bold)}
 .calmon.on small{color:rgba(255,255,255,.7)}
 .calmonths{margin-bottom:0}
 
@@ -155,7 +154,7 @@
 .cal-month-picker .calmonths::-webkit-scrollbar{display:block;width:4px}
 .cal-month-picker .calmonths::-webkit-scrollbar-thumb{background:var(--color-disabled);border-radius:var(--rounded-sm)}
 .cal-month-picker .calyr{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-sm);padding-bottom:var(--space-lg)}
-.cal-month-picker .calyr>b{top:0;padding:var(--space-md) 0 var(--space-sm);background:var(--color-surface);font:var(--type-body-sm);font-weight:600;color:var(--color-secondary)}
+.cal-month-picker .calyr>b{top:0;padding:var(--space-md) 0 var(--space-sm);background:var(--color-surface);font:var(--type-body-sm);font-weight:var(--weight-semibold);color:var(--color-secondary)}
 .cal-month-picker .calmon{height:44px;min-height:44px;border-radius:var(--rounded-sm);font:var(--type-label-md);background:transparent;color:var(--color-on-surface)}
 .cal-month-picker .calmon:hover{background:var(--color-neutral)}
 .cal-month-picker .calmon.on{background:var(--color-primary);color:var(--color-neutral)}

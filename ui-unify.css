@@ -2,12 +2,12 @@
 .libpage,.live-map{--pm-header-bg:var(--t-bg,var(--color-neutral));--pm-header-text:var(--t-ink,var(--color-on-surface));--pm-header-muted:var(--t-sub,var(--color-secondary));font-family:var(--font-family)}
 .libpage{color:var(--pm-header-text)}
 .live-map .lm-header{padding:var(--top) var(--gutter) 0;background:var(--pm-header-bg);border-bottom-color:var(--t-line,var(--color-disabled))}
-.live-map .lm-header .lm-location-header,.libpage .libhead{height:40px;min-height:40px;margin:0 0 var(--space-md,12px);padding:0 48px 0 0}
+.live-map .lm-header .lm-location-header,.libpage .libhead{height:40px;min-height:40px;margin:0 0 var(--space-md,var(--space-md));padding:0 48px 0 0}
 .live-map .lm-header .lm-location-header .placebar{min-height:40px;margin:0;gap:var(--space-md)}
 .live-map .lm-header .lm-location-header .placemain,.live-map .lm-header .lm-location-header .placesub,.live-map .lm-header .lm-location-empty,.libpage .libhead h1{font:var(--type-headline-md);letter-spacing:-.6px}
 .live-map .lm-header .lm-location-header .placemain,.live-map .lm-header .lm-location-empty{color:var(--pm-header-text)}
 .live-map .lm-header .lm-location-header .placesub{max-width:40%;color:var(--pm-header-muted)}
-.cfpage .libsearch,.live-map .lm-header .lm-search-row .libsearch{height:50px;gap:var(--space-md);padding:0 var(--space-md) 0 var(--space-lg);border-radius:var(--rounded-lg);border:1px solid rgba(255,255,255,.88);background:var(--color-surface);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none!important}
+.cfpage .libsearch,.live-map .lm-header .lm-search-row .libsearch{height:50px;gap:var(--space-md);padding:0 var(--space-md) 0 var(--space-lg);border-radius:var(--rounded-lg);border:1px solid color-mix(in srgb,var(--color-surface) 88%,transparent);background:var(--color-surface);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none!important}
 .cfpage .libsearch>.icon,.live-map .lm-header .lm-search-row .libsearch>.icon{width:20px;height:20px;color:var(--color-on-surface);stroke-width:1.8}
 .cfpage .libsearch input,.live-map .lm-header .lm-search-row .libsearch input{font:var(--type-body-md);color:var(--color-on-surface)}
 .cfpage .libsearch input::placeholder,.live-map .lm-header .lm-search-row .libsearch input::placeholder{color:var(--color-secondary)}
@@ -47,7 +47,7 @@
 .live-map .lm-location-menu{position:absolute;z-index:720;left:20px;right:68px;top:calc(var(--top) + 44px);padding:var(--space-sm);border:1px solid var(--t-line);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:var(--shadow-sm)}
 .live-map .lm-location-menu[hidden]{display:none!important}
 .live-map .lm-location-menu button{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:42px;padding:var(--space-sm) var(--space-md);text-align:left;border-radius:var(--rounded-sm);background:transparent!important;font:var(--type-body-sm)}
-.live-map .lm-location-menu button.is-active{background:var(--color-neutral)!important;font-weight:700}
+.live-map .lm-location-menu button.is-active{background:var(--color-neutral)!important;font-weight:var(--weight-bold)}
 .live-map .lm-location-menu small{font:var(--type-body-sm);color:var(--t-secondary,var(--color-secondary))}
 .live-map .lm-header .lm-search-row{position:absolute;left:auto;right:var(--gutter);top:var(--top);z-index:725;width:40px;height:40px;overflow:hidden;opacity:0;visibility:hidden;pointer-events:none;transform-origin:right center;transition:width .36s cubic-bezier(.22,1,.36,1),opacity .18s ease,visibility 0s linear .36s}
 .live-map .lm-header .lm-search-row.is-open{width:calc(100% - 2 * var(--gutter));opacity:1;visibility:visible;pointer-events:auto;transition:width .36s cubic-bezier(.22,1,.36,1),opacity .18s ease}

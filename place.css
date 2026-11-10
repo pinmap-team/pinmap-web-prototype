@@ -71,19 +71,19 @@ html.coach-lock,html.coach-lock body{overflow:hidden;overscroll-behavior:none}
 @media(prefers-reduced-motion:reduce){#sheet.bottomsheet{animation:none}}
 
 /* 홈 관심사 키워드: 전체 표시 · 누른 것만 켜짐 */
-.prefchips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc(-1 * var(--gutter,20px));margin-right:calc(-1 * var(--gutter,20px));padding:2px var(--gutter,20px)}
+.prefchips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc(-1 * var(--gutter,var(--space-xl)));margin-right:calc(-1 * var(--gutter,var(--space-xl)));padding:2px var(--gutter,var(--space-xl))}
 .prefchips::-webkit-scrollbar{display:none}
 .prefchip{flex:none;min-height:36px;padding:0 var(--space-lg);border-radius:var(--rounded-lg);border:1px solid var(--color-disabled);background:var(--color-surface);color:var(--color-secondary);font:var(--type-body-sm);white-space:nowrap}
-.prefchip.on{border-color:transparent;background:var(--pm-ink,var(--color-primary));color:var(--color-neutral);font-weight:600}
+.prefchip.on{border-color:transparent;background:var(--pm-ink,var(--color-primary));color:var(--color-neutral);font-weight:var(--weight-semibold)}
 .prefreset{flex:none;min-height:36px;padding:0 var(--space-sm);font:var(--type-body-sm);color:var(--color-on-surface);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
 
 /* 홈 주제 제목: 이모지 없이 한 단계 굵게 */
-.main:has(>.placebar) .sectionhead h2{font-weight:700}
+.main:has(>.placebar) .sectionhead h2{font-weight:var(--weight-bold)}
 /* 홈 카드: 같은 크기 2열, 줄마다 정렬 */
 .homegrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-md);align-items:stretch}
 .homegrid>.libcard{height:100%}
 /* 관심사별 추천 카드: 좌우로 넘기기 */
-.herocar{display:flex;gap:var(--space-md);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:0 calc(-1 * var(--gutter,20px));padding:0 var(--gutter,20px);scroll-padding:0 var(--gutter,20px)}
+.herocar{display:flex;gap:var(--space-md);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:0 calc(-1 * var(--gutter,var(--space-xl)));padding:0 var(--gutter,var(--space-xl));scroll-padding:0 var(--gutter,20px)}
 .herocar::-webkit-scrollbar{display:none}
 .herocar .forhero{flex:0 0 calc(100% - 22px);scroll-snap-align:start;margin:0;padding:var(--space-lg) var(--space-lg);gap:var(--space-lg)}
 .herocar:has(.forhero:only-child) .forhero{flex-basis:100%}

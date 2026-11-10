@@ -40,7 +40,7 @@ function sdCoach(){
   if (sd.step === 'osSheet') return '③ 앱 목록에서 <b>핀맵</b>을 골라 주세요';
   if (sd.step === 'save') return '';
   if (sdSaved()) return `저장했어요. <button class="sd-coachbtn" data-sd="view">핀맵에서 보기</button>`;
-  return '① 게시물 아래 <b>공유 버튼</b>을 눌러보세요';
+  return '① 게시물 아래 <b>공유 버튼</b>을 눌러 보세요';
 }
 function sdLayer(){
   const p = sd.step;
@@ -134,7 +134,7 @@ function sdCreateItem(){
   if (sdSaved()) return;
   const a = demoPost.ai;
   sd.item = {id:Date.now(), title:a.title, type:a.type, category:a.category, source:'SNS, '+demoPost.author, ago:'방금', savedAt:new Date().toISOString(), desc:'공유하기로 저장한 콘텐츠', memo:'', art:demoPost.art, distance:a.distance, address:a.address, collection:'', aiClassified:true, sample:true};
-  // 마이 > 설정에서 AI 자동 분류 기본 사용을 끄면 ‘기타’로 시작해 직접 고르게 합니다.
+  // 마이 > 설정에서 AI 자동 분류 기본 사용을 끄면 ‘기타’로 시작해 직접 골라요.
   sd.aiOn = settings.aiDefault;
   if (!sd.aiOn) Object.assign(sd.item, {type:'기타', category:'기타', aiClassified:false});
   items.unshift(sd.item); afterChange();

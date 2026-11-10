@@ -20,7 +20,7 @@ function pushFor(scene){
   const due = settings.notiDeadline ? near.filter(x => x.deadline) : [];
   const pick = due[0] || [...near].sort((a,b) => pref(a)-pref(b) || distanceOf(a)-distanceOf(b))[0];
   const more = near.length > 1 ? `, 근처에 저장한 곳 ${near.length-1}개 더` : '';
-  if (pick.deadline) return {id:pick.id, title:`⏰ 근처에 저장한 콘텐츠가 ${pick.deadline}에 마감돼요`, body:`‘${pick.title}’, ${scene.dist(pick)}. 지나가는 길에 들러볼까요?${more}`};
+  if (pick.deadline) return {id:pick.id, title:`⏰ 근처에 저장한 콘텐츠가 ${pick.deadline}에 마감돼요`, body:`‘${pick.title}’, ${scene.dist(pick)}. 지나가는 길에 들러 볼까요?${more}`};
   return {id:pick.id, title:`📍 ${scene.place}에 저장해둔 곳이 있어요`, body:`‘${pick.title}’, ${scene.dist(pick)}${pick.memo?`, “${pick.memo}”`:''}${more}`};
 }
 // 알림이 오지 않는 이유 (설정 상태)
@@ -69,7 +69,7 @@ function drawPushDemo(){
       : `<button class="ls-noti" data-ps-open="${n.id}"><div class="ls-app"><i>${icon('bookmark')}</i>핀맵<span>${i===0?'지금':'조금 전'}</span></div><b>${esc(n.title)}</b><p>${esc(n.body)}</p></button>`).join('')}</div>
     <div class="ls-panel">
       ${block ? `<div class="ls-block"><p>${block.text}</p><button data-action="${block.act}">${block.btn}</button></div>` : ''}
-      <p class="ls-q">어디로 이동해볼까요? <small>앱을 켜지 않은 채 위치만 바뀌어요</small></p>
+      <p class="ls-q">어디로 이동해 볼까요? <small>앱을 켜지 않은 채 위치만 바뀌어요</small></p>
       <div class="ls-scenes">${PUSH_SCENES.map(s => `<button data-ps-scene="${s.id}"><span aria-hidden="true">${s.emoji}</span>${s.label}</button>`).join('')}</div>
       <p class="ls-foot">설정: 푸시 ${settings.push?'허용':'꺼짐'}, 위치 ${LOC_PERM[settings.locPerm]}, 위치 기반 추천 ${settings.notiNearby?'켜짐':'꺼짐'}</p>
     </div>

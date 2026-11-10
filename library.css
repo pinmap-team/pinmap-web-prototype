@@ -30,14 +30,14 @@
 .libchips{display:flex;gap:var(--space-sm);overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--gutter));padding:2px var(--gutter) 4px}
 .libchips::-webkit-scrollbar{display:none}
 .libchip{flex:none;min-height:40px;padding:0 var(--space-lg);border-radius:20px;border:1px solid var(--pm-line);background:var(--pm-card);font:var(--type-body-md);color:var(--color-secondary);white-space:nowrap}
-.libchip.on{background:var(--pm-deep);border-color:var(--pm-deep);color:var(--color-neutral);font-weight:700}
+.libchip.on{background:var(--pm-deep);border-color:var(--pm-deep);color:var(--color-neutral);font-weight:var(--weight-bold)}
 
 /* 내 모음 바로가기 */
 .libcols{display:flex;gap:var(--space-sm);overflow-x:auto;scrollbar-width:none;margin:8px calc(-1 * var(--gutter)) 0;padding:0 var(--gutter)}
 .libcols::-webkit-scrollbar{display:none}
 .libcol{flex:none;display:inline-flex;align-items:center;gap:var(--space-xs);min-height:32px;padding:0 var(--space-md);border-radius:var(--rounded-lg);background:var(--color-neutral);font:var(--type-body-sm);color:var(--color-secondary);white-space:nowrap}
 .libcol .icon{width:15px;height:15px}
-.libcol span{color:var(--pm-mint-ink);font-weight:700}
+.libcol span{color:var(--pm-mint-ink);font-weight:var(--weight-bold)}
 
 /* 목록 머리 */
 .libsection{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);margin:var(--gap-section) 0 12px}

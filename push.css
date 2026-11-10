@@ -16,7 +16,7 @@
 .osbtns{display:grid;grid-template-columns:1fr 1fr;margin:0 calc(-1 * var(--space-lg));border-top:1px solid var(--color-disabled)}
 .osbtns button{min-height:48px;font:var(--type-body-md);color:var(--color-on-surface)}
 .osbtns button+button{border-left:1px solid var(--color-disabled)}
-.osbtns .strong{font-weight:700}
+.osbtns .strong{font-weight:var(--weight-bold)}
 
 /* 잠금화면 미리보기 */
 body.pushdemo-open{overflow:hidden}
@@ -39,7 +39,7 @@ body.pushdemo-open{overflow:hidden}
 .ls-noti p{margin:var(--space-xs) 0 0;font:var(--type-body-sm);color:var(--color-on-surface);word-break:keep-all}
 .ls-noti.waiting,.ls-noti.quiet{display:flex;align-items:center;gap:var(--space-md);justify-content:center;background:#ffffff1f;color:#F4F4F4;font:var(--type-body-sm);text-align:center}
 .ls-spin{width:14px;height:14px;border-radius:50%;border:2px solid #ffffff55;border-top-color:var(--color-surface);animation:lsSpin .8s linear infinite}
-.ls-panel{padding:14px 14px calc(18px + env(safe-area-inset-bottom));background:#0008;border-radius:var(--rounded-lg) var(--rounded-lg) 0 0}
+.ls-panel{padding:14px 14px calc(var(--space-lg) + env(safe-area-inset-bottom));background:#0008;border-radius:var(--rounded-lg) var(--rounded-lg) 0 0}
 .ls-block{padding:var(--space-md);border-radius:var(--rounded-md);background:var(--color-neutral);color:var(--color-on-surface);margin-bottom:var(--space-md)}
 .ls-block p{margin:0 0 var(--space-sm);font:var(--type-body-sm);word-break:keep-all}
 .ls-block button{min-height:36px;padding:0 var(--space-lg);border-radius:var(--rounded-lg);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md)}

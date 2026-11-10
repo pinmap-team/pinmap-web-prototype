@@ -1,7 +1,7 @@
 /* 홈 레이아웃 개편 · 블랙 & 화이트 (theme.css 변수 사용) */
 
 /* 마감 임박 띠배너: 화면 맨 위 고정 · 회색 · '오늘 다시 보지 않기'는 오른쪽 위에 작게 */
-.strip{position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(100%,480px);height:52px;z-index:6;display:flex;align-items:flex-end;padding:0 var(--gutter,20px) 7px;background:var(--color-disabled);color:var(--color-on-surface)}
+.strip{position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(100%,480px);height:52px;z-index:6;display:flex;align-items:flex-end;padding:0 var(--gutter,var(--space-xl)) 7px;background:var(--color-disabled);color:var(--color-on-surface)}
 .strip-label{position:absolute;left:var(--gutter,20px);top:6px;font:var(--type-label-md);color:var(--color-secondary);letter-spacing:.2px}
 .strip-roll{flex:1;min-width:0;height:26px;overflow:hidden}
 .strip-track{display:flex;flex-direction:column}
@@ -11,10 +11,10 @@
 .strip-item span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .strip-hide{position:absolute;right:calc(var(--gutter,20px) - 6px);top:2px;min-height:22px;padding:0 var(--space-sm);font:var(--type-body-sm);color:var(--color-secondary);text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
 /* 띠배너가 있을 때만 그 높이만큼 아래로 · 닫으면 바로 위로 올라와요 */
-.main:has(.strip){padding-top:calc(var(--top,16px) + 52px)!important}
+.main:has(.strip){padding-top:calc(var(--top,var(--space-lg)) + 52px)!important}
 
 /* 메인 추천 카드: 크게 · 가운데 카드 강조 */
-.mainpick{display:flex;gap:var(--space-md);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:4px calc(-1 * var(--gutter,20px)) 0;padding:6px calc(var(--gutter,20px) + 22px) 12px}
+.mainpick{display:flex;gap:var(--space-md);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:4px calc(-1 * var(--gutter,var(--space-xl))) 0;padding:6px calc(var(--gutter,var(--space-xl)) + var(--space-xl)) 12px}
 .mainpick::-webkit-scrollbar{display:none}
 .pick{position:relative;flex:0 0 100%;height:380px;scroll-snap-align:center;border-radius:var(--rounded-lg);overflow:hidden;padding:0;background:var(--color-disabled);box-shadow:var(--t-shadow-lg);text-align:left;transition:transform .2s,opacity .2s;transform-origin:center}
 .pickimg{position:absolute;inset:0}
@@ -52,7 +52,7 @@
 
 /* 최근 저장: 한 줄 가로 캐러셀 */
 .recentw{margin-top:var(--space-xl)}
-.recentrow{display:flex;gap:var(--space-md);overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;margin:0 calc(-1 * var(--gutter,20px));padding:2px var(--gutter,20px) 14px;scroll-padding:0 var(--gutter,20px)}
+.recentrow{display:flex;gap:var(--space-md);overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;margin:0 calc(-1 * var(--gutter,var(--space-xl)));padding:2px var(--gutter,var(--space-xl)) 14px;scroll-padding:0 var(--gutter,20px)}
 .recentrow::-webkit-scrollbar{display:none}
 .rcard{flex:0 0 132px;scroll-snap-align:start;display:grid;gap:var(--space-xs);padding:0;text-align:left}
 .rcimg{width:132px;height:132px;border-radius:var(--rounded-lg);overflow:hidden;background:var(--color-disabled);box-shadow:var(--t-shadow)}
@@ -73,7 +73,7 @@
 
 /* 관심 키워드: 메인 카드 아래 두 줄 · 줄마다 따로 좌우로 · 높이 줄임 */
 .chiprows{display:grid;gap:var(--space-sm);margin:var(--space-lg) 0 0}
-.chiprows .prefchips{margin:0 calc(-1 * var(--gutter,20px))!important;padding:2px var(--gutter,20px)}
+.chiprows .prefchips{margin:0 calc(-1 * var(--gutter,var(--space-xl)))!important;padding:2px var(--gutter,var(--space-xl))}
 .chiprows .prefchip{min-height:30px;padding:0 var(--space-md);font:var(--type-body-sm)}
 .chiprows .prefreset{min-height:30px}
 
@@ -89,7 +89,7 @@
 .strip{height:64px;padding-bottom:var(--space-md)}
 .strip-label{top:10px}
 .strip-hide{right:4px;top:8px}
-.main:has(.strip){padding-top:calc(var(--top,16px) + 64px)!important}
+.main:has(.strip){padding-top:calc(var(--top,var(--space-lg)) + 64px)!important}
 
 /* (3차) 메인 카드: 가운데 카드 뒤로 양옆 카드가 작게 겹쳐 보이게 */
 .mainpick{padding:var(--space-sm) 12% var(--space-lg);gap:0}
@@ -127,7 +127,7 @@
 .accoff{flex:none;min-height:32px;padding:0 var(--space-md);border-radius:999px;background:var(--t-soft,var(--color-neutral));font:var(--type-label-md)}
 .accnone{margin:var(--space-md) 0 var(--space-md)}
 .accadd{margin-top:var(--space-lg)}
-.accnote{margin:var(--space-md) 2px 0;line-height:1.5}
+.accnote{margin:var(--space-md) 2px 0}
 .snspick{display:grid;gap:2px;margin-top:var(--space-sm)}
 .snsopt{display:flex;align-items:center;gap:var(--space-md);min-height:56px;text-align:left}
 .snsopt+.snsopt{border-top:1px solid var(--t-line,var(--color-disabled))}
@@ -136,13 +136,13 @@
 .snshead{display:flex;align-items:center;gap:var(--space-md);margin:0 0 var(--space-sm)}.snshead b{font:var(--type-body-md)}
 
 /* 캘린더 위젯: 반투명 유리 */
-.calw{background:rgba(255,255,255,.5)!important;border:1px solid rgba(255,255,255,.75);-webkit-backdrop-filter:saturate(1.8) blur(22px);backdrop-filter:saturate(1.8) blur(22px);box-shadow:0 8px 28px rgba(0,0,0,.07),inset 0 1px 0 rgba(255,255,255,.8)!important}
+.calw{background:color-mix(in srgb,var(--color-surface) 50%,transparent)!important;border:1px solid color-mix(in srgb,var(--color-surface) 75%,transparent);-webkit-backdrop-filter:saturate(1.8) blur(22px);backdrop-filter:saturate(1.8) blur(22px);box-shadow:var(--shadow-sm),inset 0 1px 0 rgba(255,255,255,.8) !important}
 .calw .wday:not(.today){background:rgba(255,255,255,.45)}
 .calw .calnext{border-top-color:rgba(0,0,0,.06)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.calw{background:var(--color-surface)!important}}
 
 /* 메인 카드: 첫 카드부터 화면 가운데 · 양옆 카드는 뒤에 겹쳐 보이게 */
-.mainpick{--pw:min(296px,74vw);padding-left:calc(50% + var(--gutter,20px) - var(--pw) / 2);padding-right:calc(50% + var(--gutter,20px) - var(--pw) / 2)}
+.mainpick{--pw:min(296px,74vw);padding-left:calc(50% + var(--gutter,var(--space-xl)) - var(--pw) / 2);padding-right:calc(50% + var(--gutter,var(--space-xl)) - var(--pw) / 2)}
 .pick{flex:0 0 var(--pw)}
 .pick+.pick{margin-left:calc(var(--pw) * -0.12)}
 .mainpick{position:relative}
@@ -216,11 +216,11 @@
 
 /* ===== 홈 (10/18 저녁) ===== */
 /* 메인 카드 위 큰 글씨: 한 단계 얇게 (800 → 700) */
-.pick .pickword{font-weight:700!important}
+.pick .pickword{font-weight:var(--weight-bold) !important}
 /* 캘린더 위젯: 오늘은 검정 박스 대신 연한 회색 칸 + 굵은 글씨 */
 .calw .wday.today{background:var(--color-neutral)!important;color:var(--color-on-surface)!important}
-.calw .wday.today small{color:var(--color-on-surface)!important;font-weight:600}
-.calw .wday.today b{font-weight:800}
+.calw .wday.today small{color:var(--color-on-surface)!important;font-weight:var(--weight-semibold)}
+.calw .wday.today b{font-weight:var(--weight-bold)}
 .calw .wday.today i.on{background:var(--color-primary)!important}
 /* 캘린더 위젯 '전체보기' */
 .calw .calmore{color:var(--color-on-surface)!important}
@@ -229,7 +229,7 @@
 #notipanel{position:fixed;inset:0;z-index:60;margin:0 auto;max-width:480px;background:var(--t-bg,var(--color-neutral));transform:translateX(100%);transition:transform .32s cubic-bezier(.22,.8,.3,1);overflow-y:auto;overscroll-behavior:contain}
 #notipanel.in{transform:none}
 body.notipanel-open .bottomnav{display:none!important}
-.npwrap{min-height:100%;display:flex;flex-direction:column;padding:20px var(--gutter,20px) 24px}
+.npwrap{min-height:100%;display:flex;flex-direction:column;padding:20px var(--gutter,var(--space-xl)) 24px}
 .nphead{display:flex;align-items:center;gap:var(--space-sm);margin:0 0 var(--space-lg)}
 .nphead h1{margin:0;font:var(--type-headline-md);letter-spacing:-.5px;display:flex;align-items:center;gap:var(--space-sm)}
 .nphead h1 span{min-width:20px;height:20px;padding:0 var(--space-sm);border-radius:999px;background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);display:inline-grid;place-items:center}
@@ -286,12 +286,12 @@ body.notipanel-open .bottomnav{display:none!important}
 .mainwrap:has(.home-first-save) .mainpick{pointer-events:none}
 .home-first-save{position:absolute;inset:34% calc(-1 * var(--gutter,20px)) 0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:var(--space-xl) var(--space-lg) var(--space-2xl);background:linear-gradient(180deg,transparent 0%,var(--color-neutral) 80%);text-align:center}
 .home-first-save h2{margin:0;color:var(--color-on-surface);font:var(--type-headline-md);word-break:keep-all}
-.home-first-save p{margin:var(--space-sm) 0 var(--space-xl);color:var(--color-secondary);font:var(--type-label-md);font-weight:400;word-break:keep-all}
+.home-first-save p{margin:var(--space-sm) 0 var(--space-xl);color:var(--color-secondary);font:var(--type-label-md);font-weight:var(--weight-regular);word-break:keep-all}
 .home-first-save button{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-sm);min-height:48px;padding:var(--space-md) var(--space-xl);border:0;border-radius:var(--rounded-sm);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);cursor:pointer;box-shadow:var(--shadow-sm)}
 .home-first-save button .icon{width:20px;height:20px;flex:none}
 .home-first-save button:active{background:var(--color-primary-pressed)}
 .home-first-save button:focus-visible{outline:2px solid var(--color-primary);outline-offset:4px}
-@media(max-width:360px){.home-first-save{padding-bottom:var(--space-xl)}.home-first-save h2{font:var(--type-body-md);font-weight:700}.home-first-save p{margin-bottom:var(--space-lg)}}
+@media(max-width:360px){.home-first-save{padding-bottom:var(--space-xl)}.home-first-save h2{font:var(--type-body-md);font-weight:var(--weight-bold)}.home-first-save p{margin-bottom:var(--space-lg)}}
 
 /* Keep empty-state decoration quiet so the first-save action stays dominant. */
 .mainwrap:has(.home-first-save) .mainpick{opacity:.38}

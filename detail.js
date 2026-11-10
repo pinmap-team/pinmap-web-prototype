@@ -25,10 +25,12 @@ detail = function(){
   if (x.period) info += `<section class="dtsec"><h2>운영 기간</h2><div class="dtrow">${icon('calendar')}<span>${esc(x.period)}</span>${x.deadline ? `<b class="dtdue">마감 ${esc(x.deadline)}</b>` : ''}</div></section>`;
   const factRow = x.distance && ready ? `<div class="dtfacts"><span>${icon('walk')}${esc(x.distance)}</span></div>` : '';
   if (t.place) info += ready
-    ? `<section class="dtsec"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><div class="dtaddress">${icon('pin')}<span>${esc(x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div><div class="dtmap-preview"><div id="detail-map-canvas" role="img" aria-label="${esc(x.title)} 저장 위치 지도"></div><p class="dtmap-fallback" id="detail-map-fallback" hidden>지도를 불러오지 못했어요. 지도에서 위치를 확인해 주세요.</p><button type="button" class="dtmap-open" data-action="dtgomap" aria-label="핀맵 지도에서 위치 보기">지도에서 보기${icon('arrow')}</button></div>${factRow}</section>`
+    ? `<section class="dtsec"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><div class="dtaddress">${icon('pin')}<span>${esc(x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div><div class="dtmap-preview"><div id="detail-map-canvas" role="img" aria-label="${esc(x.title)} 저장 위치 지도"></div><p class="dtmap-fallback" id="detail-map-fallback" hidden>지도를 불러오지 못했어요. 지도에서 위치를 확인해 주세요.</p></div>${factRow}</section>`
     : `<section class="dtsec"><h2>장소 정보</h2><div class="dtwarn"><b>장소 확인 필요</b><p>위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.</p><button class="dtsmall" data-action="edit">장소 직접 입력</button></div></section>`;
-  if (x.type === '쇼핑') info += `<section class="dtsec"><h2>구매 정보</h2><div class="dtrow">${icon('bookmark')}<span>${esc(x.price || '가격 정보 없음')}</span></div><p class="dthint">${esc(x.shop || '판매처 정보 없음')}, 가격과 재고는 원본에서 한 번 더 확인해 주세요.</p></section>`;
-  if (x.type === '레시피') info += `<section class="dtsec"><h2>간단 정보</h2><div class="dtrow">${icon('clock')}<span>${esc(x.recipe || '정보 없음')}</span></div><p class="dthint">자세한 조리법은 원본 콘텐츠에서 확인해요.</p></section>`;
+  // 2026-11-10 가격을 크게(headline-md), 안내는 body-md. '예시 가격' → '참고 가격'
+  if (x.type === '쇼핑') { const amount = String(x.price || '').replace(/,\s*(예시|참고) 가격$/, '').trim();
+    info += `<section class="dtsec dtbuy"><h2>구매 정보</h2>${amount ? `<p class="dtprice"><span class="sr">참고 가격 </span>${esc(amount)}</p>` : '<p class="dtprice none">가격 정보 없음</p>'}<p class="dtpricehint">${x.shop ? `${esc(x.shop)}에서 본 참고 가격이에요.` : '판매처 정보가 없어요.'}<br>가격과 재고는 원본에서 한 번 더 확인해 주세요.</p></section>`; }
+  if (x.type === '레시피') info += `<section class="dtsec"><h2>간단 정보</h2><div class="dtrow dtrecipe">${icon('clock')}<span>${esc(x.recipe || '정보 없음')}</span></div><p class="dthint">자세한 조리법은 원본 콘텐츠에서 확인해요.</p></section>`;
   if (x.deleted) info += `<section class="dtsec"><h2>원본 콘텐츠</h2><div class="dtgone"><b>삭제된 게시물이에요.</b><p>원본을 열 수 없지만 ${t.place ? '장소 정보와 ' : ''}내 메모는 그대로 남아 있어요.</p></div></section>`;
 
   // 아래 고정 버튼: 길찾기 · 원본 보기 (장소가 아니면 원본 보기만)
@@ -43,7 +45,13 @@ detail = function(){
     <div class="dthero">${libThumb(x)}<div class="dtshade" aria-hidden="true"></div>
       <div class="dttop"><button class="dtbtn" data-action="back" aria-label="돌아가기">${icon('chevleft')}</button>
         <div class="dttopr">
-          <button class="dtbtn" data-action="dtshare" aria-label="공유">${icon('share')}</button>
+          <button type="button" class="dtbtn dtfavorite${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 즐겨찾기" aria-pressed="${!!x.favorite}">${icon('star')}</button>
+          <button class="dtbtn dtmorebtn" data-action="dtmore" aria-label="더보기" aria-haspopup="menu" aria-expanded="false" aria-controls="dtmenu">${icon('more')}</button>
+          <div class="dtmenu" id="dtmenu" role="menu" aria-label="콘텐츠 메뉴" hidden>
+            <button type="button" role="menuitem" data-action="dtshare">${icon('share')}공유</button>
+            <button type="button" role="menuitem" data-action="edit">${icon('pen')}수정</button>
+            <button type="button" role="menuitem" class="dtmenu-danger" data-unsave="${x.id}">${icon('trash')}삭제</button>
+          </div>
         </div></div>
       <div class="dtsrc dthtitle">
         <span class="dthpill">${esc(x.category || shortType(x.type))}</span>
@@ -52,14 +60,35 @@ detail = function(){
       </div>
     </div>
     <div class="dtsheet">
-      ${x.desc ? `<section class="dtsum"><h2>${icon('spark')}${esc(x.source === '직접 추가' ? '장소 설명' : 'AI 요약')}</h2><p>${esc(x.desc)}</p></section>` : ''}
-      <section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2><button type="button" class="dtmemoedit" data-action="edit" aria-label="저장한 메모 수정">${icon('pen')}수정</button></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨보세요.')}</span>${icon('chevron')}</button></section>
+      ${x.desc ? `<section class="dtsum"><h2${x.source === '직접 추가' ? '' : ' class="dtai"'}>${icon('spark')}${esc(x.source === '직접 추가' ? '장소 설명' : 'AI 요약')}</h2><p>${esc(x.desc)}</p></section>` : ''}
+      <section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>
       ${info}
-      <button type="button" class="dtdelete" data-unsave="${x.id}">${icon('trash')}컬렉션에서 삭제</button>
     </div>
     <div class="dtbar ${bottom.length === 1 ? 'one' : ''}">${bottom.join('')}</div>
   </article>`;
 };
+
+// 2026-11-10 상단 미트볼(⋯) 메뉴: 공유 · 수정 · 삭제
+const dtMenuSet = open => {
+  const btn = document.querySelector('.dtmorebtn'), menu = document.getElementById('dtmenu');
+  if (!btn || !menu) return;
+  menu.hidden = !open; btn.setAttribute('aria-expanded', String(open));
+  if (open) menu.querySelector('[role="menuitem"]')?.focus();
+};
+actions.dtmore = () => dtMenuSet(document.getElementById('dtmenu')?.hidden !== false);
+document.addEventListener('click', e => {
+  const menu = document.getElementById('dtmenu');
+  if (!menu || menu.hidden) return;
+  if (e.target.closest('[role="menuitem"]')) { menu.hidden = true; document.querySelector('.dtmorebtn')?.setAttribute('aria-expanded', 'false'); return; }
+  if (!e.target.closest('.dtmenu,.dtmorebtn')) dtMenuSet(false);
+}, true);
+document.addEventListener('keydown', e => {
+  const menu = document.getElementById('dtmenu');
+  if (!menu || menu.hidden) return;
+  const list = [...menu.querySelectorAll('[role="menuitem"]')], i = list.indexOf(document.activeElement);
+  if (e.key === 'Escape') { e.preventDefault(); dtMenuSet(false); document.querySelector('.dtmorebtn')?.focus(); }
+  else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); list[(i + (e.key === 'ArrowDown' ? 1 : -1) + list.length) % list.length]?.focus(); }
+});
 
 // 공유: 휴대폰 공유 메뉴 → 안 되면 제목 · 주소 · 링크를 복사
 actions.dtshare = async () => {

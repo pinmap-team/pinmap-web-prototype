@@ -2,7 +2,7 @@
 // 마이에서 누르는 기능은 아래에서 올라오는 시트 대신 새 페이지로 열리고, 왼쪽 위 ← 로 마이로 돌아가요.
 // 현재 위치 · 관심 키워드 · 알림 · 저장 · 위치/지도 · 저장하는 방법 · 앱 정보 · 핀맵 계정 설정
 
-const MY_PAGES = {placeset:'위치 설정', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', mapset:'지도 디자인', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'프로필 및 계정', accountaccess:'로그아웃, 탈퇴'};
+const MY_PAGES = {calexport:'캘린더로 내보내기', favorites:'즐겨찾기', placeset:'위치 설정', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', mapset:'지도 디자인', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리', accountaccess:'로그아웃, 탈퇴'};
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
 const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
@@ -13,16 +13,17 @@ pages.my = function(){
     .replace(/<button class="sharepromo"[\s\S]*?<\/button>\s*/, '')
     .replace('관심사, 활용 목적', '관심 키워드 설정')
     .replace(/<button class="logout"[^>]*>[\s\S]*?<\/button>/, '')
+    // 2026-11-10 프로필 카드 오른쪽 '>' · 사진/이름 밖을 누르면 계정 관리로
+    .replace('</div><!--myprofile-end-->', `<button type="button" class="myprofile-go" data-page="account" aria-label="계정 관리로 이동">${icon('chevright')}</button></div><!--myprofile-end-->`)
     // 2026-11-03: 코스 · 연동 새로고침을 프로필 아래 둥근 사각형 카드로 (목록의 '저장한 코스 보기'는 중복이라 뺌)
     .replace(/<button class="mrow" data-page="courses">[\s\S]*?<\/button>\s*/, '')
-    .replace('<!--myprofile-end-->', myQuickCards())
-    // 2026-11-04: 프로필 카드에서 바로 사진·이름을 바꾸므로 로그아웃 | 회원 탈퇴는 마이 맨 아래로
-    + `<nav class="account-exit my-exit" aria-label="로그아웃 및 회원 탈퇴"><button type="button" data-action="logoutask">로그아웃</button><span aria-hidden="true">|</span><button type="button" data-action="leaveask">회원 탈퇴</button></nav>`;
+    .replace('<!--myprofile-end-->', myQuickCards());
 };
 function myQuickCards(){
   return `<div class="my-quick" role="group" aria-label="바로가기">
-    <button type="button" class="myq-card" data-page="courses"><span class="myq-ico" aria-hidden="true">${icon('route')}</span><b>내 코스</b><small>저장한 코스 보기</small></button>
-    <button type="button" class="myq-card" data-action="accounts"><span class="myq-ico" aria-hidden="true">${icon('user')}</span><b>연동 계정 관리</b><small>${myAccounts().length}개 계정 연동</small></button>
+    <button type="button" class="myq-card" data-page="favorites"><span class="myq-ico" aria-hidden="true">${icon('star')}</span><b>즐겨찾기</b></button>
+    <button type="button" class="myq-card" data-page="courses"><span class="myq-ico" aria-hidden="true">${icon('route')}</span><b>내 코스</b></button>
+    <button type="button" class="myq-card" data-action="accounts"><span class="myq-ico" aria-hidden="true">${icon('user')}</span><b>연동 계정 관리</b></button>
   </div>`;
 }
 
@@ -53,7 +54,7 @@ pages.interestset = function(){
   return myPage('관심 키워드 설정', `
     <p class="muted mpdesc kwdesc">고른 키워드에 맞는 저장 콘텐츠를 홈에서 먼저 보여드려요.\n아무것도 고르지 않으면 홈에서 랜덤으로 추천해요.</p>
     <div class="kwgrid" role="group" aria-label="관심 키워드">${opts.map(o => { const on = preferences.includes(o.id);
-      return `<button class="kwopt ${on ? 'on' : ''}" data-kw="${o.id}" role="checkbox" aria-checked="${on}"><span class="kwico" aria-hidden="true">${o.emoji}</span><span>${o.short}</span></button>`; }).join('')}</div>
+      return `<button class="kwopt ${on ? 'on' : ''}" data-kw="${o.id}" role="checkbox" aria-checked="${on}"><span class="kwico" aria-hidden="true">${window.obIcon ? obIcon(o.id, on) : o.emoji}</span><span>${o.short}</span></button>`; }).join('')}</div>
 `, 'kwpage');
 };
 document.addEventListener('click', e => {
@@ -95,6 +96,13 @@ document.addEventListener('click', e => {
 }, true);
 
 /* ---------- 앱 정보 ---------- */
+// 2026-11-10 지도 카드에서 하트를 누른 장소(찜) 모아보기. 누르면 상세로 가요.
+pages.favorites = () => {
+  const list = items.filter(x => x.favorite);
+  return myPage('즐겨찾기', list.length
+    ? `<p class="fav-count">${list.length}개</p><div class="cf-items fav-items">${list.map(cfItem).join('')}</div>`
+    : `<div class="empty fav-empty">${icon('star')}<h3>아직 즐겨찾기한 콘텐츠가 없어요</h3><p class="muted">콘텐츠 상세에서 별을 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="library">컬렉션으로 가기</button></div>`, 'favpage');
+};
 pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
     <div class="setrow"><div><b>핀맵</b><small>저장을 다시, 일상으로</small></div></div>
     <div class="setrow"><div><b>버전</b><small>Prototype 03</small></div></div>
@@ -142,11 +150,17 @@ pages.howtopage = function(){
 };
 
 /* ---------- 프로필: 사진/이름 직접 편집 (2026-11-04: SNS 연동 계정은 마이 바로가기 '연동 계정 관리' 페이지로 분리) ---------- */
-pages.account = () => myPage('프로필 및 계정', `<section class="account-identity" aria-label="프로필">
-    <button type="button" class="account-photo" data-action="profilephoto" aria-label="프로필 사진 변경">${avatarHtml()}<span class="account-photo-edit" aria-hidden="true">${icon('image')}</span></button>
-    <input type="file" id="avatarfile" accept="image/*" hidden>
-    ${editingProfileName?`<form id="profilepage" class="account-name-form"><label class="field"><span>이름</span><input name="nickname" aria-label="프로필 이름" value="${esc(settings.nickname || '')}" required maxlength="12" autocomplete="nickname"></label><div><button type="button" class="textbtn" data-action="profilecancel">취소</button><button type="submit" class="filled">저장</button></div></form>`:`<button type="button" class="account-name" data-action="profilename" aria-label="프로필 이름 변경"><b>${esc(settings.nickname || '이름 설정')}</b>${icon('edit')}</button><p>사진이나 이름을 눌러 수정해요</p>`}
-  </section>
+/* ---------- 계정 관리 (2026-11-10): 프로필 · 개인정보(연락처, 생년월일) 보기, 맨 아래 로그아웃 | 회원 탈퇴 ---------- */
+// 사진 · 이름은 마이 프로필 카드에서 바로 바꿔요. 연락처 · 생년월일은 프로토타입 예시 값이에요.
+const ACCOUNT_EXAMPLE = {email:'seoyeon@example.com', phone:'010-0000-0000', birth:'2002년 3월 14일'};
+pages.account = () => myPage('계정 관리', `<h2 class="account-sub">프로필</h2>
+  <section class="account-identity account-card" aria-label="프로필"><span class="account-avatar">${avatarHtml()}</span><span><b>${esc(settings.nickname || '이름 설정')}</b><small>핀맵 프로필</small></span></section>
+  <h2 class="account-sub">개인정보</h2>
+  <dl class="account-card account-info">
+    <div><dt>연락처 정보</dt><dd>${esc(settings.contactEmail || ACCOUNT_EXAMPLE.email)}, ${esc(settings.contactPhone || ACCOUNT_EXAMPLE.phone)}</dd></div>
+    <div><dt>생년월일</dt><dd>${esc(settings.birth || ACCOUNT_EXAMPLE.birth)}</dd></div>
+  </dl>
+  <p class="account-note">예시 정보예요. 실제 서비스에서는 가입할 때 입력한 정보가 보여요.</p>
   <nav class="account-exit" aria-label="로그아웃 및 회원 탈퇴">
     <button type="button" data-action="logoutask">로그아웃</button><span aria-hidden="true">|</span><button type="button" data-action="leaveask">회원 탈퇴</button>
   </nav>`, 'accountpage');
@@ -206,8 +220,8 @@ function confirmPop(title, desc, okAction, okLabel = '확인', cancelLabel = '�
 }
 $('#sheet').addEventListener('close', () => $('#sheet').classList.remove('confirmpop'));
 Object.assign(actions, {
-  logoutask: () => confirmPop('로그아웃하시겠습니까?', '다시 로그인하면 저장한 콘텐츠를 그대로 볼 수 있어요.', 'logoutyes'),
-  leaveask: () => confirmPop('탈퇴하시겠습니까?', '탈퇴하면 저장한 콘텐츠와 설정이 모두 지워지고 되돌릴 수 없어요.', 'leaveyes'),
+  logoutask: () => confirmPop('로그아웃할까요?', '다시 로그인하면 저장한 콘텐츠를 그대로 볼 수 있어요.', 'logoutyes', '로그아웃', '취소'),
+  leaveask: () => confirmPop('탈퇴할까요?', '탈퇴하면 저장한 콘텐츠와 설정이 모두 지워져요.<br>지운 내용은 되돌릴 수 없어요.', 'leaveyes', '탈퇴하기', '유지하기'),
   logoutyes: () => { $('#sheet').close(); go('home'); toast('로그아웃했어요. (체험)'); openOnboarding(0); },
   leaveyes: () => { try { [STORAGE, ...LEGACY_KEYS].forEach(k => localStorage.removeItem(k)); } catch {} location.reload(); },
   resetask: () => go('account')
@@ -219,3 +233,47 @@ actions.intro = () => openOnboardingPreview();
 // Apply the previewed choice when leaving the theme page, including its back button.
 const goBeforeThemePreview = go;
 go = function(next){ if(page==='themeset'&&next!=='themeset')PinmapTheme.commitPreview();return goBeforeThemePreview.apply(this,arguments); };
+
+// 2026-11-10 프로필 카드: 사진 · 이름(편집) 밖 어디를 눌러도 계정 관리로 가요. 키보드는 오른쪽 '>' 버튼으로.
+document.addEventListener('click', e => {
+  if (page !== 'my' || detailId) return;
+  const card = e.target.closest('.myprofile');
+  if (!card || e.target.closest('.myprofile-photo,.myprofile-name,.myprofile-form,.myprofile-go,input,button,form')) return;
+  go('account');
+});
+
+/* ---------- 2026-11-10 캘린더로 내보내기: 마감 일정만 한 번에 .ics 파일로 (Google · Apple 캘린더에서 가져오기). 양방향 동기화는 다음 단계 ---------- */
+const calExportList = () => (typeof calDueList === 'function' ? calDueList().filter(x => calDue(x) >= calToday) : []);
+pages.calexport = () => {
+  const list = calExportList();
+  return myPage('캘린더로 내보내기', `<p class="mpdesc calx-desc">저장한 콘텐츠의 마감 일정을 내 캘린더에 한 번에 넣어요.<br>Google 캘린더와 Apple 캘린더 모두 같은 파일로 가져올 수 있어요.</p>
+  <section class="mycard calx-list" aria-label="내보낼 마감 일정">
+    <h2>내보낼 마감 일정 <span>${list.length}개</span></h2>
+    ${list.length ? list.map(x => `<div class="calx-row"><span class="calx-date">${esc(fmtDay(calDue(x)))}</span><b>${esc(x.title)}</b></div>`).join('') : '<p class="muted">다가오는 마감 일정이 없어요.</p>'}
+  </section>
+  <div class="calx-actions">
+    <button type="button" class="filled calx-btn" data-action="calexportapple" ${list.length ? '' : 'disabled'}>${icon('calendar')}Apple 캘린더로 내보내기</button>
+    <button type="button" class="calx-btn calx-secondary" data-action="calexportgoogle" ${list.length ? '' : 'disabled'}>${icon('calendar')}Google 캘린더로 내보내기</button>
+  </div>
+  <p class="hint calx-hint">지금은 한 번 내보내기만 할 수 있어요. 핀맵에서 바꾼 내용이 캘린더에 자동으로 반영되지는 않아요.</p>`, 'calxpage');
+};
+function calExportFile(){
+  const list = calExportList(); if (!list.length) { toast('내보낼 마감 일정이 없어요.'); return false; }
+  const d8 = d => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  const safe = t => String(t || '').replace(/[\\;,]/g, m => '\\' + m).replace(/\n/g, ' ');
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const events = list.map(x => { const s = calDue(x), e = new Date(s); e.setDate(e.getDate() + 1);
+    return ['BEGIN:VEVENT', `UID:pinmap-${x.id}-${d8(s)}@pinmap`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${d8(s)}`, `DTEND;VALUE=DATE:${d8(e)}`, `SUMMARY:${safe(x.title)} ${safe(x.dueLabel || '마감')}`, `DESCRIPTION:${safe(x.period || x.desc || '핀맵에 저장한 콘텐츠')}`, 'END:VEVENT'].join('\r\n'); });
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Pinmap//Deadlines//KO', 'CALSCALE:GREGORIAN', ...events, 'END:VCALENDAR'].join('\r\n');
+  try {
+    const url = URL.createObjectURL(new Blob([ics], {type: 'text/calendar;charset=utf-8'}));
+    const a = document.createElement('a'); a.href = url; a.download = 'pinmap-deadlines.ics'; document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return list.length;
+  } catch { toast('캘린더 파일을 만들지 못했어요. 다시 시도해 주세요.'); return false; }
+}
+Object.assign(actions, {
+  calexport: () => go('calexport'),
+  calexportapple: () => { const n = calExportFile(); if (n) toast(`마감 일정 ${n}개를 캘린더 파일로 저장했어요.\n파일을 열면 Apple 캘린더에 추가돼요.`); },
+  calexportgoogle: () => { const n = calExportFile(); if (n) { toast(`마감 일정 ${n}개를 캘린더 파일로 저장했어요.\nGoogle 캘린더의 가져오기에서 이 파일을 선택해 주세요.`); try { window.open('https://calendar.google.com/calendar/r/settings/export', '_blank', 'noopener,noreferrer'); } catch {} } }
+});

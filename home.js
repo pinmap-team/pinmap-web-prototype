@@ -86,16 +86,12 @@ function emptyPickCards(){
   </div>`).join('');
 }
 
-/* ---------- 캘린더 위젯: 오늘부터 7일 · 마감 있는 날에 점 ---------- */
+/* ---------- 캘린더 위젯: 다가오는 마감 2개, 제목 줄 오른쪽 '전체보기' (2026-11-10) ---------- */
 function calWidget(){
-  const due = calDueList(), byDay = {};
-  due.forEach(x => { const k = calKey(calDue(x)); (byDay[k] = byDay[k] || []).push(x); });
-  const W = ['일','월','화','수','목','금','토'];
-  const days = Array.from({length:7}, (_, i) => { const d = new Date(calToday); d.setDate(d.getDate() + i); return d; });
+  const due = calDueList();
   const next = due.slice(0, 2);
   return `<section class="hwidget calw">
-    <div class="hwhead"><h2>${calToday.getMonth()+1}월 일정</h2><button class="textbtn calmore" data-action="gocal">전체보기 ${icon('arrow')}</button></div>
-    <div class="weekstrip">${days.map((d, i) => { const k = calKey(d), has = byDay[k]; return `<button class="wday ${i===0?'today':''}" data-calday="${k}" aria-label="${d.getMonth()+1}월 ${d.getDate()}일${has?`, 마감 ${has.length}개`:''}"><small>${W[d.getDay()]}</small><b>${d.getDate()}</b><i class="${has?'on':''}"></i></button>`; }).join('')}</div>
+    <div class="hwhead"><h2>${calToday.getMonth()+1}월 일정</h2><button type="button" class="calgo" data-action="gocal" aria-label="캘린더 전체보기">전체보기${icon('chevright')}</button></div>
     ${next.length ? `<div class="calnext">${next.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cnbadge ${calDays(x) <= 3 ? 'soon' : ''}">${dLabel(x)}</span><span class="cntext">${esc(x.title)}</span></button>`).join('')}</div>` : '<p class="hint calnone">다가오는 마감이 없어요.</p>'}
   </section>`;
 }
@@ -155,7 +151,7 @@ pages.home = function(){
   const picks = homePicks();
   const emptyHome = PM_ENV.development && !items.length;
   const main = picks.length || PM_ENV.development
-    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${!picks.length && PM_ENV.development ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아보세요.</p><button type="button" data-action="save">${icon('plus')}콘텐츠 추가하기</button><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
+    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${!picks.length && PM_ENV.development ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" data-action="save">${icon('plus')}콘텐츠 추가하기</button><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
     : `<div class="empty small"><p class="muted">선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.</p><button class="tonal" data-action="save">새로 저장하기</button></div>`;
   const brand = '<div class="homebrand"><img src="img/pinmap-logo-splash.svg" alt="Pinmap 로고"></div>';
   return stripBar() + brand + main + (emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + chips + (emptyHome ? '' : subWidgets());

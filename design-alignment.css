@@ -140,7 +140,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 .live-map .lm-map-credits summary:focus-visible{outline:2px solid var(--color-primary);outline-offset:-5px;border-radius:50%}
 .live-map .lm-map-credits-panel{position:absolute;bottom:44px;left:4px;width:min(290px,calc(100vw - 32px));padding:var(--space-md) var(--space-lg);border:1px solid var(--color-border);border-radius:var(--rounded-md);background:var(--color-surface);box-shadow:var(--shadow-md);font:var(--type-body-sm)}
 .live-map .lm-map-credits-panel strong{display:block;margin-bottom:var(--space-sm)}
-.live-map .lm-map-credits-panel p{margin:var(--space-xs) 0;line-height:1.5}
+.live-map .lm-map-credits-panel p{margin:var(--space-xs) 0}
 .live-map .lm-map-credits-panel a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .live-map .lm-map-credits-fallback{display:none}
 .live-map:has(#live-map-canvas[data-basemap="osm-fallback"]) .lm-map-credits-vector{display:none}
@@ -389,8 +389,8 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 /* 2026-11-03 위치 편집 페이지: 제목과 등록된 위치 글자를 타입 스케일 한 단계씩 작게 (기존 토큰만 사용).
    메모·배지는 이미 가장 작은 body-sm이라 그대로 둔다. */
 .address-header h1{font:var(--type-headline-md)}
-.address-name b{font:var(--type-body-md);font-weight:700}
-.address-detail{font:var(--type-label-md);font-weight:400}
+.address-name b{font:var(--type-body-md);font-weight:var(--weight-bold)}
+.address-detail{font:var(--type-label-md);font-weight:var(--weight-regular)}
 
 /* 2026-11-03 연동 새로고침 결과 안내: 한 줄로 표시 (화면 폭 안에서 가로로 늘어남, 기존 토큰만 사용) */
 #snackbar.oneline{white-space:nowrap;width:max-content;max-width:calc(100% - var(--space-xl))}
@@ -470,8 +470,8 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 .ob-slides::-webkit-scrollbar{display:none}
 .ob-slides:focus-visible{outline:2px solid var(--color-primary);outline-offset:-2px}
 .ob-slide{flex:0 0 calc(100% - var(--space-xl));display:flex;flex-direction:column;gap:var(--space-md);min-width:0;padding:var(--space-lg);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);scroll-snap-align:start}
-.ob-chip{align-self:flex-start;display:inline-flex;align-items:center;gap:var(--space-sm);padding:var(--space-xs) var(--space-md);border:1px solid #111111;border-radius:var(--rounded-sm);background:#111111;color:#FFFFFF;font:var(--type-label-md)}
-#onboarding .step2 .ob-chip .ob-num{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#FFFFFF;color:#111111;font:var(--type-body-sm);font-weight:var(--weight-bold)}
+.ob-chip{align-self:flex-start;display:inline-flex;align-items:center;gap:var(--space-sm);padding:var(--space-xs) var(--space-md);border:1px solid var(--color-primary);border-radius:var(--rounded-sm);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md)}
+#onboarding .step2 .ob-chip .ob-num{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--color-neutral);color:var(--color-primary);font:var(--type-body-sm);font-weight:var(--weight-bold)}
 .ob-slide .ob-phone-stage.ob-phone-crop{position:relative;display:block;height:320px;padding:0;border-radius:var(--rounded-md);background:var(--color-neutral);overflow:hidden}
 .ob-slide .ob-phone-crop .ob-phone{top:var(--space-md);transform:translateX(-50%) scale(var(--ob-slide-zoom,1.2))}
 .ob-slide-desc{margin:0;color:var(--color-on-surface);font:var(--type-body-md);font-weight:var(--weight-regular)}
@@ -499,7 +499,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 #onboarding .step3 .ob-option .ob-emoji .icon{width:24px;height:24px}
 #onboarding .step3 .ob-option.on,[data-theme="dark"] #onboarding .step3 .ob-option.on{background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important}
 #onboarding .step3 .ob-option.on .ob-emoji{background:var(--color-primary);color:var(--color-neutral)!important}
-#onboarding .step3 .ob-option.on::after{content:'✓';top:var(--space-lg);right:var(--space-lg);display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--color-primary);color:var(--color-neutral);font:var(--type-body-sm);font-weight:700}
+#onboarding .step3 .ob-option.on::after{content:'✓';top:var(--space-lg);right:var(--space-lg);display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--color-primary);color:var(--color-neutral);font:var(--type-body-sm);font-weight:var(--weight-bold)}
 #onboarding .step3 .ob-option:last-child:nth-child(odd).on::after{top:50%;transform:translateY(-50%)}
 #onboarding .step3 .ob-action-back{border:1px solid var(--color-disabled);border-radius:var(--rounded-sm);background:var(--color-surface);color:var(--color-on-surface)}
 #onboarding .step3 .ob-option .ob-label{text-wrap:balance}
@@ -590,9 +590,9 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 .mypage.kwpage .subhead{margin-bottom:var(--space-xl)}
 .mypage.kwpage .kwdesc{margin:0 0 var(--space-xl);font:var(--type-body-md);color:var(--color-secondary);white-space:pre-line;word-break:keep-all}
 
-/* 2026-11-04 관심 키워드 선택: 회색 대신 accent(#70E6B3) 32% 바탕. 마이 설정과 온보딩 같은 색 */
-.kwopt.on,[data-theme="dark"] .kwopt.on{background:color-mix(in srgb,var(--color-accent) 32%,var(--color-surface))!important;color:var(--color-on-surface)}
-#onboarding .step3 .ob-option.on,[data-theme="dark"] #onboarding .step3 .ob-option.on{background:color-mix(in srgb,var(--color-accent) 32%,var(--color-surface))!important}
+/* 2026-11-04 관심 키워드 선택: 회색 대신 accent(#C6F5E1) 32% 바탕. 마이 설정과 온보딩 같은 색 */
+.kwopt.on,[data-theme="dark"] .kwopt.on{background:var(--color-accent)!important;color:var(--color-on-surface)}
+#onboarding .step3 .ob-option.on,[data-theme="dark"] #onboarding .step3 .ob-option.on{background:var(--color-accent)!important}
 /* 2026-11-04 관심 키워드 설명 한 단계 작게: body-md → label-md 크기(굵기는 regular로 설명답게) */
 .mypage.kwpage .kwdesc{font:var(--type-label-md);font-weight:var(--weight-regular)}
 /* 2026-11-04 프로필 이름 입력: 테두리 + 포커스 선이 두 겹으로 보이지 않게 포커스 때는 테두리 하나만 primary로 */
@@ -622,7 +622,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 .address-manage .address-row-edit{flex-direction:column;margin:0}
 .address-intro{font:var(--type-headline-lg);margin:var(--space-xl) 0}
 .address-help{color:var(--color-secondary);font:var(--type-body-sm);margin:var(--space-md) 0 var(--space-xl)}
-.address-help p{margin:var(--space-xs) 0;line-height:2}
+.address-help p{margin:var(--space-xs) 0}
 .address-search-result{display:flex;align-items:center;gap:var(--space-md);width:100%;padding:var(--space-lg) 0;background:transparent;color:var(--color-on-surface);border-bottom:1px solid var(--color-disabled);text-align:left}
 .address-search-result span{flex:1}
 .map-app-preview{margin:0 0 var(--space-xl);overflow:hidden;border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:var(--shadow-sm)}
@@ -637,7 +637,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 #sheet:has([data-action="addressdeleteconfirm"]) .cfkeep{order:1;background:var(--color-neutral);color:var(--color-on-surface);border-radius:var(--rounded-md)}
 
 /* 2026-11-06: navigation material and onboarding selection refinement. */
-.bottomnav .pm-nav-main::before{background:rgba(255,255,255,.72)}
+.bottomnav .pm-nav-main::before{background:color-mix(in srgb,var(--color-surface) 72%,transparent)}
 [data-theme="dark"] .bottomnav .pm-nav-main::before{background:rgba(27,27,29,.92)}
 #onboarding .step3 .ob-option.on::after{content:none;display:none}
 
@@ -709,7 +709,7 @@ body:has(.location-confirm) .bottomnav{display:none!important}
 .address-search-entry>span{flex:1}
 
 /* Reuse the light token values inside a light preview on a dark settings page. */
-.pm-theme-preview[data-theme="light"]{--color-neutral:#F4F4F5;--color-surface:#FFFFFF;--color-on-surface:#111111;--color-secondary:#6B6B70;--color-border:#6B6B70;--color-primary:#111111;--color-primary-pressed:#333333;--color-disabled:#E8E8EA;--color-error:#D13D3D;--color-accent:#70E6B3;color-scheme:light}
+.pm-theme-preview[data-theme="light"]{--color-neutral:#F4F4F5;--color-surface:#FFFFFF;--color-on-surface:#111111;--color-secondary:#6B6B70;--color-border:#6B6B70;--color-primary:#111111;--color-primary-pressed:#333333;--color-disabled:#E8E8EA;--color-error:#D13D3D;--color-accent:#C6F5E1;color-scheme:light}
 .pm-theme-preview[data-theme="dark"]{color-scheme:dark}
 
 /* Authentication: simple introduction and a separate sign-in panel. */
@@ -799,3 +799,236 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .auth-secondary+.auth-field-help{margin-top:var(--space-sm)}
 .auth-mail-links{display:flex;justify-content:space-between;flex-wrap:wrap;gap:var(--space-sm);margin-top:var(--space-lg)}
 .auth-mail-links button{min-height:44px;padding:var(--space-xs) 0;background:none;border:0;font:var(--type-body-sm);color:var(--color-secondary);text-decoration:underline;text-underline-offset:var(--space-xs)}
+
+/* 2026-11-10 홈 캘린더 위젯: 제목 줄 오른쪽 끝 '전체보기' 텍스트 버튼 */
+.calw .hwhead{display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm)}
+.calw .calgo{display:inline-flex;align-items:center;gap:var(--space-xs);flex:none;min-height:44px;margin:0 calc(-1 * var(--space-xs)) 0 auto;padding:0 var(--space-xs);border:0;background:transparent;font:var(--type-label-md);color:var(--color-secondary);cursor:pointer}
+.calw .calgo svg{width:16px;height:16px}
+
+/* 2026-11-10 컬렉션 정렬 선택지는 오른쪽 (폴더 목록 · 폴더 안 모두) */
+.cf-folder-toolbar{justify-content:flex-end}
+.cf-tools .libsort{font:var(--type-body-sm);color:var(--color-secondary)}
+
+/* 2026-11-10 상세: 미트볼 메뉴 · AI 요약 accent 칩 · 큰 가격 · 버튼 규격(Button large 56px, rounded-sm) */
+.dttopr{position:relative}
+.dtmenu{position:absolute;top:calc(100% + var(--space-sm));right:0;z-index:5;min-width:148px;padding:var(--space-xs);border-radius:var(--rounded-md);background:var(--color-surface);box-shadow:var(--shadow-md)}
+.dtmenu[hidden]{display:none}
+.dtmenu button{display:flex;align-items:center;gap:var(--space-sm);width:100%;min-height:44px;padding:0 var(--space-md);border:0;border-radius:var(--rounded-sm);background:transparent;font:var(--type-body-md);color:var(--color-on-surface);text-align:left;cursor:pointer}
+.dtmenu button .icon{width:18px;height:18px;flex:none;color:var(--color-secondary)}
+.dtmenu button:hover,.dtmenu button:focus-visible{background:var(--color-neutral)}
+.dtmenu button:focus-visible{outline:2px solid var(--color-primary);outline-offset:-2px}
+.dtmenu .dtmenu-danger,.dtmenu .dtmenu-danger .icon{color:var(--color-error)}
+.dtsum h2.dtai{display:inline-flex;width:auto;padding:var(--space-xs) var(--space-sm);border-radius:var(--rounded-sm);background:var(--color-accent);color:var(--color-on-surface)}
+[data-theme="dark"] .dtsum h2.dtai{color:var(--color-neutral)}
+.dtprice{margin:0;font:var(--type-headline-md);color:var(--color-on-surface);font-variant-numeric:tabular-nums}
+.dtprice.none{font:var(--type-body-md);color:var(--color-secondary)}
+.dtpricehint{margin:var(--space-sm) 0 0;font:var(--type-body-md);color:var(--color-secondary);word-break:keep-all}
+.dtghost,.dtprimary{min-height:56px;border-radius:var(--rounded-sm);font:var(--type-label-md)}
+.dtprimary{background:var(--color-primary);color:var(--color-neutral)}
+.dtprimary:active{background:var(--color-primary-pressed)}
+.dtghost{background:var(--color-surface);color:var(--color-on-surface);border:1px solid var(--color-border)}
+
+/* 2026-11-10 지도: 현위치 버튼 우측 위 · 직접 핀 찍기 · 카드 전체 클릭 · 위로 밀어 여는 목록 시트 */
+.live-map .lm-locate-top{position:absolute;top:180px;right:var(--space-lg);z-index:610}
+.live-map .lm-locate-top .lm-round{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:var(--color-surface);color:var(--color-on-surface);box-shadow:var(--shadow-sm)}
+.live-map .lm-locate-top .lm-round .icon{width:22px;height:22px}
+.live-map .lm-map-provider-control{right:calc(var(--space-lg) + 44px + var(--space-sm))}
+.live-map .lm-floating-actions .lm-pin-button{display:grid;place-items:center;width:46px;height:46px;padding:0;border:0;border-radius:50%;background:var(--color-surface);color:var(--color-on-surface);box-shadow:var(--shadow-sm)}
+.live-map .lm-floating-actions .lm-pin-button .icon{width:22px;height:22px}
+.live-map .lm-pin-target,.live-map .lm-pin-bar{display:none}
+.live-map.is-pinning .lm-pin-target{display:block;position:absolute;left:50%;top:50%;z-index:600;width:44px;height:44px;margin:-44px 0 0 -22px;color:var(--color-primary);pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
+.live-map.is-pinning .lm-pin-target .icon{width:44px;height:44px;fill:var(--color-surface);stroke-width:1.8}
+.live-map.is-pinning .lm-pin-bar{display:block;position:absolute;left:var(--space-lg);right:var(--space-lg);bottom:calc(96px + env(safe-area-inset-bottom));z-index:700;padding:var(--space-lg);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:var(--shadow-md)}
+.live-map .lm-pin-bar p{margin:0 0 var(--space-md);font:var(--type-body-md);color:var(--color-on-surface);word-break:keep-all}
+.live-map .lm-pin-bar div{display:grid;grid-template-columns:1fr 2fr;gap:var(--space-sm)}
+.live-map .lm-pin-bar button{min-height:48px;border-radius:var(--rounded-sm);font:var(--type-label-md)}
+.live-map .lm-pin-cancel{background:var(--color-surface);color:var(--color-on-surface);border:1px solid var(--color-border)}
+.live-map .lm-pin-confirm{background:var(--color-primary);color:var(--color-neutral);border:0}
+.live-map.is-pinning :is(.lm-selected-host,.lm-floating-actions){visibility:hidden}
+.live-map .lm-carousel-card{position:relative}
+.live-map .lm-carousel-top .lm-card-open{flex:1;min-width:0;padding:0;border:0;background:transparent;text-align:left;color:var(--color-on-surface);cursor:pointer}
+.live-map .lm-carousel-top .lm-card-open strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-label-md)}
+.live-map .lm-carousel-top .lm-card-open::after{content:"";position:absolute;inset:0;border-radius:inherit}
+.live-map .lm-carousel-top .lm-card-open:focus-visible{outline:none}
+.live-map .lm-carousel-card:has(.lm-card-open:focus-visible){outline:2px solid var(--color-primary);outline-offset:2px}
+.live-map .lm-carousel-heart{position:relative;z-index:1}
+.live-map .lm-carousel-bottom{padding-right:0}
+.live-map .lm-carousel-track{touch-action:pan-x}
+.live-map .lm-list-handle{display:flex;flex-direction:column;align-items:center;gap:var(--space-xs);width:100%;min-height:44px;padding:var(--space-xs) 0;border:0;background:transparent;pointer-events:auto;touch-action:none;font:var(--type-body-sm);color:var(--color-secondary);cursor:grab}
+#lm-selected-place .lm-list-handle{width:auto;margin:0 auto var(--space-xs);padding:var(--space-xs) var(--space-lg);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);color:var(--color-on-surface)}
+.live-map .lm-grabber{display:block;width:36px;height:4px;border-radius:2px;background:var(--color-border);opacity:.5}
+.live-map .lm-list-sheet{position:absolute;top:0;left:0;bottom:0;z-index:900;display:flex;flex-direction:column;width:min(88%,360px);padding:calc(env(safe-area-inset-top) + var(--space-xl)) var(--space-xl) calc(var(--space-xl) + env(safe-area-inset-bottom));border-radius:0 var(--rounded-lg) var(--rounded-lg) 0;background:var(--color-surface);box-shadow:var(--shadow-md);animation:lmDrawerIn .26s cubic-bezier(.22,1,.36,1)}
+@keyframes lmDrawerIn{from{transform:translateX(-100%)}to{transform:none}}
+@media(prefers-reduced-motion:reduce){.live-map .lm-list-sheet{animation:none}}
+.live-map .lm-list-scrim{position:absolute;inset:0;z-index:890;background:color-mix(in srgb,var(--color-primary) 24%,transparent)}
+[data-theme="dark"] .live-map .lm-list-scrim{background:color-mix(in srgb,var(--color-neutral) 60%,transparent)}
+.live-map .lm-list-scrim[hidden]{display:none}
+.live-map .lm-list-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm);margin-bottom:var(--space-md)}
+.live-map .lm-list-head h2{margin:0!important}
+.live-map #lm-list-sheet button.lm-list-close{display:grid;place-items:center;flex:none;width:44px;height:44px;margin-right:calc(-1 * var(--space-sm));padding:0;border:0!important;border-radius:50%;background:transparent!important;box-shadow:none!important;color:var(--color-on-surface);-webkit-backdrop-filter:none;backdrop-filter:none}
+.live-map .lm-list-close .icon{width:22px;height:22px}
+.live-map .lm-list-sheet[hidden]{display:none}
+.live-map .lm-list-sheet h2{font:var(--type-headline-md);color:var(--color-on-surface)}
+.live-map .lm-list-sheet h2 span{margin-left:var(--space-xs);color:var(--color-secondary)}
+.live-map .lm-list{flex:1;min-height:0;margin:0;padding:0;list-style:none;overflow-y:auto;overscroll-behavior:contain}
+.live-map .lm-list li{display:flex;align-items:center;gap:var(--space-sm);border-bottom:1px solid var(--color-disabled)}
+.live-map .lm-list li:last-child{border-bottom:0}
+.live-map .lm-list-row{display:flex;align-items:center;gap:var(--space-md);flex:1;min-width:0;min-height:44px;padding:var(--space-md) 0;border:0;background:transparent;text-align:left;color:var(--color-on-surface);cursor:pointer}
+.live-map .lm-list-row img{width:56px;height:56px;flex:none;border-radius:var(--rounded-sm);object-fit:cover}
+.live-map .lm-list-row span{display:flex;flex-direction:column;gap:var(--space-xs);min-width:0}
+.live-map .lm-list-row b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-label-md)}
+.live-map .lm-list-row small{font:var(--type-body-sm);color:var(--color-secondary)}
+.live-map .lm-list-row em{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-body-sm);font-style:normal;color:var(--color-on-surface)}
+.live-map .lm-list-row:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px;border-radius:var(--rounded-sm)}
+.live-map.is-listing :is(.lm-selected-host,.lm-floating-actions){visibility:hidden}
+
+/* 2026-11-10 코스: '+'를 Button 규격(secondary · medium 48px · rounded-sm)의 '장소 추가하기'로, 목록은 아래 시트로 */
+.coursepage .course-add-place{position:static!important;transform:none!important;display:flex!important;align-items:center;justify-content:center;gap:var(--space-sm);width:100%!important;height:auto!important;min-height:48px;margin:var(--space-lg) 0!important;padding:0 var(--space-lg)!important;border:1px solid var(--color-border)!important;border-radius:var(--rounded-sm)!important;background:var(--color-surface)!important;color:var(--color-on-surface)!important;box-shadow:none!important;font:var(--type-label-md)}
+.coursepage .course-add-place svg{width:18px;height:18px;stroke:currentColor!important}
+.course-picker-sheet .course-picker-hint{margin:0 0 var(--space-md);font:var(--type-body-md);color:var(--color-secondary);word-break:keep-all}
+.course-picker-sheet .course-picker{padding:0;background:transparent;max-height:56vh;overflow-y:auto}
+.course-picker-sheet .course-option b{font:var(--type-label-md)}
+.course-picker-sheet .course-option small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.course-picker-sheet .course-option>button{min-width:44px;min-height:44px;padding:0 var(--space-md);border:1px solid var(--color-border);border-radius:var(--rounded-sm);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md)}
+.course-picker-sheet .course-picker-empty{margin:var(--space-lg) 0;text-align:center;font:var(--type-body-md);color:var(--color-secondary)}
+
+/* 2026-11-10 마이 바로가기 3개(찜한 장소 · 내 코스 · 연동 계정 관리) · 찜한 장소 페이지 */
+.my-quick{grid-template-columns:repeat(3,minmax(0,1fr))}
+.my-quick .myq-card{padding:var(--space-md)}
+.my-quick .myq-card b{word-break:keep-all}
+.favpage .fav-count{margin:0 0 var(--space-md);font:var(--type-body-sm);color:var(--color-secondary)}
+.favpage .fav-empty{display:flex;flex-direction:column;align-items:center;gap:var(--space-sm);padding:var(--space-2xl) 0;text-align:center}
+.favpage .fav-empty .icon{width:32px;height:32px;color:var(--color-secondary)}
+.favpage .fav-go{min-height:48px;margin-top:var(--space-sm);padding:0 var(--space-xl);border:0;border-radius:var(--rounded-sm);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md)}
+/* integration.css의 '.live-map button' 유리 재질(!important)을 새 버튼에서는 덮어써요 */
+.live-map button:is(.lm-card-open,.lm-list-row){background:transparent!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none;backdrop-filter:none}
+.live-map #lm-list-sheet button.lm-list-handle{background:transparent!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none;backdrop-filter:none}
+.live-map #lm-selected-place button.lm-list-handle,.live-map .lm-locate-top button.lm-round,.live-map .lm-floating-actions button.lm-pin-button{background:var(--color-surface)!important;border:0!important;box-shadow:var(--shadow-sm)!important;-webkit-backdrop-filter:none;backdrop-filter:none}
+.live-map .lm-pin-bar button.lm-pin-confirm{background:var(--color-primary)!important;color:var(--color-neutral)!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none;backdrop-filter:none}
+.live-map .lm-pin-bar button.lm-pin-cancel{background:var(--color-surface)!important;color:var(--color-on-surface)!important;border:1px solid var(--color-border)!important;box-shadow:none!important;-webkit-backdrop-filter:none;backdrop-filter:none}
+
+/* 2026-11-10 위치 편집 제목 한 단계 키움(headline-md → headline-lg) */
+.address-name b{font:var(--type-headline-md)}
+
+/* 2026-11-10 마이 프로필 카드 → 계정 관리 */
+.myprofile{cursor:pointer}
+.myprofile .myprofile-go{display:grid;place-items:center;flex:none;width:44px;height:44px;margin-left:auto;padding:0;border:0;background:transparent;color:var(--color-secondary)}
+.myprofile .myprofile-go .icon{width:20px;height:20px}
+.accountpage .account-lead{margin:0 0 var(--space-xl);font:var(--type-body-md);color:var(--color-secondary);word-break:keep-all}
+.accountpage .account-sub{margin:0 0 var(--space-sm);font:var(--type-label-md);color:var(--color-on-surface)}
+.accountpage .account-card{margin:0 0 var(--space-xl);border:1px solid var(--color-disabled);border-radius:var(--rounded-md);background:var(--color-surface)}
+.accountpage .account-identity.account-card{flex-direction:row;align-items:center;gap:var(--space-md);padding:var(--space-lg);text-align:left}
+.accountpage .account-identity .pavatar{width:48px;height:48px}
+.accountpage .account-identity b{display:block;font:var(--type-body-md);font-weight:var(--weight-semibold);color:var(--color-on-surface)}
+.accountpage .account-identity small{display:block;margin-top:var(--space-xs);font:var(--type-body-sm);color:var(--color-secondary)}
+.accountpage .account-info{padding:0}
+.accountpage .account-info>div{padding:var(--space-lg)}
+.accountpage .account-info>div+div{border-top:1px solid var(--color-disabled)}
+.accountpage .account-info dt{font:var(--type-body-md);color:var(--color-on-surface)}
+.accountpage .account-info dd{margin:var(--space-xs) 0 0;font:var(--type-body-md);color:var(--color-secondary);overflow-wrap:anywhere}
+.accountpage .account-note{margin:calc(-1 * var(--space-md)) 0 0;font:var(--type-body-sm);color:var(--color-secondary)}
+
+/* 2026-11-10 글자 입력칸 · 검색창은 포커스돼도 검정 테두리(outline · 링)를 그리지 않아요. 깜박이는 커서로 위치를 알려요. 버튼 · 링크의 키보드 포커스 표시는 그대로. */
+:is(input,textarea,select):not([type="checkbox"]):not([type="radio"]):not([type="range"]):is(:focus,:focus-visible){outline:none!important}
+:is(.search,.libsearch,.cf-picksearch,.psearch,.cm-search,.lm-search,.address-search,.auth-input-shell,.esinput,.esselect,.field,.myprofile-form,.address-edit-form .field):focus-within{outline:none!important}
+.cfpage .libsearch:focus-within,.cf-picksearch:focus-within,.libsearch:focus-within,:is(.esselect,.esinput):focus-within{box-shadow:none!important}
+.live-map .lm-header .lm-search-row .libsearch:focus-within,.main>.topbar .home-search .libsearch:focus-within{box-shadow:none!important}
+:is(.myprofile-form input,.address-edit-form :is(input,textarea)):is(:focus,:focus-visible){border-color:var(--color-border)!important}
+.ob-chip .ob-num,[data-theme="dark"] .ob-chip .ob-num{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--color-neutral);color:var(--color-primary);font:var(--type-body-sm);font-weight:var(--weight-bold)}
+
+/* 2026-11-10 지도: '지도 종류' 버튼은 지도에서 빼고(마이 '지도 디자인'에서만 선택), 목록은 왼쪽 가장자리 책갈피 → 왼쪽에서 열리는 목록 */
+.live-map .lm-map-provider-control{display:none}
+.live-map #lm-selected-place button.lm-list-tab{position:absolute;left:0;bottom:calc(100% + var(--space-md));z-index:2;display:flex;flex-direction:column;align-items:center;gap:var(--space-xs);width:44px;min-height:88px;padding:var(--space-sm) var(--space-xs);border:0!important;border-radius:0 var(--rounded-md) var(--rounded-md) 0;background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important;color:var(--color-on-surface);pointer-events:auto;touch-action:none;-webkit-backdrop-filter:none;backdrop-filter:none;cursor:pointer}
+.live-map .lm-list-tab .icon{width:20px;height:20px}
+.live-map .lm-list-tab span{font:var(--type-body-sm);writing-mode:vertical-rl;letter-spacing:.1em}
+.live-map .lm-list-tab b{display:grid;place-items:center;min-width:24px;height:24px;padding:0 var(--space-xs);border-radius:var(--rounded-md);background:var(--color-primary);color:var(--color-neutral);font:var(--type-body-sm);font-weight:var(--weight-bold)}
+.live-map .lm-list-tab:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+.live-map .lm-selected-host{overflow:visible}
+
+/* 2026-11-10 민트(accent) 카드: 불투명도 40%로 연하게, 글자는 블랙(새 토큰 없이 기존 토큰 섞기).
+   라이트: accent 40% + surface, 글자 on-surface / 다크: accent 40% + on-surface(밝은 회색), 글자 neutral(#111) */
+/* 온보딩 2/2 선택 카드(Figma Option Card): 기본 surface + 흰 아이콘 원(그림자), 선택 민트 + 채운 아이콘 */
+#onboarding .step3 .ob-option,[data-theme="dark"] #onboarding .step3 .ob-option{background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important;border:0!important}
+#onboarding .step3 .ob-option .ob-emoji,[data-theme="dark"] #onboarding .step3 .ob-option .ob-emoji{background:var(--color-surface)!important;color:var(--color-on-surface)!important;box-shadow:var(--shadow-sm)}
+#onboarding .step3 .ob-option.on,.kwopt.on{background:var(--color-accent)!important;color:var(--color-on-surface)!important}
+#onboarding .step3 .ob-option.on :is(.ob-label,.ob-emoji){color:var(--color-on-surface)!important}
+[data-theme="dark"] #onboarding .step3 .ob-option.on,[data-theme="dark"] .kwopt.on{background:var(--color-accent)!important;color:var(--color-neutral)!important}
+[data-theme="dark"] #onboarding .step3 .ob-option.on .ob-label{color:var(--color-neutral)!important}
+[data-theme="dark"] #onboarding .step3 .ob-option.on .ob-emoji{background:var(--color-on-surface)!important;color:var(--color-neutral)!important}
+#onboarding .step3 .ob-option .ob-emoji .ob-icon{width:auto;height:auto}
+.kwopt .kwico .ob-icon{width:auto;height:auto}
+
+/* 2026-11-10 정렬 드롭다운: 오른쪽 정렬로 화면 안에서 펼침(가로 스크롤 없음), 픽토그램 없음 */
+.pm-choice-sort{position:relative}
+.pm-choice-sort .pm-choice-options{left:auto;right:0;min-width:168px;max-width:calc(100vw - 2 * var(--space-xl))}
+.pm-choice-sort .pm-choice-trigger{gap:var(--space-xs)}
+/* 2026-11-10 지도 목록 책갈피: 글자·개수 없이 목록 픽토그램만 (44×52, 접근 이름은 '장소 목록 열기, N곳') */
+.live-map #lm-selected-place button.lm-list-tab{min-height:52px;height:52px;justify-content:center;padding:0}
+.live-map .lm-list-tab .icon{width:22px;height:22px}
+
+/* 2026-11-10 상세 추가 조정 */
+.dtpricehint{font:var(--type-body-sm)}
+.dt .dtbtn.dtmorebtn{width:52px;height:52px}
+.dt .dtbtn.dtmorebtn .icon{width:26px;height:26px}
+.dtrow.dtrecipe{font:var(--type-body-md);color:var(--color-on-surface)}
+.dtrow.dtrecipe .icon{width:20px;height:20px}
+/* 내 메모 칸: 회색(neutral) 바탕, 선 없음 */
+.dtmemobox,[data-theme="dark"] .dtmemobox{background:var(--color-neutral)!important;border:0!important;box-shadow:none!important}
+/* AI 요약 박스 전체를 민트 40%, 문구는 블랙 */
+.dtsum{background:var(--color-accent)!important}
+.dtsum h2,.dtsum p{color:var(--color-on-surface)!important}
+.dtsum h2.dtai{background:transparent;padding-left:0;padding-right:0}
+[data-theme="dark"] .dtsum{background:var(--color-accent)!important}
+[data-theme="dark"] .dtsum h2,[data-theme="dark"] .dtsum p,[data-theme="dark"] .dtsum h2.dtai{color:var(--color-neutral)!important}
+[data-theme="dark"] .dtsum h2 .icon{color:var(--color-neutral)}
+/* 컬렉션 폴더 안 콘텐츠 제목 한 단계 키움(label-md → body-md 굵게) */
+.cf-itemtext h3{font:var(--type-body-md)!important;font-weight:var(--weight-semibold)!important}
+
+/* 2026-11-10 캘린더로 내보내기 */
+.calxpage .calx-desc{margin:0 0 var(--space-xl);font:var(--type-body-md);color:var(--color-secondary);word-break:keep-all}
+.calxpage .calx-list{padding:var(--space-lg);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:var(--shadow-sm)}
+.calxpage .calx-list h2{margin:0 0 var(--space-sm);font:var(--type-label-md);color:var(--color-on-surface)}
+.calxpage .calx-list h2 span{margin-left:var(--space-xs);color:var(--color-secondary)}
+.calxpage .calx-row{display:flex;align-items:center;gap:var(--space-md);min-height:44px;border-top:1px solid var(--color-disabled)}
+.calxpage .calx-row b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-body-md);color:var(--color-on-surface)}
+.calxpage .calx-date{flex:none;font:var(--type-body-sm);color:var(--color-secondary);font-variant-numeric:tabular-nums}
+.calxpage .calx-actions{display:grid;gap:var(--space-sm);margin-top:var(--space-xl)}
+.calxpage .calx-btn{display:flex;align-items:center;justify-content:center;gap:var(--space-sm);min-height:56px;border-radius:var(--rounded-sm);font:var(--type-label-md)}
+.calxpage .calx-btn .icon{width:20px;height:20px}
+.calxpage .calx-secondary{background:var(--color-surface);color:var(--color-on-surface);border:1px solid var(--color-border)}
+.calxpage .calx-btn:disabled{background:var(--color-disabled);color:var(--color-secondary);border-color:transparent}
+.calxpage .calx-hint{margin:var(--space-md) 0 0;font:var(--type-body-sm);color:var(--color-secondary);word-break:keep-all}
+
+/* 2026-11-10 코스 만드는 순서 표시 · 장소 추가 거리 기준 */
+.coursepage .course-steps{display:flex;gap:var(--space-xs);margin:0 0 var(--space-md);padding:0 var(--space-xl);list-style:none}
+.coursepage .course-steps li{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--space-xs);font:var(--type-body-sm);color:var(--color-secondary);text-align:center}
+.coursepage .course-steps li span{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--color-disabled);color:var(--color-secondary);font:var(--type-body-sm);font-weight:var(--weight-bold)}
+.coursepage .course-steps li.done span{background:var(--color-primary);color:var(--color-neutral)}
+.coursepage .course-steps li.now{color:var(--color-on-surface);font-weight:var(--weight-semibold)}
+.coursepage .course-steps li.now span{background:var(--color-surface);color:var(--color-on-surface);box-shadow:inset 0 0 0 2px var(--color-primary)}
+.course-picker-sheet .course-range{display:flex;flex-wrap:wrap;gap:var(--space-sm);margin:0 0 var(--space-md)}
+.course-picker-sheet .course-range button{min-height:36px;padding:0 var(--space-md);border:0;border-radius:999px;background:var(--color-neutral);color:var(--color-on-surface);font:var(--type-label-md)}
+.course-picker-sheet .course-range button[aria-pressed="true"]{background:var(--color-primary);color:var(--color-neutral)}
+
+.address-select>.address-badge{flex:none;white-space:nowrap;margin-left:auto}
+
+/* 2026-11-10 approved mint: one opaque key color for Light and Dark. */
+#onboarding .step3 .ob-option.on,.kwopt.on,[data-theme="dark"] #onboarding .step3 .ob-option.on,[data-theme="dark"] .kwopt.on,.dtsum,[data-theme="dark"] .dtsum{background:var(--color-accent)!important}
+[data-theme="dark"] #onboarding .step3 .ob-option.on,[data-theme="dark"] #onboarding .step3 .ob-option.on .ob-label,[data-theme="dark"] .kwopt.on,[data-theme="dark"] .kwopt.on span,[data-theme="dark"] .dtsum,[data-theme="dark"] .dtsum h2,[data-theme="dark"] .dtsum p,[data-theme="dark"] .dtsum h2.dtai,[data-theme="dark"] .dtsum h2 .icon{color:var(--color-surface)!important}
+[data-theme="dark"] #onboarding .step3 .ob-option.on .ob-emoji{background:var(--color-on-surface)!important;color:var(--color-surface)!important}
+.dtbtn.dtfavorite.is-active .icon,.live-map .lm-carousel-heart.is-active .icon{fill:currentColor}
+.dtbtn.dtfavorite.is-active,.live-map button.lm-carousel-heart.is-active{color:var(--color-primary)!important}
+
+.dtsum h2 .icon path{fill:currentColor}
+
+/* Onboarding icons render their original SVG geometry directly in both themes. */
+#onboarding .step3 .ob-option .ob-emoji .ob-icon,.kwopt .kwico .ob-icon{display:block;flex:none;width:auto;height:auto;max-width:none;max-height:none;overflow:visible;fill:none;stroke:none;color:inherit}
+/* Account rows: room for the handle and two lines of sync information. */
+.connectionpage .accrow{min-height:96px;padding:var(--space-lg) 0;gap:var(--space-md)}
+.connectionpage .acctext b{margin-bottom:var(--space-xs)}
+.connectionpage .acctext small{display:block}
+/* Figma Empty State / Type=Text Only (1398:434). */
+.course-list-page .course-list-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-sm);padding:var(--space-2xl) 0;text-align:center}
+.course-list-empty .course-empty-icon{display:block;flex:none;width:32px;height:32px;background:var(--color-secondary);-webkit-mask:url("data:image/svg+xml,%3Csvg%20preserveAspectRatio%3D%22none%22%20overflow%3D%22visible%22%20style%3D%22display%3A%20block%3B%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20id%3D%22icon%2Froute%22%3E%0A%3Cpath%20id%3D%22Vector%22%20d%3D%22M8.4%205.6H20.6667C22.4701%205.6%2024.1997%206.31643%2025.475%207.59167C26.7502%208.86692%2027.4667%2010.5965%2027.4667%2012.4C27.4667%2014.2035%2026.7502%2015.9331%2025.475%2017.2083C24.1997%2018.4836%2022.4701%2019.2%2020.6667%2019.2H13.3333C12.2017%2019.2%2011.1165%2019.6495%2010.3163%2020.4497C9.51619%2021.2498%209.06667%2022.3351%209.06667%2023.4667C9.06667%2024.5983%209.51619%2025.6835%2010.3163%2026.4837C11.1165%2027.2838%2012.2017%2027.7333%2013.3333%2027.7333H23.6M8.4%205.6C8.4%205.9677%208.32758%206.3318%208.18686%206.67151C8.04615%207.01123%207.8399%207.31989%207.5799%207.5799C7.3199%207.8399%207.01123%208.04615%206.67151%208.18686C6.3318%208.32758%205.9677%208.4%205.6%208.4C5.2323%208.4%204.8682%208.32758%204.52849%208.18686C4.18877%208.04615%203.88011%207.8399%203.6201%207.5799C3.3601%207.31989%203.15385%207.01123%203.01314%206.67151C2.87242%206.3318%202.8%205.9677%202.8%205.6C2.8%204.85739%203.095%204.1452%203.6201%203.6201C4.1452%203.095%204.85739%202.8%205.6%202.8C6.34261%202.8%207.0548%203.095%207.5799%203.6201C8.105%204.1452%208.4%204.85739%208.4%205.6ZM23.6%2027.7333C23.6%2028.4759%2023.895%2029.1881%2024.4201%2029.7132C24.9452%2030.2383%2025.6574%2030.5333%2026.4%2030.5333C27.1426%2030.5333%2027.8548%2030.2383%2028.3799%2029.7132C28.905%2029.1881%2029.2%2028.4759%2029.2%2027.7333C29.2%2026.9907%2028.905%2026.2785%2028.3799%2025.7534C27.8548%2025.2283%2027.1426%2024.9333%2026.4%2024.9333C25.6574%2024.9333%2024.9452%2025.2283%2024.4201%2025.7534C23.895%2026.2785%2023.6%2026.9907%2023.6%2027.7333Z%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke%3D%22%236B6B70%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E") center / contain no-repeat;mask:url("data:image/svg+xml,%3Csvg%20preserveAspectRatio%3D%22none%22%20overflow%3D%22visible%22%20style%3D%22display%3A%20block%3B%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20id%3D%22icon%2Froute%22%3E%0A%3Cpath%20id%3D%22Vector%22%20d%3D%22M8.4%205.6H20.6667C22.4701%205.6%2024.1997%206.31643%2025.475%207.59167C26.7502%208.86692%2027.4667%2010.5965%2027.4667%2012.4C27.4667%2014.2035%2026.7502%2015.9331%2025.475%2017.2083C24.1997%2018.4836%2022.4701%2019.2%2020.6667%2019.2H13.3333C12.2017%2019.2%2011.1165%2019.6495%2010.3163%2020.4497C9.51619%2021.2498%209.06667%2022.3351%209.06667%2023.4667C9.06667%2024.5983%209.51619%2025.6835%2010.3163%2026.4837C11.1165%2027.2838%2012.2017%2027.7333%2013.3333%2027.7333H23.6M8.4%205.6C8.4%205.9677%208.32758%206.3318%208.18686%206.67151C8.04615%207.01123%207.8399%207.31989%207.5799%207.5799C7.3199%207.8399%207.01123%208.04615%206.67151%208.18686C6.3318%208.32758%205.9677%208.4%205.6%208.4C5.2323%208.4%204.8682%208.32758%204.52849%208.18686C4.18877%208.04615%203.88011%207.8399%203.6201%207.5799C3.3601%207.31989%203.15385%207.01123%203.01314%206.67151C2.87242%206.3318%202.8%205.9677%202.8%205.6C2.8%204.85739%203.095%204.1452%203.6201%203.6201C4.1452%203.095%204.85739%202.8%205.6%202.8C6.34261%202.8%207.0548%203.095%207.5799%203.6201C8.105%204.1452%208.4%204.85739%208.4%205.6ZM23.6%2027.7333C23.6%2028.4759%2023.895%2029.1881%2024.4201%2029.7132C24.9452%2030.2383%2025.6574%2030.5333%2026.4%2030.5333C27.1426%2030.5333%2027.8548%2030.2383%2028.3799%2029.7132C28.905%2029.1881%2029.2%2028.4759%2029.2%2027.7333C29.2%2026.9907%2028.905%2026.2785%2028.3799%2025.7534C27.8548%2025.2283%2027.1426%2024.9333%2026.4%2024.9333C25.6574%2024.9333%2024.9452%2025.2283%2024.4201%2025.7534C23.895%2026.2785%2023.6%2026.9907%2023.6%2027.7333Z%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke%3D%22%236B6B70%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E") center / contain no-repeat}
+.course-list-empty h2{margin:0;font:var(--type-label-md);color:var(--color-on-surface)}
+.course-list-empty p{margin:0;font:var(--type-body-sm);color:var(--color-secondary);word-break:keep-all}

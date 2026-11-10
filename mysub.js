@@ -57,10 +57,9 @@ const snsLogo = sns => `<img class="snslogo" src="${SNS[sns].logo}" alt="">`;
 pages.accounts = function(){
   const acc = myAccounts(), total = acc.reduce((n, a) => n + accountCount(a), 0);
   return `<div class="mypage connectionpage">${subHead('연동 계정 관리', 'my')}
-  <p class="muted acchint">연동한 계정들의 저장 콘텐츠를 핀맵 한곳에 모아 보여줘요.</p>
   ${syncBtn()}
   <section class="mgroup"><h2>연동된 계정 ${acc.length}개</h2>
-    ${acc.length ? acc.map(a => `<div class="accrow">${snsLogo(a.sns)}<span class="acctext"><b>${esc(a.handle)}</b><small>저장 ${accountCount(a)}개, ${syncingAcc === a.id ? '가져오는 중…' : syncTime(settings.accSync?.[a.id])}</small></span>${accSyncBtn(a)}<button class="accoff" data-acc-off="${a.id}">연동 중지</button></div>`).join('')
+    ${acc.length ? acc.map(a => `<div class="accrow">${snsLogo(a.sns)}<span class="acctext"><b>${esc(a.handle)}</b><small>저장 ${accountCount(a)}개<br>${syncingAcc === a.id ? '가져오는 중…' : syncTime(settings.accSync?.[a.id])}</small></span>${accSyncBtn(a)}<button class="accoff" data-acc-off="${a.id}">연동 중지</button></div>`).join('')
       : '<p class="hint accnone">연동된 계정이 없어요. 아래에서 추가해 보세요.</p>'}
   </section>
   <button class="padd accadd" data-action="accadd">${icon('plus')} SNS 계정 연동 추가</button>

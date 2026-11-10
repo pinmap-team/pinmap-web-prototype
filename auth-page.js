@@ -77,7 +77,7 @@
       main.setAttribute('aria-busy','false'); return;
     }
     const title = {signin:'이메일 로그인',signup:'회원가입',reset:'비밀번호 재설정',password:'새 비밀번호 설정'}[mode];
-    const description = {signin:'저장한 취향을 다시 만나요.',signup:'이메일로 나만의 핀맵을 시작하세요.',reset:'가입한 이메일로 링크를 보내드려요.',password:'앞으로 사용할 비밀번호를 입력해 주세요.'}[mode];
+    const description = {signin:'저장한 취향을 다시 만나요.',signup:'이메일로 나만의 핀맵을 시작해 보세요.',reset:'가입한 이메일로 링크를 보내드려요.',password:'앞으로 사용할 비밀번호를 입력해 주세요.'}[mode];
     const submit = {signin:'이메일로 로그인',signup:'가입하고 인증 메일 받기',reset:'재설정 링크 보내기',password:'비밀번호 변경'}[mode];
     content.innerHTML = `<button class="auth-back" type="button" data-auth="welcome" aria-label="로그인 방식 선택으로 돌아가기"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><header class="auth-heading"><h1>${title}</h1><p>${description}</p></header>
       ${mode === 'signup' ? signupProgress(1) : ''}

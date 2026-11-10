@@ -35,7 +35,7 @@ function libMeta(x){
     if (x.pending) return libMetaLine('pin', '위치 확인 필요', 'warn');
     return x.distance ? libMetaLine('pin', x.distance) : '';
   }
-  if (x.type === '쇼핑' && x.price) return libMetaLine('bookmark', x.price.replace(', 예시 가격',''));
+  if (x.type === '쇼핑' && x.price) return libMetaLine('bookmark', x.price.replace(/, (예시|참고) 가격/,''));
   if (x.type === '레시피' && x.recipe) return libMetaLine('clock', x.recipe);
   return '';
 }
@@ -83,7 +83,7 @@ function libList(){
 resultCards = function(){
   const list = libList(), gallery = galleryMode();
   return list.map(x => libCard(x, gallery)).join('')
-    || `<div class="empty">${icon('search')}<h3>아직 찾는 콘텐츠가 없어요</h3><p class="muted">다른 키워드나 유형으로 다시 찾아보세요.</p><button class="tonal" data-action="resetfilter">전체 콘텐츠 보기</button></div>`;
+    || `<div class="empty">${icon('search')}<h3>아직 찾는 콘텐츠가 없어요</h3><p class="muted">다른 키워드나 유형으로 다시 찾아 보세요.</p><button class="tonal" data-action="resetfilter">전체 콘텐츠 보기</button></div>`;
 };
 
 pages.library = function(){

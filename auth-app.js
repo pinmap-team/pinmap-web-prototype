@@ -4,7 +4,7 @@ if (PM_ENV.requiresAuth) (() => {
   let client, user, resolving = false;
   const app = document.getElementById('app');
   const login = () => PinmapAuth.login();
-  function gate(message = '로그인하고 나만의 핀맵을 시작하세요.') {
+  function gate(message = '로그인하고 나만의 핀맵을 시작해 보세요.') {
     document.documentElement.classList.add('auth-pending');
     app.inert = true;
     closeOnboarding();
@@ -42,10 +42,11 @@ if (PM_ENV.requiresAuth) (() => {
     } catch (error) {toast(PinmapAuth.message(error));}
   };
   actions.logout = logout;
-  actions.logoutask = () => confirmPop('로그아웃할까요?', '이 브라우저의 로그인 상태를 종료해요.', 'logoutyes','로그아웃','취소');
+  actions.logoutask = () => confirmPop('로그아웃할까요?', '다시 로그인하면 저장한 콘텐츠를 그대로 볼 수 있어요.', 'logoutyes','로그아웃','취소');
   actions.logoutyes = logout;
   // Never run the old prototype's destructive local reset as account deletion.
-  actions.leaveask = actions.leaveyes = () => toast('회원 탈퇴는 아직 연결되지 않았어요.');
+  actions.leaveask = () => confirmPop('탈퇴할까요?', '탈퇴하면 저장한 콘텐츠와 설정이 모두 지워져요.<br>지운 내용은 되돌릴 수 없어요.', 'leaveyes', '탈퇴하기', '유지하기');
+  actions.leaveyes = () => { $('#sheet').close(); toast('회원 탈퇴는 아직 연결되지 않았어요.'); };
   async function verify() {
     if (resolving) return; resolving = true;
     try {

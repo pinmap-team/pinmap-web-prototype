@@ -9,7 +9,7 @@ function notifications(){
   // 홈 띠배너의 마감 임박 콘텐츠는 알림 목록에도 항상 보여줘요 (설정은 휴대폰 푸시 알림에만 적용)
   items.filter(x => x.deadline).sort((a,b) => dueNum(a) - dueNum(b)).forEach(x => list.push({
     id:'due-'+x.id, emoji:'⏰', title:`마감 ${x.deadline}, ${x.title}`,
-    body:`${x.period ? x.period.replace(', 예시 기간','')+' 운영, ' : ''}끝나기 전에 다녀오세요.`, time:'오늘 오전 9:00', detail:x.id
+    body:`${x.period ? x.period.replace(', 예시 기간','')+' 운영, ' : ''}끝나기 전에 다녀와 보세요.`, time:'오늘 오전 9:00', detail:x.id
   }));
   if (settings.notiNearby) {
     const near = readyPlaces().filter(x => distanceOf(x) < 999).sort((a,b) => distanceOf(a)-distanceOf(b));
@@ -63,6 +63,7 @@ pages.my = function(){
     ${myRow('appearance','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>','화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
     ${myRow('notisheet','🔔','알림 설정', settings.push ? `푸시 켜짐, ${notiOn}개` : '푸시 꺼짐')}
     ${myRow('mapsheet','🗺️','지도 디자인', esc(MAP_APPS[settings.mapApp].name))}
+    ${myRow('calexport',icon('calendar'),'캘린더로 내보내기', typeof calDueList === 'function' ? `마감 ${calDueList().filter(x => calDue(x) >= calToday).length}개` : '')}
   </section>
   <section class="mgroup my-section" aria-label="도움말">
     ${myRow('guide',interestOf('study').emoji,'이용 가이드')}

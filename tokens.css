@@ -5,8 +5,8 @@
   --color-neutral:#F4F4F5;--color-surface:#FFFFFF;--color-on-surface:#111111;
   --color-secondary:#6B6B70;--color-border:#6B6B70;--color-primary:#111111;
   --color-primary-pressed:#333333;--color-disabled:#E8E8EA;--color-error:#D13D3D;
-  /* 2026-11-04 사용자 지정으로 추가: 선택 강조(관심 키워드). 바탕에는 불투명도를 낮춰 씀 */
-  --color-accent:#70E6B3;
+  /* 2026-11-10 승인: 기존 민트 40% + 흰색의 결과를 불투명한 공통 키 컬러로 고정 */
+  --color-accent:#C6F5E1;
   --type-headline-lg:700 28px/36px var(--font-family);
   --type-headline-md:700 22px/30px var(--font-family);
   --type-body-md:400 16px/24px var(--font-family);
@@ -22,7 +22,7 @@
 [data-theme="dark"]{
   --color-neutral:#111111;--color-surface:#1B1B1D;--color-on-surface:#F4F4F5;
   --color-secondary:#B4B4B8;--color-border:#8A8A8E;--color-primary:#F4F4F5;
-  --color-primary-pressed:#D4D4D8;--color-disabled:#333333;--color-error:#D73535;--color-accent:#70E6B3;
+  --color-primary-pressed:#D4D4D8;--color-disabled:#333333;--color-error:#D73535;--color-accent:#C6F5E1;
   --shadow-sm:0 1px 2px rgba(0,0,0,.24),0 8px 24px rgba(0,0,0,.36);
   --shadow-md:0 12px 40px rgba(0,0,0,.48);
 }
