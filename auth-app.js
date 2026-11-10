@@ -28,8 +28,8 @@ if (PM_ENV.requiresAuth) (() => {
   // prototype settings. A cloud content database is a separate integration.
   const accountPage = pages.account;
   const myPageWithProfile = pages.my;
-  pages.my = () => `<p class="auth-current-user" aria-label="로그인 계정">${esc(user?.email || '카카오 계정으로 로그인됨')}</p>` + myPageWithProfile();
-  pages.account = () => accountPage().replace('<section class="account-identity"', `<section class="auth-account-status" aria-label="로그인 계정"><b>로그인 계정</b><p>${esc(user?.email || '카카오 계정으로 로그인됨')}</p><small>저장 콘텐츠의 계정별 동기화는 준비 중이에요.</small></section><section class="account-identity"`);
+  pages.my = () => `<p class="auth-current-user" aria-label="로그인 계정">${esc(user?.email || '연결된 계정으로 로그인됨')}</p>` + myPageWithProfile();
+  pages.account = () => accountPage().replace('<section class="account-identity"', `<section class="auth-account-status" aria-label="로그인 계정"><b>로그인 계정</b><p>${esc(user?.email || '연결된 계정으로 로그인됨')}</p><small>저장 콘텐츠의 계정별 동기화는 준비 중이에요.</small></section><section class="account-identity"`);
   const logout = async () => {
     if (!client) {login(); return;}
     const button = document.querySelector('[data-action="logoutyes"]');

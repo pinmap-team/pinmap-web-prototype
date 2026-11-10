@@ -1,4 +1,4 @@
-# 이메일 · 카카오 로그인 연결
+# 이메일 · 카카오 · 구글 로그인 연결
 
 2026-11-09 로컬 구현. 실제 Supabase 프로젝트의 인증과 메일 발송은 배포 후 확인해야 한다. GitHub 업로드·PR·Vercel 배포는 수행하지 않았다.
 
@@ -12,7 +12,7 @@
 - `entry-router.js`: Supabase가 루트 Site URL로 돌려보낸 code/error/token을 `auth.html`로 전달한다.
 - `vendor/supabase.js`: 공식 `@supabase/supabase-js` 2.119.0 UMD 배포본. MIT 라이선스는 `vendor/supabase-LICENSE.txt`.
 
-로그인은 버전 선택 화면의 ‘이메일 · 카카오로 로그인하기’ 또는 개발 테스트 버전에서 시작한다. 인증 성공 후 빈 개발 모드 앱으로 진입한다. 구글은 아직 UI나 공급자로 연결하지 않았다. 가입·로그인은 저장 콘텐츠의 계정별 DB 동기화와 별개다. 개발 모드의 기존 빈 데이터 정책과 프로토타입의 기존 브라우저 저장을 바꾸지 않았다. 회원 탈퇴는 구현하지 않았으며, 실제 계정에 기존 체험용 데이터 삭제 동작을 실행하지 않는다.
+로그인은 버전 선택 화면의 ‘이메일 · 카카오로 로그인하기’ 또는 개발 테스트 버전에서 시작한다. 인증 성공 후 빈 개발 모드 앱으로 진입한다. 구글 버튼과 OAuth 호출도 연결했으며, 실제 사용에는 Google Cloud와 Supabase의 공급자 설정이 필요하다. 가입·로그인은 저장 콘텐츠의 계정별 DB 동기화와 별개다. 개발 모드의 기존 빈 데이터 정책과 프로토타입의 기존 브라우저 저장을 바꾸지 않았다. 회원 탈퇴는 구현하지 않았으며, 실제 계정에 기존 체험용 데이터 삭제 동작을 실행하지 않는다.
 
 ## Vercel
 
@@ -81,3 +81,14 @@ node --env-file=.env.local scripts/dev-auth-server.cjs
 ## 화면 검토용 시작 순서 (최신)
 
 루트 `/`에서 개발 테스트·프로토타입 체험·로그인 테스트 중 고른다. 개발 테스트는 로그인 없이 빈 화면으로 진입하고, 로그인 테스트만 `auth.html?screen=welcome`로 진입한다. 로그인 완료 후 실제 세션이 필요한 앱은 `index.html?mode=development&auth=required`로 연다. 이는 서버 데이터 동기화 구현과 별개이며 기존 프로토타입 데이터는 유지한다.
+
+## 구글 로그인 (2026-11-10)
+
+1. Google Cloud → Google Auth Platform에서 프로젝트를 선택하고 Branding, Audience, Data Access를 설정한다. 기본 범위는 openid, userinfo.email, userinfo.profile이다.
+2. Clients → Create client → Web application. Authorized JavaScript origins에 `https://pinmap-prototype.vercel.app`과 필요한 로컬 테스트 주소를 등록한다.
+3. Authorized redirect URIs에는 Supabase Google 화면의 Callback URL을 그대로 등록한다. 현재 프로젝트: `https://tgwryxkdhkkqvmhuyzse.supabase.co/auth/v1/callback`.
+4. Client ID와 Client Secret을 Supabase → Authentication → Sign In / Providers → Google에 입력하고 Enable Sign in with Google을 켜서 저장한다. Secret은 저장소나 브라우저 코드에 넣지 않는다.
+5. Supabase Site URL 및 Redirect URLs는 기존 설정을 공유한다. Vercel에 구글 전용 변수를 추가할 필요는 없다.
+6. 로그인 테스트에서 구글 버튼 → 계정 선택 → 동의 → 핀맵 복귀를 실제 계정으로 확인한다. 테스트 대상은 Google Auth Platform Audience에서 확인한다.
+
+공식 안내: https://supabase.com/docs/guides/auth/social-sign-in/auth-google

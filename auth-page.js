@@ -25,6 +25,7 @@
   const passwordField = fresh => `<label class="auth-field" for="auth-password"><span class="auth-field-label">${mode === 'password' ? '새 비밀번호' : '비밀번호'}</span><span class="auth-input-shell auth-password">${fieldIcon('password')}<input id="auth-password" name="password" type="password" autocomplete="${fresh ? 'new-password' : 'current-password'}" ${fresh ? 'minlength="8"' : ''} aria-describedby="auth-password-help" maxlength="128" placeholder="${mode === 'password' ? '새 비밀번호 · 8자 이상' : fresh ? '8자 이상 입력해 주세요' : '비밀번호'}" required><button type="button" data-auth="reveal" aria-controls="auth-password" aria-label="비밀번호 표시" aria-pressed="false">보기</button></span></label>`;
   const confirmation = `<label class="auth-field" for="auth-confirm"><span class="auth-field-label">비밀번호 확인</span><span class="auth-input-shell">${fieldIcon('password')}<input id="auth-confirm" name="confirm" type="password" placeholder="비밀번호 확인" autocomplete="new-password" minlength="8" maxlength="128" aria-describedby="auth-confirm-help" required></span><small id="auth-confirm-help" class="auth-field-help" aria-live="polite"></small></label>`;
   const kakao = '<button class="auth-kakao" type="button" data-auth="kakao" aria-label="카카오로 시작하기"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M12 3C6.5 3 2 6.5 2 10.8c0 2.7 1.8 5.1 4.5 6.5l-.9 3.3c-.1.3.2.5.5.3l3.9-2.6c.7.1 1.3.2 2 .2 5.5 0 10-3.5 10-7.7S17.5 3 12 3Z"/></svg></button>';
+  const google = '<button class="auth-google" type="button" data-auth="google" aria-label="구글로 시작하기"><svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true"><path fill="#4285F4" d="M43.61 24.46c0-1.36-.12-2.67-.35-3.92H24v7.42h11a9.4 9.4 0 0 1-4.08 6.17v5h6.6c3.86-3.55 6.09-8.78 6.09-14.67Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.82 13.52-4.87l-6.6-5c-1.82 1.22-4.15 1.94-6.92 1.94-5.32 0-9.82-3.59-11.43-8.42H5.75v5.16A20 20 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.57 27.65a12 12 0 0 1 0-7.3v-5.16H5.75a20 20 0 0 0 0 17.62l6.82-5.16Z"/><path fill="#EA4335" d="M24 11.93c3 0 5.68 1.03 7.8 3.06l5.85-5.85C34.1 5.83 29.5 4 24 4a20 20 0 0 0-18.25 11.19l6.82 5.16C14.18 15.52 18.68 11.93 24 11.93Z"/></svg></button>';
   function notice(text, error = false) {
     const node = document.getElementById('auth-message');
     node.classList.toggle('is-error', error); node.textContent = text;
@@ -73,7 +74,7 @@
     try {sessionStorage.removeItem(pendingKey);} catch {}
     resumeVerification = false;
     if (mode === 'welcome') {
-      content.innerHTML = `<div class="auth-social"><p>간편하게 시작하기</p>${kakao}</div><nav class="auth-entry-links" aria-label="이메일 계정"><button type="button" data-auth="signin">이메일 로그인</button><span aria-hidden="true">|</span><button type="button" data-auth="signup">회원가입</button></nav><p class="auth-message" id="auth-message" role="status" aria-live="polite" aria-atomic="true"></p>`;
+      content.innerHTML = `<div class="auth-social"><p>간편하게 시작하기</p><div class="auth-social-buttons">${kakao}${google}</div></div><nav class="auth-entry-links" aria-label="이메일 계정"><button type="button" data-auth="signin">이메일 로그인</button><span aria-hidden="true">|</span><button type="button" data-auth="signup">회원가입</button></nav><p class="auth-message" id="auth-message" role="status" aria-live="polite" aria-atomic="true"></p>`;
       main.setAttribute('aria-busy','false'); return;
     }
     const title = {signin:'이메일 로그인',signup:'회원가입',reset:'비밀번호 재설정',password:'새 비밀번호 설정'}[mode];
@@ -173,15 +174,16 @@
       button.setAttribute('aria-pressed', String(visible)); button.setAttribute('aria-label', visible ? '비밀번호 숨기기' : '비밀번호 표시'); return;
     }
     if (['welcome','signin','signup','reset'].includes(action) && client) {lastEmail = document.getElementById('auth-email')?.value.trim() || lastEmail; render(action); (action === 'signin' && lastEmail ? document.getElementById('auth-password') : content.querySelector('input'))?.focus(); return;}
-    if (action === 'kakao') {
+    if (['kakao','google'].includes(action) && client) {
+      const providerName = action === 'google' ? '구글' : '카카오';
       await PinmapButton.run(button, async () => {
-        loading(true); notice('카카오 로그인으로 이동하고 있어요.');
+        loading(true); notice(`${providerName} 로그인으로 이동하고 있어요.`);
         try {
-          const {error} = await client.auth.signInWithOAuth({provider:'kakao', options:{redirectTo:PinmapAuth.callback()}});
+          const {error} = await client.auth.signInWithOAuth({provider:action, options:{redirectTo:PinmapAuth.callback()}});
           if (error) throw error;
         } catch (error) {notice(PinmapAuth.message(error),true);}
         finally {loading(false);}
-      },'카카오 로그인 연결 중');
+      },`${providerName} 로그인 연결 중`);
     }
   });
   content.addEventListener('submit', async event => {
