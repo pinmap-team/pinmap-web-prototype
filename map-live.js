@@ -38,6 +38,20 @@
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
   const round = (name, symbol) => `<button class="lm-round" data-lm="locate" aria-label="${name}" title="${name}">${icon(symbol)}</button>`;
   const safe = value => esc(value || '');
+  const LM_RECENT_KEY='pinmap.map.recent-searches.v1';
+  let recentSearches=[];
+  try{const stored=JSON.parse(localStorage.getItem(LM_RECENT_KEY)||'[]');if(Array.isArray(stored))recentSearches=stored.filter(x=>typeof x==='string'&&x.trim()&&x.length<=80).slice(0,8);}catch{}
+  function persistRecentSearches(){try{localStorage.setItem(LM_RECENT_KEY,JSON.stringify(recentSearches));}catch{}}
+  function rememberSearch(q){const text=String(q||'').trim().replace(/\s+/g,' ').slice(0,80);if(!text)return;recentSearches=[text,...recentSearches.filter(x=>x.toLocaleLowerCase()!==text.toLocaleLowerCase())].slice(0,8);persistRecentSearches();}
+  function mapRecentContent(){return recentSearchMarkup(recentSearches,{pick:'data-lm-recent',remove:'data-lm-recent-remove',clear:'data-lm-recent-clear',target:'장소'});}
+  function refreshRecentSearches(){const panel=$('#lm-recent');if(!panel)return;panel.hidden=!searchOpen||!!$('#lm-search input')?.value.trim();panel.innerHTML=mapRecentContent();}
+  document.addEventListener('click',event=>{
+    if(page!=='map')return;
+    const pick=event.target.closest('[data-lm-recent]'),remove=event.target.closest('[data-lm-recent-remove]');
+    if(pick){const q=recentSearches[Number(pick.dataset.lmRecent)];if(!q)return;const input=$('#lm-search input');input.value=q;$('#lm-search [data-lm="clear-search"]').hidden=false;refreshRecentSearches();input.blur();searchPlaces(q);return;}
+    if(remove){recentSearches.splice(Number(remove.dataset.lmRecentRemove),1);persistRecentSearches();refreshRecentSearches();$('#lm-recent .cf-recent-remove')?.focus();return;}
+    if(event.target.closest('[data-lm-recent-clear]')){recentSearches=[];persistRecentSearches();refreshRecentSearches();$('#lm-search input')?.focus();}
+  });
   const savedPlaces = () => {
     const pinned = savedCoords.map(position => {
       const item = items.find(x => x.id === position.id);
@@ -52,7 +66,8 @@
       <header class="lm-header">
         <h1 class="lm-sr-only">지도에서 저장한 장소 찾기</h1>
         <div class="lm-location-header"><button type="button" class="lm-location-title" data-action="mapaddresses">${icon('pin')}<span>${safe((n => n ? (settings.placeLabels?.[n] || n) : '현재 위치')(mapLocationName || (typeof myPlaces === 'function' ? myPlaces()[0] : null)))}</span>${icon('chevron')}</button><button type="button" class="lm-header-search" data-lm="toggle-search" aria-label="${searchOpen?'검색창 닫기':'지도에서 장소 검색'}" aria-expanded="${searchOpen}" aria-controls="lm-search-row"><span class="lm-search-open-icon">${icon('search')}</span><span class="lm-search-close-icon">${icon('close')}</span></button></div>
-        <div class="lm-search-row cfpage${searchOpen?' is-open':''}" id="lm-search-row" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="어디로 가고 싶어요?" value="${safe(searchQuery)}" autocomplete="off" ${searchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button></form></div>
+        <div class="lm-search-row cfpage${searchOpen?' is-open':''}" id="lm-search-row" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="어디로 가고 싶어요?" value="${safe(searchQuery)}" autocomplete="off" maxlength="80" ${searchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button></form></div>
+        <section class="cf-recent lm-recent" id="lm-recent" aria-label="최근 지도 검색어" ${searchOpen&&!searchQuery.trim()?'':'hidden'}>${mapRecentContent()}</section>
         <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,cats.findIndex(([id])=>id===category))*100}%">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
       </header>
       <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">ⓘ</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p class="lm-map-credits-vector"><a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>, © <a href="https://openmaptiles.org/" target="_blank" rel="noopener noreferrer">OpenMapTiles</a>, © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></p><p class="lm-map-credits-fallback">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></p><p class="lm-map-credits-google">지도 © Google</p><p class="lm-map-credits-kakao">지도 © Kakao</p><p class="lm-map-credits-naver">지도 © NAVER</p><p class="lm-map-credits-subway">지하철 출입구 © <a href="https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0" target="_blank" rel="noopener noreferrer">행정안전부·Esri Korea</a></p></div></details>
@@ -412,6 +427,7 @@
   async function searchPlaces(q) {
     if(PM_ENV.development){toast('장소 데이터가 아직 연결되지 않았어요.');return;}
     if (q.length < 2) { status('검색어를 2자 이상 입력해 주세요.'); return; }
+    rememberSearch(q);refreshRecentSearches();
     searchController?.abort(); searchController=new AbortController();
     const current=searchController;
     status('실제 장소를 검색하고 있어요…');
@@ -474,6 +490,7 @@
         input.tabIndex=searchOpen?0:-1;
         if(searchOpen)requestAnimationFrame(()=>input.focus());
         else {input.blur();$('#lm-search-results').hidden=true;}
+        refreshRecentSearches();
         break;
       }
       case 'toggle-favorite':{
@@ -490,13 +507,13 @@
       case 'select-place':{const place=markerEntries.get(button.dataset.placeKey)?.place;if(place)expandPlace(place);break;}
       case 'close-place':clearSelection();renderSheet();break;
       case 'open-place':{if(button.closest('.just-dragged'))break;const place=markerEntries.get(button.dataset.placeKey)?.place;if(!place)break;if(place.saved)openDetail(place.id,button);else window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place.lat+','+place.lng),'_blank','noopener,noreferrer');break;}
-      case 'clear-search':searchResults=null;searchQuery='';$('#lm-search input').value='';$('#lm-search [data-lm="clear-search"]').hidden=true;$('#lm-search-results').hidden=true;markers();break;
+      case 'clear-search':searchResults=null;searchQuery='';$('#lm-search input').value='';$('#lm-search [data-lm="clear-search"]').hidden=true;$('#lm-search-results').hidden=true;refreshRecentSearches();markers();break;
     }
   });
   document.addEventListener('error',event=>{if(event.target.matches?.('.lm-badge-image img'))event.target.hidden=true;},true);
   document.addEventListener('keydown',event=>{if(page==='map'&&event.key===' '&&event.target.closest('.lm-photo-marker')){event.preventDefault();event.target.closest('.lm-photo-marker').click();}});
   document.addEventListener('keydown',event=>{if(page==='map'&&event.key==='Escape')hideProviderOptions();});
-  document.addEventListener('input',event=>{if(event.target.matches('#lm-search input'))$('#lm-search [data-lm="clear-search"]').hidden=!event.target.value;});
+  document.addEventListener('input',event=>{if(event.target.matches('#lm-search input')){$('#lm-search [data-lm="clear-search"]').hidden=!event.target.value;refreshRecentSearches();}});
   document.addEventListener('submit',event => {
     if(event.target.id!=='lm-search')return;
     event.preventDefault();

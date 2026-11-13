@@ -92,7 +92,7 @@ function calWidget(){
   const next = due.slice(0, 2);
   return `<section class="hwidget calw">
     <div class="hwhead"><h2>${calToday.getMonth()+1}월 일정</h2><button type="button" class="calgo" data-action="gocal" aria-label="캘린더 전체보기">전체보기${icon('chevright')}</button></div>
-    ${next.length ? `<div class="calnext">${next.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cnbadge ${calDays(x) <= 3 ? 'soon' : ''}">${dLabel(x)}</span><span class="cntext">${esc(x.title)}</span></button>`).join('')}</div>` : '<p class="hint calnone">다가오는 마감이 없어요.</p>'}
+    ${next.length ? `<div class="calnext">${next.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cncontent"><span class="cntext">${esc(x.title)}</span></span><span class="cnbadge ${calDays(x) <= 3 ? 'soon' : ''}">${dLabel(x)}</span></button>`).join('')}</div>` : '<p class="hint calnone">다가오는 마감이 없어요.</p>'}
   </section>`;
 }
 

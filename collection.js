@@ -46,8 +46,8 @@ function cfMatches(){
 
 // 썸네일 URL: 사진이 있으면 사진, 없으면 기존 콘텐츠 썸네일(일러스트)을 이미지로
 const cfThumbUrl = x => libPhoto(x) || 'data:image/svg+xml,' + encodeURIComponent(art(x.art));
-// 최신 콘텐츠 3개 (사진이 있는 콘텐츠를 먼저)
-const cfThumbs = list => [...list].sort((a,b) => (libPhoto(b)?1:0) - (libPhoto(a)?1:0)).slice(0, 3).map(cfThumbUrl);
+// 실제 저장 시각이 최신인 콘텐츠부터. 시각이 같을 때만 사진을 우선한다.
+const cfThumbs = list => [...list].sort((a,b) => ((savedTimestamp(b) ?? -Infinity) - (savedTimestamp(a) ?? -Infinity)) || (libPhoto(b)?1:0) - (libPhoto(a)?1:0)).slice(0, 3).map(cfThumbUrl);
 
 function cfFolderData(list){
   const q = query.trim(), sel = cfSelected();
@@ -236,6 +236,37 @@ resultCards = function(){
 };
 
 let cfSearchOpen = false;
+const CF_RECENT_KEY='pinmap.collection.recent-searches.v1';
+let cfRecent=[];
+try{const stored=JSON.parse(localStorage.getItem(CF_RECENT_KEY)||'[]');if(Array.isArray(stored))cfRecent=stored.filter(x=>typeof x==='string'&&x.trim()&&x.length<=80).slice(0,8);}catch{}
+function cfPersistRecent(){try{localStorage.setItem(CF_RECENT_KEY,JSON.stringify(cfRecent));}catch{}}
+function cfRememberSearch(value){
+  const text=String(value||'').trim().replace(/\s+/g,' ').slice(0,80);if(!text)return;
+  cfRecent=[text,...cfRecent.filter(x=>x.toLocaleLowerCase()!==text.toLocaleLowerCase())].slice(0,8);cfPersistRecent();
+}
+function recentSearchMarkup(entries,{pick='data-cf-recent',remove='data-cf-recent-remove',clear='data-cf-recent-clear',target='콘텐츠'}={}){
+  return `<div class="cf-recent-head"><h2>최근 검색</h2>${entries.length?`<button type="button" ${clear}>전체 삭제</button>`:''}</div>${entries.length?`<ul class="cf-recent-list">${entries.map((text,index)=>`<li><button type="button" class="cf-recent-query" ${pick}="${index}" aria-label="${esc(text)} 다시 검색">${icon('clock')}<span>${esc(text)}</span></button><button type="button" class="cf-recent-remove" ${remove}="${index}" aria-label="${esc(text)} 검색 기록 삭제">${icon('close')}</button></li>`).join('')}</ul>`:`<p class="cf-recent-empty">최근 검색어가 없어요.<br>찾고 싶은 ${esc(target)}를 검색해 보세요.</p>`}`;
+}
+function cfRecentContent(){return recentSearchMarkup(cfRecent);}
+function cfRefreshRecent(){
+  const panel=document.getElementById('cf-recent');if(!panel)return;
+  panel.hidden=!cfSearchOpen||!!query.trim();panel.innerHTML=cfRecentContent();
+}
+document.addEventListener('click',event=>{
+  if(page!=='library')return;
+  const pick=event.target.closest('[data-cf-recent]'),remove=event.target.closest('[data-cf-recent-remove]');
+  if(pick){
+    const text=cfRecent[Number(pick.dataset.cfRecent)];if(!text)return;
+    const input=document.querySelector('.cf-search-header #search');if(!input)return;
+    cfRememberSearch(text);input.value=text;input.dispatchEvent(new Event('input',{bubbles:true}));input.focus();return;
+  }
+  if(remove){cfRecent.splice(Number(remove.dataset.cfRecentRemove),1);cfPersistRecent();cfRefreshRecent();document.querySelector('.cf-recent-remove')?.focus();return;}
+  if(event.target.closest('[data-cf-recent-clear]')){cfRecent=[];cfPersistRecent();cfRefreshRecent();document.querySelector('.cf-search-header #search')?.focus();}
+});
+document.addEventListener('click',event=>{
+  if(page==='library'&&cfSearchOpen&&!cfSel&&query.trim()&&(event.target.closest('[data-cfitem]')||event.target.closest('#pm-keyboard-preview [data-key="search"]')))cfRememberSearch(query);
+},true);
+
 pages.library = function(){
   cfSyncCollections();
   const open = cfOpenTitle();
@@ -257,9 +288,10 @@ pages.library = function(){
     <div class="cf-search-header">
     <div class="libhead cf-fhead${back ? ' hasback' : ''}">${back}<h1>${esc(open || '컬렉션')}</h1>${open ? `<span class="cf-hcount" aria-label="저장 ${cfTotal()}개">${cfTotal()}</span>` : ''}${collection && cfCustom().includes(collection) && !cfSel ? `<button type="button" class="cf-delfolder" data-action="cfdelfolder" aria-label="‘${esc(collection)}’ 폴더 삭제">${icon('trash')}</button>` : ''}</div>
       <div class="cf-search-row${cfSearchOpen?' is-open':''}" id="cf-search-row" aria-hidden="${!cfSearchOpen}" ${cfSearchOpen?'':'inert'}>
-        <label class="libsearch"><input id="search" type="search" enterkeyhint="search" aria-label="${esc(ph)}" placeholder="${esc(ph)}" value="${esc(query)}" ${cfSearchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-action="clear" aria-label="검색 지우기" ${query?'':'hidden'}>${icon('close')}</button></label>
+        <label class="libsearch"><input id="search" type="search" enterkeyhint="search" aria-label="${esc(ph)}" placeholder="${esc(ph)}" value="${esc(query)}" autocomplete="off" maxlength="80" ${cfSearchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-action="clear" aria-label="검색 지우기" ${query?'':'hidden'}>${icon('close')}</button></label>
       </div>
       <button type="button" class="cf-header-search" data-action="cftogglesearch" aria-label="${cfSearchOpen?'컬렉션 검색창 닫기':'컬렉션에서 콘텐츠 검색'}" aria-expanded="${cfSearchOpen}" aria-controls="cf-search-row"><span class="lm-search-open-icon">${icon('search')}</span><span class="lm-search-close-icon">${icon('close')}</span></button>
+      <section class="cf-recent" id="cf-recent" aria-label="최근 검색어" ${cfSearchOpen&&!query.trim()?'':'hidden'}>${cfRecentContent()}</section>
     </div>
     <p id="resultcount" class="sr" role="status">${cfStatus()}</p>
     <div id="results" class="cf-results">${resultCards()}</div>
@@ -277,6 +309,7 @@ actions.cftogglesearch = () => {
   input.tabIndex=cfSearchOpen?0:-1;
   toggle.setAttribute('aria-expanded',String(cfSearchOpen));
   toggle.setAttribute('aria-label',cfSearchOpen?'컬렉션 검색창 닫기':'컬렉션에서 콘텐츠 검색');
+  cfRefreshRecent();
   if(cfSearchOpen)requestAnimationFrame(()=>input.focus());
   else {
     input.blur();input.value='';query='';
@@ -343,14 +376,13 @@ actions.cfback = () => { filter = '전체'; collection = null; query = ''; rende
 // 입력 즉시 검색하며 Enter로 키보드를 닫습니다.
 document.addEventListener('keydown', e => {
   if (e.target.id === 'search' && page === 'library' && e.key === 'Enter') {
-    e.preventDefault(); e.target.blur();
+    e.preventDefault(); cfRememberSearch(query); cfRefreshRecent(); e.target.blur();
   }
 });
 // 새 폴더 만들기
 actions.newfolder = () => {
   modal('새 폴더', `<form id="cfnewform" class="cf-form" novalidate>
-    <label class="field"><span>폴더 이름</span><input id="cfname" name="name" maxlength="20" autocomplete="off" placeholder="예: 제주 여행, 생일 선물"></label>
-    <p class="hint">만든 폴더에는 저장한 콘텐츠를 골라 담을 수 있어요.</p>
+    <label class="field"><span>폴더 이름</span><input id="cfname" name="name" maxlength="20" autocomplete="off" aria-describedby="cferr" placeholder="예: 제주 여행, 생일 선물"></label>
     <p class="error" id="cferr" role="alert"></p>
     <div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">만들기</button></div>
   </form>`);
@@ -437,6 +469,7 @@ document.addEventListener('click', e => {
 document.addEventListener('input', e => {
   if (e.target.id !== 'search' || page !== 'library') return;
   const n = $('#resultcount'); if (n) n.textContent = cfStatus();
+  cfRefreshRecent();
 });
 
 /* ---------- 하단 메뉴: 검정 캡슐 + 오른쪽 원형 버튼 ---------- */

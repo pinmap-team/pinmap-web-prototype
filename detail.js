@@ -25,8 +25,8 @@ detail = function(){
   if (x.period) info += `<section class="dtsec"><h2>운영 기간</h2><div class="dtrow">${icon('calendar')}<span>${esc(x.period)}</span>${x.deadline ? `<b class="dtdue">마감 ${esc(x.deadline)}</b>` : ''}</div></section>`;
   const factRow = x.distance && ready ? `<div class="dtfacts"><span>${icon('walk')}${esc(x.distance)}</span></div>` : '';
   if (t.place) info += ready
-    ? `<section class="dtsec"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><div class="dtaddress">${icon('pin')}<span>${esc(x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div><div class="dtmap-preview"><div id="detail-map-canvas" role="img" aria-label="${esc(x.title)} 저장 위치 지도"></div><p class="dtmap-fallback" id="detail-map-fallback" hidden>지도를 불러오지 못했어요. 지도에서 위치를 확인해 주세요.</p></div>${factRow}</section>`
-    : `<section class="dtsec"><h2>장소 정보</h2><div class="dtwarn"><b>장소 확인 필요</b><p>위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.</p><button class="dtsmall" data-action="edit">장소 직접 입력</button></div></section>`;
+    ? `<section class="dtsec dtlocation"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><div class="dtplacecard"><div class="dtaddress">${icon('pin')}<span>${esc(x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div><div class="dtmap-preview"><div id="detail-map-canvas" role="img" aria-label="${esc(x.title)} 저장 위치 지도"></div><button type="button" class="dtmaplink" data-action="dtgomap" aria-label="${esc(x.title)} 지도 탭에서 보기"></button><p class="dtmap-fallback" id="detail-map-fallback" hidden>지도를 불러오지 못했어요. 지도에서 위치를 확인해 주세요.</p></div>${factRow}</div></section>`
+    : `<section class="dtsec dtlocation"><h2>장소 정보</h2><div class="dtplacecard"><div class="dtwarn"><b>장소 확인 필요</b><p>위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.</p><button class="dtsmall" data-action="edit">장소 직접 입력</button></div></div></section>`;
   // 2026-11-10 가격을 크게(headline-md), 안내는 body-md. '예시 가격' → '참고 가격'
   if (x.type === '쇼핑') { const amount = String(x.price || '').replace(/,\s*(예시|참고) 가격$/, '').trim();
     info += `<section class="dtsec dtbuy"><h2>구매 정보</h2>${amount ? `<p class="dtprice"><span class="sr">참고 가격 </span>${esc(amount)}</p>` : '<p class="dtprice none">가격 정보 없음</p>'}<p class="dtpricehint">${x.shop ? `${esc(x.shop)}에서 본 참고 가격이에요.` : '판매처 정보가 없어요.'}<br>가격과 재고는 원본에서 한 번 더 확인해 주세요.</p></section>`; }
@@ -42,6 +42,7 @@ detail = function(){
   if (bottom.length === 1) bottom[0] = bottom[0].replace('class="dtghost"', 'class="dtprimary"');
 
   return `<article class="dt">
+    <div class="dtambient" aria-hidden="true">${libThumb(x)}</div>
     <div class="dthero">${libThumb(x)}<div class="dtshade" aria-hidden="true"></div>
       <div class="dttop"><button class="dtbtn" data-action="back" aria-label="돌아가기">${icon('chevleft')}</button>
         <div class="dttopr">
