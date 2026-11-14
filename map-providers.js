@@ -35,7 +35,7 @@
     scripts.set(provider,promise);
     return promise;
   }
-  function attach(map, onChange) {
+  function attach(map, onChange, preferredProvider) {
     const host=map.getContainer();
     const nativeHost=document.createElement('div');
     nativeHost.className='pm-native-map';
@@ -139,8 +139,10 @@
       if(disposed)return;
       providerConfig=value;
       notify();
-      const preferred=readChoice();
-      const desired=providerConfig.available[preferred] ? preferred : providerConfig.defaultProvider;
+      // My page selection is authoritative; the legacy map-only choice is a fallback.
+      const preferred=labels[preferredProvider] ? preferredProvider : readChoice();
+      const desired=providerConfig.available[preferred] ? preferred : preferredProvider ? 'openfree' : providerConfig.defaultProvider;
+      if(preferred && !providerConfig.available[preferred])onChange?.({current,available:providerConfig.available,labels,error:`${labels[preferred] || '선택한 지도'} 연결을 확인해 주세요. 기본 지도를 표시해요.`});
       if(desired!=='openfree') {
         try { await select(desired); }
         catch(error) { onChange?.({current,available:providerConfig.available,labels,error:error.message}); }

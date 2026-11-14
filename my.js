@@ -97,8 +97,8 @@ function mapAppPreview(){
 }
 function mapSettings(){
   modal('지도 디자인', `<div class="mycard settings">
-    <div class="setrow col"><div><b>길찾기 지도 앱</b><small>장소 상세의 길찾기 버튼이 이 앱으로 열려요</small></div>
-      <div class="segmented" role="radiogroup" aria-label="길찾기 지도 앱">${Object.entries(MAP_APPS).map(([k,v]) => `<button role="radio" aria-checked="${settings.mapApp===k}" class="${settings.mapApp===k?'on':''}" data-mapapp="${k}">${v.name}</button>`).join('')}</div>
+    <div class="setrow col"><div><b>지도 디자인</b><small>지도 탭과 길찾기에 사용할 지도를 선택해요</small></div>
+      <div class="segmented" role="radiogroup" aria-label="지도 디자인">${Object.entries(MAP_APPS).map(([k,v]) => `<button role="radio" aria-checked="${settings.mapApp===k}" class="${settings.mapApp===k?'on':''}" data-mapapp="${k}">${v.name}</button>`).join('')}</div>
     ${mapAppPreview()}</div></div>`);
 }
 $('#sheet').addEventListener('close', () => { mySheet = null; });
@@ -132,7 +132,7 @@ document.addEventListener('click', e => {
     return;
   }
   const m = e.target.closest('[data-mapapp]');
-  if (m) { settings.mapApp = m.dataset.mapapp; afterChange(); render(); mySheet?.(); toast(`길찾기는 ${josa(MAP_APPS[settings.mapApp].name, '으로/로')} 열려요.`); $('#snackbar').classList.add('oneline'); }
+  if (m) { settings.mapApp = m.dataset.mapapp; afterChange(); render(); mySheet?.(); toast(`${josa(MAP_APPS[settings.mapApp].name, '을/를')} 선택했어요.`); $('#snackbar').classList.add('oneline'); }
 });
 document.addEventListener('change', e => {
   const key = e.target.dataset?.setting;

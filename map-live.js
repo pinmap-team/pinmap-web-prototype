@@ -2,7 +2,7 @@
 (() => {
   const originalRender = render;
   let detailMap;
-  let liveMap, pinLayer, locationMarker, searchController, placeController, mapProviderController;
+  let liveMap, pinLayer, locationMarker, locationHeadingMarker, searchController, placeController, mapProviderController;
   let expandedKey=null, sheetStage='peek', sheetDrag=null, suppressSheetClickUntil=0;
   let mapLocationName=null, searchOpen=false;
   if(!paths.list)paths.list='M9 6h11 M9 12h11 M9 18h11 M4.5 6h.01 M4.5 12h.01 M4.5 18h.01';
@@ -91,14 +91,13 @@
   }
   function updateProviderUi(state) {
     const control=$('#app .lm-map-provider-control');
-    if(!control)return;
-    control.querySelector('.lm-map-provider-current').textContent=state.labels[state.current];
-    control.querySelectorAll('[data-provider]').forEach(option=>{
+    if(control)control.querySelector('.lm-map-provider-current').textContent=state.labels[state.current];
+    control?.querySelectorAll('[data-provider]').forEach(option=>{
       option.disabled=!state.available[option.dataset.provider];
       option.setAttribute('aria-pressed',String(option.dataset.provider===state.current));
     });
     const notice=$('#app .lm-status');
-    if(state.error){notice.textContent=state.error;notice.hidden=false;}
+    if(state.error&&notice){notice.textContent=state.error;notice.hidden=false;}
     else if(notice && /^(구글|카카오|네이버) 지도/.test(notice.textContent)){
       notice.textContent='';
       notice.hidden=true;
@@ -321,7 +320,7 @@
     if (!window.L) { status('지도 라이브러리를 불러오지 못했어요.'); return; }
     liveMap = L.map('live-map-canvas',{zoomControl:false,zoomAnimation:false}).setView(center,zoom);
     window.attachPinmapBasemap(liveMap);
-    mapProviderController=window.PinmapMapProviders?.attach(liveMap,updateProviderUi);
+    mapProviderController=window.PinmapMapProviders?.attach(liveMap,updateProviderUi,settings.mapApp);
     pinLayer = L.layerGroup().addTo(liveMap); markers(); drawLocation();
     if(!PM_ENV.development&&!mapLocationName){automaticLocation=true;locate();automaticLocation=false;}
     if(!PM_ENV.development&&typeof window.DeviceOrientationEvent?.requestPermission!=='function')startOrientation();
@@ -356,7 +355,7 @@
     window.unmountCourseMap?.();
     window.unmountCourseThumbnails?.();
     stopLocation();
-    if (liveMap) { liveMap.remove(); liveMap=null; mapProviderController=null; locationMarker=null; }
+    if (liveMap) { liveMap.remove(); liveMap=null; mapProviderController=null; locationMarker=null; locationHeadingMarker=null; }
     const isMap = page === 'map' && !detailId;
     document.body.classList.toggle('live-map-page',isMap);
     // 상세 페이지 '지도에서 보기' → 그 장소로 이동해 핀을 펼쳐요
@@ -374,17 +373,25 @@
     const point=userPosition || [37.5425,127.042];
     const heading=demo?35:userHeading;
     const label=demo?'성수동 예시 위치, 방향 예시':heading==null?'현재 위치, 방향 정보 없음':`현재 위치, 북쪽 기준 ${Math.round(heading)}도`;
-    const locationIcon=L.divIcon({className:'lm-location-marker',html:`<span class="lm-location-person${heading==null?' no-heading':''}" style="--heading:${heading??0}deg"><span class="lm-heading-cone" aria-hidden="true"></span><span class="lm-location-dot"></span>${demo?'<span class="lm-location-demo">예시 위치</span>':''}</span>`,iconSize:[92,92],iconAnchor:[46,46]});
-    if(locationMarker)locationMarker.setLatLng(point).setIcon(locationIcon);
-    else locationMarker=L.marker(point,{zIndexOffset:1000,icon:locationIcon,title:label}).addTo(liveMap);
-    locationMarker.getElement()?.setAttribute('aria-label',label);
+    // Draw the position as a geographic vector point, never a viewport overlay.
+    // The decorative heading/label is separate and cannot take focus or pan the map.
+    if(locationMarker)locationMarker.setLatLng(point);
+    else locationMarker=L.circleMarker(point,{radius:8,weight:3,color:'var(--color-surface)',fillColor:'var(--color-secondary)',fillOpacity:1,interactive:false,className:'lm-current-position-dot'}).addTo(liveMap);
+    const element=locationMarker.getElement();
+    element?.setAttribute('role','img');element?.setAttribute('aria-label',label);
+    const locationIcon=L.divIcon({className:'lm-location-marker',html:`<span class="lm-location-person${heading==null?' no-heading':''}" style="--heading:${heading??0}deg"><span class="lm-heading-cone" aria-hidden="true"></span>${demo?'<span class="lm-location-demo">예시 위치</span>':''}</span>`,iconSize:[92,92],iconAnchor:[46,46]});
+    if(locationHeadingMarker)locationHeadingMarker.setLatLng(point).setIcon(locationIcon);
+    else locationHeadingMarker=L.marker(point,{zIndexOffset:0,icon:locationIcon,interactive:false,keyboard:false,autoPanOnFocus:false}).addTo(liveMap);
+    const decoration=locationHeadingMarker.getElement();
+    if(decoration){decoration.style.pointerEvents='none';decoration.setAttribute('aria-hidden','true');}
   }
+
   function updateHeading(event) {
     const angle=Number.isFinite(event.webkitCompassHeading)?event.webkitCompassHeading:event.absolute&&Number.isFinite(event.alpha)?(360-event.alpha)%360:null;
     if(angle==null||!liveMap)return;
     userHeading=(angle+360)%360;
     if(!userPosition)return;
-    const person=locationMarker?.getElement()?.querySelector('.lm-location-person');
+    const person=locationHeadingMarker?.getElement()?.querySelector('.lm-location-person');
     person?.classList.remove('no-heading');person?.style.setProperty('--heading',userHeading+'deg');
     if(userPosition)locationMarker?.getElement()?.setAttribute('aria-label',`현재 위치, 북쪽 기준 ${Math.round(userHeading)}도`);
   }
