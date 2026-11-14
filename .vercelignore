@@ -12,3 +12,6 @@ login.js
 
 # License copies remain in GitHub alongside the vendored libraries.
 vendor/*LICENSE*
+.env.local
+.env.*
+.vercel/

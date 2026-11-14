@@ -100,6 +100,15 @@ test('post-login auth flag reaches only the development frame and is removed fro
   assert.equal(route('?mode=development&auth=required','reload').src,'entry.html');
 });
 
+test('online place test reaches only the explicit development frame',()=>{
+  const result=route('?mode=development&place-test=1');
+  assert.equal(result.src,'app.html?mode=development&place-test=1');
+  assert.deepEqual(result.replacements,['/index.html']);
+  assert.equal(route('?mode=prototype&place-test=1').src,'app.html?mode=prototype');
+  assert.equal(boot('development&place-test=1').value('PM_ENV.cloudPlaceTest'),true);
+  assert.equal(boot('development').value('PM_ENV.cloudPlaceTest'),false);
+});
+
 test('disconnected development keeps the existing page layouts and blocks data creation',()=>{
   const home=()=>'<main class="main">existing empty home</main>';
   const account=()=>'<section class="mycard settings">existing account controls</section>';
