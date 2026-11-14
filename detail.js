@@ -13,6 +13,7 @@ function dtLogo(src){
 }
 
 detail = function(){
+  requestAnimationFrame(dtSheetLayout);
   const x = items.find(i => i.id === detailId);
   if (!x) { detailId = null; return pages[page](); }
   const t = typeOf(x.type), ready = t.place && x.address && !x.pending;
@@ -41,7 +42,7 @@ detail = function(){
   else if (!ready) bottom.push(`<button class="dtprimary" data-action="edit">${icon('pen')}정보 수정</button>`);
   if (bottom.length === 1) bottom[0] = bottom[0].replace('class="dtghost"', 'class="dtprimary"');
 
-  return `<article class="dt">
+  return `<article class="dt dt-photo">
     <div class="dtambient" aria-hidden="true">${libThumb(x)}</div>
     <div class="dthero">${libThumb(x)}<div class="dtshade" aria-hidden="true"></div>
       <div class="dttop"><button class="dtbtn" data-action="back" aria-label="돌아가기">${icon('chevleft')}</button>
@@ -60,14 +61,91 @@ detail = function(){
         <small>${esc(src)}, ${esc(savedAgo(x))} 저장</small>
       </div>
     </div>
-    <div class="dtsheet">
+    <section class="dtsheet" id="detail-info" aria-label="콘텐츠 상세 정보">
+      <button type="button" class="dt-sheet-handle" data-action="dtsheettoggle" aria-label="상세 정보 펼치기" aria-controls="detail-info" aria-expanded="false"><span aria-hidden="true"></span></button>
       ${x.desc ? `<section class="dtsum"><h2${x.source === '직접 추가' ? '' : ' class="dtai"'}>${icon('spark')}${esc(x.source === '직접 추가' ? '장소 설명' : 'AI 요약')}</h2><p>${esc(x.desc)}</p></section>` : ''}
       <section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>
       ${info}
-    </div>
+    </section>
     <div class="dtbar ${bottom.length === 1 ? 'one' : ''}">${bottom.join('')}</div>
   </article>`;
 };
+
+// The information sheet rides over the sticky photo using native page scrolling.
+let dtSheetDrag=null,dtSheetIgnoreClickUntil=0;
+function dtSheetStop(){
+  const title=document.querySelector('.dt-photo .dthtitle'),hero=document.querySelector('.dt-photo .dthero');
+  if(!title||!hero)return 240;
+  const bottom=title.getBoundingClientRect().bottom-hero.getBoundingClientRect().top;
+  return Math.min(Math.max(120,bottom+24),Math.max(120,innerHeight-260));
+}
+function dtSheetLayout(){
+  const sheet=document.getElementById('detail-info');if(!sheet)return;
+  sheet.style.setProperty('--dt-sheet-top',`${dtSheetStop()}px`);
+  dtSheetSync();
+}
+function dtSheetTarget(){
+  const sheet=document.getElementById('detail-info');
+  return sheet?Math.max(0,sheet.getBoundingClientRect().top+scrollY-dtSheetStop()):0;
+}
+addEventListener('resize',dtSheetLayout);
+document.fonts?.ready.then(dtSheetLayout);
+function dtSheetScroll(expand){
+  const top=expand?dtSheetTarget():0;
+  if(!expand){const sheet=document.getElementById('detail-info');if(sheet)sheet.scrollTop=0;}
+  scrollTo({top,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+}
+actions.dtsheettoggle=()=>{
+  if(performance.now()<dtSheetIgnoreClickUntil)return;
+  dtSheetScroll(document.querySelector('.dt-sheet-handle')?.getAttribute('aria-expanded')!=='true');
+};
+function dtSheetSync(){
+  const handle=document.querySelector('.dt-sheet-handle');if(!handle)return;
+  const expanded=scrollY>=dtSheetTarget()-2;
+  const sheet=handle.closest('.dtsheet');
+  sheet.classList.toggle('is-expanded',expanded);
+  if(!expanded&&sheet.scrollTop)sheet.scrollTop=0;
+  handle.setAttribute('aria-expanded',String(expanded));
+  handle.setAttribute('aria-label',expanded?'상세 정보 접기':'상세 정보 펼치기');
+}
+// Wheel/trackpad scrolling lifts the sheet before scrolling its contents.
+document.addEventListener('wheel',event=>{
+  if(event.ctrlKey||event.deltaY<=0||!event.target.closest?.('.dt-photo')||document.querySelector('#sheet[open]'))return;
+  const sheet=document.getElementById('detail-info');if(!sheet)return;
+  const remaining=Math.max(0,dtSheetTarget()-scrollY);
+  if(remaining<=2)return;
+  const delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?innerHeight:1);
+  event.preventDefault();
+  scrollTo({top:Math.min(dtSheetTarget(),scrollY+delta),behavior:'instant'});
+  dtSheetSync();
+  if(delta>remaining&&sheet.classList.contains('is-expanded'))sheet.scrollTop+=delta-remaining;
+},{passive:false});
+
+document.addEventListener('pointerdown',event=>{
+  const handle=event.target.closest('.dt-sheet-handle');
+  if(!handle||event.button!==0)return;
+  dtSheetDrag={id:event.pointerId,handle,y:event.clientY,start:scrollY,moved:false};
+  handle.setPointerCapture(event.pointerId);
+});
+document.addEventListener('pointermove',event=>{
+  const drag=dtSheetDrag;if(!drag||event.pointerId!==drag.id)return;
+  if(!drag.handle.isConnected){dtSheetDrag=null;return;}
+  const delta=drag.y-event.clientY;
+  if(Math.abs(delta)>4)drag.moved=true;
+  if(drag.moved){event.preventDefault();scrollTo({top:Math.min(dtSheetTarget(),Math.max(0,drag.start+delta)),behavior:'instant'});}
+},{passive:false});
+function dtSheetRelease(event){
+  const drag=dtSheetDrag;if(!drag||event.pointerId!==drag.id)return;
+  dtSheetDrag=null;
+  if(drag.handle.hasPointerCapture(event.pointerId))drag.handle.releasePointerCapture(event.pointerId);
+  if(!drag.moved)return;
+  dtSheetIgnoreClickUntil=performance.now()+250;
+  if(event.type==='pointercancel'||!drag.handle.isConnected)return;
+  const delta=drag.y-event.clientY;
+  dtSheetScroll(Math.abs(delta)>32?delta>0:scrollY>dtSheetTarget()/2);
+}
+document.addEventListener('pointerup',dtSheetRelease);
+document.addEventListener('pointercancel',dtSheetRelease);
 
 // 2026-11-10 상단 미트볼(⋯) 메뉴: 공유 · 수정 · 삭제
 const dtMenuSet = open => {
@@ -266,7 +344,9 @@ paths.link = paths.link || 'M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1 M14 10a4
 // 상세에서 사진 아래까지 스크롤하면 상태 표시줄 띠를 켜요
 addEventListener('scroll', () => {
   const hero = document.querySelector('.dthero');
-  document.body.classList.toggle('dtscrolled', !!hero && hero.getBoundingClientRect().bottom < 120);
+  const sheet=document.getElementById('detail-info');
+  document.body.classList.toggle('dtscrolled',sheet?sheet.getBoundingClientRect().top<80:!!hero&&hero.getBoundingClientRect().bottom<120);
+  dtSheetSync();
 }, {passive: true});
 
 // 주소 복사 (클립보드 → 안 되면 선택 복사)

@@ -1176,69 +1176,68 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 #sheet .esinput,#sheet .esselect{border-radius:var(--rounded-md)}
 #sheet .esinput input{min-height:56px;font:var(--type-body-md)}
 
-/* Content detail: calm hierarchy, consistent gutters, room between sections. */
-.dt .dthero{height:360px}
-.dt .dttop{inset:var(--space-xl) var(--space-xl) auto}
-.dt .dtbtn,.dt .dtbtn.dtmorebtn{width:44px;height:44px;border-radius:50%;box-shadow:var(--shadow-sm)}
-.dt .dtbtn .icon,.dt .dtbtn.dtmorebtn .icon{width:20px;height:20px;stroke-width:1.6}
-.dt .dthtitle{left:var(--space-xl);right:var(--space-xl);bottom:calc(var(--space-2xl) + var(--space-xl))}
-.dt .dthtitle h1{margin:var(--space-md) 0 var(--space-sm);letter-spacing:normal;font:var(--type-headline-lg);color:#fff}
-.dt .dtsheet{display:flex;flex-direction:column;gap:var(--space-2xl);margin-top:calc(-1 * var(--space-xl));padding:var(--space-xl) var(--space-xl) var(--space-2xl);box-shadow:none;border-radius:var(--rounded-lg) var(--rounded-lg) 0 0}
-.dt .dtsheet>.dtsec,.dt .dtsheet>.dtsum{margin:0}
-.dt .dtsheet>.dtsum{padding:var(--space-lg);border-radius:var(--rounded-md)}
-.dt .dtsum h2{display:flex;align-items:center;gap:var(--space-sm);padding:0;margin:0 0 var(--space-sm);font:var(--type-label-md)}
-.dt .dtsum h2 .icon{width:16px;height:16px}
-.dt .dtsum p{margin:0;font:var(--type-body-md);font-weight:var(--weight-regular);word-break:keep-all}
-.dt .dtsec>h2,.dt .dtsechead h2{font:var(--type-body-md);font-weight:var(--weight-semibold);letter-spacing:normal;margin:0;color:var(--color-on-surface)}
-.dt .dtsec>h2{margin-bottom:var(--space-lg)}
-.dt .dtsechead,.dt .dtmemo .dtsechead{min-height:0;margin:0 0 var(--space-md)}
-.dt .dtmemobox{min-height:56px;padding:var(--space-lg);border-radius:var(--rounded-md);font:var(--type-body-md);font-weight:var(--weight-regular)}
-.dt .dtmemobox .icon{width:16px;height:16px;stroke-width:1.6}
-.dt .dtaddress{gap:var(--space-sm);margin:0 0 var(--space-md);font:var(--type-label-md);font-weight:var(--weight-regular);color:var(--color-secondary)}
-.dt .dtaddress>.icon{width:20px;height:20px}
-.dt .dtaddress .dtcopy{width:44px;height:44px;border-radius:var(--rounded-sm)}
-.dt .dtmap-preview{height:200px;margin:0;border-radius:var(--rounded-md)}
-.dt .dtrow{font:var(--type-label-md);font-weight:var(--weight-regular);gap:var(--space-sm)}
-.dt .dtdue{font:var(--type-body-sm);font-weight:var(--weight-semibold);padding:var(--space-xs) var(--space-sm);border-radius:var(--rounded-sm)}
-.dt .dtbar{gap:var(--space-md);padding:var(--space-md) var(--space-xl);bottom:calc(80px + env(safe-area-inset-bottom))}
-.dt .dtbar::before{top:calc(-1 * var(--space-lg));background:linear-gradient(180deg,transparent,var(--color-surface) 40px)}
-.dt .dtbar>:is(a,button){min-height:48px;height:auto;padding:var(--space-md);border-radius:var(--rounded-md);font:var(--type-label-md);font-weight:var(--weight-semibold);box-shadow:none}
-.dt .dtbar>.dtghost{background:var(--color-neutral);color:var(--color-on-surface);border:0}
-.dt .dtbar>.dtprimary{background:var(--color-primary);color:var(--color-neutral);border:0}
-.dt .dtbar .icon{width:20px;height:20px;stroke-width:1.6}
-.dt{padding-bottom:calc(144px + env(safe-area-inset-bottom))}
+/* Photo-led detail: editorial cover, floating controls and a rounded information sheet. */
+body:has(.dt-photo){background:var(--color-neutral)}
+body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bottom:0;background:var(--color-neutral)}
+.dt-photo .dtambient{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.dt-photo .dtambient>:is(img,svg){display:block;width:100%;height:100%;object-fit:cover;filter:blur(48px);transform:scale(1.12);opacity:.12}
+.dt.dt-photo .dthero{position:sticky;top:0;flex:none;z-index:0;height:clamp(420px,60svh,560px);overflow:hidden}
+.dt-photo .dthero>:is(img,svg){object-fit:cover;object-position:center;width:100%;height:100%}
+.dt-photo .dtshade{background:linear-gradient(180deg,rgba(17,17,17,.76) 0%,rgba(17,17,17,.58) 28%,rgba(17,17,17,.12) 48%,transparent 64%,transparent 100%)}
+.dt.dt-photo .dttop{inset:var(--space-xl) var(--space-xl) auto;display:flex;justify-content:space-between;align-items:center;gap:var(--space-sm);z-index:2}
+.dt.dt-photo .dtbtn,.dt.dt-photo .dtbtn.dtmorebtn{width:44px;height:44px;border:1px solid rgba(255,255,255,.2);border-radius:50%;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);color:#fff;box-shadow:none}
+.dt.dt-photo .dtbtn .icon,.dt.dt-photo .dtbtn.dtmorebtn .icon{width:20px;height:20px;stroke-width:1.6}
+.dt-photo .dtfavorite.is-active .icon{fill:currentColor}
+.dt.dt-photo .dthtitle{top:calc(var(--space-xl) + 44px + var(--space-2xl));left:var(--space-xl);right:var(--space-xl);bottom:auto;display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-md);z-index:1;isolation:isolate}
+.dt-photo .dthpill{height:auto;min-height:24px;padding:var(--space-xs) var(--space-md);border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(255,255,255,.18);font:var(--type-body-sm);font-weight:var(--weight-semibold);color:#fff}
+.dt.dt-photo .dthtitle h1{margin:0;max-width:100%;font:var(--type-headline-lg);font-weight:var(--weight-bold);letter-spacing:normal;color:#fff;text-shadow:0 1px 6px rgba(17,17,17,.45);word-break:keep-all;overflow-wrap:anywhere}
+.dt-photo .dthtitle small{margin:0;font:var(--type-body-sm);color:#fff;opacity:1;text-shadow:0 1px 4px rgba(17,17,17,.55)}
+.dt.dt-photo .dtbtn,.dt.dt-photo .dtbtn.dtmorebtn{background:rgba(17,17,17,.22)}
 
-/* Detail glass uses the current cover as a quiet blurred backdrop, like edit sheets. */
-.dt{position:relative;isolation:isolate;background:var(--color-neutral)}
-.dtambient{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;border-radius:inherit}
-.dtambient>:is(img,svg){display:block;width:100%;height:100%;object-fit:cover;filter:blur(48px);transform:scale(1.12);opacity:.14}
-.dt .dtsheet,[data-theme="dark"] .dt .dtsheet{background:color-mix(in srgb,var(--color-neutral) 76%,transparent);-webkit-backdrop-filter:blur(28px) saturate(1.15);backdrop-filter:blur(28px) saturate(1.15);border-top:1px solid color-mix(in srgb,var(--color-surface) 72%,transparent)}
-.dt .dtmemobox,[data-theme="dark"] .dt .dtmemobox{background:color-mix(in srgb,var(--color-surface) 92%,transparent)!important}
-.dt .dtsec:not(.dtmemo){padding:var(--space-lg);border-radius:var(--rounded-md);background:color-mix(in srgb,var(--color-surface) 90%,transparent)}
-.dt .dtbuy .dtprice{margin:0 0 var(--space-sm);font:var(--type-headline-md);font-weight:var(--weight-bold);color:var(--color-on-surface)}
-.dt .dtpricehint,.dt .dthint{margin:0;font:var(--type-body-sm);color:var(--color-secondary)}
-.dt .dtbar::before,[data-theme="dark"] .dt .dtbar::before{background:linear-gradient(180deg,transparent,var(--color-neutral) 48px)}
-.dt .dtbar>.dtghost{background:var(--color-surface);color:var(--color-on-surface)}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.dt .dtsheet{background:var(--color-neutral)}}
-
-/* Keep the glass sheet continuous through the final scroll position. */
-.dt{padding-bottom:0}
-.dt .dtsheet{padding-bottom:calc(176px + env(safe-area-inset-bottom));min-height:calc(100dvh - 336px)}
-.dt .dtbar::before{display:none}
-body:has(.dt){background:var(--color-neutral)}
-.dt .dtsec.dtlocation{padding:0;background:transparent}
-.dt .dtplacecard{padding:var(--space-lg);border-radius:var(--rounded-md);background:color-mix(in srgb,var(--color-surface) 90%,transparent)}
-.dt .dtlocation>h2{margin-bottom:var(--space-md)}
-.dt .dtmap-preview{height:160px}
-.dt .dtmaplink{position:absolute;inset:0;z-index:460;width:100%;height:100%;padding:0;border:0;border-radius:inherit;background:transparent;cursor:pointer}
-.dt .dtmaplink:focus-visible{outline:2px solid var(--color-primary);outline-offset:-2px}
-.dt .dtmap-fallback{pointer-events:none}
-.dt .dtfacts{margin:var(--space-lg) 0 0;padding:0;font:var(--type-label-md);font-weight:var(--weight-regular);color:var(--color-secondary)}
-.dt .dtfacts span{gap:var(--space-sm);margin:0;padding:0;border:0}
-.dt .dtfacts .icon{width:20px;height:20px;stroke-width:1.6}
-
-/* Softer summary tint; keep the shared accent token unchanged. */
-.dt .dtsheet>.dtsum,[data-theme="dark"] .dt .dtsheet>.dtsum{background:color-mix(in srgb,var(--color-accent) 45%,#fff)!important}
+.dt.dt-photo .dtsheet,[data-theme="dark"] .dt.dt-photo .dtsheet{position:relative;z-index:1;display:flex;flex-direction:column;gap:var(--space-xl);margin-top:calc(-1 * var(--space-xl));padding:var(--space-xl) var(--space-xl) calc(176px + env(safe-area-inset-bottom));height:calc(100svh - var(--dt-sheet-top,240px));min-height:0;max-height:calc(100svh - var(--dt-sheet-top,240px));overflow-y:hidden;overflow-x:hidden;overscroll-behavior:auto;scrollbar-width:none;flex:none;border:0;border-top:1px solid color-mix(in srgb,var(--color-surface) 72%,transparent);border-radius:var(--rounded-lg) var(--rounded-lg) 0 0;background:color-mix(in srgb,var(--color-surface) 68%,transparent);-webkit-backdrop-filter:blur(28px) saturate(1.15);backdrop-filter:blur(28px) saturate(1.15);box-shadow:var(--shadow-sm)}
+.dt.dt-photo .dtsheet{padding-top:0}
+.dt.dt-photo .dtsheet.is-expanded{overflow-y:auto;overscroll-behavior:contain}
+.dt-photo .dtsheet::-webkit-scrollbar{display:none}
+.dt-photo .dtsheet>.dtsec,.dt-photo .dtsheet>.dtsum{flex:none}
+.dt-photo .dt-sheet-handle{position:sticky;top:0;z-index:3;display:grid;place-items:center;flex:none;align-self:center;width:calc(100% + var(--space-xl) * 2);min-height:44px;margin:0 calc(-1 * var(--space-xl)) calc(-1 * var(--space-md));padding:0;border:0;border-radius:var(--rounded-lg) var(--rounded-lg) 0 0;background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;cursor:grab;touch-action:none;filter:none;box-shadow:none;-webkit-tap-highlight-color:transparent}
+.dt-photo .dt-sheet-handle:hover,.dt-photo .dt-sheet-handle:active{background:transparent;filter:none;box-shadow:none}
+.dt-photo .dt-sheet-handle:active{cursor:grabbing}
+.dt-photo .dt-sheet-handle>span{display:block;width:40px;height:4px;border-radius:999px;background:var(--color-border);opacity:.45}
+.dt-photo .dt-sheet-handle:focus-visible{outline:none}
+.dt-photo .dt-sheet-handle:focus-visible>span{background:var(--color-primary);opacity:1;box-shadow:0 0 0 2px var(--color-surface)}
+.dt-photo .dtsheet>.dtsec,.dt-photo .dtsheet>.dtsum{margin:0}
+.dt.dt-photo .dtsheet>.dtsum,[data-theme="dark"] .dt.dt-photo .dtsheet>.dtsum{padding:var(--space-lg);border-radius:var(--rounded-md);background:color-mix(in srgb,var(--color-accent) 32%,#fff)!important}
+.dt-photo .dtsum h2{display:flex;align-items:center;gap:var(--space-sm);padding:0;margin:0 0 var(--space-sm);font:var(--type-label-md);font-weight:var(--weight-semibold)}
+.dt-photo .dtsum h2 .icon{width:16px;height:16px}
+.dt-photo .dtsum p{margin:0;font:var(--type-body-md);font-weight:var(--weight-regular);word-break:keep-all;overflow-wrap:anywhere}
+.dt-photo .dtsec>h2,.dt-photo .dtsechead h2{font:var(--type-body-md);font-weight:var(--weight-semibold);letter-spacing:normal;margin:0;color:var(--color-on-surface)}
+.dt-photo .dtsec>h2{margin-bottom:var(--space-md)}
+.dt-photo .dtsechead,.dt-photo .dtmemo .dtsechead{min-height:0;margin:0 0 var(--space-md)}
+.dt.dt-photo .dtmemobox,[data-theme="dark"] .dt.dt-photo .dtmemobox{min-height:56px;padding:var(--space-lg);border:0;border-radius:var(--rounded-md);background:var(--color-neutral)!important;font:var(--type-body-md);font-weight:var(--weight-regular);color:var(--color-on-surface);box-shadow:none!important}
+.dt-photo .dtmemobox .icon{width:16px;height:16px;stroke-width:1.6}
+.dt-photo .dtsec:not(.dtmemo){padding:0;background:transparent}
+.dt-photo .dtplacecard{padding:var(--space-lg);border-radius:var(--rounded-md);background:var(--color-neutral)}
+.dt-photo .dtaddress{display:flex;align-items:center;gap:var(--space-sm);margin:0 0 var(--space-md);font:var(--type-label-md);font-weight:var(--weight-regular);color:var(--color-secondary)}
+.dt-photo .dtaddress>.icon{width:20px;height:20px}
+.dt-photo .dtaddress .dtcopy{flex:none;width:44px;height:44px;border-radius:var(--rounded-sm)}
+.dt-photo .dtmap-preview{height:160px;margin:0;border-radius:var(--rounded-md)}
+.dt-photo .dtmaplink{position:absolute;inset:0;z-index:460;width:100%;height:100%;padding:0;border:0;border-radius:inherit;background:transparent;cursor:pointer}
+.dt-photo .dtmaplink:focus-visible{outline:2px solid var(--color-primary);outline-offset:-2px}
+.dt-photo .dtmap-fallback{pointer-events:none}
+.dt-photo .dtfacts{margin:var(--space-lg) 0 0;padding:0;font:var(--type-label-md);font-weight:var(--weight-regular);color:var(--color-secondary)}
+.dt-photo .dtfacts span{gap:var(--space-sm);margin:0;padding:0;border:0}
+.dt-photo .dtfacts .icon{width:20px;height:20px;stroke-width:1.6}
+.dt-photo .dtrow{font:var(--type-label-md);font-weight:var(--weight-regular);gap:var(--space-sm)}
+.dt-photo .dtdue{font:var(--type-body-sm);font-weight:var(--weight-semibold);padding:var(--space-xs) var(--space-sm);border-radius:var(--rounded-sm)}
+.dt-photo .dtbuy .dtprice{margin:0 0 var(--space-sm);font:var(--type-headline-md);font-weight:var(--weight-semibold);color:var(--color-on-surface)}
+.dt-photo .dtpricehint,.dt-photo .dthint{margin:0;font:var(--type-body-sm);color:var(--color-secondary)}
+.dt.dt-photo .dtbar{z-index:5;gap:var(--space-md);padding:var(--space-md) var(--space-xl);bottom:calc(80px + env(safe-area-inset-bottom))}
+.dt-photo .dtbar::before{display:block;position:absolute;inset:calc(-1 * var(--space-xl)) 0 calc(-80px - env(safe-area-inset-bottom));z-index:-1;background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--color-surface) 92%,transparent) 48px);pointer-events:none}
+.dt-photo .dtbar>:is(a,button){min-height:48px;height:auto;padding:var(--space-md);border-radius:var(--rounded-md);font:var(--type-label-md);font-weight:var(--weight-semibold);box-shadow:var(--shadow-sm)}
+.dt-photo .dtbar>.dtghost{background:var(--color-surface);color:var(--color-on-surface);border:1px solid var(--color-disabled)}
+.dt-photo .dtbar>.dtprimary{background:var(--color-primary);color:var(--color-neutral);border:0}
+.dt-photo .dtbar .icon{width:20px;height:20px;stroke-width:1.6}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.dt.dt-photo .dtsheet{background:var(--color-surface)}}
 
 /* Home schedule: quiet header, readable event rows, compact deadline chips. */
 .hwidget.calw{padding:var(--space-lg);border-radius:var(--rounded-lg);border:1px solid color-mix(in srgb,var(--color-surface) 72%,transparent)!important;background:color-mix(in srgb,var(--color-surface) 56%,transparent)!important;-webkit-backdrop-filter:blur(18px) saturate(1.3)!important;backdrop-filter:blur(18px) saturate(1.3)!important;box-shadow:var(--shadow-sm)!important}
