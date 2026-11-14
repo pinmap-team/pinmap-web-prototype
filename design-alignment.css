@@ -44,6 +44,8 @@ button,input,select,textarea,svg text,.libpage,.live-map,#login-screen,.ob-phone
 .live-map .lm-carousel-top{gap:var(--space-xs)}
 .live-map .lm-carousel-bottom{padding-right:44px}
 .live-map .lm-carousel-bottom p{margin:var(--space-xs) 0 0;color:var(--color-on-surface)}
+.live-map .lm-carousel-address{position:relative;z-index:1;display:block;width:100%;min-height:44px;margin:0;padding:var(--space-xs) 0;border:0;background:transparent;color:var(--color-on-surface);font:var(--type-label-md);text-align:left;text-decoration:underline;text-underline-offset:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.live-map .lm-carousel-address:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
 .live-map .lm-carousel-bottom small{color:var(--color-secondary)}
 .cfpage .libsearch{gap:var(--space-sm);padding:0 var(--space-sm) 0 var(--space-lg)}
 .field input,.field textarea,.esinput.area{padding:var(--space-md)}

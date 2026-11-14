@@ -25,8 +25,8 @@ const ALLOWED=new Map([
   // transformed values that are escaped at render time
   ['library.js title 353d511dd3d1','toast writes textContent'],
   ['my.js title 22ee3f364199','notification text is escaped when rendered'],
-  ['my.js period c85493135c6c','notification body is escaped when rendered'],
-  ['detail.js desc d7c542d1eaff','condition only; description is escaped when rendered'],
+  ['my.js period 767a15f12514','notification body is escaped when rendered'],
+  ['detail.js desc c49510988482','condition only; description is escaped when rendered'],
   ['detail.js address 80d05f3cdda3','toast writes textContent'],
   ['collection.js title 75a5731d4d77','regex source, not HTML output'],
   ['collection.js category 75a5731d4d77','regex source, not HTML output'],
