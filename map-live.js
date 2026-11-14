@@ -10,6 +10,7 @@
   let automaticLocation=false;
   const markerEntries=new Map();
   let userPosition = null;
+  const locationTracker=window.PinmapLocation.createTracker();
   let userHeading = null, locationWatch = null, orientationActive = false;
   let locationBusy = false;
   let center = PM_ENV.development ? [20,0] : [37.5445,127.043], zoom = PM_ENV.development ? 2 : 15, category = 'all';
@@ -368,13 +369,14 @@
   };
   function drawLocation() {
     if(!liveMap)return;
-    if(locationMarker)liveMap.removeLayer(locationMarker);
     if(PM_ENV.development&&!userPosition)return;
     const demo=!userPosition;
     const point=userPosition || [37.5425,127.042];
     const heading=demo?35:userHeading;
     const label=demo?'성수동 예시 위치, 방향 예시':heading==null?'현재 위치, 방향 정보 없음':`현재 위치, 북쪽 기준 ${Math.round(heading)}도`;
-    locationMarker=L.marker(point,{zIndexOffset:1000,icon:L.divIcon({className:'lm-location-marker',html:`<span class="lm-location-person${heading==null?' no-heading':''}" style="--heading:${heading??0}deg"><span class="lm-heading-cone" aria-hidden="true"></span><span class="lm-location-dot"></span>${demo?'<span class="lm-location-demo">예시 위치</span>':''}</span>`,iconSize:[92,92],iconAnchor:[46,46]}),title:label}).addTo(liveMap);
+    const locationIcon=L.divIcon({className:'lm-location-marker',html:`<span class="lm-location-person${heading==null?' no-heading':''}" style="--heading:${heading??0}deg"><span class="lm-heading-cone" aria-hidden="true"></span><span class="lm-location-dot"></span>${demo?'<span class="lm-location-demo">예시 위치</span>':''}</span>`,iconSize:[92,92],iconAnchor:[46,46]});
+    if(locationMarker)locationMarker.setLatLng(point).setIcon(locationIcon);
+    else locationMarker=L.marker(point,{zIndexOffset:1000,icon:locationIcon,title:label}).addTo(liveMap);
     locationMarker.getElement()?.setAttribute('aria-label',label);
   }
   function updateHeading(event) {
@@ -411,7 +413,9 @@
     locationBusy=true;
     locationWatch=navigator.geolocation.watchPosition(position=>{
       if(!liveMap||page!=='map')return;
-      const first=!userPosition;locationBusy=false;userPosition=[position.coords.latitude,position.coords.longitude];
+      locationBusy=false;
+      const fix=locationTracker.accept(position);if(!fix)return;
+      const first=!userPosition;userPosition=[fix.latitude,fix.longitude];
       // A GPS travel heading is not the direction the person is facing.
       if(first&&!mapLocationName)liveMap.setView(userPosition,16);
       drawLocation();
