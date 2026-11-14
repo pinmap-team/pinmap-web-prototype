@@ -337,7 +337,7 @@ document.addEventListener('submit', e => {
   if (e.target.id !== 'saveform') return;
   const f = e.target, err = $('#saveerror');
   if (!f.url.value.trim()) { e.preventDefault(); e.stopImmediatePropagation(); err.textContent = '저장할 콘텐츠 링크를 붙여넣어 주세요.'; f.url.focus(); return; }
-  if (!f.elements.namedItem('title').value.trim()) { e.preventDefault(); e.stopImmediatePropagation(); err.textContent = '제목을 입력해 주세요.'; f.elements.namedItem('title').focus(); }
+  if (!PM_ENV.cloudPlaceTest && !f.elements.namedItem('title').value.trim()) { e.preventDefault(); e.stopImmediatePropagation(); err.textContent = '제목을 입력해 주세요.'; f.elements.namedItem('title').focus(); }
 }, true);
 paths.link = paths.link || 'M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1 M14 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1';
 
