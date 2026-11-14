@@ -100,21 +100,23 @@ test('post-login auth flag reaches only the development frame and is removed fro
   assert.equal(route('?mode=development&auth=required','reload').src,'entry.html');
 });
 
-test('online place test reaches only the explicit development frame',()=>{
+test('online place test is active in login-free development, including the legacy direct link',()=>{
   const result=route('?mode=development&place-test=1');
   assert.equal(result.src,'app.html?mode=development&place-test=1');
   assert.deepEqual(result.replacements,['/index.html']);
   assert.equal(route('?mode=prototype&place-test=1').src,'app.html?mode=prototype');
   assert.equal(boot('development&place-test=1').value('PM_ENV.cloudPlaceTest'),true);
-  assert.equal(boot('development').value('PM_ENV.cloudPlaceTest'),false);
+  assert.equal(boot('development').value('PM_ENV.cloudPlaceTest'),true);
+  assert.equal(boot('development&auth=required').value('PM_ENV.cloudPlaceTest'),false);
+  assert.equal(boot('prototype').value('PM_ENV.cloudPlaceTest'),false);
 });
 
-test('disconnected development keeps the existing page layouts and blocks data creation',()=>{
+test('login-free development keeps its screens and allows only place-link saves',()=>{
   const home=()=>'<main class="main">existing empty home</main>';
   const account=()=>'<section class="mycard settings">existing account controls</section>';
   const listeners={};let message='';
   const context=vm.createContext({
-    PM_ENV:{development:true},startCoach(){},notifications(){return ['sample'];},unreadCount(){return 1;},
+    PM_ENV:{development:true,cloudPlaceTest:true},startCoach(){},notifications(){return ['sample'];},unreadCount(){return 1;},
     pages:{home,account,my:()=>'<b></b><small>프로필 편집</small>',accounts:()=>'<section class="mgroup">연동된 계정 0개</section>',appinfo:()=>'<div class="mycard settings">버전</div>'},
     actions:{},mapSettings(){},render(){},$:()=>null,
     toast:text=>message=text,
@@ -127,6 +129,9 @@ test('disconnected development keeps the existing page layouts and blocks data c
   assert(!context.pages.accounts().includes('dev-panel'));
   let prevented=false,stopped=false;
   listeners.submit({target:{id:'saveform'},preventDefault(){prevented=true;},stopImmediatePropagation(){stopped=true;}});
+  assert.equal(prevented,false);
+  assert.equal(stopped,false);
+  listeners.submit({target:{id:'accform'},preventDefault(){prevented=true;},stopImmediatePropagation(){stopped=true;}});
   assert(prevented&&stopped);
   assert.equal(message,'아직 데이터가 연결되지 않았어요.');
 });
