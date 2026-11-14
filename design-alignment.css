@@ -1213,10 +1213,10 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .dt-photo .dtsec>h2,.dt-photo .dtsechead h2{font:var(--type-body-md);font-weight:var(--weight-semibold);letter-spacing:normal;margin:0;color:var(--color-on-surface)}
 .dt-photo .dtsec>h2{margin-bottom:var(--space-md)}
 .dt-photo .dtsechead,.dt-photo .dtmemo .dtsechead{min-height:0;margin:0 0 var(--space-md)}
-.dt.dt-photo .dtmemobox,[data-theme="dark"] .dt.dt-photo .dtmemobox{min-height:56px;padding:var(--space-lg);border:0;border-radius:var(--rounded-md);background:var(--color-neutral)!important;font:var(--type-body-md);font-weight:var(--weight-regular);color:var(--color-on-surface);box-shadow:none!important}
+.dt.dt-photo .dtmemobox,[data-theme="dark"] .dt.dt-photo .dtmemobox{min-height:56px;padding:var(--space-lg);border:0;border-radius:var(--rounded-md);background:var(--color-surface)!important;font:var(--type-body-md);font-weight:var(--weight-regular);color:var(--color-on-surface);box-shadow:none!important}
 .dt-photo .dtmemobox .icon{width:16px;height:16px;stroke-width:1.6}
 .dt-photo .dtsec:not(.dtmemo){padding:0;background:transparent}
-.dt-photo .dtplacecard{padding:var(--space-lg);border-radius:var(--rounded-md);background:var(--color-neutral)}
+.dt-photo .dtplacecard{padding:var(--space-lg);border-radius:var(--rounded-md);background:var(--color-surface)}
 .dt-photo .dtaddress{display:flex;align-items:center;gap:var(--space-sm);margin:0 0 var(--space-md);font:var(--type-label-md);font-weight:var(--weight-regular);color:var(--color-secondary)}
 .dt-photo .dtaddress>.icon{width:20px;height:20px}
 .dt-photo .dtaddress .dtcopy{flex:none;width:44px;height:44px;border-radius:var(--rounded-sm)}
@@ -1290,3 +1290,32 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 /* Home hero breathes; schedule stays compact beneath it. */
 .main>.mainwrap{margin-top:var(--space-2xl)!important;margin-bottom:var(--space-2xl)}
 .main>.mainwrap+.calw{margin-top:0!important}
+
+/* Kakao's location overlay uses its own projection, alongside its basemap. */
+#live-map-canvas[data-native-location="kakao"] :is(.lm-current-position-dot,.lm-location-marker){opacity:0;pointer-events:none}
+.lm-kakao-location{position:relative;width:92px;height:92px;pointer-events:none}
+
+/* Loading uses the same vector wordmark as Home, in white on the dark backdrop. */
+#onboarding .ob-screen.step1,#onboarding:has(.step1){background:var(--color-primary)!important}
+[data-theme="dark"] #onboarding .ob-screen.step1,[data-theme="dark"] #onboarding:has(.step1){background:var(--color-neutral)!important}
+#onboarding .ob-splash{display:grid;place-items:center}
+#onboarding .ob-splash img.ob-splash-wordmark{width:70%!important;max-width:320px;height:auto!important;object-fit:contain;filter:brightness(0) invert(1)}
+
+/* Map design: three compact choices, with a clear selected state. */
+.map-design{padding:0}
+.map-design-intro{margin:0 0 var(--space-xl);font:var(--type-label-md);font-weight:var(--weight-regular);color:var(--color-secondary);word-break:keep-all}
+.map-design-options{display:flex;flex-direction:column;gap:var(--space-md)}
+.map-design-option{display:flex;align-items:center;gap:var(--space-lg);width:100%;min-height:104px;padding:var(--space-md);border:1px solid color-mix(in srgb,var(--color-surface) 72%,transparent);border-radius:var(--rounded-lg);background:color-mix(in srgb,var(--color-surface) 72%,transparent);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:var(--shadow-sm);color:var(--color-on-surface);text-align:left;cursor:pointer;transition:background-color .18s ease,border-color .18s ease}
+.map-design-option[aria-checked="true"]{background:var(--color-surface);border-color:var(--color-primary)}
+.map-design-option:focus-visible{outline:2px solid var(--color-primary);outline-offset:var(--space-xs)}
+.map-design-option:hover{background:var(--color-surface);filter:none}
+.map-design-thumbnail{display:block;flex:none;width:80px;height:80px;overflow:hidden;border-radius:var(--rounded-md);background:var(--color-neutral)}
+.map-design-thumbnail img{display:block;width:100%;height:100%;object-fit:cover}
+.map-design-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:var(--space-xs)}
+.map-design-copy strong{font:var(--type-body-md);font-weight:var(--weight-semibold);color:var(--color-on-surface)}
+.map-design-copy small{font:var(--type-body-sm);font-weight:var(--weight-regular);color:var(--color-secondary)}
+.map-design-check{display:grid;place-items:center;flex:none;width:24px;height:24px;margin-right:var(--space-xs);border:1px solid var(--color-disabled);border-radius:50%;background:transparent;color:var(--color-surface)}
+.map-design-check .icon{width:16px;height:16px;stroke-width:2;opacity:0}
+.map-design-option[aria-checked="true"] .map-design-check{border-color:var(--color-primary);background:var(--color-primary);color:var(--color-surface)}
+.map-design-option[aria-checked="true"] .map-design-check .icon{opacity:1}
+@media(prefers-reduced-motion:reduce){.map-design-option{transition:none}}

@@ -60,7 +60,7 @@
     }).filter(Boolean);
     const own = items.filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lng) && !x.pending && !savedCoords.some(y => y.id === x.id))
       .map(x => ({id:x.id,lat:x.lat,lng:x.lng,kind:x.mapKind||kindOf(x.category || ''),image:libPhoto(x)||localPhoto(x.mapKind||kindOf(x.category || '')),title:x.title,address:x.address || '',category:x.category || x.type,description:x.desc || '',savedLabel:savedAgo(x)+' 저장',source:'저장한 콘텐츠',saved:true,favorite:!!x.favorite}));
-    return [...pinned,...own.flatMap(place=>{const item=items.find(x=>x.id===place.id);return item?.mapLocations?.length?item.mapLocations.filter(loc=>Number.isFinite(loc.coordinates?.lat)&&Number.isFinite(loc.coordinates?.lng)).map((loc,index)=>({...place,title:loc.name||place.title,lat:loc.coordinates.lat,lng:loc.coordinates.lng,address:loc.address||'주소 확인 필요',image:loc.image_data_url||PM_ENV.placeholderImage,savedLabel:loc.review_required?'지도 검색 위치 · 확인 필요':place.savedLabel,locationIndex:index})): [place];})];
+    return [...pinned,...own];
   };
   function content() {
     return `<section class="live-map" aria-label="지도에서 장소 탐색"><div id="live-map-canvas"></div>
@@ -117,7 +117,7 @@
     const list = searchResults || savedPlaces();
     return list.filter(x => category === 'all' || x.kind === category);
   }
-  const placeKey=place=>`${place.saved?'saved':'search'}:${place.id}${place.locationIndex==null?'':':'+place.locationIndex}`;
+  const placeKey=place=>`${place.saved?'saved':'search'}:${place.id}`;
   function markerIcon(place,expanded=false) {
     const photo=safe(place.image||localPhoto(place.kind));
     return L.divIcon({className:`lm-photo-marker${expanded?' is-selected':''}`,
@@ -363,8 +363,7 @@
     if (focusId != null) { window.pmMapFocus = null; searchResults = null; searchQuery = ''; category = 'all';
       const f = savedPlaces().find(p => p.id === focusId); if (f) { center = [f.lat, f.lng]; zoom = 15; } }
     if (isMap) { $('#app').innerHTML=content(); mount(); if(searchResults) showResults();
-      if (focusId != null) { const focused=savedPlaces().filter(p=>p.id===focusId); if (focused.length>1 && liveMap) liveMap.fitBounds(focused.map(p=>[p.lat,p.lng]),{maxZoom:15,padding:[48,48]});
-        const f=focused[0]; if (f && liveMap) expandPlace(f,false); } }
+      if (focusId != null) { const f = savedPlaces().find(p => p.id === focusId); if (f && liveMap) expandPlace(f); } }
     else { originalRender(); if(detailId)mountDetailMap(); if(page==='course' && !detailId) window.mountCourseMap?.(); if(page==='courses' && !detailId) window.mountCourseThumbnails?.(); }
   };
   function drawLocation() {
@@ -385,6 +384,7 @@
     else locationHeadingMarker=L.marker(point,{zIndexOffset:0,icon:locationIcon,interactive:false,keyboard:false,autoPanOnFocus:false}).addTo(liveMap);
     const decoration=locationHeadingMarker.getElement();
     if(decoration){decoration.style.pointerEvents='none';decoration.setAttribute('aria-hidden','true');}
+    mapProviderController?.setLocation({point:[...point],heading,demo});
   }
 
   function updateHeading(event) {
@@ -395,6 +395,7 @@
     const person=locationHeadingMarker?.getElement()?.querySelector('.lm-location-person');
     person?.classList.remove('no-heading');person?.style.setProperty('--heading',userHeading+'deg');
     if(userPosition)locationMarker?.getElement()?.setAttribute('aria-label',`현재 위치, 북쪽 기준 ${Math.round(userHeading)}도`);
+    mapProviderController?.setLocation({point:[...userPosition],heading:userHeading,demo:false});
   }
   function startOrientation() {
     if(orientationActive)return;

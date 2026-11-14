@@ -41,7 +41,24 @@
     nativeHost.className='pm-native-map';
     nativeHost.setAttribute('aria-hidden','true');
     host.prepend(nativeHost);
-    let current='openfree', native=null, providerConfig=emptyConfig, disposed=false, request=0, frame=0, authObserver=null;
+    let current='openfree', native=null, providerConfig=emptyConfig, disposed=false, request=0, frame=0, authObserver=null, location=null, kakaoLocation=null, locationContent=null;
+    function drawNativeLocation() {
+      if(current!=='kakao'||!native||!location)return;
+      const position=new kakao.maps.LatLng(location.point[0],location.point[1]);
+      if(!locationContent){
+        locationContent=document.createElement('div');
+        locationContent.className='lm-kakao-location';
+        locationContent.setAttribute('aria-hidden','true');
+        locationContent.innerHTML='<span class="lm-location-person"><span class="lm-heading-cone" aria-hidden="true"></span><span class="lm-location-dot"></span><span class="lm-location-demo">예시 위치</span></span>';
+      }
+      const person=locationContent.querySelector('.lm-location-person');
+      person.classList.toggle('no-heading',location.heading==null);
+      person.style.setProperty('--heading',(location.heading??0)+'deg');
+      locationContent.querySelector('.lm-location-demo').hidden=!location.demo;
+      if(kakaoLocation)kakaoLocation.setPosition(position);
+      else kakaoLocation=new kakao.maps.CustomOverlay({map:native.map,position,content:locationContent,xAnchor:.5,yAnchor:.5,zIndex:1000,clickable:false});
+      host.dataset.nativeLocation='kakao';
+    }
     const notify=() => onChange?.({current,available:providerConfig.available,labels});
     function sync() {
       if(!native || disposed)return;
@@ -78,6 +95,7 @@
     function clearNative() {
       cancelAnimationFrame(frame);
       authObserver?.disconnect();authObserver=null;
+      kakaoLocation?.setMap(null);kakaoLocation=null;locationContent=null;delete host.dataset.nativeLocation;
       if(native?.provider==='google') window.google?.maps?.event?.clearInstanceListeners?.(native.map);
       native=null;
       nativeHost.replaceChildren();
@@ -122,7 +140,7 @@
           checkAuth();
         }
         if(id!==request)return false;
-        sync();
+        sync();drawNativeLocation();
         if(remember)saveChoice(next);
         notify();return true;
       } catch(error) {
@@ -148,7 +166,7 @@
         catch(error) { onChange?.({current,available:providerConfig.available,labels,error:error.message}); }
       }
     });
-    return {select,get current(){return current;}};
+    return {select,setLocation(value){location=value;drawNativeLocation();},get current(){return current;}};
   }
   window.PinmapMapProviders={attach,labels};
 })();

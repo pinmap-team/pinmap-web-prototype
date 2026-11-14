@@ -209,7 +209,7 @@ document.addEventListener('scroll', e => { if (e.target?.classList?.contains('ob
 function onboardScreen() {
   const s = onboardStep;
   // 첫 화면: 로고만 심플하게 (화면을 누르면 바로 다음 단계)
-  if (s === 0) return `<button class="ob-splash" data-ob="next" aria-label="핀맵 시작"><img src="${PM_IMG.splash}" alt="Pinmap"></button>`;
+  if (s === 0) return `<button class="ob-splash" data-ob="next" aria-label="핀맵 시작"><img class="ob-splash-wordmark" src="img/pinmap-logo-splash.svg" alt="Pinmap"></button>`;
   // 2026-11-04: 세 단계를 세로 카드 대신 가로로 넘기는 큰 카드(레퍼런스: 라벨 칩 + 큰 이미지 + 점 표시)로 보여줘요.
   if (s === 1) return `
     <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를<br><em>발견</em>했나요?</h1>

@@ -90,16 +90,16 @@ function notiSettings(){
 function saveSettings(){
   modal('저장 설정', `<div class="mycard settings">${sw('aiDefault','AI 자동 분류 기본 사용','끄면 저장할 때 카테고리를 직접 골라요')}</div>`);
 }
-function mapAppPreview(){
- const key=settings.mapApp||'naver',name=MAP_APPS[key].name;
- const colors={naver:['#edf2e8','#c5e8b8','#03c75a'],kakao:['#f5f0df','#d4e6bb','#fee500'],google:['#f1f3f4','#cde6ce','#4285f4']}[key]||['#f1f3f4','#cde6ce','#4285f4'];
- return `<figure class="map-app-preview"><svg viewBox="0 0 360 220" role="img" aria-label="${esc(name)} 지도 화면 예시"><rect width="360" height="220" fill="${colors[0]}"/><path d="M0 155 Q120 95 220 170 T360 160V220H0" fill="#b9dcf2"/><path d="M230 5h110v90H230zM12 20h65v45H12z" fill="${colors[1]}"/><path d="M0 100H360M110 0V220M0 25L330 220" stroke="white" stroke-width="14"/><path d="M110 150V100H245V65" fill="none" stroke="${colors[2]}" stroke-width="6"/><circle cx="245" cy="65" r="12" fill="${colors[2]}" stroke="#333" stroke-width="2"/><text x="160" y="55" font-size="14" fill="#333">저장한 장소</text><text x="270" y="125" font-size="12" fill="#555">공원</text></svg></figure>`;
+function mapAppPreview(key){
+  return `<span class="map-design-thumbnail" aria-hidden="true"><img src="img/map-previews/${key}-seoul-forest.png" alt="" width="360" height="360" decoding="async"></span>`;
 }
 function mapSettings(){
-  modal('지도 디자인', `<div class="mycard settings">
-    <div class="setrow col"><div><b>지도 디자인</b><small>지도 탭과 길찾기에 사용할 지도를 선택해요</small></div>
-      <div class="segmented" role="radiogroup" aria-label="지도 디자인">${Object.entries(MAP_APPS).map(([k,v]) => `<button role="radio" aria-checked="${settings.mapApp===k}" class="${settings.mapApp===k?'on':''}" data-mapapp="${k}">${v.name}</button>`).join('')}</div>
-    ${mapAppPreview()}</div></div>`);
+  const credits={naver:'© NAVER',kakao:'© Kakao',google:'© Google · TMap Mobility'};
+  modal('지도 디자인', `<div class="map-design"><p class="map-design-intro">지도 탭과 길찾기에 사용할 지도를 선택해요.</p>
+    <div class="map-design-options" role="radiogroup" aria-label="지도 디자인">${Object.entries(MAP_APPS).map(([key,value])=>{
+      const selected=settings.mapApp===key;
+      return `<button type="button" class="map-design-option" role="radio" aria-checked="${selected}" tabindex="${selected?'0':'-1'}" data-mapapp="${key}">${mapAppPreview(key)}<span class="map-design-copy"><strong>${esc(value.name)}</strong><small>${credits[key]}</small></span><span class="map-design-check" aria-hidden="true">${icon('check')}</span></button>`;
+    }).join('')}</div></div>`);
 }
 $('#sheet').addEventListener('close', () => { mySheet = null; });
 
@@ -132,7 +132,7 @@ document.addEventListener('click', e => {
     return;
   }
   const m = e.target.closest('[data-mapapp]');
-  if (m) { settings.mapApp = m.dataset.mapapp; afterChange(); render(); mySheet?.(); toast(`${josa(MAP_APPS[settings.mapApp].name, '을/를')} 선택했어요.`); $('#snackbar').classList.add('oneline'); }
+  if (m) { const refocus=document.activeElement===m; settings.mapApp = m.dataset.mapapp; afterChange(); render(); mySheet?.(); if(refocus)document.querySelector(`[data-mapapp="${settings.mapApp}"]`)?.focus({preventScroll:true}); toast(`${josa(MAP_APPS[settings.mapApp].name, '을/를')} 선택했어요.`); $('#snackbar').classList.add('oneline'); }
 });
 document.addEventListener('change', e => {
   const key = e.target.dataset?.setting;
@@ -149,4 +149,17 @@ document.addEventListener('submit', e => {
   if (!nick) return;
   settings.nickname = nick; afterChange();
   $('#sheet').close(); render(); toast('프로필을 저장했어요.');
+});
+
+// Radio-group keyboard navigation keeps focus on the selected map after rendering.
+document.addEventListener('keydown',event=>{
+  const current=event.target.closest('.map-design-option');
+  if(!current||!['ArrowDown','ArrowRight','ArrowUp','ArrowLeft','Home','End'].includes(event.key))return;
+  event.preventDefault();
+  const options=[...current.closest('[role="radiogroup"]').querySelectorAll('[data-mapapp]')];
+  const index=options.indexOf(current),direction=['ArrowUp','ArrowLeft'].includes(event.key)?-1:1;
+  const next=event.key==='Home'?0:event.key==='End'?options.length-1:(index+direction+options.length)%options.length;
+  const key=options[next].dataset.mapapp;
+  options[next].click();
+  document.querySelector(`.map-design-option[data-mapapp="${key}"]`)?.focus({preventScroll:true});
 });
