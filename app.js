@@ -273,7 +273,8 @@ document.addEventListener('submit',e=>{
   if(e.target.id==='saveform'){
     e.preventDefault();const f=e.target;let u;
     try{u=new URL(f.url.value);if(!['https:','http:'].includes(u.protocol))throw Error()}catch{$('#saveerror').textContent='http 또는 https 링크를 입력해 주세요.';return}
-    const title=f.elements.namedItem('title').value.trim(), ai=!PM_ENV.development&&f.type.value==='ai', type=ai?guessType(title+' '+u.href):f.type.value, sample=!PM_ENV.development&&f.url.value.includes('sample-prototype');
+    const sourceName=/^(?:www\.)?instagram\.com$/i.test(u.hostname)?'Instagram 게시물':/^(?:www\.)?(?:youtube\.com|youtu\.be)$/i.test(u.hostname)?'YouTube 영상':`${u.hostname.replace(/^www\./,'')} 링크`;
+    const title=f.elements.namedItem('title').value.trim()||sourceName.slice(0,50), ai=!PM_ENV.development&&f.type.value==='ai', type=ai?guessType(title+' '+u.href):f.type.value, sample=!PM_ENV.development&&f.url.value.includes('sample-prototype');
     const x={id:Date.now(),title,type,category:shortType(type),source:sample?'YouTube':u.hostname.replace(/^www\./,''),ago:'방금',savedAt:new Date().toISOString(),desc:PM_ENV.development?'':'새롭게 담아둔 나의 취향',memo:f.memo.value,art:typeOf(type).art,collection:f.collection.value,url:u.href,sample,aiClassified:ai};
     if(typeOf(type).place)x.pending=true;
     items.unshift(x);afterChange();$('#sheet').close();page='library';openDetail(x.id);

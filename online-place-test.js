@@ -42,13 +42,18 @@ if (PM_ENV.cloudPlaceTest && !PM_ENV.backend) {
     form.dataset.busy = '1';
     const submit = form.querySelector('button[type=submit]');
     const submitLabel = submit?.textContent;
+    const progress = form.querySelector('#saveprogress');
     const hint = form.querySelector('.eshint,.hint');
     const hintText = hint?.textContent;
     if (submit) {
       submit.disabled = true;
-      submit.textContent = '장소 분석 중…';
+      submit.setAttribute('aria-busy', 'true');
+      submit.textContent = '저장 중…';
     }
-    if (hint) hint.textContent = '장소를 찾고 있어요. 게시물에 사진·영상이 많으면 몇 분 걸릴 수 있어요.';
+    if (progress) {
+      progress.textContent = '저장 중 · 게시물에서 장소를 찾고 있어요. 몇 분 걸릴 수 있어요.';
+      progress.hidden = false;
+    }
     try {
       const response = await fetch('/api/place-extract', {
         method: 'POST',
@@ -91,7 +96,12 @@ if (PM_ENV.cloudPlaceTest && !PM_ENV.backend) {
       delete form.dataset.busy;
       if (submit) {
         submit.disabled = false;
+        submit.removeAttribute('aria-busy');
         submit.textContent = submitLabel;
+      }
+      if (progress) {
+        progress.hidden = true;
+        progress.textContent = '';
       }
       if (hint) hint.textContent = hintText;
     }
