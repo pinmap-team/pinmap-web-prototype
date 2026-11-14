@@ -380,3 +380,15 @@ body.dtscrolled:has(.dt)::before{content:"";position:fixed;inset:0 0 auto;height
 .dtmap-open{top:auto;bottom:8px;right:8px;min-height:24px;height:24px;padding:0 var(--space-sm);gap:var(--space-xs);border-radius:var(--rounded-sm);background:color-mix(in srgb,var(--color-surface) 80%,transparent);box-shadow:none;font:var(--type-body-sm);color:var(--color-secondary)}
 .dtmap-open::before{content:'';position:absolute;inset:-10px 0}
 .dtmap-open .icon{width:12px;height:12px}
+.dt-author{display:flex;align-items:center;gap:var(--space-sm);margin:0 0 var(--space-lg);color:var(--color-secondary);font:var(--type-body-sm)}
+.dt-author img,.dt-author-fallback{width:32px;height:32px;flex:none;border-radius:50%;object-fit:cover;background:var(--color-neutral)}
+.dt-author-fallback{display:grid;place-items:center;color:var(--color-on-surface);font:var(--type-label-md)}
+.dt-author b{color:var(--color-on-surface);font:var(--type-label-md)}
+.dt-extraction-count{margin:var(--space-sm) 0 var(--space-md);color:var(--color-secondary);font:var(--type-body-sm)}
+.dt-extraction ul{list-style:none;padding:0;margin:0;display:grid;gap:var(--space-sm)}
+.dt-extraction li{padding:var(--space-md);border-radius:var(--rounded-md);background:var(--color-neutral)}
+.dt-extraction li div{display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm)}
+.dt-extraction li strong{font:var(--type-label-md);color:var(--color-on-surface)}
+.dt-extraction li span{flex:none;color:var(--color-secondary);font:var(--type-body-sm)}
+.dt-extraction li .dt-extraction-pending{color:var(--color-error)}
+.dt-extraction li p{margin:var(--space-xs) 0 0;color:var(--color-secondary);font:var(--type-body-sm)}

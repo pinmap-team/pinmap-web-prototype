@@ -20,6 +20,11 @@ detail = function(){
   const app = MAP_APPS[settings.mapApp] || MAP_APPS.naver;
   const mapHref = ready ? app.url(encodeURIComponent(x.mapQuery || x.address)) : '';
   const src = x.source || 'SNS';
+  const author = /^[A-Za-z0-9._]{1,30}$/.test(x.authorUsername || '') ? x.authorUsername : '';
+  const authorPhoto = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(x.authorProfilePhoto || '') ? x.authorProfilePhoto : '';
+  const extracted = Array.isArray(x.extractionPlaces) ? x.extractionPlaces : [];
+  const mappedCount = extracted.filter(place => place.hasCoordinates).length;
+  const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 확인 · 지도 표시 ${mappedCount}곳 · 위치 확인 필요 ${extracted.length - mappedCount}곳</p><ul>${extracted.map(place => `<li><div><strong>${esc(place.name || '이름 확인 필요')}</strong><span class="${place.hasCoordinates ? 'dt-extraction-ready' : 'dt-extraction-pending'}">${place.hasCoordinates ? '지도 표시' : '위치 확인 필요'}</span></div><p>${esc(place.hasCoordinates ? (place.address || '지도 위치 확인됨') : (place.reason || '주소를 확인하지 못했어요.'))}</p></li>`).join('')}</ul></section>` : '';
 
   // 유형별 정보
   let info = '';
@@ -63,7 +68,9 @@ detail = function(){
     </div>
     <section class="dtsheet" id="detail-info" aria-label="콘텐츠 상세 정보">
       <button type="button" class="dt-sheet-handle" data-action="dtsheettoggle" aria-label="상세 정보 펼치기" aria-controls="detail-info" aria-expanded="false"><span aria-hidden="true"></span></button>
-      ${x.desc ? `<section class="dtsum"><h2${x.source === '직접 추가' ? '' : ' class="dtai"'}>${icon('spark')}${esc(x.source === '직접 추가' ? '장소 설명' : 'AI 요약')}</h2><p>${esc(x.desc)}</p></section>` : ''}
+      ${author ? `<div class="dt-author">${authorPhoto ? `<img src="${esc(authorPhoto)}" alt="">` : `<span class="dt-author-fallback" aria-hidden="true">@</span>`}<span>게시물 작성자 <b>@${esc(author)}</b></span></div>` : ''}
+      ${x.desc ? `<section class="dtsum"><h2${x.source === '직접 추가' || x.aiSummary === false ? '' : ' class="dtai"'}>${icon('spark')}${esc(x.source === '직접 추가' || x.aiSummary === false ? '장소 설명' : 'AI 요약')}</h2><p>${esc(x.desc)}</p></section>` : ''}
+      ${extractionInfo}
       <section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>
       ${info}
     </section>

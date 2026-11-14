@@ -73,23 +73,44 @@ if (PM_ENV.cloudPlaceTest && !PM_ENV.backend) {
       const mapLocations = (report.map_locations || [])
         .filter(place => Number.isFinite(place.coordinates?.lat) && Number.isFinite(place.coordinates?.lng))
         .map(place => ({...place, review_required:place.needs_review}));
-      if (!mapLocations.length) throw Error(report.notes?.[0] || '지도에 표시할 장소 좌표를 찾지 못했어요.');
+      const extractionPlaces = (report.places || []).map(place => {
+        const hasCoordinates = Number.isFinite(place.coordinates?.lat) && Number.isFinite(place.coordinates?.lng);
+        const lookup = place.map_lookup || {};
+        let reason = '';
+        if (!hasCoordinates) {
+          if (lookup.status === 'not_found') reason = '지도에서 같은 이름의 장소를 찾지 못했어요.';
+          else if (lookup.status === 'ambiguous') reason = '동명이점이 있어 위치를 확정하지 못했어요.';
+          else if (lookup.status === 'lookup_failed') reason = '지도 검색에 실패했어요.';
+          else if (place.address) reason = '주소의 정확한 위치를 확인하지 못했어요.';
+          else reason = '장소 주소를 확인하지 못했어요.';
+        }
+        return {name:place.name || '이름 확인 필요', address:place.address || '',
+          hasCoordinates, reason, needsReview:!!place.needs_review};
+      });
+      if (!extractionPlaces.length) throw Error(report.notes?.[0] || '게시물에서 장소를 찾지 못했어요.');
       const first = mapLocations[0];
       const id = Date.now();
       items.unshift({
-        id, title:form.elements.namedItem('title').value.trim() || 'Instagram 장소 게시물',
+        id, title:form.elements.namedItem('title').value.trim() || report.ai_title || 'Instagram 장소 게시물',
         type:'맛집/카페', category:'장소', mapKind:'eat', source:'Instagram', savedAt:new Date().toISOString(),
-        desc:`장소 ${report.places?.length || mapLocations.length}곳 · 지도 좌표 ${mapLocations.length}곳`,
+        desc:report.ai_summary || '', aiSummary:!!report.ai_summary,
+        extractedPlaceCount:extractionPlaces.length, extractionPlaces,
+        authorUsername:report.author_username || '', authorProfilePhoto:report.author_profile_data_url || '',
         memo:form.elements.namedItem('memo').value.trim(), art:'cafe',
         photo:report.cover_data_url || '', collection:form.elements.namedItem('collection').value,
-        url:report.source_url || url, address:first.address || '', lat:first.coordinates.lat,
-        lng:first.coordinates.lng, mapLocations, aiClassified:false
+        url:report.source_url || url, address:first?.address || '', lat:first?.coordinates.lat,
+        lng:first?.coordinates.lng, mapLocations, pending:!first, aiClassified:false
       });
       afterChange();
       document.getElementById('sheet')?.close();
-      window.pmMapFocus = id;
-      go('map');
-      toast(`장소 ${mapLocations.length}곳을 지도에 표시했어요.`);
+      if (first) {
+        window.pmMapFocus = id;
+        go('map');
+      } else {
+        go('home');
+        openDetail(id);
+      }
+      toast(`장소 ${extractionPlaces.length}곳 확인 · 지도 표시 ${mapLocations.length}곳`);
     } catch (cause) {
       if (error) error.textContent = cause.message;
     } finally {
