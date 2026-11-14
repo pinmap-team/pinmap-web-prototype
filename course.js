@@ -273,6 +273,6 @@
 
   });
   document.addEventListener('input',event=>{if(page==='course'&&event.target.dataset.courseField==='title'){course.title=event.target.value;save()}});
-  document.addEventListener('focusout',event=>{if(page==='course'&&event.target.dataset.courseField==='title'){event.target.readOnly=true;freshCourse=false;if(!course.title.trim()){course.title='새 코스';event.target.value=course.title;}refresh()}});
+  document.addEventListener('focusout',event=>{if(page==='course'&&event.target.dataset.courseField==='title'){event.target.readOnly=true;freshCourse=false;if(!course.title.trim()){course.title='새 코스';event.target.value=course.title;}save();const steps=document.querySelector('.course-steps');if(steps)steps.outerHTML=courseSteps(dayStops().length);}});
   document.addEventListener('change',event=>{if(page!=='course')return;if(event.target.dataset.courseField==='date'){if(!validDate(event.target.value)){event.target.value=course.date;toast('출발일을 선택해 주세요.');return;}course.date=event.target.value;refresh()}else if(event.target.dataset.courseTime){const stop=dayStops().find(item=>item.id===Number(event.target.dataset.courseTime));if(stop){stop.time=event.target.value;save()}}});
 })();

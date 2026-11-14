@@ -31,11 +31,13 @@ test('user timestamp ids recover exact dates; valid savedAt always takes priorit
   assert.equal(dated.savedAt,'2025-01-01T00:00:00Z');
   const unknown={id:1,ago:'unknown'};context.normalizeSavedAt(unknown,now);assert.equal(unknown.savedAt,undefined);
 });
-test('recent and old sorting use timestamps, with unknown dates last',()=>{
+test('recent sorting uses timestamps; supported name sorting and legacy fallback remain stable',()=>{
   context.libSort='recent';context.cfHasPlaces=()=>false;
   const collection=fs.readFileSync('collection.js','utf8');
   vm.runInContext(collection.slice(collection.indexOf('function cfSort('),collection.indexOf('// 선택 모드:')),context);
-  const items=[{id:1,savedAt:'2026-01-01T00:00:00Z'},{id:3},{id:2,savedAt:'2026-10-01T00:00:00Z'}];
+  const items=[{id:1,title:'가',savedAt:'2026-01-01T00:00:00Z'},{id:3,title:'나'},{id:2,title:'다',savedAt:'2026-10-01T00:00:00Z'}];
   assert.deepEqual(Array.from(context.cfSort(items),x=>x.id),[2,1,3]);
-  context.libSort='old';assert.deepEqual(Array.from(context.cfSort(items),x=>x.id),[1,2,3]);
+  context.libSort='name';assert.deepEqual(Array.from(context.cfSort(items),x=>x.id),[1,3,2]);
+  context.libSort='name-desc';assert.deepEqual(Array.from(context.cfSort(items),x=>x.id),[2,3,1]);
+  context.libSort='old';assert.deepEqual(Array.from(context.cfSort(items),x=>x.id),[2,1,3]);
 });

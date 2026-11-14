@@ -3,6 +3,9 @@ const assert = require('node:assert/strict');
 const vm = require('node:vm');
 const fs = require('node:fs');
 const source = fs.readFileSync(require('node:path').join(__dirname, '../course.js'), 'utf8');
+const appSource = fs.readFileSync(require('node:path').join(__dirname, '../app.js'), 'utf8');
+const formatDaySource = appSource.match(/^const fmtDay = .+;$/m)?.[0];
+if (!formatDaySource) throw Error('app.js no longer defines fmtDay');
 
 function app(seed = {}, development = false) {
   const storage = new Map(Object.entries(seed));
@@ -25,6 +28,8 @@ function app(seed = {}, development = false) {
     toast: message => { context.message = message; },
     go: page => { context.page = page; }
   });
+  // app.html loads app.js before course.js; mirror that shared date helper here.
+  vm.runInContext(formatDaySource, context);
   vm.runInContext(source, context);
   return {
     context, storage,
