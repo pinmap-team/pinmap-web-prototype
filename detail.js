@@ -300,8 +300,8 @@ function saveSheet(){
       <label class="esfield">${label('link','링크', `<button type="button" class="essample" data-action="sample">예시 링크로 채우기</button>`)}
         <span class="esinput withicon">${icon('link')}<input type="url" name="url" id="es-url" placeholder="https://" required inputmode="url"></span>
       </label>
-      <label class="esfield">${label('text','제목')}
-        <span class="esinput"><input name="title" id="es-title" placeholder="다시 찾기 쉬운 이름" required maxlength="50"><small class="escount" data-for="es-title"></small></span>
+      <label class="esfield">${label('text','제목', '<small class="esopt">선택</small>')}
+        <span class="esinput"><input name="title" id="es-title" placeholder="${PM_ENV.cloudPlaceTest ? '비워두면 Instagram 장소 게시물로 저장' : '비워두면 링크 이름으로 저장'}" maxlength="50"><small class="escount" data-for="es-title"></small></span>
       </label>
       <label class="esfield">${label('grid','카테고리')}
         <span class="esselect"><span class="esemoji" aria-hidden="true">${settings.aiDefault ? '✨' : typeOf('기타').emoji}</span><select name="type" id="es-type"><option value="ai" ${settings.aiDefault?'selected':''}>AI 자동 분류</option>${TYPES.map(t => `<option value="${t.id}" ${!settings.aiDefault&&t.id==='기타'?'selected':''}>${t.id}</option>`).join('')}</select>${icon('chevron')}</span>
@@ -317,7 +317,7 @@ function saveSheet(){
       <p class="eshint">이 브라우저에 저장돼요. AI 분류는 프로토타입용 간단한 규칙이에요.</p>
       <p class="eserror" id="saveerror" role="alert"></p>
     </div>
-    <div class="esfoot"><button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
+    <div class="esfoot">${PM_ENV.cloudPlaceTest ? '<p class="esprogress" id="saveprogress" role="status" aria-live="polite" hidden></p>' : ''}<button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
   </form>`);
   $('#sheet').classList.add('editsheet');
   esCounts();
@@ -332,12 +332,11 @@ actions.sample = () => {
   const v = $('#es-col').value;
   document.querySelectorAll('[data-escol]').forEach(b => { const on = b.dataset.escol === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
 };
-// 제목 · 링크를 비워둔 채 저장하면 안내 (app.js는 링크 형식만 확인해요)
+// 링크를 비워둔 채 저장하면 안내 (제목은 선택 사항이에요).
 document.addEventListener('submit', e => {
   if (e.target.id !== 'saveform') return;
   const f = e.target, err = $('#saveerror');
   if (!f.url.value.trim()) { e.preventDefault(); e.stopImmediatePropagation(); err.textContent = '저장할 콘텐츠 링크를 붙여넣어 주세요.'; f.url.focus(); return; }
-  if (!PM_ENV.cloudPlaceTest && !f.elements.namedItem('title').value.trim()) { e.preventDefault(); e.stopImmediatePropagation(); err.textContent = '제목을 입력해 주세요.'; f.elements.namedItem('title').focus(); }
 }, true);
 paths.link = paths.link || 'M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1 M14 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1';
 
