@@ -2,7 +2,7 @@
 
 핀맵은 SNS에서 저장한 콘텐츠를 다시 찾고, 콘텐츠에 나온 장소를 지도에서 살펴보는 모바일 웹 프로토타입입니다. 이 저장소의 `main`은 [공식 핀맵 화면](https://pinmap-prototype.vercel.app/)에 연결되어 있습니다. 사용자경험디자인II (26-2) 팀 프로젝트입니다.
 
-이 저장소에는 **예시 콘텐츠를 둘러보는 프로토타입**, **로그인 없는 빈 개발 화면**, **Supabase 로그인 화면**이 있습니다. Instagram 장소 분석 API와 원본 응답 테스트 화면은 별도 [Pinmap 백엔드 저장소](https://github.com/pinmap-team/pinmap-backend)에서 관리합니다.
+저장소 루트에는 **예시 콘텐츠를 둘러보는 프로토타입**, **로그인 없는 빈 개발 화면**, **Supabase 로그인 화면**이 있습니다. 예전 화면 복사본은 Git 기록에서 확인할 수 있습니다. Instagram 장소 분석 API와 원본 응답 테스트 화면은 별도 [Pinmap 백엔드 저장소](https://github.com/pinmap-team/pinmap-backend)에서 관리합니다.
 
 ## 시작 환경과 데이터
 

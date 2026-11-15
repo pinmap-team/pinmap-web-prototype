@@ -4,12 +4,6 @@ tests/
 scripts/
 *.md
 
-# Legacy screens that are not loaded by app.html.
-map.css
-map.js
-login.css
-login.js
-
 # License copies remain in GitHub alongside the vendored libraries.
 vendor/*LICENSE*
 .env.local
