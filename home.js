@@ -24,9 +24,9 @@ Object.assign(homeSections, {
 // 개발 단계라 저장하지 않아요: 새로고침하면 다시 뜨고, 앱 안에서 다른 화면에 갔다 와도 숨긴 상태가 유지돼요
 let stripHidden = false;
 const stripHiddenToday = () => stripHidden;
-const dLabel = x => calDays(x) === 0 ? 'D-day' : 'D-' + calDays(x);
+const dLabel = x => x.eventCandidate ? '확인 필요' : calDays(x) === 0 ? 'D-day' : 'D-' + calDays(x);
 function stripBar(){
-  const due = calDueList().filter(x => calDays(x) <= 14);
+  const due = calDueList().filter(x => calDue(x) >= calToday && calDays(x) <= 14);
   if (!due.length || stripHiddenToday()) return '';
   const item = x => `<button class="strip-item ${calDays(x) <= 3 ? 'soon' : ''}" data-detail="${x.id}"><b>${dLabel(x)}</b><span>${esc(x.title)}</span></button>`;
   // 끝에서 처음으로 자연스럽게 이어지도록 첫 항목을 한 번 더 붙여요
@@ -88,7 +88,7 @@ function emptyPickCards(){
 
 /* ---------- 캘린더 위젯: 다가오는 마감 2개, 제목 줄 오른쪽 '전체보기' (2026-11-10) ---------- */
 function calWidget(){
-  const due = calDueList();
+  const due = calDueList().filter(x => calDue(x) >= calToday);
   const next = due.slice(0, 2);
   return `<section class="hwidget calw">
     <div class="hwhead"><h2>${calToday.getMonth()+1}월 일정</h2><button type="button" class="calgo" data-action="gocal" aria-label="캘린더 전체보기">전체보기${icon('chevright')}</button></div>

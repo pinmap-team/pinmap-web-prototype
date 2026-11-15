@@ -392,3 +392,5 @@ body.dtscrolled:has(.dt)::before{content:"";position:fixed;inset:0 0 auto;height
 .dt-extraction li span{flex:none;color:var(--color-secondary);font:var(--type-body-sm)}
 .dt-extraction li .dt-extraction-pending{color:var(--color-error)}
 .dt-extraction li p{margin:var(--space-xs) 0 0;color:var(--color-secondary);font:var(--type-body-sm)}
+.dt-events li p{display:flex;align-items:flex-start;gap:var(--space-xs)}
+.dt-events li p .icon{flex:none;width:16px;height:16px;stroke-width:1.6}

@@ -16,7 +16,9 @@ detail = function(){
   requestAnimationFrame(dtSheetLayout);
   const x = items.find(i => i.id === detailId);
   if (!x) { detailId = null; return pages[page](); }
-  const t = typeOf(x.type), ready = t.place && x.address && !x.pending;
+  const t = typeOf(x.type);
+  const showPlaceInfo = t.place && (x.contentKind !== 'event' || (x.extractionPlaces || []).length > 0 || !!x.address);
+  const ready = showPlaceInfo && x.address && !x.pending;
   const app = MAP_APPS[settings.mapApp] || MAP_APPS.naver;
   const mapHref = ready ? app.url(encodeURIComponent(x.mapQuery || x.address)) : '';
   const src = x.source || 'SNS';
@@ -25,14 +27,30 @@ detail = function(){
   const extracted = Array.isArray(x.extractionPlaces) ? x.extractionPlaces : [];
   const mappedCount = extracted.filter(place => place.hasCoordinates).length;
   const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 확인 · 지도 표시 ${mappedCount}곳 · 위치 확인 필요 ${extracted.length - mappedCount}곳</p><ul>${extracted.map(place => `<li><div><strong>${esc(place.name || '이름 확인 필요')}</strong><span class="${place.hasCoordinates ? 'dt-extraction-ready' : 'dt-extraction-pending'}">${place.hasCoordinates ? '지도 표시' : '위치 확인 필요'}</span></div><p>${esc(place.hasCoordinates ? (place.address || '지도 위치 확인됨') : (place.reason || '주소를 확인하지 못했어요.'))}</p></li>`).join('')}</ul></section>` : '';
+  const events = Array.isArray(x.events) ? x.events : [];
+  const eventDate = value => {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
+    const [year,month,day] = value.split('-').map(Number), date = new Date(year,month-1,day);
+    return date.getFullYear() === year && date.getMonth() === month-1 && date.getDate() === day ? value.replaceAll('-', '.') : '';
+  };
+  const eventInfo = events.length ? `<section class="dtsec dt-extraction dt-events"><h2>게시물에서 찾은 행사 일정</h2><p class="dt-extraction-count">${events.length}건 · 날짜와 장소는 원본에서 확인해 주세요.</p><ul>${events.map(event => {
+    const start = eventDate(event.start_date), end = eventDate(event.end_date);
+    const date = start ? `${start}${end && end !== start ? ' – ' + end : ''}` : event.date_text || '날짜 확인 필요';
+    const kind = {exhibition:'전시',pop_up:'팝업',other:'행사'}[event.event_type] || '행사';
+    const notes = Array.isArray(event.notes) ? event.notes.filter(note => typeof note === 'string').slice(0, 3) : [];
+    return `<li><div><strong>${esc(event.title || '행사 이름 확인 필요')}</strong><span class="dt-extraction-pending">${kind} · 확인 필요</span></div><p>${icon('calendar')}${esc(date)}${start ? '' : ' · 확정 날짜 아님'}</p>${event.time_text ? `<p>${icon('clock')}${esc(event.time_text)}</p>` : ''}${event.venue_name || event.address ? `<p>${icon('pin')}${esc([event.venue_name,event.address].filter(Boolean).join(' · '))}</p>` : ''}${notes.map(note => `<p>${esc(note)}</p>`).join('')}</li>`;
+  }).join('')}</ul></section>` : '';
+  const analysisNotes = Array.isArray(x.extractionNotes) ? x.extractionNotes.filter(note => typeof note === 'string').slice(0, 8) : [];
+  const reviewInfo = analysisNotes.length || x.contentKind === 'unknown' ? `<section class="dtsec dt-extraction dt-analysis-notes"><h2>분석 안내</h2><ul>${(analysisNotes.length ? analysisNotes : ['게시물에서 장소 또는 행사 정보를 확인하지 못했어요.']).map(note => `<li><p>${esc(note)}</p></li>`).join('')}</ul></section>` : '';
+  const memoInfo = PM_ENV.requiresAuth ? '' : `<section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>`;
 
   // 유형별 정보
   let info = '';
   if (x.period) info += `<section class="dtsec"><h2>운영 기간</h2><div class="dtrow">${icon('calendar')}<span>${esc(x.period)}</span>${x.deadline ? `<b class="dtdue">마감 ${esc(x.deadline)}</b>` : ''}</div></section>`;
   const factRow = x.distance && ready ? `<div class="dtfacts"><span>${icon('walk')}${esc(x.distance)}</span></div>` : '';
-  if (t.place) info += ready
+  if (showPlaceInfo) info += ready
     ? `<section class="dtsec dtlocation"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><div class="dtplacecard"><div class="dtaddress">${icon('pin')}<span>${esc(x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div><div class="dtmap-preview"><div id="detail-map-canvas" role="img" aria-label="${esc(x.title)} 저장 위치 지도"></div><button type="button" class="dtmaplink" data-action="dtgomap" aria-label="${esc(x.title)} 지도 탭에서 보기"></button><p class="dtmap-fallback" id="detail-map-fallback" hidden>지도를 불러오지 못했어요. 지도에서 위치를 확인해 주세요.</p></div>${factRow}</div></section>`
-    : `<section class="dtsec dtlocation"><h2>장소 정보</h2><div class="dtplacecard"><div class="dtwarn"><b>장소 확인 필요</b><p>위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.</p><button class="dtsmall" data-action="edit">장소 직접 입력</button></div></div></section>`;
+    : `<section class="dtsec dtlocation"><h2>장소 정보</h2><div class="dtplacecard"><div class="dtwarn"><b>장소 확인 필요</b><p>${PM_ENV.requiresAuth ? '위치를 확정하지 못했어요. 원본에서 주소를 확인해 주세요.' : '위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.'}</p>${PM_ENV.requiresAuth ? '' : '<button class="dtsmall" data-action="edit">장소 직접 입력</button>'}</div></div></section>`;
   // 2026-11-10 가격을 크게(headline-md), 안내는 body-md. '예시 가격' → '참고 가격'
   if (x.type === '쇼핑') { const amount = String(x.price || '').replace(/,\s*(예시|참고) 가격$/, '').trim();
     info += `<section class="dtsec dtbuy"><h2>구매 정보</h2>${amount ? `<p class="dtprice"><span class="sr">참고 가격 </span>${esc(amount)}</p>` : '<p class="dtprice none">가격 정보 없음</p>'}<p class="dtpricehint">${x.shop ? `${esc(x.shop)}에서 본 참고 가격이에요.` : '판매처 정보가 없어요.'}<br>가격과 재고는 원본에서 한 번 더 확인해 주세요.</p></section>`; }
@@ -42,9 +60,9 @@ detail = function(){
   // 아래 고정 버튼: 길찾기 · 원본 보기 (장소가 아니면 원본 보기만)
   const bottom = [];
   if (ready) bottom.push(`<a class="dtghost" href="${mapHref}" target="_blank" rel="noopener noreferrer">${icon('send')}길찾기</a>`);
-  else if (t.place) bottom.push(`<button class="dtghost" data-action="edit">${icon('pin')}장소 입력</button>`);
+  else if (showPlaceInfo && !PM_ENV.requiresAuth) bottom.push(`<button class="dtghost" data-action="edit">${icon('pin')}장소 입력</button>`);
   if (!x.deleted) bottom.push(`<button class="dtprimary" data-action="original">${icon('image')}원본 보기</button>`);
-  else if (!ready) bottom.push(`<button class="dtprimary" data-action="edit">${icon('pen')}정보 수정</button>`);
+  else if (!ready && !PM_ENV.requiresAuth) bottom.push(`<button class="dtprimary" data-action="edit">${icon('pen')}정보 수정</button>`);
   if (bottom.length === 1) bottom[0] = bottom[0].replace('class="dtghost"', 'class="dtprimary"');
 
   return `<article class="dt dt-photo">
@@ -52,11 +70,11 @@ detail = function(){
     <div class="dthero">${libThumb(x)}<div class="dtshade" aria-hidden="true"></div>
       <div class="dttop"><button class="dtbtn" data-action="back" aria-label="돌아가기">${icon('chevleft')}</button>
         <div class="dttopr">
-          <button type="button" class="dtbtn dtfavorite${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 즐겨찾기" aria-pressed="${!!x.favorite}">${icon('star')}</button>
+          ${PM_ENV.requiresAuth ? '' : `<button type="button" class="dtbtn dtfavorite${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 즐겨찾기" aria-pressed="${!!x.favorite}">${icon('star')}</button>`}
           <button class="dtbtn dtmorebtn" data-action="dtmore" aria-label="더보기" aria-haspopup="menu" aria-expanded="false" aria-controls="dtmenu">${icon('more')}</button>
           <div class="dtmenu" id="dtmenu" role="menu" aria-label="콘텐츠 메뉴" hidden>
             <button type="button" role="menuitem" data-action="dtshare">${icon('share')}공유</button>
-            <button type="button" role="menuitem" data-action="edit">${icon('pen')}수정</button>
+            ${PM_ENV.requiresAuth ? '' : `<button type="button" role="menuitem" data-action="edit">${icon('pen')}수정</button>`}
             <button type="button" role="menuitem" class="dtmenu-danger" data-unsave="${x.id}">${icon('trash')}삭제</button>
           </div>
         </div></div>
@@ -71,7 +89,9 @@ detail = function(){
       ${author ? `<div class="dt-author">${authorPhoto ? `<img src="${esc(authorPhoto)}" alt="">` : `<span class="dt-author-fallback" aria-hidden="true">@</span>`}<span>게시물 작성자 <b>@${esc(author)}</b></span></div>` : ''}
       ${x.desc ? `<section class="dtsum"><h2${x.source === '직접 추가' || x.aiSummary === false ? '' : ' class="dtai"'}>${icon('spark')}${esc(x.source === '직접 추가' || x.aiSummary === false ? '장소 설명' : 'AI 요약')}</h2><p>${esc(x.desc)}</p></section>` : ''}
       ${extractionInfo}
-      <section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>
+      ${eventInfo}
+      ${reviewInfo}
+      ${memoInfo}
       ${info}
     </section>
     <div class="dtbar ${bottom.length === 1 ? 'one' : ''}">${bottom.join('')}</div>
@@ -324,7 +344,7 @@ function saveSheet(){
       <p class="eshint">이 브라우저에 저장돼요. AI 분류는 프로토타입용 간단한 규칙이에요.</p>
       <p class="eserror" id="saveerror" role="alert"></p>
     </div>
-    <div class="esfoot">${PM_ENV.cloudPlaceTest ? '<p class="esprogress" id="saveprogress" role="status" aria-live="polite" hidden></p>' : ''}<button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
+    <div class="esfoot">${PM_ENV.cloudPlaceTest || PM_ENV.requiresAuth ? '<p class="esprogress" id="saveprogress" role="status" aria-live="polite" hidden></p>' : ''}<button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
   </form>`);
   $('#sheet').classList.add('editsheet');
   esCounts();

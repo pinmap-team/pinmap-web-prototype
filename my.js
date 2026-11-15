@@ -63,7 +63,7 @@ pages.my = function(){
     ${myRow('appearance','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>','화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
     ${myRow('notisheet','🔔','알림 설정', settings.push ? `푸시 켜짐, ${notiOn}개` : '푸시 꺼짐')}
     ${myRow('mapsheet','🗺️','지도 디자인', esc(MAP_APPS[settings.mapApp].name))}
-    ${myRow('calexport',icon('calendar'),'캘린더로 내보내기', typeof calDueList === 'function' ? `마감 ${calDueList().filter(x => calDue(x) >= calToday).length}개` : '')}
+    ${myRow('calexport',icon('calendar'),'캘린더로 내보내기', typeof calExportList === 'function' ? `마감 ${calExportList().length}개` : '')}
   </section>
   <section class="mgroup my-section" aria-label="도움말">
     ${myRow('guide',interestOf('study').emoji,'이용 가이드')}

@@ -243,7 +243,9 @@ document.addEventListener('click', e => {
 });
 
 /* ---------- 2026-11-10 캘린더로 내보내기: 마감 일정만 한 번에 .ics 파일로 (Google · Apple 캘린더에서 가져오기). 양방향 동기화는 다음 단계 ---------- */
-const calExportList = () => (typeof calDueList === 'function' ? calDueList().filter(x => calDue(x) >= calToday) : []);
+// An unverified extracted date stays visible as a candidate in Pinmap, but is
+// not exported into a personal calendar as a confirmed appointment.
+const calExportList = () => (typeof calDueList === 'function' ? calDueList().filter(x => calDue(x) >= calToday && !x.eventCandidate) : []);
 pages.calexport = () => {
   const list = calExportList();
   return myPage('캘린더로 내보내기', `<p class="mpdesc calx-desc">저장한 콘텐츠의 마감 일정을 내 캘린더에 한 번에 넣어요.<br>Google 캘린더와 Apple 캘린더 모두 같은 파일로 가져올 수 있어요.</p>
