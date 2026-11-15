@@ -77,7 +77,8 @@ if (PM_ENV.cloudPlaceTest) {
     if (heading) heading.textContent = 'Instagram 링크에서 장소를 찾아 지도에 표시해요.';
     for (const selector of ['.esshare','.esdivider','.essample']) {
       const element = form.querySelector(selector);
-      if (element) element.hidden = true;
+      // These controls have explicit display rules that override the UA [hidden] rule.
+      if (element) element.style.display = 'none';
     }
     const hint = form.querySelector('.eshint,.hint');
     if (hint) hint.textContent = '링크에서 장소와 지도 좌표를 찾아 이 화면에 표시해요. 장소 후보는 방문 전에 확인해 주세요.';
