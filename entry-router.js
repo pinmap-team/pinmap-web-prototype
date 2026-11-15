@@ -10,7 +10,6 @@
   const reloading = performance.getEntriesByType('navigation')[0]?.type === 'reload';
   const mode = reloading ? null : params.get('mode');
   const requiresAuth = mode === 'development' && params.get('auth') === 'required';
-  const placeTest = mode === 'development' && params.get('place-test') === '1';
   // A mode is a one-time entry choice, not a route to restore on refresh.
   if(params.has('mode')) {
     params.delete('mode');
@@ -20,7 +19,7 @@
     history.replaceState(null,'',location.pathname+(query?'?'+query:'')+location.hash);
   }
   // Explicit assignment also prevents a browser restoring the previous iframe.
-  document.querySelector('.phone-frame').src = mode === 'development' || mode === 'prototype'
-    ? 'app.html?mode=' + mode + (requiresAuth ? '&auth=required' : '') + (placeTest ? '&place-test=1' : '')
+  document.querySelector('.phone-frame').src = mode === 'prototype' || requiresAuth
+    ? 'app.html?mode=' + mode + (requiresAuth ? '&auth=required' : '')
     : 'entry.html';
 })();
