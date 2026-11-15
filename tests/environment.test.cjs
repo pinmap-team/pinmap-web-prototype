@@ -75,11 +75,10 @@ function route(search, navigationType='navigate') {
   return {src:frame.src,replacements};
 }
 test('explicit choices enter the selected app once and remove the mode from the top URL',()=>{
-  for(const mode of ['development','prototype']) {
-    const result=route('?mode='+mode);
-    assert.equal(result.src,'app.html?mode='+mode);
-    assert.deepEqual(result.replacements,['/index.html']);
-  }
+  const result=route('?mode=prototype');
+  assert.equal(result.src,'app.html?mode=prototype');
+  assert.deepEqual(result.replacements,['/index.html']);
+  assert.equal(route('?mode=development').src,'entry.html');
   assert.equal(route('').src,'entry.html');
   assert.equal(route('?mode=invalid').src,'entry.html');
 });
@@ -88,7 +87,7 @@ test('refresh always returns to version selection, including old links with a mo
     assert.equal(route(query,'reload').src,'entry.html');
   }
   const first=route('?mode=development&v=review');
-  assert.equal(first.src,'app.html?mode=development');
+  assert.equal(first.src,'entry.html');
   assert.deepEqual(first.replacements,['/index.html?v=review']);
   assert.equal(route('?v=review','reload').src,'entry.html');
 });
@@ -100,40 +99,10 @@ test('post-login auth flag reaches only the development frame and is removed fro
   assert.equal(route('?mode=development&auth=required','reload').src,'entry.html');
 });
 
-test('online place test is active in login-free development, including the legacy direct link',()=>{
-  const result=route('?mode=development&place-test=1');
-  assert.equal(result.src,'app.html?mode=development&place-test=1');
-  assert.deepEqual(result.replacements,['/index.html']);
-  assert.equal(route('?mode=prototype&place-test=1').src,'app.html?mode=prototype');
-  assert.equal(boot('development&place-test=1').value('PM_ENV.cloudPlaceTest'),true);
-  assert.equal(boot('development').value('PM_ENV.cloudPlaceTest'),true);
+test('online place test is served only by the backend project',()=>{
+  assert.equal(route('?mode=development&place-test=1').src,'entry.html');
+  assert.equal(boot('development').value('PM_ENV.cloudPlaceTest'),false);
   assert.equal(boot('development&auth=required').value('PM_ENV.cloudPlaceTest'),false);
-  assert.equal(boot('prototype').value('PM_ENV.cloudPlaceTest'),false);
-});
-
-test('login-free development keeps its screens and allows only place-link saves',()=>{
-  const home=()=>'<main class="main">existing empty home</main>';
-  const account=()=>'<section class="mycard settings">existing account controls</section>';
-  const listeners={};let message='';
-  const context=vm.createContext({
-    PM_ENV:{development:true,cloudPlaceTest:true},startCoach(){},notifications(){return ['sample'];},unreadCount(){return 1;},
-    pages:{home,account,my:()=>'<b></b><small>프로필 편집</small>',accounts:()=>'<section class="mgroup">연동된 계정 0개</section>',appinfo:()=>'<div class="mycard settings">버전</div>'},
-    actions:{},mapSettings(){},render(){},$:()=>null,
-    toast:text=>message=text,
-    document:{body:{classList:{add(){}}},addEventListener:(type,handler)=>listeners[type]=handler}
-  });
-  vm.runInContext(read('development.js'),context);
-  assert.equal(context.pages.home,home);
-  assert.equal(context.pages.account,account);
-  assert.deepEqual(Array.from(context.notifications()),[]);
-  assert(!context.pages.accounts().includes('dev-panel'));
-  let prevented=false,stopped=false;
-  listeners.submit({target:{id:'saveform'},preventDefault(){prevented=true;},stopImmediatePropagation(){stopped=true;}});
-  assert.equal(prevented,false);
-  assert.equal(stopped,false);
-  listeners.submit({target:{id:'accform'},preventDefault(){prevented=true;},stopImmediatePropagation(){stopped=true;}});
-  assert(prevented&&stopped);
-  assert.equal(message,'아직 데이터가 연결되지 않았어요.');
 });
 
 test('disconnected map controls do not request location or fetch external places',async()=>{

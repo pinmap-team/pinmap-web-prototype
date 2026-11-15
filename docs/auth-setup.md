@@ -7,7 +7,7 @@
 - `auth.html`: 프레임 밖에서 실행되는 실제 로그인·회원가입·비밀번호 재설정 화면.
 - `auth-client.js`: Supabase JS 클라이언트. PKCE, 세션 보관과 자동 갱신을 사용한다.
 - `auth-page.js`: 이메일 가입/로그인, 카카오 OAuth, 비밀번호 재설정·변경.
-- `api/auth/config.js`: Vercel 환경 변수에서 브라우저용 URL·공개 키만 전달한다.
+- 별도 [`pinmap-backend` 저장소](https://github.com/pinmap-team/pinmap-backend)의 `api/auth/config.js`: Vercel 환경 변수에서 브라우저용 URL·공개 키만 전달한다. 웹 배포의 `/api/auth/config`는 이 백엔드로 전달된다.
 - `auth-app.js`: 개발 테스트 버전의 로그인 상태 확인, 로그인 계정 표시, 실제 로그아웃. 프로토타입 체험 모드와 기존 저장 데이터는 유지한다.
 - `entry-router.js`: Supabase가 루트 Site URL로 돌려보낸 code/error/token을 `auth.html`로 전달한다.
 - `vendor/supabase.js`: 공식 `@supabase/supabase-js` 2.119.0 UMD 배포본. MIT 라이선스는 `vendor/supabase-LICENSE.txt`.
@@ -80,7 +80,7 @@ node --env-file=.env.local scripts/dev-auth-server.cjs
 
 ## 화면 검토용 시작 순서 (최신)
 
-루트 `/`에서 개발 테스트·프로토타입 체험·로그인 테스트 중 고른다. 개발 테스트는 로그인 없이 빈 화면으로 진입하고, 로그인 테스트만 `auth.html?screen=welcome`로 진입한다. 로그인 완료 후 실제 세션이 필요한 앱은 `index.html?mode=development&auth=required`로 연다. 이는 서버 데이터 동기화 구현과 별개이며 기존 프로토타입 데이터는 유지한다.
+루트 `/`에서 프로토타입 체험 또는 로그인 테스트를 고른다. 장소 추출 개발 테스트는 [별도 온라인 화면](https://pinmap-backend.vercel.app/)에서 진행한다. 로그인 완료 후 실제 세션이 필요한 앱은 `index.html?mode=development&auth=required`로 연다. 이는 서버 데이터 동기화 구현과 별개이며 기존 프로토타입 데이터는 유지한다.
 
 ## 구글 로그인 (2026-11-10)
 
