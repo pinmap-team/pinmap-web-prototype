@@ -78,7 +78,7 @@ test('explicit choices enter the selected app once and remove the mode from the 
   const result=route('?mode=prototype');
   assert.equal(result.src,'app.html?mode=prototype');
   assert.deepEqual(result.replacements,['/index.html']);
-  assert.equal(route('?mode=development').src,'entry.html');
+  assert.equal(route('?mode=development').src,'app.html?mode=development');
   assert.equal(route('').src,'entry.html');
   assert.equal(route('?mode=invalid').src,'entry.html');
 });
@@ -87,7 +87,7 @@ test('refresh always returns to version selection, including old links with a mo
     assert.equal(route(query,'reload').src,'entry.html');
   }
   const first=route('?mode=development&v=review');
-  assert.equal(first.src,'entry.html');
+  assert.equal(first.src,'app.html?mode=development');
   assert.deepEqual(first.replacements,['/index.html?v=review']);
   assert.equal(route('?v=review','reload').src,'entry.html');
 });
@@ -99,10 +99,11 @@ test('post-login auth flag reaches only the development frame and is removed fro
   assert.equal(route('?mode=development&auth=required','reload').src,'entry.html');
 });
 
-test('online place test is served only by the backend project',()=>{
-  assert.equal(route('?mode=development&place-test=1').src,'entry.html');
-  assert.equal(boot('development').value('PM_ENV.cloudPlaceTest'),false);
+test('login-free development can display backend place results, while signed-in mode remains separate',()=>{
+  assert.equal(route('?mode=development&place-test=1').src,'app.html?mode=development&place-test=1');
+  assert.equal(boot('development').value('PM_ENV.cloudPlaceTest'),true);
   assert.equal(boot('development&auth=required').value('PM_ENV.cloudPlaceTest'),false);
+  assert.equal(boot('prototype').value('PM_ENV.cloudPlaceTest'),false);
 });
 
 test('disconnected map controls do not request location or fetch external places',async()=>{

@@ -2,6 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     { "source": "/api/map-config", "destination": "https://pinmap-backend.vercel.app/api/map-config" },
-    { "source": "/api/auth/config", "destination": "https://pinmap-backend.vercel.app/api/auth/config" }
+    { "source": "/api/auth/config", "destination": "https://pinmap-backend.vercel.app/api/auth/config" },
+    { "source": "/api/place-extract", "destination": "https://pinmap-backend.vercel.app/api/place-extract" }
   ]
 }
