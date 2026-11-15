@@ -33,10 +33,13 @@ function pinmapPlaceReportItem(report, options = {}) {
 }
 
 if (PM_ENV.cloudPlaceTest) {
+  // Opened from the backend result button: show the empty map immediately.
+  if (new URLSearchParams(location.search).get('place-test') === '1') closeOnboarding();
   const importReport = (report, options = {}) => {
     const item = pinmapPlaceReportItem(report, options);
     items.unshift(item);
     afterChange();
+    closeOnboarding();
     document.getElementById('sheet')?.close();
     if (item.mapLocations.length) {
       window.pmMapFocus = item.id;
