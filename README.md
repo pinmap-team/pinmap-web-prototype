@@ -1,70 +1,97 @@
 # 핀맵 웹 프로토타입
 
-사용자경험디자인II (26-2) 팀의 모바일 웹 프로토타입입니다. 현재 `main` 브랜치는 [Vercel 공개 화면](https://pinmap-prototype.vercel.app/)으로 자동 배포됩니다.
+핀맵은 SNS에서 저장한 콘텐츠를 다시 찾고, 콘텐츠에 나온 장소를 지도에서 살펴보는 모바일 웹 프로토타입입니다. 이 저장소의 `main`은 [공식 핀맵 화면](https://pinmap-prototype.vercel.app/)에 연결되어 있습니다. 사용자경험디자인II (26-2) 팀 프로젝트입니다.
 
-## 디자인 기준
+현재 앱에는 **예시 콘텐츠를 둘러보는 프로토타입**, **로그인 없이 Instagram 장소 게시물 링크를 분석하는 개발 테스트**, **Supabase 로그인 테스트**가 함께 있습니다. 세 경로의 데이터와 연결 상태가 다르므로 아래 구분을 먼저 확인해 주세요.
 
-현재 원본은 [DESIGN.md](DESIGN.md), [tokens.css](tokens.css), [컴포넌트 계약 목차](components/index.md)입니다. 서체는 Pretendard이며 웹 로딩 이름은 Pretendard Variable입니다. 공통 보정은 design-alignment.css, [9주차 적용·검증 기록](docs/wk9-verification.md)에서 로컬 적용·Figma·배포·독립 평가 상태를 구분합니다.
+## 시작 환경과 데이터
 
-## 실행
+루트 주소를 열면 시작 환경을 선택합니다. `index.html`은 402 × 874 크기의 앱 프레임이고, 화면과 동작은 프레임 안의 `app.html`에 있습니다. 직접 URL을 열 때도 `index.html?mode=...` 형식을 사용하세요. 새로고침하면 시작 환경 선택으로 돌아가며, 이는 브라우저에 저장된 데이터를 지우는 동작은 아닙니다.
 
-별도 빌드 없이 이 폴더에서 `python3 -m http.server 8080`을 실행하고 `http://localhost:8080/`을 여세요. `index.html`은 402×874 화면 프레임을 제공하고, 실제 앱은 `app.html`에서 실행됩니다.
+| 시작 화면 | 현재 동작 | 데이터 보관 |
+| --- | --- | --- |
+| **프로토타입 체험** (`mode=prototype`) | 예시 콘텐츠 13개로 홈, 저장함, 지도, 상세, 코스, 설정을 체험합니다. 링크 저장과 SNS 공유 흐름은 화면 시연이며 `AI 자동 분류`는 간단한 규칙입니다. | 콘텐츠·설정·코스를 해당 브라우저의 `localStorage`에 저장합니다. |
+| **개발 테스트** (`mode=development`) | 예시 콘텐츠 없이 시작합니다. 로그인 없이 Instagram 장소 게시물 또는 릴스 링크를 온라인 분석 서버로 보내 결과를 지도와 상세 화면에서 확인합니다. | 추출 결과는 현재 화면의 메모리에만 있습니다. 새로고침하거나 다시 진입하면 사라집니다. |
+| **로그인 테스트** (`auth.html?screen=welcome`) | Supabase를 통한 이메일 가입·인증·로그인·비밀번호 재설정과 소셜 로그인 화면을 사용합니다. 로그인 성공 시 인증이 필요한 빈 개발 화면으로 이동합니다. | 인증 세션은 Supabase 클라이언트가 관리합니다. 저장 콘텐츠를 사용자 계정의 DB에 동기화하지는 않습니다. |
 
-## 현재 화면
+프로토타입의 저장 데이터와 개발 테스트 결과는 서로 섞이지 않습니다. 개발 테스트 화면은 재진입할 때 빈 상태로 시작하지만 프로토타입의 브라우저 저장 데이터는 유지합니다. 다른 브라우저·기기·팀원 계정으로 자동 동기화되지 않습니다.
 
-- 온보딩과 로그인 체험 화면, 홈, 저장 목록·컬렉션, 장소 상세, 마이페이지
-- OpenFreeMap Positron 지도와 Photon 장소 검색, 장소 마커, 성수동 기본 위치
-- 지도 핀을 누르면 지도 위에서 저장된 콘텐츠 사진·장소명·분류·주소를 펼쳐 확인
-- 지도 → 저장한 코스 목록 → 새 코스 만들기·저장, 저장한 코스 다시 편집
-- 날짜 탭 없는 단일 코스 편집: 기존 여러 날짜의 장소는 순서를 유지해 하나로 합치고 중복 장소는 한 번만 표시
-- 모든 주요 페이지에서 공유하는 하단 내비게이션
+## 구현된 화면과 기능
 
-이 웹 프로토타입의 로그인, SNS 저장, 알림 등은 체험용 화면입니다. 코스와 저장 내용은 방문자별 브라우저 저장소에 보관되며 팀원 사이에 자동 동기화되지 않습니다. 지도와 장소 검색에는 외부 지도 서비스를 사용합니다.
+- **시작과 탐색:** 온보딩, 관심사에 따른 홈, 검색, 저장함·모음·폴더, 콘텐츠 상세, 캘린더, 마이페이지, 라이트·다크 화면 모드.
+- **콘텐츠 저장:** 프로토타입에서 링크, 제목(선택), 분류, 모음, 메모를 저장·수정합니다. SNS 공유 시연은 실제 Instagram 저장 목록을 자동으로 가져오는 기능이 아닙니다.
+- **장소 지도:** 저장한 장소의 사진 핀과 카드 캐러셀, 카테고리 필터, 저장 장소 우선 검색과 OpenStreetMap/Photon 외부 장소 검색, 현재 위치·직접 핀 찍기 흐름을 제공합니다. 지도 카드의 주소를 누르면 같은 지도에서 해당 위치로 이동합니다.
+- **지도 종류:** 기본 OpenFreeMap 지도와, 배포 환경의 브라우저용 키가 설정된 경우 구글·카카오·네이버 지도를 선택할 수 있습니다. 현재 공식 배포의 기본 선택은 네이버이며, 외부 지도가 열리지 않으면 기본 지도로 돌아갑니다. 장소 핀과 저장 데이터는 지도 배경 선택과 별개입니다.
+- **코스:** 저장한 장소로 단일 목록 코스를 만들고 저장·재편집합니다. 기존 여러 날짜 코스는 순서를 유지해 한 목록으로 읽으며 중복 장소는 한 번만 표시합니다. 코스는 프로토타입 브라우저 저장 데이터입니다.
+- **로그인:** `auth.html`의 이메일·카카오·구글 로그인 화면은 Supabase와 연결됩니다. 소셜 공급자 설정과 실제 계정 상태에 따라 로그인 가능 여부가 달라집니다. 로그인 자체가 콘텐츠의 서버 저장을 뜻하지는 않습니다.
 
-`integration.css`와 `integration.js`는 팀 화면을 합치는 스타일과 동작을 담고 있습니다. `map-live.*`, `course.*`, `collection.*`은 각각 지도, 코스, 저장 목록 화면의 코드입니다. `vendor/`에는 지도 표시용 Leaflet 파일이 포함되어 있습니다. `home.*`은 홈 화면, `mypages.*`는 마이 하위 페이지(현재 위치 · 관심 키워드 · 알림 설정 · 저장하는 방법 · 계정 설정), `coach.js`는 홈 튜토리얼입니다. 수정 내역은 [CHANGELOG.md](CHANGELOG.md)에 있습니다.
+기본 지도는 키 없이 동작합니다. 지도 데이터와 출처는 OpenFreeMap, OpenMapTiles, OpenStreetMap이며 화면에도 출처를 표시합니다. 외부 지도 SDK 키는 지도 **배경 표시**용입니다. Instagram 장소 이름의 좌표를 찾는 온라인 분석은 아래의 별도 서버 경로를 사용합니다.
 
-협업 방법은 [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.
+## Instagram 장소 추출 테스트
 
-## 검증
+1. [공식 핀맵](https://pinmap-prototype.vercel.app/)에서 **개발 테스트**를 선택합니다.
+2. **새로 저장**에서 `https://www.instagram.com/p/.../` 또는 `https://www.instagram.com/reel/.../` 링크를 붙여넣습니다. `tv` 형식도 받습니다. 제목은 비워둘 수 있습니다.
+3. 처음 제출할 때 온라인 테스트 코드를 입력합니다. 코드는 현재 브라우저 탭의 세션에 보관되며, 잘못된 코드일 때 다시 입력할 수 있습니다. 공유 저장소에 테스트 코드를 적지 마세요.
+4. 저장 중에는 버튼과 진행 안내가 표시됩니다. 완료되면 좌표가 있는 장소는 지도에, 찾은 장소 전체와 확인이 필요한 이유는 게시물 상세에 표시됩니다.
 
-`node --test tests/*.test.cjs`로 코스 저장·재편집·새로고침 유지, 기존 데이터 이전, 저장 실패 처리를 확인합니다.
+응답에서 게시물 제목·AI 요약·작성자 아이디·프로필 사진(수집 가능한 경우)·대표 표지·장소별 이름, 주소, 좌표 및 확인 상태를 받아 화면에 사용합니다. 지도에는 **좌표가 있는 장소만** 나타나므로 추출 장소 수와 지도 핀 수가 다를 수 있습니다. 장소별 이미지가 분석 결과에 있으면 그 이미지를 쓰고, 없으면 대체 이미지를 보여줍니다. 게시물 대표 표지와 장소별 이미지는 별개입니다.
 
+브라우저는 `POST /api/place-extract`를 호출합니다. Vercel 함수가 테스트 코드를 확인한 뒤 별도 Cloud Run 분석 서버의 `/extract-link`로 요청을 전달합니다. 분석 서버 인증 토큰은 브라우저에 보내지 않습니다. Vercel 함수의 최대 실행 시간은 300초, 백엔드 요청 제한은 270초입니다. 이 저장소에는 Vercel 중계 코드가 있고 미디어 수집·AI 분석·지도 후보 검색을 수행하는 Cloud Run 서버 코드는 포함되지 않습니다.
 
-## 실제 콘텐츠 실험 브랜치
+현재 테스트는 **장소 관련 Instagram 링크**를 전제로 합니다. 일반 카테고리 자동 분류, 사용자의 Instagram 저장 목록 자동 가져오기, ZIP 업로드 화면은 이 흐름에 없습니다. 비공개·로그인 필요·접근 제한 게시물은 원본을 수집하지 못할 수 있고, 장소명만으로 고른 지도 후보는 실제 영업 위치와 일치하는지 확인해야 합니다. 좌표가 없는 장소와 그 이유도 상세에서 확인할 수 있습니다. 개발 테스트 결과는 새로고침 후 복원되지 않습니다.
 
-`experiment/real-content`는 운영 `main`과 분리된 개발 환경입니다. 루트 주소에서 온보딩 전에 시작 환경을 선택합니다.
+## 코드 구조
 
-- `index.html?mode=development`: 콘텐츠·계정·프로필 사진·위치·알림·코스를 예시값 없이 시작합니다. 데이터 연결 전의 빈 초기 화면을 표시하며, 저장·계정 연동·장소 검색·현재 위치 요청은 실행하지 않습니다. SNS 인증, 자동 수집, AI 추출, 푸시는 아직 연결하지 않았습니다.
-- `index.html?mode=prototype`: 기존 13개 콘텐츠와 SNS 저장 체험 등 현재 프로토타입의 흐름을 유지합니다.
-- 이전 개발 저장 공간: `pinmap.dev.v1`, `pinmap.dev.courses.v1`, `pinmap.dev.course-draft.v1`. 기존 체험 저장 공간과 이전 버전 데이터를 불러오거나 지우지 않습니다.
-- 개발 모드는 기존 화면·컴포넌트·버튼·배치를 그대로 사용하며, 데이터 생성이나 연결 동작에는 미연결 안내만 표시합니다. 개발 전용 안내 카드나 별도 디자인은 사용하지 않습니다.
-- 브라우저 저장은 동일한 출처(도메인·포트)의 두 모드 사이에서 분리됩니다. 온보딩은 기존처럼 진입 시 표시됩니다.
+| 위치 | 역할 |
+| --- | --- |
+| `index.html`, `entry.html`, `entry-router.js` | 시작 환경 선택과 앱 프레임 진입. 인증 콜백은 `auth.html`로 전달합니다. |
+| `app.html`, `app.js`, `pinmap.js`, `environment.js` | 공통 화면, 상태, 모드 구분, 브라우저 저장·온보딩. |
+| `online-place-test.js`, `api/place-extract.js` | 로그인 없는 개발 화면의 링크 분석·응답 표시, Vercel에서 Cloud Run으로 보내는 중계. |
+| `map-live.js`, `map-providers.js`, `api/map-config.js` | 지도 장소 카드·검색·마커, 지도 배경 선택, 배포 환경의 브라우저용 지도 설정. |
+| `detail.js`, `collection.js`, `course.js` | 콘텐츠 상세와 추출 상태, 저장함·폴더, 코스 작성·저장. |
+| `auth.html`, `auth-page.js`, `auth-client.js`, `auth-app.js`, `api/auth/config.js` | Supabase 로그인 화면, 세션과 인증이 필요한 앱 진입, 공개 인증 설정 전달. |
+| `tokens.css`, `design-alignment.css`, `components/`, `DESIGN.md` | 디자인 역할과 공통 스타일, 컴포넌트 계약 및 현재 디자인 기준. |
+| `vendor/` | Pretendard, Leaflet, MapLibre, Supabase 클라이언트 등 앱에서 사용하는 배포 파일과 라이선스. |
 
-실행: `python3 -m http.server 8092 --bind 127.0.0.1` 후 `http://localhost:8092/`.
-검증: `node --test tests/environment.test.cjs`.
+`app.html`은 여러 전역 JavaScript 파일을 정해진 순서로 불러옵니다. 파일을 나누거나 로드 순서를 바꿀 때 앞선 파일의 전역 함수에 의존하는 코드가 있는지 확인해야 합니다. 프런트엔드는 HTML·CSS·JavaScript로 구성되어 별도 빌드 과정이 없습니다.
 
-스타일/스크립트 수정 후 `python3 scripts/refresh-asset-versions.py`로 자산 버전을 갱신합니다. 전체 검증은 `node --test tests/*.test.cjs`를 실행합니다. 스타일 로딩 검사는 실패한 스타일을 한 번 재시도합니다.
+## 로컬 실행
 
-버전 선택은 한 번의 진입에만 적용됩니다. 새로고침하면 항상 버전 선택 화면으로 돌아오며, 기존 저장 데이터는 삭제하지 않습니다. 개발 경로는 매번 연결 전의 빈 화면으로 시작합니다.
+저장소 루트에서 정적 화면을 실행합니다.
 
-## 지도 배경
+```sh
+python3 -m http.server 8093 --bind 127.0.0.1
+```
 
-지도 페이지의 **지도 종류** 버튼에서 기본 지도(OpenFreeMap)와 구글·카카오·네이버 지도를 선택할 수 있습니다. 기본 지도는 키 없이 사용합니다. 배포 환경에서는 Vercel의 `GOOGLE_MAPS_BROWSER_KEY`, `KAKAO_MAP_JAVASCRIPT_KEY`, `NAVER_MAP_CLIENT_ID`, `PINMAP_MAP_PROVIDER`를 `api/map-config.js`가 브라우저용 설정으로 전달합니다. `PINMAP_MAP_PROVIDER`는 `openfree`, `google`, `kakao`, `naver` 중 하나이며 현재 기본값은 네이버입니다. 해당 키가 없으면 선택지를 비활성화하고 지도 SDK를 불러오지 못하면 기본 지도로 돌아갑니다. 선택은 해당 브라우저에 보관됩니다. 지도 종류를 바꾸어도 저장한 장소 데이터와 사진 마커는 유지합니다.
+브라우저에서 `http://127.0.0.1:8093/`을 엽니다. 프로토타입과 빈 개발 화면은 볼 수 있지만 이 정적 서버는 `/api/*` Vercel 함수를 실행하지 않습니다. 따라서 로컬 정적 실행만으로는 온라인 장소 추출·실제 로그인·외부 지도 키 설정을 확인할 수 없습니다. 기본 지도는 사용할 수 있습니다.
 
-세 지도 키는 모두 브라우저 SDK에서 쓰는 공개 식별자입니다. 브라우저 네트워크 요청에 포함되므로 각 지도 제공자 콘솔에서 배포 도메인과 필요한 지도 API로 사용 범위를 제한해야 합니다. `python3 -m http.server` 로컬 실행에서는 `/api/map-config`가 없어 기본 지도만 사용합니다. Vercel Functions가 실행되는 환경에서만 외부 지도 설정이 로드됩니다.
+로컬에서 로그인 설정 API와 지도 설정 API를 시험하려면 Node 20.12 이상에서 `.env.local`에 해당 공개 설정을 넣고 다음 서버를 실행합니다.
 
-장소 지도·코스 편집·코스 미리보기는 API 키 없이 OpenFreeMap의 Positron 벡터 지도를 사용합니다. MapLibre GL JS 5.21.0과 Leaflet 연결 모듈 0.1.4를 `vendor/`에 고정해 포함했습니다. 지도 데이터 출처는 OpenMapTiles와 OpenStreetMap이며 화면의 출처 표기를 유지합니다. 지도는 지하철역과 함께 15배율부터 주요 버스정류장, 16배율부터 번호가 붙은 지하철 출입구, 17배율부터 더 많은 정류장과 이름을 표시합니다. 출구 번호는 [행정안전부 주소제공서비스 자료를 게시한 Esri Korea 공개 레이어](https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0)의 2026-04-30 기준 스냅샷입니다. 자료에 없는 서울 신림선과 울산·부산 동해선 일부 출구는 표시되지 않을 수 있습니다. `python3 scripts/update-subway-exits.py`로 스냅샷을 갱신한 다음 `python3 scripts/refresh-asset-versions.py`로 버전을 갱신합니다. WebGL을 지원하지 않는 기기는 기존 OpenStreetMap 배경으로 대체합니다. 장소 검색과 위치 권한 동작은 변경하지 않습니다.
+```sh
+node --env-file=.env.local scripts/dev-auth-server.cjs
+```
 
-현재 테마는 `map-style.json`에 저장한 OpenFreeMap Positron 기반의 Pinmap Warm Minimal입니다. 미색 배경에 저채도 녹지·물을 사용하고 도로 번호·작은 도로명·철도 표시를 숨깁니다. 건물은 확대 수준 16부터 표시하며 지명은 현지 이름 한 줄로 표현합니다. 수정 후 JSON 콘텐츠 해시에 맞춰 `integration.js`의 스타일 URL 버전을 갱신하세요.
+기본 주소는 `http://127.0.0.1:8095/`입니다. 이 서버는 `/api/auth/config`와 `/api/map-config`만 제공합니다. Instagram 링크 분석용 `/api/place-extract`는 제공하지 않으므로 그 흐름은 Vercel 배포 환경에서 확인하세요. OAuth를 로컬에서 시험한다면 Supabase와 각 공급자의 허용 URL을 실제 로컬 주소·포트에 맞춰 설정해야 합니다. 상세 절차는 [인증 설정 문서](docs/auth-setup.md)를 참고하되, 그 문서의 과거 배포 상태 기록보다 현재 코드와 이 README의 상태 설명을 우선하세요.
 
-지하철·철도역은 배경의 실제 `poi` 데이터에서 표시합니다. 확대 수준 12부터 역 아이콘과 한국어 우선 이름을 보여주며, 출입구·버스 정류장·일반 상점은 추가하지 않습니다. 겹치는 역 표시는 지도 충돌 배치로 줄입니다.
+## Vercel 설정
 
-## Portfolio embed
+| 환경 변수 | 사용처 | 범위 |
+| --- | --- | --- |
+| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | `/api/auth/config` | 브라우저로 전달 가능한 Supabase 프로젝트 URL·공개 키. |
+| `GOOGLE_MAPS_BROWSER_KEY`, `KAKAO_MAP_JAVASCRIPT_KEY`, `NAVER_MAP_CLIENT_ID` | `/api/map-config` | 브라우저 지도 SDK의 공개 식별자. 필요한 서비스·배포 도메인으로 제한합니다. |
+| `PINMAP_MAP_PROVIDER` | `/api/map-config` | 기본 지도 선택: `openfree`, `google`, `kakao`, `naver`. 미설정·사용 불가 값은 기본 지도로 돌아갑니다. |
+| `PINMAP_EXTRACTOR_ORIGIN`, `PINMAP_EXTRACTOR_TOKEN`, `PINMAP_TEST_ACCESS_CODE` | `/api/place-extract` | Cloud Run 주소, 서버 간 인증 토큰, 온라인 테스트 접근 코드. 서버에만 둡니다. |
 
-The portfolio embeds the production `app.html?mode=prototype&portfolio-demo=1` directly. Keep this app on the Pinmap origin so root-relative APIs and map SDK domain authorization continue to work. `portfolio-embed.js` loads the cursor tour only when embedded by `https://ji-hyeon-jeong.vercel.app` with that explicit flag; ordinary app visits are unaffected. Tour messages validate both origin and sender.
+지도 브라우저 키와 Supabase 공개 키는 브라우저에 노출되는 값입니다. Cloud Run 인증 토큰과 테스트 접근 코드는 공개 키가 아니며 저장소·스크린샷·브라우저 코드에 넣지 않습니다. 실제 값이 없을 때 인증 설정과 장소 분석 함수는 준비되지 않았다는 응답을 반환합니다.
 
-## 실제 이메일 · 카카오 로그인 (로컬 구현)
+`main`에 병합하면 연결된 Vercel 프로젝트가 자동 배포됩니다. 공개 화면과 GitHub Actions 결과를 함께 확인하세요. 지도 제공자의 도메인 인증, Supabase 공급자 설정, Instagram 원본 접근 가능 여부는 코드 배포 성공과 별도로 확인해야 합니다.
 
-`auth.html`에서 Supabase 기반 이메일 가입·인증·로그인·비밀번호 재설정과 카카오 로그인을 연결한다. 인증 후 빈 개발 모드 앱으로 진입하며 프로토타입 체험과 기존 저장 데이터는 유지한다. 계정별 콘텐츠 동기화는 별도 작업이다.
+## 검증과 협업
 
-Vercel에 `SUPABASE_URL`과 `SUPABASE_PUBLISHABLE_KEY`를 등록한다. 로컬에서는 `.env.local`에 값을 넣고 `node --env-file=.env.local scripts/dev-auth-server.cjs`를 실행한다. 일반 정적 서버는 인증 설정 API를 실행하지 않는다. 상세 설정은 [로그인 연결 안내](docs/auth-setup.md), 현재 기준과 검사 결과는 [로그인 검증 기록](docs/auth-verification.md)을 참고한다.
+```sh
+node --test tests/*.test.cjs
+```
+
+GitHub Actions는 PR과 `main` 푸시에서 이 검사를 실행합니다. 테스트는 환경 분리, 저장·정렬·코스, 인증 설정, 지도 설정, 테마와 스크립트 자산 버전 등을 확인합니다. 외부 Instagram 게시물 수집이나 실제 소셜 계정 로그인 성공을 이 단위 테스트만으로 보장하지는 않습니다.
+
+CSS 또는 JavaScript를 바꾸었다면 검사 전에 `python3 scripts/refresh-asset-versions.py`로 `app.html` 등의 자산 버전을 갱신하세요. 화면 변경은 402 × 874 모바일 크기와 넓은 화면에서 확인합니다. 협업 절차는 [CONTRIBUTING.md](CONTRIBUTING.md), 변경 기록은 [CHANGELOG.md](CHANGELOG.md)를 참고하세요. 디자인 수정 전에는 [DESIGN.md](DESIGN.md)와 [컴포넌트 계약 목차](components/index.md)를 읽습니다.
