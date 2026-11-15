@@ -50,7 +50,23 @@ fs.mkdirSync(output,{recursive:true});
     assert.match(await frame.locator('body').innerText(),/2026.12.11 – 2027.04.11/);
     assert.equal(await frame.locator('.dtlocation').count(),0);
     await page.screenshot({path:path.join(output,'pinmap-account-event-mobile.png')});
-    await frame.locator('.dt-events').scrollIntoViewIfNeeded();
+    await frame.locator('.dt-sheet-handle').click();
+    await frame.locator('.dtsheet.is-expanded').waitFor({timeout:5000});
+    await page.waitForTimeout(500);
+    await frame.locator('.dtsheet').evaluate(sheet=>{
+      const row=sheet.querySelector('.dt-events li:first-child');
+      sheet.scrollTop+=row.getBoundingClientRect().top-sheet.getBoundingClientRect().top-80;
+    });
+    await page.waitForTimeout(100);
+    const visible=await frame.locator('.dtsheet').evaluate(sheet=>{
+      const row=sheet.querySelector('.dt-events li:first-child');
+      const date=row.querySelector('p').getBoundingClientRect();
+      const bar=document.querySelector('.dtbar').getBoundingClientRect();
+      return {dateTop:date.top,dateBottom:date.bottom,barTop:bar.top};
+    });
+    assert(visible.dateTop>=0 && visible.dateBottom<visible.barTop,
+      'The first extracted event date must be visible above the fixed action bar: '+JSON.stringify(visible));
+    console.log('event-date-viewport:',JSON.stringify(visible));
     await page.screenshot({path:path.join(output,'pinmap-account-event-detail.png')});
     await frame.locator('body').evaluate(()=>{go('calendar');calMonth=new Date(2026,11,1);render();});
     assert.equal(await frame.locator('[data-calday="2026-12-11"] .caldot').count(),1);
