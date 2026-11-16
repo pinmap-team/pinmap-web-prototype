@@ -71,7 +71,7 @@ detail = function(){
       ${author ? `<div class="dt-author">${authorPhoto ? `<img src="${esc(authorPhoto)}" alt="">` : `<span class="dt-author-fallback" aria-hidden="true">@</span>`}<span>게시물 작성자 <b>@${esc(author)}</b></span></div>` : ''}
       ${x.desc ? `<section class="dtsum"><h2${x.source === '직접 추가' || x.aiSummary === false ? '' : ' class="dtai"'}>${icon('spark')}${esc(x.source === '직접 추가' || x.aiSummary === false ? '장소 설명' : 'AI 요약')}</h2><p>${esc(x.desc)}</p></section>` : ''}
       ${extractionInfo}
-      <section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>
+      <section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')} 메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>
       ${info}
     </section>
     <div class="dtbar ${bottom.length === 1 ? 'one' : ''}">${bottom.join('')}</div>

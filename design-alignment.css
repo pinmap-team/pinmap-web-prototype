@@ -51,9 +51,11 @@ button,input,select,textarea,svg text,.libpage,.live-map,#login-screen,.ob-phone
 .field input,.field textarea,.esinput.area{padding:var(--space-md)}
 
 /* Regular surfaces use three radii. Pill search, circles and folder silhouettes are geometric exceptions. */
-.libcard,.card,.gcard,.mycard,.infobox,.mgroup,.cf-item,.live-map .lm-carousel-card,.esinput,.esselect{border-radius:var(--rounded-md)}
-.libart,.cf-photo,.cf-pickthumb,.ntthumb,.field input,.field textarea,.field select,.live-map .lm-location-menu button{border-radius:var(--rounded-sm)}
+.libcard,.card,.gcard,.mycard,.infobox,.mgroup,.cf-item,.course-card,.live-map .lm-carousel-card,.esinput,.esselect{border-radius:var(--rounded-md)}
+.libart,.cf-photo,.cf-pickthumb,.ntthumb,.ntsheet .ntthumb,.field input,.field textarea,.field select,.live-map .lm-location-menu button{border-radius:var(--rounded-sm)}
 .forhero,.live-map .lm-location-menu,.live-map .lm-carousel-empty,#sheet.cfcenter,dialog{border-radius:var(--rounded-lg)}
+/* Bottom sheets meet the viewport edge; centered dialogs retain four rounded corners. */
+#sheet.editsheet,#sheet.course-picker-sheet{border-radius:var(--rounded-lg) var(--rounded-lg) 0 0}
 .libcard{padding:var(--space-sm) var(--space-sm) var(--space-md)}
 .mgroup{padding:var(--space-sm) var(--space-lg)}
 .mgroup>h2{margin:var(--space-md) 0 var(--space-xs)}
@@ -308,7 +310,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 .address-search>button{display:grid;place-items:center;width:44px;height:44px;flex:none;padding:0;background:transparent;color:var(--color-secondary)}
 .address-search>button[hidden]{display:none}
 .address-search>button .icon{width:20px;height:20px}
-.address-locate,.address-add{display:flex;align-items:center;justify-content:center;gap:var(--space-sm);width:100%;min-height:48px;padding:var(--space-md);border:1px solid var(--color-border);border-radius:var(--rounded-md);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md)}
+.address-locate,.address-add{display:flex;align-items:center;justify-content:center;gap:var(--space-sm);width:100%;min-height:48px;padding:var(--space-md);border:1px solid var(--color-border);border-radius:var(--rounded-sm);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md)}
 .address-locate{margin:var(--space-lg) 0 var(--space-xl)}
 .address-locate .icon,.address-add .icon{width:20px;height:20px;flex:none}
 .address-row{border-bottom:1px solid var(--color-disabled);padding:var(--space-xl) 0}
@@ -355,7 +357,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 .account-name-form{display:grid;gap:var(--space-md);width:100%;max-width:100%;text-align:left;margin-top:var(--space-md)}
 .account-name-form .field{margin:0;gap:var(--space-sm)}
 .account-name-form .field>span{font:var(--type-label-md)}
-.account-name-form input{width:100%;min-height:48px;color:var(--color-on-surface);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--rounded-sm);font:var(--type-body-md)}
+.account-name-form input{width:100%;min-height:48px;color:var(--color-on-surface);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--rounded-md);font:var(--type-body-md)}
 .account-name-form>div{display:flex;justify-content:flex-end;gap:var(--space-sm)}
 .account-name-form>div button{min-width:80px;min-height:44px;padding:var(--space-sm) var(--space-lg);border-radius:var(--rounded-sm);font:var(--type-label-md)}
 .accountpage .account-section,.accountaccesspage .account-section{border-top:1px solid var(--color-disabled);padding:var(--space-sm) 0}
@@ -590,7 +592,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 /* 2026-11-14: reference dock, expanded active capsule and outline icons. */
 .bottomnav,.live-map .bottomnav{width:min(calc(100% - 48px),336px)!important;max-width:336px!important;height:72px!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 .bottomnav .pm-nav-main{isolation:isolate;display:flex;align-items:center;box-sizing:border-box;width:100%;height:64px;padding:var(--space-xs);border-radius:999px;border:1px solid color-mix(in srgb,var(--color-surface) 88%,transparent)!important;box-shadow:var(--shadow-sm)!important}
-.bottomnav .pm-nav-main::before{background:color-mix(in srgb,var(--color-surface) 40%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6)}
+.bottomnav .pm-nav-main::before{background:color-mix(in srgb,var(--color-surface) 94%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6)}
 .bottomnav .pm-nav-main::after{content:none}
 .bottomnav .pm-nav-main .pm-nav-indicator{top:4px;left:calc(4px + var(--nav-index,0) * (100% - 8px) / 4.25);width:calc((100% - 8px) * 1.25 / 4.25);height:54px;transform:none;transition:none;border:1px solid color-mix(in srgb,var(--color-border) 18%,transparent)!important;background:color-mix(in srgb,var(--color-surface) 92%,transparent)!important;box-shadow:var(--shadow-sm)!important;border-radius:999px}
 .bottomnav .pm-nav-main .pm-nav-indicator::before{content:none}
@@ -633,7 +635,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 .myprofile-name b{font:var(--type-headline-md);overflow-wrap:anywhere}
 .myprofile-name .icon{flex:none;width:16px;height:16px;color:var(--color-secondary)}
 .myprofile-form{flex:1;display:flex;align-items:center;gap:var(--space-sm);min-width:0}
-.myprofile-form input{flex:1;min-width:0;min-height:44px;padding:0 var(--space-md);border:1px solid var(--color-border);border-radius:var(--rounded-sm);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-body-md)}
+.myprofile-form input{flex:1;min-width:0;min-height:44px;padding:0 var(--space-md);border:1px solid var(--color-border);border-radius:var(--rounded-md);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-body-md)}
 .myprofile-form button{flex:none;min-height:44px;padding:0 var(--space-md);border-radius:var(--rounded-sm);font:var(--type-label-md)}
 /* 마이 맨 아래 로그아웃 | 회원 탈퇴 (프로필 및 계정 화면과 같은 모양) */
 .my-exit{display:flex;align-items:center;justify-content:center;gap:var(--space-xs);margin:var(--space-xl) 0 0;color:var(--color-secondary);font:var(--type-body-sm)}
@@ -752,7 +754,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 .location-confirm-panel h2{font:var(--type-headline-md);margin:0 0 var(--space-sm);word-break:keep-all}
 .location-confirm-panel>p{font:var(--type-body-md);margin:0 0 var(--space-lg);color:var(--color-secondary);word-break:keep-all}
 .location-confirm-panel .location-confirm-notice{font:var(--type-label-md);padding:var(--space-md);border-radius:var(--rounded-sm);background:color-mix(in srgb,var(--color-error) 8%,var(--color-surface));color:var(--color-error);text-align:center}
-.location-confirm-panel>.filled{width:100%;min-height:52px;border-radius:var(--rounded-md)}
+.location-confirm-panel>.filled{width:100%;min-height:52px;border-radius:var(--rounded-sm)}
 .location-confirm-panel>.filled:disabled{opacity:.45}
 body:has(.location-confirm) .bottomnav{display:none!important}
 
@@ -1004,7 +1006,7 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .accountpage .account-note{margin:calc(-1 * var(--space-md)) 0 0;font:var(--type-body-sm);color:var(--color-secondary)}
 
 /* 2026-11-10 글자 입력칸 · 검색창은 포커스돼도 검정 테두리(outline · 링)를 그리지 않아요. 깜박이는 커서로 위치를 알려요. 버튼 · 링크의 키보드 포커스 표시는 그대로. */
-:is(input,textarea,select):not([type="checkbox"]):not([type="radio"]):not([type="range"]):is(:focus,:focus-visible){outline:none!important}
+:is(input,textarea,select):not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus-visible{outline:2px solid var(--color-primary)!important;outline-offset:2px}
 :is(.search,.libsearch,.cf-picksearch,.psearch,.cm-search,.lm-search,.address-search,.auth-input-shell,.esinput,.esselect,.field,.myprofile-form,.address-edit-form .field):focus-within{outline:none!important}
 .cfpage .libsearch:focus-within,.cf-picksearch:focus-within,.libsearch:focus-within,:is(.esselect,.esinput):focus-within{box-shadow:none!important}
 .live-map .lm-header .lm-search-row .libsearch:focus-within,.main>.topbar .home-search .libsearch:focus-within{box-shadow:none!important}
@@ -1155,7 +1157,8 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 #cfnewform .dialogactions .textbtn:active{background:var(--color-disabled)}
 
 /* Dialog family: shared rhythm without changing sheet-specific scrolling. */
-#sheet:not(.editsheet):not(.placesearch):not(.osdialog){padding:var(--space-xl);border-radius:var(--rounded-lg);color:var(--color-on-surface)}
+#sheet:not(.editsheet):not(.placesearch):not(.osdialog){padding:var(--space-xl);color:var(--color-on-surface)}
+#sheet:not(.editsheet):not(.course-picker-sheet):not(.placesearch):not(.osdialog){border-radius:var(--rounded-lg)}
 #sheet .dialoghead{align-items:center;gap:var(--space-lg);margin:0 0 var(--space-xl)}
 #sheet .dialoghead h2,#sheet .eshead h2,#sheet .nthead h2{margin:0;font:var(--type-headline-md);letter-spacing:normal;color:var(--color-on-surface)}
 #sheet :is(.dialoghead .iconbtn,.esclose,.ntclose){display:grid;place-items:center;flex:none;width:44px;height:44px;min-width:44px;min-height:44px;margin:0 0 0 auto;border:0;border-radius:50%;background:var(--color-neutral);color:var(--color-secondary);box-shadow:none}
@@ -1321,3 +1324,12 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .map-design-option[aria-checked="true"] .map-design-check{border-color:var(--color-primary);background:var(--color-primary);color:var(--color-surface)}
 .map-design-option[aria-checked="true"] .map-design-check .icon{opacity:1}
 @media(prefers-reduced-motion:reduce){.map-design-option{transition:none}}
+
+/* 2026-11-17 verified accessibility follow-up: preserve existing semantic tokens. */
+.strip-hide,.confirmpop .cfok{color:var(--color-on-surface)!important}
+.connectionpage .accoff{color:var(--color-on-surface)!important}
+.myprofile-form input:focus-visible{outline:2px solid var(--color-primary)!important;outline-offset:2px}
+.live-map .lm-map-credits{left:60px}
+/* Photo text uses a black scrim in both text zones; imagery remains visible in the center. */
+.mainpick .pick:not(.pick-placeholder) .pickimg::after{background:linear-gradient(180deg,rgba(0,0,0,.64) 0%,rgba(0,0,0,.64) 25%,transparent 45%,rgba(0,0,0,.64) 60%,rgba(0,0,0,.64) 100%)!important}
+.mainpick .pick:not(.pick-placeholder) .pickword{color:#fff;opacity:1}

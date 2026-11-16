@@ -71,14 +71,14 @@ function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected 
     return `<span class="cf-photo cf-slot${i}${src ? '' : ' cf-empty'}">${src
       ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('cf-empty');this.remove()">` : ''}</span>`;
   };
-  return `<button type="button" class="cf-folder${selected ? ' on' : ''}" ${attr || `data-cffolder="${esc(id)}"`} aria-label="${esc(title)} 폴더, 저장 ${count}개">
-    <span class="cf-shell" aria-hidden="true">
+  return `<button type="button" class="cf-folder${selected ? ' on' : ''}" ${attr || `data-cffolder="${esc(id)}"`}>
+    <span class="cf-shell">
       <span class="cf-back"><span class="cf-backshape"></span></span>
       ${[2, 1, 0].map(slot).join('')}
       <svg class="cf-shade" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
       <span class="cf-front"></span>
       <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
-      <span class="cf-meta"><span class="cf-title">${esc(title)}</span><span class="cf-count">${count}</span></span>
+      <span class="cf-meta"><span class="cf-title">${esc(title)}</span><span class="cf-count">${count}<span class="sr">개 저장된 폴더</span></span></span>
     </span>
   </button>`;
 }
@@ -221,7 +221,7 @@ resultCards = function(){
   });
   // 새 폴더 추가 타일: 항상 맨 앞(좌측 상단) · 검색 중엔 숨겨요
   const addTile = q ? [] : [`<button type="button" class="cf-folder cf-add" data-action="newfolder" aria-label="새 폴더 만들기">
-    <span class="cf-shell" aria-hidden="true">
+    <span class="cf-shell">
       <span class="cf-back"><span class="cf-backshape"></span></span>
       <span class="cf-front"></span>
       <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>

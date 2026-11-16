@@ -214,11 +214,13 @@ Object.entries(RESET_OPTIONS).forEach(([key, option]) => {
 
 // 확인(회색 · 왼쪽) / 유지하기(검정 · 오른쪽)
 function confirmPop(title, desc, okAction, okLabel = '확인', cancelLabel = '유지하기'){
-  modal('', `<div class="cfpop"><b>${title}</b><p>${desc}</p>
+  modal('', `<div class="cfpop"><b id="confirm-title">${title}</b><p id="confirm-desc">${desc}</p>
     <div class="cfpopbtns"><button class="cfok" data-action="${okAction}">${okLabel}</button><button class="cfkeep" data-action="close">${cancelLabel}</button></div></div>`);
   $('#sheet').classList.add('confirmpop');
+  $('#sheet').setAttribute('aria-labelledby','confirm-title');
+  $('#sheet').setAttribute('aria-describedby','confirm-desc');
 }
-$('#sheet').addEventListener('close', () => $('#sheet').classList.remove('confirmpop'));
+$('#sheet').addEventListener('close', () => { if($('#sheet').open)return; $('#sheet').classList.remove('confirmpop'); $('#sheet').removeAttribute('aria-labelledby'); $('#sheet').removeAttribute('aria-describedby'); });
 Object.assign(actions, {
   logoutask: () => confirmPop('로그아웃할까요?', '다시 로그인하면 저장한 콘텐츠를 그대로 볼 수 있어요.', 'logoutyes', '로그아웃', '취소'),
   leaveask: () => confirmPop('탈퇴할까요?', '탈퇴하면 저장한 콘텐츠와 설정이 모두 지워져요.<br>지운 내용은 되돌릴 수 없어요.', 'leaveyes', '탈퇴하기', '유지하기'),
