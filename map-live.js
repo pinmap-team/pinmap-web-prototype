@@ -72,7 +72,7 @@
         <section class="cf-recent lm-recent" id="lm-recent" aria-label="최근 지도 검색어" ${searchOpen&&!searchQuery.trim()?'':'hidden'}>${mapRecentContent()}</section>
         <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,cats.findIndex(([id])=>id===category))*100}%">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
       </header>
-      <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">ⓘ</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p class="lm-map-credits-vector"><a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>, © <a href="https://openmaptiles.org/" target="_blank" rel="noopener noreferrer">OpenMapTiles</a>, © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></p><p class="lm-map-credits-fallback">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></p><p class="lm-map-credits-google">지도 © Google</p><p class="lm-map-credits-kakao">지도 © Kakao</p><p class="lm-map-credits-naver">지도 © NAVER</p><p class="lm-map-credits-subway">지하철 출입구 © <a href="https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0" target="_blank" rel="noopener noreferrer">행정안전부·Esri Korea</a></p></div></details>
+      <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">ⓘ</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p>지도 © Google</p></div></details>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
       <div class="lm-floating-actions">${PM_ENV.requiresAuth ? '' : `<button type="button" class="lm-pin-button" data-lm="pin-start" aria-label="지도에 직접 핀 찍기" title="지도에 직접 핀 찍기">${icon('pin')}</button>`}<button type="button" class="lm-course-button" data-lm="new-course" aria-label="새 코스 만들기" title="새 코스 만들기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="4.2" cy="4.2" r="2.1"/><path d="M6.3 4.2h9.2a5.1 5.1 0 0 1 0 10.2H10a3.2 3.2 0 0 0 0 6.4h7.7"/><circle cx="19.8" cy="20.8" r="2.1"/></svg></button></div>
@@ -84,22 +84,10 @@
       <nav class="bottomnav lm-shared-nav" aria-label="하단 메뉴">${nav()}</nav></section>`;
   }
   function status(message) { const el = $('#app .lm-status'); if (el) { el.textContent = message; el.hidden = !/못|실패|입력|확인|검색하고/.test(message); } }
-  function hideProviderOptions() {
-    const control=$('#app .lm-map-provider-control');
-    if(!control)return;
-    control.querySelector('.lm-map-provider-options').hidden=true;
-    control.querySelector('.lm-map-provider-toggle').setAttribute('aria-expanded','false');
-  }
-  function updateProviderUi(state) {
-    const control=$('#app .lm-map-provider-control');
-    if(control)control.querySelector('.lm-map-provider-current').textContent=state.labels[state.current];
-    control?.querySelectorAll('[data-provider]').forEach(option=>{
-      option.disabled=!state.available[option.dataset.provider];
-      option.setAttribute('aria-pressed',String(option.dataset.provider===state.current));
-    });
+  function updateMapState(state) {
     const notice=$('#app .lm-status');
     if(state.error&&notice){notice.textContent=state.error;notice.hidden=false;}
-    else if(notice && /^(구글|카카오|네이버) 지도/.test(notice.textContent)){
+    else if(notice && /^구글 지도/.test(notice.textContent)){
       notice.textContent='';
       notice.hidden=true;
     }
@@ -320,8 +308,7 @@
   function mount(followLocation=true) {
     if (!window.L) { status('지도 라이브러리를 불러오지 못했어요.'); return; }
     liveMap = L.map('live-map-canvas',{zoomControl:false,zoomAnimation:false}).setView(center,zoom);
-    window.attachPinmapBasemap(liveMap);
-    mapProviderController=window.PinmapMapProviders?.attach(liveMap,updateProviderUi,settings.mapApp);
+    mapProviderController=window.attachPinmapBasemap(liveMap,updateMapState);
     pinLayer = L.layerGroup().addTo(liveMap); markers(); drawLocation();
     locate({recenter:followLocation&&!mapLocationName&&!searchResults,automatic:true});
     liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); });
@@ -465,8 +452,6 @@
     finally { if(current===searchController && input) input.disabled=false; }
   }
   document.addEventListener('click',event => {
-    const providerControl=$('#app .lm-map-provider-control');
-    if(providerControl && !providerControl.contains(event.target))hideProviderOptions();
     const card=event.target.closest('.lm-carousel-card');
     if(card&&!event.target.closest('button')){if(card.closest('.just-dragged'))return;const place=markerEntries.get(card.dataset.placeKey)?.place;if(place)expandPlace(place);return;}
     const result=event.target.closest('[data-result]');
@@ -475,17 +460,6 @@
     if(cat){selectCategory(cat.dataset.lmCat);markers();showResults();return;}
     const button=event.target.closest('[data-lm]'); if(!button)return;
     switch(button.dataset.lm){
-      case 'toggle-map-provider':{
-        const menu=$('#app .lm-map-provider-options');
-        menu.hidden=!menu.hidden;
-        button.setAttribute('aria-expanded',String(!menu.hidden));
-        break;
-      }
-      case 'select-map-provider':{
-        hideProviderOptions();
-        mapProviderController?.select(button.dataset.provider,true).catch(error=>status(error.message));
-        break;
-      }
       case 'new-course':window.startNewCourse?.(expandedKey&&expandedKey.startsWith('saved:')?[Number(expandedKey.slice(6))]:[]);break;
       case 'open-list':if(Date.now()<suppressSheetClickUntil)break;setList(!listOpen);break;
       case 'close-list':if(Date.now()<suppressSheetClickUntil)break;setList(false);break;

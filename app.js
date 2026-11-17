@@ -69,13 +69,9 @@ let items = PM_ENV.development ? [] : [
 ];
 let page='home', filter='전체', query='', detailId=null, selectedPin=1, collection=null, locationAllowed=false, toastTimer;
 // 마이 > 프로필 · 설정 (pinmap.js가 브라우저에 저장합니다)
-let settings = PM_ENV.development ? {nickname:'',area:'',notiDeadline:false,notiNearby:false,notiReminder:false,aiDefault:false,mapApp:'naver',readNoti:[],push:false,locPerm:'none',places:[],recentPlaces:[],accounts:[],calSeeded:true} : {nickname:'서연', area:'성수동', notiDeadline:true, notiNearby:true, notiReminder:false, aiDefault:true, mapApp:'naver', readNoti:[], push:false, locPerm:'none', places:['성수동','청파동'], recentPlaces:['한남동','연남동','잠실3동']};
+let settings = PM_ENV.development ? {nickname:'',area:'',notiDeadline:false,notiNearby:false,notiReminder:false,aiDefault:false,readNoti:[],push:false,locPerm:'none',places:[],recentPlaces:[],accounts:[],calSeeded:true} : {nickname:'서연', area:'성수동', notiDeadline:true, notiNearby:true, notiReminder:false, aiDefault:true, readNoti:[], push:false, locPerm:'none', places:['성수동','청파동'], recentPlaces:['한남동','연남동','잠실3동']};
 const LOC_PERM = {always:'항상 허용', using:'앱을 사용하는 동안', none:'허용 안 함'};
-const MAP_APPS = {
-  naver:{name:'네이버 지도', url:q=>`https://map.naver.com/p/search/${q}`},
-  kakao:{name:'카카오맵', url:q=>`https://map.kakao.com/?q=${q}`},
-  google:{name:'구글 지도', url:q=>`https://www.google.com/maps/search/?api=1&query=${q}`}
-};
+const GOOGLE_MAP = {name:'구글 지도', url:q=>`https://www.google.com/maps/search/?api=1&query=${q}`};
 let dueDismissed = false; // 마감 임박 배너를 닫으면 이번 방문 동안 숨김
 let unreadCount = () => 0; // my.js가 알림 개수 계산을 연결합니다
 const pages = {};          // 화면 렌더 함수 (pinmap.js가 home을 개인화 버전으로 바꿉니다)
@@ -190,7 +186,7 @@ function detail(){
   const original = x.deleted
     ? `<div class="infobox deletedbox"><div class="inline">${icon('external')}<h3>원본 콘텐츠</h3></div><p>삭제된 게시물이에요.</p><p class="hint">원본을 열 수 없지만 ${t.place?'장소 정보와 ':''}내 메모는 그대로 남아 있어요.</p></div>`
     : '';
-  const mapLink = t.place && x.address && !x.pending ? `<a class="outlined" target="_blank" rel="noopener noreferrer" href="${(MAP_APPS[settings.mapApp]||MAP_APPS.naver).url(encodeURIComponent(x.mapQuery||x.address))}">${icon('map')} ${(MAP_APPS[settings.mapApp]||MAP_APPS.naver).name}에서 길찾기</a>` : '';
+  const mapLink = t.place && x.address && !x.pending ? `<a class="outlined" target="_blank" rel="noopener noreferrer" href="${esc(GOOGLE_MAP.url(encodeURIComponent(x.mapQuery||x.address)))}">${icon('map')} ${GOOGLE_MAP.name}에서 길찾기</a>` : '';
   return `<div class="detail"><button class="back" data-action="back">${icon('back')} 돌아가기</button><div class="art">${art(x.art)}${badge(x)}</div><div class="detailmeta"><span>${esc(x.source)}에서 저장, ${esc(savedAgo(x))}</span><span class="classlabel">${x.aiClassified?'✨ AI 분류':'직접 분류'}, ${t.emoji} ${esc(x.type)}</span></div><h1>${esc(x.title)}</h1><p class="muted">${esc(x.desc)}</p><span class="tag">${esc(x.collection||'미분류')}</span>${info}<div class="infobox"><div class="inline">${icon('bookmark')}<h3>이래서 저장했어요</h3></div><p>${esc(x.memo||'아직 메모가 없어요.')}</p><button class="textbtn" data-action="edit">${t.place?'장소/분류/메모 수정':'분류/메모 수정'}</button></div>${original}<div class="actions">${x.deleted?'':`<button class="filled" data-action="original">${icon('external')} 원본 콘텐츠 보기</button>`}${mapLink}</div><p class="hint">원본 콘텐츠는 저장한 SNS에서 확인해요. 핀맵은 썸네일과 요약만 보여줘요. (예시 콘텐츠)</p></div>`;
 }
 

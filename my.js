@@ -60,7 +60,6 @@ pages.my = function(){
     ${myRow('savesheet','✨','저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
     ${myRow('appearance','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>','화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
     ${myRow('notisheet','🔔','알림 설정', settings.push ? `푸시 켜짐, ${notiOn}개` : '푸시 꺼짐')}
-    ${myRow('mapsheet','🗺️','지도 디자인', esc(MAP_APPS[settings.mapApp].name))}
     ${myRow('calexport',icon('calendar'),'캘린더로 내보내기', typeof calExportList === 'function' ? `마감 ${calExportList().length}개` : '')}
   </section>
   <section class="mgroup my-section" aria-label="도움말">
@@ -88,17 +87,6 @@ function notiSettings(){
 function saveSettings(){
   modal('저장 설정', `<div class="mycard settings">${sw('aiDefault','AI 자동 분류 기본 사용','끄면 저장할 때 카테고리를 직접 골라요')}</div>`);
 }
-function mapAppPreview(key){
-  return `<span class="map-design-thumbnail" aria-hidden="true"><img src="img/map-previews/${key}-seoul-forest.png" alt="" width="360" height="360" decoding="async"></span>`;
-}
-function mapSettings(){
-  const credits={naver:'© NAVER',kakao:'© Kakao',google:'© Google · TMap Mobility'};
-  modal('지도 디자인', `<div class="map-design"><p class="map-design-intro">지도 탭과 길찾기에 사용할 지도를 선택해요.</p>
-    <div class="map-design-options" role="radiogroup" aria-label="지도 디자인">${Object.entries(MAP_APPS).map(([key,value])=>{
-      const selected=settings.mapApp===key;
-      return `<button type="button" class="map-design-option" role="radio" aria-checked="${selected}" tabindex="${selected?'0':'-1'}" data-mapapp="${key}">${mapAppPreview(key)}<span class="map-design-copy"><strong>${esc(value.name)}</strong><small>${credits[key]}</small></span><span class="map-design-check" aria-hidden="true">${icon('check')}</span></button>`;
-    }).join('')}</div></div>`);
-}
 $('#sheet').addEventListener('close', () => { mySheet = null; });
 
 /* ---------- 동작 ---------- */
@@ -109,7 +97,6 @@ Object.assign(actions, {
   notisettings: () => { if (page !== 'my') go('my'); openMySheet(notiSettings); },
   notisheet: () => openMySheet(notiSettings),
   savesheet: () => openMySheet(saveSettings),
-  mapsheet: () => openMySheet(mapSettings),
   coachagain: () => { go('home'); setTimeout(() => {if(page==='home')startCoach(true);}, 300); },
   appinfo: () => { modal('앱 정보', `<p>핀맵 Prototype 03</p><p class="hint">예시 데이터로 체험하는 프로토타입이에요. 데이터는 이 브라우저에만 저장돼요.</p>`); $('#sheet').classList.add('bottomsheet'); },
   howto: () => openOnboarding(1),
@@ -129,8 +116,6 @@ document.addEventListener('click', e => {
     else render();
     return;
   }
-  const m = e.target.closest('[data-mapapp]');
-  if (m) { const refocus=document.activeElement===m; settings.mapApp = m.dataset.mapapp; afterChange(); render(); mySheet?.(); if(refocus)document.querySelector(`[data-mapapp="${settings.mapApp}"]`)?.focus({preventScroll:true}); toast(`${josa(MAP_APPS[settings.mapApp].name, '을/를')} 선택했어요.`); $('#snackbar').classList.add('oneline'); }
 });
 document.addEventListener('change', e => {
   const key = e.target.dataset?.setting;
@@ -147,17 +132,4 @@ document.addEventListener('submit', e => {
   if (!nick) return;
   settings.nickname = nick; afterChange();
   $('#sheet').close(); render(); toast('프로필을 저장했어요.');
-});
-
-// Radio-group keyboard navigation keeps focus on the selected map after rendering.
-document.addEventListener('keydown',event=>{
-  const current=event.target.closest('.map-design-option');
-  if(!current||!['ArrowDown','ArrowRight','ArrowUp','ArrowLeft','Home','End'].includes(event.key))return;
-  event.preventDefault();
-  const options=[...current.closest('[role="radiogroup"]').querySelectorAll('[data-mapapp]')];
-  const index=options.indexOf(current),direction=['ArrowUp','ArrowLeft'].includes(event.key)?-1:1;
-  const next=event.key==='Home'?0:event.key==='End'?options.length-1:(index+direction+options.length)%options.length;
-  const key=options[next].dataset.mapapp;
-  options[next].click();
-  document.querySelector(`.map-design-option[data-mapapp="${key}"]`)?.focus({preventScroll:true});
 });
