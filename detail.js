@@ -319,6 +319,25 @@ document.addEventListener('click', e => {
 function saveSheet(){
   const label = (ic, text, extra='') => `<div class="eslabel">${icon(ic)}<span>${text}</span>${extra}</div>`;
   const colChip = (name, text) => `<button type="button" class="eschip ${name===''?'on':''}" data-escol="${esc(name)}" aria-pressed="${name===''}">${esc(text)}</button>`;
+  if (!PM_ENV.development) {
+    modal('', `<form id="saveform" class="esform" novalidate>
+      <div class="eshead"><span class="esicon" aria-hidden="true">${icon('plus')}</span><div><h2>새로 저장</h2><p>콘텐츠 링크를 저장해요.</p></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
+      <div class="esbody">
+        <label class="esfield">${label('link','게시물 주소 (URL)')}
+          <span class="esinput withicon">${icon('link')}<input type="url" name="url" id="es-url" placeholder="https://www.instagram.com/p/…/" required inputmode="url"></span>
+        </label>
+        <input type="hidden" name="title" value="">
+        <input type="hidden" name="type" value="ai">
+        <input type="hidden" name="collection" value="">
+        <input type="hidden" name="memo" value="">
+        <p class="eshint">이 브라우저에 저장돼요. 장소·일정 자동 추출은 로그인 화면에서 이용할 수 있어요.</p>
+        <p class="eserror" id="saveerror" role="alert"></p>
+      </div>
+      <div class="esfoot"><button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
+    </form>`);
+    $('#sheet').classList.add('editsheet');
+    return;
+  }
   modal('', `<form id="saveform" class="esform" novalidate>
     <div class="eshead"><span class="esicon" aria-hidden="true">${icon('plus')}</span><div><h2>새로 저장</h2><p>SNS 링크를 붙여넣으면 바로 저장돼요.</p></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
     <div class="esbody">
