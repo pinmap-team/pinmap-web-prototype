@@ -39,9 +39,7 @@
 .cf-folder:focus-visible{outline:3px solid var(--t-ink);outline-offset:4px}
 
 /* 폴더 박스: 가로 100 : 세로 80 비율 고정 (기기 너비가 바뀌어도 모양 유지) */
-.cf-shell{position:relative;display:block;aspect-ratio:100/80;isolation:isolate;transition:transform .2s ease}
-@media(hover:hover){.cf-folder:hover .cf-shell{transform:translateY(-2px)}}
-.cf-folder:active .cf-shell{transform:scale(.98)}
+.cf-shell{position:relative;display:block;aspect-ratio:100/80;isolation:isolate}
 
 /* 뒤판: 왼쪽 위 탭이 있는 판 · 그림자는 감싼 요소에 */
 .cf-back{position:absolute;left:0;right:0;top:20%;bottom:0;filter:drop-shadow(0 1px 2px rgba(0,0,0,.06)) drop-shadow(0 12px 22px rgba(0,0,0,.10))}
