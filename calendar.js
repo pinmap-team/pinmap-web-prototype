@@ -30,12 +30,43 @@ afterChange();
 /* ---------- 날짜 계산 ---------- */
 const calToday = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
 const calKey = d => `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-const calDays = x => Number(String(x.deadline || '').replace(/\D/g, '')); // 'D-3' → 3
-function calDue(x){ // 마감일 (오늘 기준 D-n)
+function calAbsoluteDate(value){
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day ? date : null;
+}
+const calDays = x => x.eventDate
+  ? Math.round((Date.UTC(calDue(x).getFullYear(),calDue(x).getMonth(),calDue(x).getDate())
+    - Date.UTC(calToday.getFullYear(),calToday.getMonth(),calToday.getDate())) / 86400000)
+  : Number(String(x.deadline || '').replace(/\D/g, '')); // 기존 예시의 'D-3' → 3
+function calDue(x){ // 서버 일정은 명시된 절대 날짜, 기존 예시는 D-n
+  if (x.eventDate) return calAbsoluteDate(x.eventDate);
   if (!x.deadline) return null;
   const d = new Date(calToday); d.setDate(d.getDate() + calDays(x)); return d;
 }
-const calDueList = () => items.filter(x => calDue(x)).sort((a,b) => calDue(a) - calDue(b));
+function calEventEntries(item){
+  if (!Array.isArray(item.events)) return [];
+  return item.events.flatMap(event => {
+    if (!event || typeof event !== 'object') return [];
+    const start = calAbsoluteDate(event.start_date), end = calAbsoluteDate(event.end_date);
+    if (!start && !end) return []; // 연도가 빠진 날짜는 캘린더의 확정 날짜로 만들지 않아요.
+    const title = typeof event.title === 'string' && event.title.trim() ? event.title.trim() : item.title;
+    const candidate = event.needs_review !== false;
+    const base = {id:item.id,title,art:item.art,photo:item.photo,desc:item.desc,
+      contentKind:item.contentKind,eventCandidate:candidate,period:event.date_text || ''};
+    if (start && end && start.getTime() === end.getTime())
+      return [{...base,eventDate:event.start_date,dueLabel:'행사 일정'}];
+    return [
+      ...(start ? [{...base,eventDate:event.start_date,dueLabel:'행사 시작'}] : []),
+      ...(end ? [{...base,eventDate:event.end_date,dueLabel:'행사 종료'}] : [])
+    ];
+  });
+}
+const calDueList = () => items.flatMap(item => {
+  const eventEntries = calEventEntries(item);
+  return eventEntries.length ? eventEntries : calDue(item) ? [item] : [];
+}).sort((a,b) => calDue(a) - calDue(b));
 let calPick = false; // 월 선택 패널 열림
 let calMonth = new Date(calToday.getFullYear(), calToday.getMonth(), 1);
 let calSel = calKey(calToday);
@@ -43,10 +74,12 @@ const calSelDate = () => { const [y, m, d] = calSel.split('-').map(Number); retu
 
 function calRow(x){
   const d = calDue(x), n = calDays(x);
+  const candidate = !!x.eventCandidate;
+  const badge = candidate ? '확인 필요' : n < 0 ? '지난 일정' : n === 0 ? 'D-day' : 'D-' + n;
   return `<button class="calrow" data-detail="${x.id}">
     <span class="calthumb">${libThumb(x)}</span>
-    <span class="caltext"><b>${esc(x.title)}</b><small>${icon('clock')}${fmtDay(d)} ${esc(x.dueLabel || (x.period ? '운영 종료' : '마감'))}</small></span>
-    <span class="calbadge ${n <= 3 ? 'soon' : ''}">${n === 0 ? 'D-day' : 'D-' + n}</span>
+    <span class="caltext"><b>${esc(x.title)}</b><small>${icon('clock')}${fmtDay(d)} ${esc(x.dueLabel || (x.period ? '운영 종료' : '마감'))}${candidate ? ' · 추출 일정 후보' : ''}</small></span>
+    <span class="calbadge ${!candidate && n >= 0 && n <= 3 ? 'soon' : ''}">${badge}</span>
   </button>`;
 }
 
@@ -61,7 +94,7 @@ pages.calendar = function(){
     const date = new Date(y, m, d), k = calKey(date), list = dueByDay[k] || [];
     // 선택한 하루만 표시합니다. 오늘부터 이어지는 기간 띠는 사용하지 않습니다.
     const cls = [k === calKey(calToday) ? 'today' : '', k === calSel ? 'sel' : '', date < calToday ? 'past' : '', list.length ? 'hasdue' : ''].join(' ');
-    cells.push(`<button class="calcell ${cls}" data-calday="${k}" aria-pressed="${k === calSel}" aria-label="${m+1}월 ${d}일${list.length ? `, 마감 ${list.length}개` : ''}"><span>${d}</span>${list.length ? '<i class="caldot"></i>' : ''}</button>`);
+    cells.push(`<button class="calcell ${cls}" data-calday="${k}" aria-pressed="${k === calSel}" aria-label="${m+1}월 ${d}일${list.length ? `, 일정 ${list.length}개` : ''}"><span>${d}</span>${list.length ? '<i class="caldot"></i>' : ''}</button>`);
   }
   const [sy, sm, sd] = calSel.split('-').map(Number);
   const selList = dueByDay[calSel] || [];
@@ -87,8 +120,8 @@ pages.calendar = function(){
         <button type="button" class="cal-picker-today" data-caltoday>이번 달로 이동</button>
       </div>` : ''}
     </section>
-    ${selList.length ? `<div class="sectionhead calsec"><h2>${fmtDay(new Date(sy, sm - 1, sd))} 마감</h2></div><div class="callist">${selList.map(calRow).join('')}</div>` : ''}
-    ${soon.length ? `<div class="sectionhead calsec"><h2>곧 마감돼요</h2></div><div class="callist">${soon.map(calRow).join('')}</div>` : ''}`;
+    ${selList.length ? `<div class="sectionhead calsec"><h2>${fmtDay(new Date(sy, sm - 1, sd))} 일정</h2></div><div class="callist">${selList.map(calRow).join('')}</div>` : ''}
+    ${soon.length ? `<div class="sectionhead calsec"><h2>다가오는 일정</h2></div><div class="callist">${soon.map(calRow).join('')}</div>` : ''}`;
 };
 
 function calClosePicker(){

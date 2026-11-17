@@ -192,7 +192,7 @@ function cfCards(list, pick, canSelect){
     : `<h2 class="cf-resulthead">검색 결과 <span>${list.length}</span></h2>`;
   return `<div class="libsection cf-sec">
       ${lead}
-      <div class="cf-tools">${pick && !cfSel ? `<button type="button" class="cf-pickbtn" data-action="cfpick">${icon('plus')}담기</button>` : ''}
+      <div class="cf-tools">${pick && !cfSel && !PM_ENV.requiresAuth ? `<button type="button" class="cf-pickbtn" data-action="cfpick">${icon('plus')}담기</button>` : ''}
       ${cfSel ? '' : `<label class="libsort"><span class="sr">정렬</span><select data-libsort>${sorts.map(([k,v]) => `<option value="${k}" ${libSort===k?'selected':''}>${v}</option>`).join('')}</select>${icon('chevron')}</label>`}${selBtn}</div>
     </div>
     <div class="cf-items">${cfSort(list).map(cfItem).join('')}</div>`;
@@ -209,7 +209,7 @@ resultCards = function(){
     }
     if (q) return cfEmpty('search', '찾는 콘텐츠가 없어요', '다른 키워드로 다시 찾아 보세요.', `<button class="tonal" data-action="clear">검색 지우기</button>`);
     return collection
-      ? cfEmpty('folder', '아직 담긴 콘텐츠가 없어요', '저장한 콘텐츠를 골라 이 폴더에 담아 보세요.', `<button class="tonal" data-action="cfpick">콘텐츠 담기</button>`)
+      ? cfEmpty('folder', '아직 담긴 콘텐츠가 없어요', PM_ENV.requiresAuth ? '계정의 모음 편집은 준비 중이에요.' : '저장한 콘텐츠를 골라 이 폴더에 담아 보세요.', PM_ENV.requiresAuth ? '' : `<button class="tonal" data-action="cfpick">콘텐츠 담기</button>`)
       : cfEmpty('bookmark', '아직 저장한 콘텐츠가 없어요', 'SNS에서 공유 → 핀맵으로 담아 보세요.', `<button class="tonal" data-action="save">새로 저장</button>`);
   }
   // 전체: 카테고리 폴더 + 내가 만든 폴더
@@ -220,8 +220,8 @@ resultCards = function(){
     return {id:n,title:n,icon:'folder',count:inFolder.length,thumbnails:cfThumbs(inFolder),attr:`data-collection="${esc(n)}"`};
   });
   // 새 폴더 추가 타일: 항상 맨 앞(좌측 상단) · 검색 중엔 숨겨요
-  const addTile = q ? [] : [`<button type="button" class="cf-folder cf-add" data-action="newfolder" aria-label="새 폴더 만들기">
-    <span class="cf-shell">
+  const addTile = q || PM_ENV.requiresAuth ? [] : [`<button type="button" class="cf-folder cf-add" data-action="newfolder" aria-label="새 폴더 만들기">
+    <span class="cf-shell" aria-hidden="true">
       <span class="cf-back"><span class="cf-backshape"></span></span>
       <span class="cf-front"></span>
       <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
@@ -477,7 +477,7 @@ document.addEventListener('input', e => {
 const navCore = nav;
 nav = function(){
   const lib = page === 'library' && !detailId;
-  const fab = lib
+  const fab = lib && !PM_ENV.requiresAuth
     ? `<button type="button" class="navfab" data-action="newfolder" aria-label="새 폴더 만들기">${icon('folderplus')}</button>`
     : `<button type="button" class="navfab" data-action="save" aria-label="새로 저장">${icon('plus')}</button>`;
   return `<span class="navcap">${navCore()}</span>${fab}`;

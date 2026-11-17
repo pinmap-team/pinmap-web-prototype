@@ -24,9 +24,9 @@ Object.assign(homeSections, {
 // 개발 단계라 저장하지 않아요: 새로고침하면 다시 뜨고, 앱 안에서 다른 화면에 갔다 와도 숨긴 상태가 유지돼요
 let stripHidden = false;
 const stripHiddenToday = () => stripHidden;
-const dLabel = x => calDays(x) === 0 ? 'D-day' : 'D-' + calDays(x);
+const dLabel = x => x.eventCandidate ? '확인 필요' : calDays(x) === 0 ? 'D-day' : 'D-' + calDays(x);
 function stripBar(){
-  const due = calDueList().filter(x => calDays(x) <= 14);
+  const due = calDueList().filter(x => calDue(x) >= calToday && calDays(x) <= 14);
   if (!due.length || stripHiddenToday()) return '';
   const item = x => `<button class="strip-item ${calDays(x) <= 3 ? 'soon' : ''}" data-detail="${x.id}"><b>${dLabel(x)}</b><span>${esc(x.title)}</span></button>`;
   // 끝에서 처음으로 자연스럽게 이어지도록 첫 항목을 한 번 더 붙여요
@@ -52,9 +52,12 @@ actions.striphide = () => {
 const shuffle = list => { const a = [...list]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 let randomPickIds = null; // 랜덤 추천은 새로고침할 때마다 바뀌고, 앱 안에서는 그대로 유지돼요
 function homePicks(){
-  const ready = items.filter(x => !x.pending), photoFirst = (a,b) => (libPhoto(b)?1:0) - (libPhoto(a)?1:0);
+  const ready = PM_ENV.requiresAuth ? items : items.filter(x => !x.pending);
+  const photoFirst = (a,b) => (libPhoto(b)?1:0) - (libPhoto(a)?1:0);
+  // Account content belongs on the home screen even when its map position needs review.
+  if (PM_ENV.requiresAuth) return ready.slice(0, 8).map(x => ({x, id:null}));
   if (!preferences.length) {
-    if (!randomPickIds || randomPickIds.some(id => !ready.some(x => x.id === id))) randomPickIds = shuffle(ready).slice(0, 8).map(x => x.id);
+    if (!randomPickIds || (!randomPickIds.length && ready.length) || randomPickIds.some(id => !ready.some(x => x.id === id))) randomPickIds = shuffle(ready).slice(0, 8).map(x => x.id);
     return randomPickIds.map(id => ({x: ready.find(x => x.id === id), id:null})).filter(p => p.x);
   }
   const seen = new Set(), lists = preferences.map(id => ({id, list: homeSections[id]().list.filter(x => !x.pending).sort(photoFirst)})), picks = [];
@@ -88,7 +91,7 @@ function emptyPickCards(){
 
 /* ---------- 캘린더 위젯: 다가오는 마감 2개, 제목 줄 오른쪽 '전체보기' (2026-11-10) ---------- */
 function calWidget(){
-  const due = calDueList();
+  const due = calDueList().filter(x => calDue(x) >= calToday);
   const next = due.slice(0, 2);
   return `<section class="hwidget calw">
     <div class="hwhead"><h2>${calToday.getMonth()+1}월 일정</h2><button type="button" class="calgo" data-action="gocal" aria-label="캘린더 전체보기">전체보기${icon('chevright')}</button></div>
@@ -149,12 +152,18 @@ document.addEventListener('click', e => {
 pages.home = function(){
   const chips = homeCategoryChips();
   const picks = homePicks();
-  const emptyHome = PM_ENV.development && !items.length;
-  const main = picks.length || PM_ENV.development
-    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'role="group" aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${!picks.length && PM_ENV.development ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" data-action="save">${icon('plus')}콘텐츠 추가하기</button><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
+  const loadingAccount = PM_ENV.requiresAuth && !window.PinmapAccountLoaded;
+  const accountError = PM_ENV.requiresAuth && !items.length && window.PinmapAccountLoadError;
+  const emptyHome = PM_ENV.development && !items.length && !loadingAccount && !accountError;
+  const main = loadingAccount
+    ? '<div class="empty small" role="status">저장한 콘텐츠를 불러오는 중이에요.</div>'
+    : accountError
+    ? '<div class="empty small" role="status"><p class="muted">저장한 콘텐츠를 불러오지 못했어요.</p><button class="tonal" data-action="accountretry">다시 불러오기</button></div>'
+    : picks.length || emptyHome
+    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'role="group" aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${emptyHome ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" data-action="save">${icon('plus')}콘텐츠 추가하기</button><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
     : `<div class="empty small"><p class="muted">선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.</p><button class="tonal" data-action="save">새로 저장하기</button></div>`;
   const brand = '<div class="homebrand"><img src="img/pinmap-logo-splash.svg" alt="Pinmap 로고"></div>';
-  return stripBar() + brand + main + (emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + chips + (emptyHome ? '' : subWidgets());
+  return stripBar() + brand + main + (loadingAccount || accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + chips + (emptyHome || loadingAccount || accountError ? '' : subWidgets());
 };
 
 // Android 공유 안내: 실제 설치나 공유 수신이 연결된 것으로 표시하지 않아요.

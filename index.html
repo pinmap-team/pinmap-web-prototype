@@ -7,13 +7,14 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="stylesheet" href="tokens.css?v=72a1435ab1a8"><style>
 *{box-sizing:border-box}
-html{background:var(--color-neutral)}
-body{margin:0;min-width:402px;min-height:874px;background:var(--color-neutral)}
-.phone-frame{display:block;width:402px;height:874px;margin:0 auto;border:0;background:var(--color-surface);box-shadow:0 0 60px #1e33221a}
+html{height:100%;background:var(--color-neutral)}
+body{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);place-items:center;margin:0;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--color-neutral)}
+.phone-frame{display:block;width:402px;height:874px;max-width:none;max-height:none;border:0;background:var(--color-surface);box-shadow:0 0 60px #1e33221a;transform:scale(var(--phone-scale,1));transform-origin:center center}
 </style>
 </head>
 <body>
-<iframe class="phone-frame" title="핀맵, 아이폰 화면" src="entry.html" width="402" height="874"></iframe>
+<iframe class="phone-frame" data-phone-viewport title="핀맵, 아이폰 화면" src="entry.html"></iframe>
+<script src="phone-viewport.js?v=534575da0c1a"></script>
 <script src="entry-router.js?v=953d789c571d"></script>
 <script src="place-report-bridge.js?v=2bd3fad39dc2"></script>
 </body>

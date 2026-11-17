@@ -2,7 +2,7 @@
 
 핀맵은 SNS에서 저장한 콘텐츠를 다시 찾고, 콘텐츠에 나온 장소를 지도에서 살펴보는 모바일 웹 프로토타입입니다. 이 저장소의 `main`은 [공식 핀맵 화면](https://pinmap-prototype.vercel.app/)에 연결되어 있습니다. 사용자경험디자인II (26-2) 팀 프로젝트입니다.
 
-저장소 루트에는 **예시 콘텐츠를 둘러보는 프로토타입**, **로그인 없는 빈 개발 화면**, **Supabase 로그인 화면**이 있습니다. 예전 화면 복사본은 Git 기록에서 확인할 수 있습니다. Instagram 장소 분석 API와 원본 응답 테스트 화면은 별도 [Pinmap 백엔드 저장소](https://github.com/pinmap-team/pinmap-backend)에서 관리합니다.
+저장소 루트에는 **예시 콘텐츠를 둘러보는 프로토타입**, **로그인 없는 빈 개발 화면**, **Supabase 로그인 화면과 계정용 개발 화면**이 있습니다. 예전 화면 복사본은 Git 기록에서 확인할 수 있습니다. Instagram 분석 API와 원본 응답 테스트 화면은 별도 [Pinmap 백엔드 저장소](https://github.com/pinmap-team/pinmap-backend)에서 관리합니다.
 
 ## 시작 환경과 데이터
 
@@ -12,9 +12,9 @@
 | --- | --- | --- |
 | **프로토타입 체험** (`mode=prototype`) | 예시 콘텐츠 13개로 홈, 저장함, 지도, 상세, 코스, 설정을 체험합니다. 링크 저장과 SNS 공유 흐름은 화면 시연이며 `AI 자동 분류`는 간단한 규칙입니다. | 콘텐츠·설정·코스를 해당 브라우저의 `localStorage`에 저장합니다. |
 | **장소 추출 개발 화면** (`mode=development`) | 로그인 없는 빈 화면에서 Instagram 링크를 저장하면 백엔드가 분석한 장소를 지도와 상세에 표시합니다. | 현재 화면의 메모리에만 보관하며 새로고침하면 사라집니다. |
-| **로그인 테스트** (`auth.html?screen=welcome`) | Supabase를 통한 이메일 가입·인증·로그인·비밀번호 재설정과 소셜 로그인 화면을 사용합니다. 로그인 성공 시 인증이 필요한 빈 개발 화면으로 이동합니다. | 인증 세션은 Supabase 클라이언트가 관리합니다. 저장 콘텐츠를 사용자 계정의 DB에 동기화하지는 않습니다. |
+| **로그인 후 개발 화면** (`auth.html?screen=welcome` → `mode=development&auth=required`) | Supabase로 로그인한 뒤 Instagram 링크에서 장소와 전시·팝업 일정을 분석합니다. 장소는 지도에, 행사는 상세와 캘린더에 표시합니다. | 백엔드의 `content-save` API와 계정별 DB 저장소가 배포·설정된 경우 링크와 추출 결과를 계정에 저장하고 새로고침 후 다시 불러옵니다. |
 
-예시 프로토타입의 브라우저 저장 데이터와 장소 추출 개발 결과는 서로 섞이지 않습니다. 다른 브라우저·기기·팀원 계정으로 자동 동기화되지 않습니다.
+예시 프로토타입의 브라우저 저장 데이터와 로그인 없는 개발 화면의 결과는 서로 섞이지 않습니다. 두 화면의 데이터는 다른 기기와 동기화되지 않습니다. 계정용 개발 화면의 링크와 추출 결과는 별도 DB에 계정별로 보관하며, 서버 준비가 끝나기 전에는 저장 실패를 표시합니다.
 
 ## 구현된 화면과 기능
 
@@ -23,7 +23,7 @@
 - **장소 지도:** 저장한 장소의 사진 핀과 카드 캐러셀, 카테고리 필터, 저장 장소 우선 검색과 OpenStreetMap/Photon 외부 장소 검색, 현재 위치·직접 핀 찍기 흐름을 제공합니다. 지도 카드의 주소를 누르면 같은 지도에서 해당 위치로 이동합니다.
 - **지도 종류:** 기본 OpenFreeMap 지도와, 배포 환경의 브라우저용 키가 설정된 경우 구글·카카오·네이버 지도를 선택할 수 있습니다. 현재 공식 배포의 기본 선택은 네이버이며, 외부 지도가 열리지 않으면 기본 지도로 돌아갑니다. 장소 핀과 저장 데이터는 지도 배경 선택과 별개입니다.
 - **코스:** 저장한 장소로 단일 목록 코스를 만들고 저장·재편집합니다. 기존 여러 날짜 코스는 순서를 유지해 한 목록으로 읽으며 중복 장소는 한 번만 표시합니다. 코스는 프로토타입 브라우저 저장 데이터입니다.
-- **로그인:** `auth.html`의 이메일·카카오·구글 로그인 화면은 Supabase와 연결됩니다. 소셜 공급자 설정과 실제 계정 상태에 따라 로그인 가능 여부가 달라집니다. 로그인 자체가 콘텐츠의 서버 저장을 뜻하지는 않습니다.
+- **로그인과 계정 저장:** `auth.html`의 이메일·카카오·구글 로그인은 Supabase와 연결됩니다. 인증된 계정은 링크 분석과 저장, 목록 복원, 개별·선택 삭제를 백엔드 API로 처리합니다. 이 기능은 아래 데이터베이스 이전과 백엔드 배포가 완료돼야 사용할 수 있습니다. 계정용 화면의 메모·즐겨찾기·모음 편집과 지도 직접 핀 저장은 아직 서버 저장을 지원하지 않아 제공하지 않습니다.
 
 기본 지도는 키 없이 동작합니다. 지도 데이터와 출처는 OpenFreeMap, OpenMapTiles, OpenStreetMap이며 화면에도 출처를 표시합니다. 외부 지도 SDK 키는 지도 **배경 표시**용입니다. Instagram 장소 이름의 좌표를 찾는 온라인 분석은 아래의 별도 서버 경로를 사용합니다.
 
@@ -37,7 +37,7 @@
 
 브라우저는 백엔드 저장소의 `POST /api/place-extract`를 호출합니다. 그 함수가 테스트 코드를 확인한 뒤 Cloud Run 분석 서버로 전달합니다. API 함수, 미디어 수집, AI 분석, 지도 후보 검색 코드는 모두 백엔드 저장소에서 관리합니다. 이 웹 저장소는 화면과 API 연결 경로만 유지합니다.
 
-현재 테스트는 **장소 관련 Instagram 링크**를 전제로 합니다. 일반 카테고리 자동 분류와 사용자의 Instagram 저장 목록 자동 가져오기는 이 흐름에 없습니다. 비공개·로그인 필요·접근 제한 게시물은 원본을 수집하지 못할 수 있고, 장소명만으로 고른 지도 후보는 실제 영업 위치와 일치하는지 확인해야 합니다.
+로그인 없는 테스트는 **장소 관련 Instagram 링크**를 전제로 합니다. 계정용 화면은 장소와 전시·팝업 행사를 별도 항목으로 추출하며, 연월일이 확정된 행사 시작·종료일만 캘린더에 후보 일정으로 표시합니다. 날짜·장소는 원본에서 확인해야 합니다. 일반 카테고리 자동 분류와 사용자의 Instagram 저장 목록 자동 가져오기는 이 흐름에 없습니다. 비공개·로그인 필요·접근 제한 게시물은 원본을 수집하지 못할 수 있고, 장소명만으로 고른 지도 후보는 실제 영업 위치와 일치하는지 확인해야 합니다.
 
 ## 코드 구조
 
@@ -46,8 +46,8 @@
 | `index.html`, `entry.html`, `entry-router.js`, `place-report-bridge.js` | 시작 환경 선택, 앱 프레임 진입, 백엔드 결과의 개발 화면 전달. 인증 콜백은 `auth.html`로 전달합니다. |
 | `app.html`, `app.js`, `pinmap.js`, `environment.js` | 공통 화면, 상태, 모드 구분, 브라우저 저장·온보딩. |
 | `map-live.js`, `map-providers.js` | 지도 장소 카드·검색·마커와 지도 배경 선택. `/api/map-config`는 별도 백엔드로 전달합니다. |
-| `detail.js`, `collection.js`, `course.js` | 콘텐츠 상세와 추출 상태, 저장함·폴더, 코스 작성·저장. |
-| `auth.html`, `auth-page.js`, `auth-client.js`, `auth-app.js` | Supabase 로그인 화면, 세션과 인증이 필요한 앱 진입. `/api/auth/config`는 별도 백엔드로 전달합니다. |
+| `detail.js`, `calendar.js`, `collection.js`, `course.js` | 콘텐츠 상세의 장소·행사 결과, 행사 후보 일정, 저장함·폴더, 코스 작성·저장. |
+| `auth.html`, `auth-page.js`, `auth-client.js`, `auth-app.js`, `account-content.js` | Supabase 로그인, 세션, 인증이 필요한 앱과 계정별 저장 목록. `/api/auth/config`는 별도 백엔드로 전달합니다. |
 | `online-place-test.js`, `vercel.json` | 개발 화면의 장소 응답 표시와 추출·인증·지도 설정 요청을 별도 백엔드로 보내는 경로. |
 | `tokens.css`, `design-alignment.css`, `components/`, `DESIGN.md` | 디자인 역할과 공통 스타일, 컴포넌트 계약 및 현재 디자인 기준. |
 | `vendor/` | Pretendard, Leaflet, MapLibre, Supabase 클라이언트 등 앱에서 사용하는 배포 파일과 라이선스. |
@@ -74,7 +74,7 @@ node scripts/dev-auth-server.cjs
 
 ## 온라인 연결
 
-공식 Vercel 웹은 `/api/auth/config`, `/api/map-config`, `/api/place-extract`를 별도 백엔드 Vercel 프로젝트에 전달합니다. API 키와 추출 서버 설정은 [백엔드 저장소](https://github.com/pinmap-team/pinmap-backend)의 배포 환경에서 관리합니다. 웹과 백엔드 저장소는 각각 따로 배포하며, 백엔드 변경은 GitHub Actions 테스트 통과 후 자동 배포됩니다.
+웹의 `vercel.json`은 `/api/auth/config`, `/api/map-config`, `/api/place-extract`, `/api/content-extract`, `/api/content-save`를 별도 백엔드 Vercel 프로젝트에 전달합니다. API 키와 추출 서버 설정은 [백엔드 저장소](https://github.com/pinmap-team/pinmap-backend)의 배포 환경에서 관리합니다. 계정 저장을 사용하려면 백엔드 저장소의 `database/001_content_extraction_quota.sql` → `database/002_saved_content.sql` → `database/003_developer_test_quota.sql`을 같은 Supabase 프로젝트에 순서대로 적용하고, 백엔드 Vercel에 서버 전용 `SUPABASE_SECRET_KEY`를 설정한 뒤 분석 서버·백엔드·웹을 배포해야 합니다. 비밀 키는 웹 저장소·브라우저에 넣지 않습니다. GitHub 코드 반영만으로 DB 표가 자동 생성되지는 않습니다. 인증된 행사 저장 흐름은 `?mode=development&auth=required`에서만 켜지며, 기본 시작 화면과 프로토타입 체험에는 적용되지 않습니다.
 
 `main`에 병합하면 연결된 Vercel 프로젝트가 자동 배포됩니다. 공개 화면과 GitHub Actions 결과를 함께 확인하세요. 지도 제공자의 도메인 인증, Supabase 공급자 설정, Instagram 원본 접근 가능 여부는 코드 배포 성공과 별도로 확인해야 합니다.
 
@@ -85,5 +85,7 @@ node --test tests/*.test.cjs
 ```
 
 GitHub Actions는 PR과 `main` 푸시에서 이 검사를 실행합니다. 테스트는 환경 분리, 저장·정렬·코스, 인증 설정, 지도 설정, 테마와 스크립트 자산 버전 등을 확인합니다. 외부 Instagram 게시물 수집이나 실제 소셜 계정 로그인 성공을 이 단위 테스트만으로 보장하지는 않습니다.
+
+Playwright와 Chrome이 설치된 개발 환경에서는 `node scripts/check-account-browser.cjs`로 가짜 계정·서버 응답을 사용해 계정 목록 복원 → 행사 상세·캘린더 → 링크 저장 → 서버 삭제를 모바일과 넓은 화면에서 확인할 수 있습니다. 이 검사는 실제 계정이나 유료 분석 API를 호출하지 않으며, 실행 전 위의 로컬 정적 서버를 켜야 합니다.
 
 CSS 또는 JavaScript를 바꾸었다면 검사 전에 `python3 scripts/refresh-asset-versions.py`로 `app.html` 등의 자산 버전을 갱신하세요. 화면 변경은 402 × 874 모바일 크기와 넓은 화면에서 확인합니다. 협업 절차는 [CONTRIBUTING.md](CONTRIBUTING.md), 변경 기록은 [CHANGELOG.md](CHANGELOG.md)를 참고하세요. 디자인 수정 전에는 [DESIGN.md](DESIGN.md)와 [컴포넌트 계약 목차](components/index.md)를 읽습니다.

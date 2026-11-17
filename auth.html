@@ -8,7 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="tokens.css?v=72a1435ab1a8">
   <link rel="stylesheet" href="style.css?v=3b7492a42ea7">
-  <link rel="stylesheet" href="design-alignment.css?v=50503b453a91">
+  <link rel="stylesheet" href="design-alignment.css?v=b42337138819">
   <style>@font-face{font-family:"Pretendard Variable";font-style:normal;font-weight:45 920;font-display:swap;src:url("vendor/PretendardVariable.woff2") format("woff2")}</style>
   <script src="theme-mode.js?v=3a61a98d1277"></script>
   <script defer src="vendor/supabase.js?v=a867edbcfb02"></script>
@@ -17,7 +17,7 @@
   <script defer src="auth-page.js?v=6389fbc61360"></script>
 </head>
 <body class="auth-body">
-  <main class="pm-auth auth-shell" id="auth-main" data-screen="connecting" aria-busy="true">
+  <main class="pm-auth auth-shell" id="auth-main" data-phone-viewport data-screen="connecting" aria-busy="true">
     <section class="auth-hero" aria-label="핀맵 소개">
       <a class="auth-brand" href="index.html" aria-label="핀맵 시작 화면"><span class="auth-brand-logo" aria-hidden="true"></span></a>
       <div class="auth-hero-copy"><h1>저장한 취향이<br>일상이 되는 곳,<br>핀맵.</h1><p>흩어진 장소와 콘텐츠를<br>나만의 지도에 모아 보세요.</p></div>
@@ -27,5 +27,6 @@
       <div id="auth-content"><div class="auth-connection"><span class="auth-connection-symbol" aria-hidden="true"></span><header class="auth-heading" role="status"><h1>잠시 연결을<br>기다려 주세요</h1></header></div></div>
     </section>
   </main>
+  <script src="phone-viewport.js?v=534575da0c1a"></script>
 </body>
 </html>

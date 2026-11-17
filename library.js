@@ -163,6 +163,18 @@ document.addEventListener('click', e => {
   if (ok) {
     e.stopPropagation();
     const id = Number(ok.dataset.delconfirm), x = items.find(i => i.id === id);
+    if (PM_ENV.requiresAuth) {
+      if (!window.PinmapAccountContent) {toast('계정 연결을 확인하고 있어요. 다시 시도해 주세요.'); return;}
+      if (ok.disabled) return;
+      ok.disabled = true;
+      ok.textContent = '삭제 중…';
+      window.PinmapAccountContent.remove(x).catch(error => {
+        ok.disabled = false;
+        ok.textContent = '삭제';
+        toast(error.message || '계정에서 삭제하지 못했어요.');
+      });
+      return;
+    }
     items = items.filter(i => i.id !== id); afterChange();
     $('#sheet').close();
     if (detailId === id) detailId = null;
