@@ -852,8 +852,11 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .calw .calgo{display:inline-flex;align-items:center;gap:var(--space-xs);flex:none;min-height:44px;margin:0 calc(-1 * var(--space-xs)) 0 auto;padding:0 var(--space-xs);border:0;background:transparent;font:var(--type-label-md);color:var(--color-secondary);cursor:pointer}
 .calw .calgo svg{width:16px;height:16px}
 
-/* 2026-11-10 컬렉션 정렬 선택지는 오른쪽 (폴더 목록 · 폴더 안 모두) */
-.cf-folder-toolbar{justify-content:flex-end}
+/* 컬렉션 정렬은 폴더 목록과 폴더 안 목록의 왼쪽에 둔다. */
+.cf-folder-toolbar{justify-content:flex-start}
+.cfpage .cf-sec{width:100%}
+.cfpage .cf-sec .cf-tools{display:flex;flex:1 1 100%;width:100%;margin-left:0}
+.cfpage .cf-sec .cf-tools .libsort{order:-1;margin-right:auto}
 .cf-tools .libsort{font:var(--type-body-sm);color:var(--color-secondary)}
 
 /* 2026-11-10 상세: 미트볼 메뉴 · AI 요약 accent 칩 · 큰 가격 · 버튼 규격(Button large 56px, rounded-sm) */
@@ -1297,13 +1300,13 @@ html.pm-refresh-enabled,html.pm-refresh-enabled body{overscroll-behavior-y:conta
 .lm-location-person .lm-location-dot{background:#2789ef}
 .lm-heading-cone{background:conic-gradient(from -35deg at 50% 50%,#2789efad 0deg,#2789ef20 70deg,transparent 70deg);transition:transform .22s ease-out}
 
-/* Glass navigation: keep the map or page visible through the capsule. */
+/* Glass navigation: layered refraction, a brighter rim and no selected-pill shadow. */
 .bottomnav .pm-nav-main{border-color:#ffffffbd!important;box-shadow:0 12px 32px #26334c29,0 2px 8px #26334c18,inset 0 1px 0 #ffffffdd!important}
-.bottomnav .pm-nav-main::before,.bottomnav .pm-nav-main[data-refraction="true"]::before{background:linear-gradient(145deg,#ffffffb8 0%,#ffffff80 46%,#f1f5ff99 100%);-webkit-backdrop-filter:blur(20px) saturate(1.85);backdrop-filter:blur(20px) saturate(1.85)}
+.bottomnav .pm-nav-main::before,.bottomnav .pm-nav-main[data-refraction="true"]::before{background:radial-gradient(ellipse 48% 90% at var(--nav-light) 0%,#ffffffb8,transparent 85%),linear-gradient(150deg,#ffffffbd 0%,#ffffff70 49%,#e9f0ff9e 100%);-webkit-backdrop-filter:blur(26px) saturate(1.95);backdrop-filter:blur(26px) saturate(1.95)}
 .bottomnav .pm-nav-main::after{content:'';background:conic-gradient(from 115deg,#ffffffeb,#ffffff38 15%,#c5d3f58c 29%,#ffffffec 43%,#ffffff69 65%,#cbd7f371 80%,#ffffffeb)}
-.bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffffed,#eef3ffaf 68%,#ffffffc4)!important;border-color:#ffffffdf!important;box-shadow:0 3px 12px #26334c2e,inset 0 1px 1px #fff!important;transition:left .34s cubic-bezier(.2,.9,.25,1.2)}
+.bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffffed,#eef3ffaf 68%,#ffffffc4)!important;border-color:#ffffffdf!important;box-shadow:none!important;transition:left .34s cubic-bezier(.2,.9,.25,1.2)}
 [data-theme="dark"] .bottomnav .pm-nav-main::before,[data-theme="dark"] .bottomnav .pm-nav-main[data-refraction="true"]::before{background:linear-gradient(145deg,#434751b8,#272b36a8 60%,#3d4351a8)}
-[data-theme="dark"] .bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffff42,#ffffff13)!important;border-color:#ffffff52!important}
+[data-theme="dark"] .bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffff42,#ffffff13)!important;border-color:#ffffff52!important;box-shadow:none!important}
 
 /* Readable labels with an open photographic middle, not an even dark veil. */
 .mainpick .pick:not(.pick-placeholder) .pickimg::after{background:linear-gradient(180deg,#0009 0%,#0004 18%,transparent 38%,transparent 53%,#0001 67%,#000b 100%)!important}
@@ -1333,7 +1336,7 @@ html.pm-refresh-enabled,html.pm-refresh-enabled body{overscroll-behavior-y:conta
 .cfpage .cf-itemtext h3,.cfpage .cf-itemdesc,.cfpage .cf-itemmeta{color:#fff!important;text-shadow:0 1px 5px #0009}
 
 /* Home-only icon action; its accessible name stays in the button markup. */
-.home-add-fab{position:fixed;right:max(var(--gutter),calc((100vw - 480px)/2 + var(--gutter)));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;min-height:56px;padding:0;border:0;border-radius:var(--rounded-lg);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);box-shadow:var(--shadow-md);white-space:nowrap;cursor:pointer}
+.home-add-fab{position:fixed;right:max(var(--gutter),calc((100vw - 480px)/2 + var(--gutter)));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;min-height:56px;padding:0;border:0;border-radius:50%;background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);box-shadow:var(--shadow-md);white-space:nowrap;cursor:pointer}
 .home-add-fab .icon{width:22px;height:22px;flex:none}
 .home-add-fab:active{background:var(--color-primary-pressed)}
 .home-add-fab:focus-visible{outline:2px solid var(--color-primary);outline-offset:4px}
