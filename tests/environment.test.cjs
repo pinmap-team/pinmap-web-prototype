@@ -106,17 +106,15 @@ test('login-free development can display backend place results, while signed-in 
   assert.equal(boot('prototype').value('PM_ENV.cloudPlaceTest'),false);
 });
 
-test('disconnected map controls do not request location or fetch external places',async()=>{
+test('disconnected external place search does not fetch outside data',async()=>{
   const source=read('map-live.js');
   let messages=[],networkCalls=0;
   const context=vm.createContext({PM_ENV:{development:true},toast:text=>messages.push(text),fetch:()=>{networkCalls++;throw Error('Unexpected network');},navigator:{get geolocation(){throw Error('Unexpected geolocation');}}});
-  const locate=source.slice(source.indexOf('  function locate()'),source.indexOf('  function showResults()'));
   const search=source.slice(source.indexOf('  async function searchPlaces('),source.indexOf("  document.addEventListener('click',event =>"));
-  vm.runInContext(locate,context);vm.runInContext(search,context);
-  vm.runInContext('locate()',context);
+  vm.runInContext(search,context);
   await vm.runInContext("searchPlaces('서울숲')",context);
   assert.equal(networkCalls,0);
-  assert.equal(messages.length,2);
+  assert.equal(messages.length,1);
   assert(messages.every(text=>text.includes('연결되지')));
 });
 

@@ -9,7 +9,7 @@
     folderplus:'M2 5a2 2 0 0 1 2-2h5l3 3h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2Zm9 5v3H8v2h3v3h2v-3h3v-2h-3v-3Z'
   };
   const solid=name=>`<svg class="pm-solid" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="${silhouettes[name]}"></path></svg>`;
-  // One expanded active tab and three icon-only tabs share the same dock.
+  // Four equal tabs keep their labels below their icons.
   let lastNavIndex=null, navMotionFrame;
   function slideNav(index,from){
     cancelAnimationFrame(navMotionFrame);
@@ -18,7 +18,7 @@
       if(dock?.dataset.navTarget!==String(index))return;
       const marker=dock.querySelector('.pm-nav-indicator');
       if(!marker || matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-      const distance=(from-index)*(dock.clientWidth-8)/4.25;
+      const distance=(from-index)*(dock.clientWidth-8)/4;
       if(Math.abs(distance)<.5)return;
       marker.getAnimations().forEach(animation=>animation.cancel());
       marker.animate([{transform:`translateX(${distance}px)`},{transform:'translateX(0)'}],
@@ -33,12 +33,12 @@
     const previousMarker=previousDock?.querySelector('.pm-nav-indicator');
     // Read the live visual position, including any unfinished animation.
     const from=previousMarker
-      ? (previousMarker.getBoundingClientRect().left-previousDock.getBoundingClientRect().left-previousDock.clientLeft-4)/((previousDock.clientWidth-8)/4.25)
+      ? (previousMarker.getBoundingClientRect().left-previousDock.getBoundingClientRect().left-previousDock.clientLeft-4)/((previousDock.clientWidth-8)/4)
       : lastNavIndex??index;
     queueMicrotask(()=>{lastNavIndex=index;});
     if(Math.abs(from-index)>.01)slideNav(index,from);
     const entry=(p,label,glyph)=>{const active=activePage===p;return `<button class="navitem ${active?'active':''}" data-page="${p}" aria-label="${label}" ${active?'aria-current="page"':''}><span class="navicon">${active?solid(p==='library'?'bookmark':p):icon(glyph)}</span><span class="pm-nav-label" aria-hidden="true">${label}</span></button>`};
-    return `<span class="pm-nav-main" data-nav-target="${index}" style="--nav-index:${index}"><span class="pm-nav-indicator" aria-hidden="true"></span>${entry('home','홈','home')}${entry('map','지도','map')}${entry('library','저장함','bookmark')}${entry('my','마이','user')}</span>`;
+    return `<span class="pm-nav-main" data-nav-target="${index}" style="--nav-index:${index}"><span class="pm-nav-indicator" aria-hidden="true"></span>${entry('home','홈','home')}${entry('map','지도','map')}${entry('library','컬렉션','bookmark')}${entry('my','마이','user')}</span>`;
   };
   // Keep the loaded basemap in the same moving pane as the markers.
   const attachFallbackBasemap=map=>{

@@ -156,7 +156,7 @@ pages.home = function(){
   const accountError = PM_ENV.requiresAuth && !items.length && window.PinmapAccountLoadError;
   const emptyHome = PM_ENV.development && !items.length && !loadingAccount && !accountError;
   const main = loadingAccount
-    ? '<div class="empty small" role="status">저장한 콘텐츠를 불러오는 중이에요.</div>'
+    ? '<div class="pm-loading" role="status" aria-label="저장한 콘텐츠 불러오는 중"><span class="pm-spinner" aria-hidden="true"></span></div>'
     : accountError
     ? '<div class="empty small" role="status"><p class="muted">저장한 콘텐츠를 불러오지 못했어요.</p><button class="tonal" data-action="accountretry">다시 불러오기</button></div>'
     : picks.length || emptyHome

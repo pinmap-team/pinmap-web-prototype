@@ -7,13 +7,14 @@
   let mapLocationName=null, searchOpen=false;
   if(!paths.list)paths.list='M9 6h11 M9 12h11 M9 18h11 M4.5 6h.01 M4.5 12h.01 M4.5 18h.01';
   let listOpen=false, pinning=false, listGesture=null; // 2026-11-10 목록 시트 · 직접 핀 찍기
-  let automaticLocation=false;
+  let followNextFix=false;
   const markerEntries=new Map();
   let userPosition = null;
   const locationTracker=window.PinmapLocation.createTracker();
-  let userHeading = null, locationWatch = null, orientationActive = false;
+  let userHeading = null, locationWatch = null, orientationActive = false, orientationGranted = false;
   let locationBusy = false;
-  let center = PM_ENV.development ? [20,0] : [37.5445,127.043], zoom = PM_ENV.development ? 2 : 15, category = 'all';
+  // A neutral city view remains until permission yields a real GPS fix.
+  let center = [37.5665,126.978], zoom = 14, category = 'all';
   let searchResults = null, searchQuery = '';
   const savedCoords = PM_ENV.development ? [] : [
     {id:1, lat:37.5461, lng:127.0434, kind:'cafe', image:'img/cafe.jpg'},
@@ -66,7 +67,7 @@
     return `<section class="live-map" aria-label="지도에서 장소 탐색"><div id="live-map-canvas"></div>
       <header class="lm-header">
         <h1 class="lm-sr-only">지도에서 저장한 장소 찾기</h1>
-        <div class="lm-location-header"><button type="button" class="lm-location-title" data-action="mapaddresses">${icon('pin')}<span>${safe((n => n ? (settings.placeLabels?.[n] || n) : '현재 위치')(mapLocationName || (typeof myPlaces === 'function' ? myPlaces()[0] : null)))}</span>${icon('chevron')}</button><button type="button" class="lm-header-search" data-lm="toggle-search" aria-label="${searchOpen?'검색창 닫기':'지도에서 장소 검색'}" aria-expanded="${searchOpen}" aria-controls="lm-search-row"><span class="lm-search-open-icon">${icon('search')}</span><span class="lm-search-close-icon">${icon('close')}</span></button></div>
+        <div class="lm-location-header"><button type="button" class="lm-location-title" data-action="mapaddresses">${icon('pin')}<span>${safe((n => n ? (settings.placeLabels?.[n] || n) : '현재 위치')(mapLocationName))}</span>${icon('chevron')}</button><button type="button" class="lm-header-search" data-lm="toggle-search" aria-label="${searchOpen?'검색창 닫기':'지도에서 장소 검색'}" aria-expanded="${searchOpen}" aria-controls="lm-search-row"><span class="lm-search-open-icon">${icon('search')}</span><span class="lm-search-close-icon">${icon('close')}</span></button></div>
         <div class="lm-search-row cfpage${searchOpen?' is-open':''}" id="lm-search-row" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="어디로 가고 싶어요?" value="${safe(searchQuery)}" autocomplete="off" maxlength="80" ${searchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button></form></div>
         <section class="cf-recent lm-recent" id="lm-recent" aria-label="최근 지도 검색어" ${searchOpen&&!searchQuery.trim()?'':'hidden'}>${mapRecentContent()}</section>
         <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,cats.findIndex(([id])=>id===category))*100}%">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
@@ -316,14 +317,13 @@
     renderSheet();
     status(searchResults ? `${list.length}개 실제 장소 검색 결과` : `${list.length}개 저장 장소`);
   }
-  function mount() {
+  function mount(followLocation=true) {
     if (!window.L) { status('지도 라이브러리를 불러오지 못했어요.'); return; }
     liveMap = L.map('live-map-canvas',{zoomControl:false,zoomAnimation:false}).setView(center,zoom);
     window.attachPinmapBasemap(liveMap);
     mapProviderController=window.PinmapMapProviders?.attach(liveMap,updateProviderUi,settings.mapApp);
     pinLayer = L.layerGroup().addTo(liveMap); markers(); drawLocation();
-    if(!PM_ENV.development&&!mapLocationName){automaticLocation=true;locate();automaticLocation=false;}
-    if(!PM_ENV.development&&typeof window.DeviceOrientationEvent?.requestPermission!=='function')startOrientation();
+    locate({recenter:followLocation&&!mapLocationName&&!searchResults,automatic:true});
     liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); });
     requestAnimationFrame(() => liveMap?.invalidateSize());
   }
@@ -362,18 +362,18 @@
     const focusId = isMap ? window.pmMapFocus : null;
     if (focusId != null) { window.pmMapFocus = null; searchResults = null; searchQuery = ''; category = 'all';
       const f = savedPlaces().find(p => p.id === focusId); if (f) { center = [f.lat, f.lng]; zoom = 15; } }
-    if (isMap) { $('#app').innerHTML=content(); mount(); if(searchResults) showResults();
+    if (isMap) { $('#app').innerHTML=content(); mount(focusId==null); if(searchResults) showResults();
       if (focusId != null) { const focused=savedPlaces().filter(p=>p.id===focusId); if (focused.length>1 && liveMap) liveMap.fitBounds(focused.map(p=>[p.lat,p.lng]),{maxZoom:15,padding:[48,48]});
         const f=focused[0]; if (f && liveMap) expandPlace(f,false); } }
     else { originalRender(); if(detailId)mountDetailMap(); if(page==='course' && !detailId) window.mountCourseMap?.(); if(page==='courses' && !detailId) window.mountCourseThumbnails?.(); }
   };
   function drawLocation() {
     if(!liveMap)return;
-    if(PM_ENV.development&&!userPosition)return;
-    const demo=!userPosition;
-    const point=userPosition || [37.5425,127.042];
-    const heading=demo?35:userHeading;
-    const label=demo?'성수동 예시 위치, 방향 예시':heading==null?'현재 위치, 방향 정보 없음':`현재 위치, 북쪽 기준 ${Math.round(heading)}도`;
+    if(!userPosition)return;
+    const demo=false;
+    const point=userPosition;
+    const heading=userHeading;
+    const label=heading==null?'현재 위치, 방향 정보 없음':`현재 위치, 북쪽 기준 ${Math.round(heading)}도`;
     // Draw the position as a geographic vector point, never a viewport overlay.
     // The decorative heading/label is separate and cannot take focus or pan the map.
     if(locationMarker)locationMarker.setLatLng(point);
@@ -406,30 +406,31 @@
   }
   function stopLocation() {
     if(locationWatch!==null)navigator.geolocation?.clearWatch(locationWatch);
-    locationWatch=null;locationBusy=false;
+    locationWatch=null;locationBusy=false;followNextFix=false;userHeading=null;
     window.removeEventListener('deviceorientation',updateHeading);
     window.removeEventListener('deviceorientationabsolute',updateHeading);orientationActive=false;
   }
-  function locate() {
-    if(PM_ENV.development){toast('위치 데이터가 아직 연결되지 않았어요.');return;}
-    if(!liveMap||locationBusy)return;
-    const automatic=automaticLocation;
+  function locate({recenter=true,automatic=false}={}) {
+    if(!liveMap)return;
+    if(recenter)followNextFix=true;
     const request=window.DeviceOrientationEvent?.requestPermission;
     if(!automatic&&typeof request==='function'){
-      try{Promise.resolve(request.call(window.DeviceOrientationEvent,true)).then(result=>{if(result==='granted'&&page==='map'&&liveMap)startOrientation();}).catch(()=>{});}catch{}
-    }else if(typeof request!=='function')startOrientation();
-    if(userPosition){liveMap.setView(userPosition,16);drawLocation();if(locationWatch!==null)return;}
+      try{Promise.resolve(request.call(window.DeviceOrientationEvent,true)).then(result=>{if(result==='granted'){orientationGranted=true;if(page==='map'&&liveMap)startOrientation();}}).catch(()=>{});}catch{}
+    }else if(typeof request!=='function'||orientationGranted)startOrientation();
+    if(userPosition){if(recenter)liveMap.setView(userPosition,16);followNextFix=false;drawLocation();}
+    if(locationWatch!==null||locationBusy)return;
     if(!navigator.geolocation){toast('이 기기에서는 현재 위치를 확인할 수 없어요.');return;}
     locationBusy=true;
+    const activeMap=liveMap;
     locationWatch=navigator.geolocation.watchPosition(position=>{
-      if(!liveMap||page!=='map')return;
+      if(liveMap!==activeMap||page!=='map')return;
       locationBusy=false;
-      const fix=locationTracker.accept(position);if(!fix)return;
-      const first=!userPosition;userPosition=[fix.latitude,fix.longitude];
+      const fix=locationTracker.accept(position)||locationTracker.current;if(!fix)return;
+      userPosition=[fix.latitude,fix.longitude];
       // A GPS travel heading is not the direction the person is facing.
-      if(first&&!mapLocationName)liveMap.setView(userPosition,16);
+      if(followNextFix&&!mapLocationName){liveMap.setView(userPosition,16);followNextFix=false;}
       drawLocation();
-    },()=>{if(!liveMap||page!=='map')return;locationBusy=false;if(locationWatch!==null)navigator.geolocation.clearWatch(locationWatch);locationWatch=null;if(!automatic)toast('위치 권한을 확인해 주세요.');},{enableHighAccuracy:true,maximumAge:30000,timeout:12000});
+    },error=>{if(liveMap!==activeMap||page!=='map')return;locationBusy=false;if(locationWatch!==null)navigator.geolocation.clearWatch(locationWatch);locationWatch=null;toast(error.code===1?'현재 위치를 보려면 브라우저에서 위치 접근을 허용해 주세요.':'현재 위치를 확인하지 못했어요. 현위치 버튼으로 다시 시도해 주세요.');},{enableHighAccuracy:true,maximumAge:30000,timeout:12000});
   }
   function showResults() {
     const panel=$('#lm-search-results'); if(!panel) return;
