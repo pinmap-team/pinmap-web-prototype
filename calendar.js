@@ -98,7 +98,6 @@ pages.calendar = function(){
   }
   const [sy, sm, sd] = calSel.split('-').map(Number);
   const selList = dueByDay[calSel] || [];
-  const soon = calDueList().filter(x => calDue(x) >= calToday).slice(0, 5);
   // 배경: 가장 가까운 마감 콘텐츠 사진을 흐리게 깔고 그 위에 유리 카드
   const bgItem = calDueList().find(x => calDue(x) >= calToday && libPhoto(x)) || calDueList().find(x => libPhoto(x));
   const bg = ''; // 유리 배경은 취소 (흰 카드 유지)
@@ -120,8 +119,8 @@ pages.calendar = function(){
         <button type="button" class="cal-picker-today" data-caltoday>이번 달로 이동</button>
       </div>` : ''}
     </section>
-    ${selList.length ? `<div class="sectionhead calsec"><h2>${fmtDay(new Date(sy, sm - 1, sd))} 일정</h2></div><div class="callist">${selList.map(calRow).join('')}</div>` : ''}
-    ${soon.length ? `<div class="sectionhead calsec"><h2>다가오는 일정</h2></div><div class="callist">${soon.map(calRow).join('')}</div>` : ''}`;
+    <div class="sectionhead calsec"><h2>${fmtDay(new Date(sy, sm - 1, sd))} 일정</h2></div>
+    ${selList.length ? `<div class="callist">${selList.map(calRow).join('')}</div>` : '<p class="calnone">이 날짜에 등록된 일정이 없어요.</p>'}`;
 };
 
 function calClosePicker(){
