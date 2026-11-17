@@ -344,7 +344,7 @@ function saveSheet(){
       <p class="eshint">이 브라우저에 저장돼요. AI 분류는 프로토타입용 간단한 규칙이에요.</p>
       <p class="eserror" id="saveerror" role="alert"></p>
     </div>
-    <div class="esfoot">${PM_ENV.cloudPlaceTest || PM_ENV.requiresAuth ? '<p class="esprogress" id="saveprogress" role="status" aria-live="polite" hidden></p>' : ''}<button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
+    <div class="esfoot">${PM_ENV.cloudPlaceTest || PM_ENV.requiresAuth ? '<div class="esprogress" id="saveprogress" role="status" aria-live="polite" hidden></div>' : ''}<button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
   </form>`);
   $('#sheet').classList.add('editsheet');
   esCounts();

@@ -1319,6 +1319,18 @@ html.pm-refresh-enabled,html.pm-refresh-enabled body{overscroll-behavior-y:conta
 [data-theme="dark"] .bottomnav .pm-nav-main::before,[data-theme="dark"] .bottomnav .pm-nav-main[data-refraction="true"]::before{background:linear-gradient(145deg,#434751b8,#272b36a8 60%,#3d4351a8)}
 [data-theme="dark"] .bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffff42,#ffffff13)!important;border-color:#ffffff52!important;box-shadow:none!important}
 
+/* Keep the in-tab save job visible after its modal closes or the app page changes. */
+.pm-save-status{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom));z-index:1000;box-sizing:border-box;width:min(calc(100% - 48px),354px);padding:var(--space-lg);transform:translateX(-50%);border:1px solid var(--color-border);border-radius:var(--rounded-lg);background:var(--color-surface);color:var(--color-on-surface);box-shadow:var(--shadow-md);pointer-events:none}
+.pm-save-status[hidden],#sheet .esprogress[hidden]{display:none}
+#sheet .esprogress{display:block;color:var(--color-on-surface)}
+#sheet .esprogress::before{content:none}
+.pm-save-status-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);font:var(--type-label-md)}
+.pm-save-status-row span{font-variant-numeric:tabular-nums}
+.pm-save-meter{height:6px;margin-top:var(--space-sm);overflow:hidden;border-radius:999px;background:var(--color-neutral)}
+.pm-save-meter>span{display:block;height:100%;border-radius:inherit;background:var(--color-primary);transition:width .7s ease}
+.pm-save-status p,#sheet .esprogress p{margin:var(--space-sm) 0 0;font:var(--type-body-sm);color:var(--color-secondary)}
+@media(prefers-reduced-motion:reduce){.pm-save-meter>span{transition:none}}
+
 /* Readable labels with an open photographic middle, not an even dark veil. */
 .mainpick .pick:not(.pick-placeholder) .pickimg::after{background:linear-gradient(180deg,#0009 0%,#0004 18%,transparent 38%,transparent 53%,#0001 67%,#000b 100%)!important}
 

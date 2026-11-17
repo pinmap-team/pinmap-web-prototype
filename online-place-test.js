@@ -68,6 +68,7 @@ if (PM_ENV.cloudPlaceTest) {
     save();
     const form = document.getElementById('saveform');
     if (!form) return;
+    PinmapSaveProgress.render();
     const title = form.elements.namedItem('title');
     title.required = false;
     title.placeholder = '비워두면 Instagram 장소 게시물로 저장';
@@ -89,7 +90,11 @@ if (PM_ENV.cloudPlaceTest) {
     event.preventDefault();
     event.stopImmediatePropagation();
     const form = event.target;
-    if (form.dataset.busy) return;
+    if (PinmapSaveProgress.isRunning()) {
+      const error = form.querySelector('#saveerror');
+      if (error) error.textContent = '다른 링크를 저장 중이에요. 완료될 때까지 기다려 주세요.';
+      return;
+    }
     const error = document.getElementById('saveerror');
     if (error) error.textContent = '';
     const url = form.elements.namedItem('url').value.trim();
@@ -103,21 +108,7 @@ if (PM_ENV.cloudPlaceTest) {
       if (!code) return;
       sessionStorage.setItem('pinmap.place-test-code', code);
     }
-    form.dataset.busy = '1';
-    const submit = form.querySelector('button[type=submit]');
-    const submitLabel = submit?.textContent;
-    const progress = form.querySelector('#saveprogress');
-    const hint = form.querySelector('.eshint,.hint');
-    const hintText = hint?.textContent;
-    if (submit) {
-      submit.disabled = true;
-      submit.setAttribute('aria-busy', 'true');
-      submit.textContent = '저장 중…';
-    }
-    if (progress) {
-      progress.textContent = '저장 중 · 게시물에서 장소를 찾고 있어요. 몇 분 걸릴 수 있어요.';
-      progress.hidden = false;
-    }
+    if (!PinmapSaveProgress.start()) return;
     try {
       const response = await fetch('/api/place-extract', {
         method: 'POST',
@@ -137,20 +128,13 @@ if (PM_ENV.cloudPlaceTest) {
         memo:form.elements.namedItem('memo').value.trim(),
         collection:form.elements.namedItem('collection').value
       });
+      PinmapSaveProgress.finish();
     } catch (cause) {
-      if (error) error.textContent = cause.message;
-    } finally {
-      delete form.dataset.busy;
-      if (submit) {
-        submit.disabled = false;
-        submit.removeAttribute('aria-busy');
-        submit.textContent = submitLabel;
-      }
-      if (progress) {
-        progress.hidden = true;
-        progress.textContent = '';
-      }
-      if (hint) hint.textContent = hintText;
+      const message = cause.message || '장소 분석 서버가 응답하지 않았어요.';
+      PinmapSaveProgress.finish(message);
+      const currentError = document.querySelector('#saveform #saveerror');
+      if (currentError) currentError.textContent = message;
+      else toast(message);
     }
   }, true);
 }
