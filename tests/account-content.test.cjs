@@ -36,6 +36,7 @@ test('account history loads all pages using the backend page-size contract', asy
   let finished;
   const done = new Promise(resolve=>{finished=resolve;});
   const context = {
+    PinmapFolders:require('../account-folders.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
     PM_ENV:{requiresAuth:true}, PinmapAuth:{ready:async()=>sdk},
     document:{addEventListener:()=>{}}, window:{}, actions:{save:()=>{}},
     items:[], detailId:null, toast:()=>{},
@@ -67,6 +68,7 @@ test('bulk removal deletes on the server and keeps failed records visible', asyn
   const done = new Promise(resolve=>{finished=resolve;});
   const toasts = [], deletes = [];
   const context = {
+    PinmapFolders:require('../account-folders.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
     PM_ENV:{requiresAuth:true},PinmapAuth:{ready:async()=>sdk},
     document:{addEventListener:()=>{},getElementById:()=>({close:()=>{}}),querySelector:()=>null},
     window:{},actions:{save:()=>{}},items:[],detailId:null,cfSel:null,

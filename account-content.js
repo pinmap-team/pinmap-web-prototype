@@ -55,6 +55,33 @@ if (PM_ENV.requiresAuth) (() => {
   window.PinmapAccountLoaded = false;
   window.PinmapAccountLoadError = false;
   const localIds = new Map();
+  let folderState=PinmapFolders.normalize(null),folderSaving=false;
+  function applyFolders(value){
+    for(const name of cfCustom()){
+      const index=COLLECTIONS.findIndex(entry=>entry[0]===name);
+      if(index>=0)COLLECTIONS.splice(index,1);
+    }
+    folderState=PinmapFolders.normalize(value);
+    settings.customFolders=[...folderState.names];cfSyncCollections();
+    for(const item of items)item.collection=folderState.assignments[String(item.backendId)]||'';
+  }
+  // Only non-sensitive folder preferences use user metadata. Never use this
+  // client-editable field for authorization or copy other users' organization.
+  async function saveFolder(operation){
+    if(folderSaving)throw Error('폴더를 저장 중이에요. 잠시 기다려 주세요.');
+    folderSaving=true;
+    const expected=currentUserId;
+    try{
+      const {data,error}=await client.auth.getUser();
+      if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)throw Error('로그인 계정을 다시 확인해 주세요.');
+      const value=PinmapFolders.change(data.user.user_metadata?.pinmap_collections,operation,items);
+      const result=await client.auth.updateUser({data:{pinmap_collections:value}});
+      if(result.error)throw result.error;
+      if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
+      loadVersion++; // Do not let an older list response undo new folder metadata.
+      applyFolders(value);
+    }finally{folderSaving=false;}
+  }
   const localId = record => {
     const key = String(record.id || record.source_url || '');
     if (!localIds.has(key)) localIds.set(key, nextLocalId++);
@@ -92,6 +119,7 @@ if (PM_ENV.requiresAuth) (() => {
     window.PinmapAccountLoaded = false;
     window.PinmapAccountLoadError = false;
     items = [];
+    applyFolders(null);
     detailId = null;
     render();
   }
@@ -99,14 +127,15 @@ if (PM_ENV.requiresAuth) (() => {
     if (!client) return;
     const version = ++loadVersion;
     window.PinmapAccountLoadError = false;
-    const {data, error} = await client.auth.getUser();
-    if (error || !data?.user?.id) { clearAccount(); return; }
-    const userId = data.user.id;
-    if (currentUserId && currentUserId !== userId) {
-      items = []; detailId = null; render();
-    }
-    currentUserId = userId;
+    let userId=currentUserId;
     try {
+      const {data, error} = await client.auth.getUser();
+      if(version!==loadVersion)return;
+      if(error)throw error;
+      if(!data?.user?.id){clearAccount();return;}
+      userId=data.user.id;
+      if(currentUserId&&currentUserId!==userId){items=[];applyFolders(null);detailId=null;}
+      currentUserId=userId;
       const records = [];
       let offset = 0;
       for (let pageNumber = 0; pageNumber < 100; pageNumber++) {
@@ -121,6 +150,7 @@ if (PM_ENV.requiresAuth) (() => {
       }
       if (version !== loadVersion || currentUserId !== userId) return;
       items = records.map(record => pinmapAccountItem(record, localId(record)));
+      applyFolders(data.user.user_metadata?.pinmap_collections);
       window.PinmapAccountLoaded = true;
       window.PinmapAccountLoadError = false;
       render();
@@ -176,6 +206,7 @@ if (PM_ENV.requiresAuth) (() => {
       if (!result.item || typeof result.item !== 'object') throw Error('저장 결과를 확인하지 못했어요.');
       if (currentUserId !== userId) return;
       const item = pinmapAccountItem(result.item, localId(result.item));
+      item.collection=folderState.assignments[String(item.backendId)]||'';
       items = [item, ...items.filter(x => x.url !== item.url)];
       document.getElementById('sheet')?.close();
       closeOnboarding();
@@ -220,9 +251,35 @@ if (PM_ENV.requiresAuth) (() => {
       : `콘텐츠 ${removed.length}개를 삭제했어요.`);
   }, refresh:loadAccount};
   const unsupportedContent = () => toast('계정 콘텐츠의 수정·즐겨찾기는 준비 중이에요. 저장된 정보는 그대로예요.');
-  const unsupportedFolder = () => toast('계정의 모음 편집은 준비 중이에요. 저장된 정보는 그대로예요.');
   for (const name of ['edit','fav']) actions[name] = unsupportedContent;
-  for (const name of ['newfolder','cfpick','cfdelfolder','cfdelfolderok']) actions[name] = unsupportedFolder;
+  actions.cfdelfolderok=async()=>{
+    const name=cfFolderToDelete;if(!name)return;
+    const button=document.querySelector('[data-action="cfdelfolderok"]');
+    try{await PinmapButton.run(button,async()=>{
+      await saveFolder({type:'remove',name});cfFolderToDelete=null;
+      document.getElementById('sheet').close();collection=null;filter='전체';query='';render();
+      toast('폴더를 삭제했어요. 콘텐츠는 그대로 남아 있어요.');
+    });}catch(error){toast(error.message||'폴더를 삭제하지 못했어요.');}
+  };
+  document.addEventListener('submit',async event=>{
+    const form=event.target;if(!['cfnewform','cfpickform'].includes(form.id))return;
+    event.preventDefault();event.stopImmediatePropagation();
+    const creating=form.id==='cfnewform',data=new FormData(form);
+    const name=creating?String(data.get('name')||'').trim().replace(/\s+/g,' '):collection;
+    if(creating&&(!name||[...CF_ALL.map(x=>x.id),'전체',...cfCustom()].includes(name))){
+      document.getElementById('cferr').textContent=name?'같은 이름의 폴더가 이미 있어요.':'폴더 이름을 입력해 주세요.';return;
+    }
+    const button=form.querySelector('[type="submit"]');
+    try{await PinmapButton.run(button,async()=>{
+      await saveFolder({type:creating?'create':'assign',name,ids:data.getAll('pick').map(Number)});
+      document.getElementById('sheet').close();page='library';detailId=null;filter='전체';query='';collection=name;render();window.scrollTo(0,0);
+      toast(creating?'폴더를 만들었어요. 콘텐츠를 담아 보세요.':'폴더에 담은 콘텐츠를 저장했어요.');
+    },'폴더 저장 중');}catch(error){
+      const errorNode=form.querySelector('#cferr');
+      if(errorNode)errorNode.textContent=error.message||'폴더를 저장하지 못했어요.';
+      else toast(error.message||'폴더를 저장하지 못했어요.');
+    }
+  },true);
   actions.cfdelconfirm = () => {
     const selected = items.filter(item => cfSel?.has(item.id));
     if (!selected.length) return;
@@ -235,9 +292,9 @@ if (PM_ENV.requiresAuth) (() => {
     });
   };
   document.addEventListener('submit', event => {
-    if (!['cfnewform','cfpickform','editform','lm-pin-form'].includes(event.target.id)) return;
+    if (!['editform','lm-pin-form'].includes(event.target.id)) return;
     event.preventDefault(); event.stopImmediatePropagation();
-    (['cfnewform','cfpickform'].includes(event.target.id) ? unsupportedFolder : unsupportedContent)();
+    unsupportedContent();
   }, true);
   PinmapAuth.ready().then(sdk => {
     client = sdk;

@@ -4,7 +4,7 @@ if (PM_ENV.requiresAuth) (() => {
   let client, user, resolving = false;
   const app = document.getElementById('app');
   const login = () => PinmapAuth.login();
-  function gate(message = '로그인하고 나만의 핀맵을 시작해 보세요.') {
+  function gate(message = '로그인하고 나만의 핀맵을 시작해 보세요.',loading=false) {
     document.documentElement.classList.add('auth-pending');
     app.inert = true;
     closeOnboarding();
@@ -16,6 +16,7 @@ if (PM_ENV.requiresAuth) (() => {
       node.className = 'pm-auth auth-gate'; node.setAttribute('aria-label','핀맵 로그인');
       document.body.append(node);
     }
+    if(loading){node.innerHTML='<div class="pm-loading" role="status" aria-label="로그인 상태 확인 중"><span class="pm-spinner" aria-hidden="true"></span></div>';return;}
     node.innerHTML = `<img src="img/pinmap-symbol-splash.svg" alt="" width="48" height="48"><h1>나의 취향을 한곳에</h1><p>${esc(message)}</p><button class="filled auth-submit" id="auth-enter">로그인 · 회원가입</button><a class="auth-home" href="index.html" target="_top">시작 화면으로 돌아가기</a>`;
     node.querySelector('button').onclick = login;
   }
@@ -26,8 +27,6 @@ if (PM_ENV.requiresAuth) (() => {
   }
   // Expose identity in the account page without persisting it into shared settings.
   const accountPage = pages.account;
-  const myPageWithProfile = pages.my;
-  pages.my = () => `<p class="auth-current-user" aria-label="로그인 계정">${esc(user?.email || '연결된 계정으로 로그인됨')}</p>` + myPageWithProfile();
   pages.account = () => accountPage().replace('<section class="account-identity"', `<section class="auth-account-status" aria-label="로그인 계정"><b>로그인 계정</b><p>${esc(user?.email || '연결된 계정으로 로그인됨')}</p><small>저장 콘텐츠는 이 계정에 연결돼요.</small></section><section class="account-identity"`);
   const logout = async () => {
     if (!client) {login(); return;}
@@ -55,7 +54,7 @@ if (PM_ENV.requiresAuth) (() => {
     } catch {gate('로그인 상태를 확인하지 못했어요. 다시 연결해 주세요.');}
     finally {resolving = false;}
   }
-  gate('로그인 상태를 확인하고 있어요.');
+  gate('',true);
   PinmapAuth.ready().then(async sdk => {
     client = sdk;
     client.auth.onAuthStateChange((event) => {
