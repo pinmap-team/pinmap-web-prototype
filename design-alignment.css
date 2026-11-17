@@ -1278,7 +1278,7 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 /* Keep the card edges at the same 40px spacing while leaving room for the center shadow. */
 .mainwrap:not(:has(.home-first-save)) .mainpick{height:calc(var(--ph) + 56px)!important;margin-top:calc(-1 * var(--space-sm));margin-bottom:calc(-1 * var(--space-2xl))}
 .mainwrap:not(:has(.home-first-save)) .mainpick .pick{top:16px}
-.mainpick .pick:not(.pick-placeholder)[aria-hidden="false"]{box-shadow:var(--shadow-sm)!important}
+.mainpick .pick:not(.pick-placeholder)[aria-hidden="false"]{box-shadow:var(--shadow-md)!important}
 .main:has(.homebrand)>.mainwrap:not(:has(.home-first-save)){margin-top:calc(var(--space-xl) - var(--space-xs))!important}
 .main>.topbar .bellbtn .icon{width:28px;height:28px}
 
