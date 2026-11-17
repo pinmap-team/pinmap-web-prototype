@@ -165,7 +165,7 @@ pages.home = function(){
     : picks.length || emptyHome
     ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'role="group" aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${emptyHome ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
     : `<div class="empty small"><p class="muted">선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.</p></div>`;
-  const brand = '<div class="homebrand"><img src="img/pinmap-logo-splash.svg" alt="Pinmap 로고"></div>';
+  const brand = '<div class="homebrand" aria-label="Pinmap"><img class="homebrand-symbol" src="img/pinmap-symbol-splash.svg" alt=""><span class="homebrand-name" aria-hidden="true">Pinmap</span></div>';
   const addButton = `<button type="button" class="home-add-fab" data-action="save" aria-label="콘텐츠 추가하기">${icon('plus')}</button>`;
   return stripBar() + brand + main + (loadingAccount || accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + chips + (emptyHome || loadingAccount || accountError ? '' : subWidgets()) + (loadingAccount ? '' : addButton);
 };
@@ -181,46 +181,11 @@ actions.sharehelp = () => modal('공유로 저장하기', `<div class="home-shar
 /* 캘린더 위젯의 날짜를 누르면 그 날짜가 선택된 캘린더로 */
 document.addEventListener('click', e => { const d = e.target.closest('[data-calday]'); if (d && page === 'home') { calSel = d.dataset.calday; const date = calSelDate(); calMonth = new Date(date.getFullYear(),date.getMonth(),1); const y = window.scrollY; render(); window.scrollTo(0,y); } });
 
-/* 홈의 캘린더 위젯 · 전체 보기 · 검색으로 들어간 화면: 왼쪽 위 ← 버튼으로 홈으로 */
+/* 홈의 캘린더 위젯 · 전체 보기로 들어간 화면: 왼쪽 위 ← 버튼으로 홈으로 */
 let backHome = false;
 actions.gocal = () => { backHome = true; go('calendar'); };
 actions.golib = () => { backHome = true; go('library'); };
 actions.backhome = () => { backHome = false; go('home'); };
-/* 2026-11-04 홈 검색: 컬렉션처럼 오른쪽 위 돋보기를 누르면 같은 줄에 검색창이 펼쳐져요 (페이지 이동 없음).
-   입력하면 저장한 콘텐츠를 바로 아래에 보여주고, 누르면 상세로 가요. X·Esc로 닫아요. */
-var homeSearchOpen = false, homeQuery = '';
-function homeSearchHits(){
-  const q = homeQuery.trim().toLowerCase(); if (!q) return [];
-  return items.filter(x => [x.title, x.desc, x.category, x.type, x.address, x.memo].some(v => String(v || '').toLowerCase().includes(q))).slice(0, 6);
-}
-function homeSearchList(){
-  if (!homeQuery.trim()) return '';
-  const hits = homeSearchHits();
-  return hits.length ? hits.map(x => `<button type="button" class="hs-row" data-detail="${x.id}"><b>${esc(x.title)}</b><small>${esc([...new Set([shortType(x.type), x.category].filter(Boolean))].join(', '))}</small></button>`).join('')
-    : `<p class="hs-empty">‘${esc(homeQuery)}’와 맞는 저장 콘텐츠가 없어요.</p>`;
-}
-function homeSearchBar(){
-  return `<div class="home-search${homeSearchOpen ? ' is-open' : ''}" id="home-search" aria-hidden="${!homeSearchOpen}" ${homeSearchOpen ? '' : 'inert'}>
-    <label class="libsearch"><input id="homesearchinput" type="search" enterkeyhint="search" aria-label="저장한 콘텐츠 찾기" placeholder="저장한 콘텐츠 찾기" value="${esc(homeQuery)}" ${homeSearchOpen ? '' : 'tabindex="-1"'}></label>
-    <div class="hs-results" role="list" aria-live="polite">${homeSearchList()}</div>
-  </div>`;
-}
-actions.homesearch = () => {
-  homeSearchOpen = !homeSearchOpen; if (!homeSearchOpen) homeQuery = '';
-  const box = $('#home-search'), btn = $('.topbar .searchbtn');
-  if (!box || !btn) { render(); return; }
-  box.classList.toggle('is-open', homeSearchOpen); box.setAttribute('aria-hidden', String(!homeSearchOpen)); box.inert = !homeSearchOpen;
-  const input = $('#homesearchinput'); input.tabIndex = homeSearchOpen ? 0 : -1;
-  if (!homeSearchOpen) { input.value = ''; box.querySelector('.hs-results').innerHTML = ''; }
-  btn.setAttribute('aria-expanded', String(homeSearchOpen)); btn.setAttribute('aria-label', homeSearchOpen ? '검색창 닫기' : '저장한 콘텐츠 검색');
-  homeSearchOpen ? input.focus({preventScroll:true}) : btn.focus();
-};
-// 결과를 누르면 검색창은 닫고 상세로 가요 (돌아왔을 때 닫힌 상태)
-document.addEventListener('click', e => { if (e.target.closest('#home-search .hs-row')) { homeSearchOpen = false; homeQuery = ''; } }, true);
-const goBeforeHomeSearch = go;
-go = function(p){ if (p !== 'home') { homeSearchOpen = false; homeQuery = ''; } return goBeforeHomeSearch.apply(this, arguments); };
-document.addEventListener('input', e => { if (e.target.id !== 'homesearchinput') return; homeQuery = e.target.value; const r = $('#home-search .hs-results'); if (r) r.innerHTML = homeSearchList(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && homeSearchOpen && e.target.closest('#home-search')) { e.preventDefault(); actions.homesearch(); } else if (e.key === 'Enter' && e.target.id === 'homesearchinput') { e.preventDefault(); e.target.blur(); } });
 document.addEventListener('click', e => { if (e.target.closest('.bottomnav [data-page], .rail [data-page]')) backHome = false; }, true);
 const backBtn = () => backHome ? `<button class="subback pageback" data-action="backhome" aria-label="홈으로 돌아가기">${icon('back')}</button>` : '';
 for (const p of ['calendar', 'library']) { const base = pages[p]; pages[p] = function(){ return backBtn() + base(); }; }

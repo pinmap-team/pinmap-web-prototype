@@ -133,16 +133,6 @@
 /* 지난 날짜: 가운데 줄 없이 (색만 연하게 유지) */
 .calcell.past,.calcell.past span{text-decoration:none!important}
 
-/* v2 (10/19): 마감 콘텐츠 블럭 — 크기는 그대로, 컬렉션 콘텐츠 카드처럼 사진 위 그라데이션 + 흰 글씨 */
-.calrow{position:relative;isolation:isolate;overflow:hidden;min-height:82px;background:var(--color-primary);color:var(--color-neutral);box-shadow:var(--shadow-sm)}
-.calthumb{position:absolute;inset:0;z-index:-1;width:auto;height:auto;border-radius:0;background:var(--color-primary-pressed)}
-.calthumb::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,rgba(0,0,0,.5) 50%,rgba(0,0,0,.74) 100%)}
-.caltext{padding-left:var(--space-sm)}
-.caltext b{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.25)}
-.caltext small{color:rgba(255,255,255,.82)}
-.calbadge{background:rgba(255,255,255,.22);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.calbadge.soon{background:var(--color-error);color:#fff}
-
 /* Compact month picker: floats above the calendar without replacing its dates. */
 .calbox:has(.cal-month-picker){overflow:visible;z-index:6}
 .cal-month-picker{position:absolute;top:72px;left:var(--space-lg);z-index:10;width:min(272px,calc(100% - 32px));padding:0 var(--space-lg);border:1px solid var(--color-disabled);border-radius:var(--rounded-lg);background:var(--color-surface);color:var(--color-on-surface);box-shadow:var(--shadow-md);animation:cal-picker-in .15s ease-out}
