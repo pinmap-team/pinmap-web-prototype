@@ -267,6 +267,13 @@ body.notipanel-open .bottomnav{display:none!important}
 .homebrand{display:flex;align-items:center;gap:var(--space-sm);min-height:40px;margin:0 0 var(--space-lg);padding-right:100px;color:var(--t-ink,var(--color-on-surface))}
 .homebrand img{display:block;width:130px;height:40px;object-fit:contain;object-position:left center}
 
+/* The content action belongs to Home and stays clear of the bottom navigation. */
+.home-add-fab{position:fixed;right:max(var(--gutter),calc((100vw - 480px)/2 + var(--gutter)));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;display:inline-flex;align-items:center;justify-content:center;gap:var(--space-sm);min-height:56px;padding:0 var(--space-lg);border:0;border-radius:var(--rounded-lg);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);box-shadow:var(--shadow-md);white-space:nowrap;cursor:pointer}
+.home-add-fab .icon{width:22px;height:22px;flex:none}
+.home-add-fab:active{background:var(--color-primary-pressed)}
+.home-add-fab:focus-visible{outline:2px solid var(--color-primary);outline-offset:4px}
+@media(max-width:360px){.home-add-fab{right:var(--space-lg);padding:0 var(--space-md)}}
+
 /* Empty content uses the same banner dimensions, stacking and text positions. */
 .mainpick[data-placeholder="true"]{cursor:default}
 .pick-placeholder .pickimg{background:var(--t-line,var(--color-disabled))}
@@ -287,10 +294,6 @@ body.notipanel-open .bottomnav{display:none!important}
 .home-first-save{position:absolute;inset:34% calc(-1 * var(--gutter,20px)) 0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:var(--space-xl) var(--space-lg) var(--space-2xl);background:linear-gradient(180deg,transparent 0%,var(--color-neutral) 80%);text-align:center}
 .home-first-save h2{margin:0;color:var(--color-on-surface);font:var(--type-headline-md);word-break:keep-all}
 .home-first-save p{margin:var(--space-sm) 0 var(--space-xl);color:var(--color-secondary);font:var(--type-label-md);font-weight:var(--weight-regular);word-break:keep-all}
-.home-first-save button{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-sm);min-height:48px;padding:var(--space-md) var(--space-xl);border:0;border-radius:var(--rounded-sm);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);cursor:pointer;box-shadow:var(--shadow-sm)}
-.home-first-save button .icon{width:20px;height:20px;flex:none}
-.home-first-save button:active{background:var(--color-primary-pressed)}
-.home-first-save button:focus-visible{outline:2px solid var(--color-primary);outline-offset:4px}
 @media(max-width:360px){.home-first-save{padding-bottom:var(--space-xl)}.home-first-save h2{font:var(--type-body-md);font-weight:var(--weight-bold)}.home-first-save p{margin-bottom:var(--space-lg)}}
 
 /* Keep empty-state decoration quiet so the first-save action stays dominant. */
@@ -302,8 +305,9 @@ body.notipanel-open .bottomnav{display:none!important}
 
 /* The empty calendar is decorative, like the empty recommendation cards. */
 .home-empty-calendar{opacity:.38;pointer-events:none}
-.home-first-save .home-share-help{min-height:44px;margin-top:var(--space-sm);padding:var(--space-sm) var(--space-md);background:transparent;color:var(--color-secondary);box-shadow:none;font:var(--type-body-sm);text-decoration:underline;text-underline-offset:3px}
+.home-first-save .home-share-help{min-height:44px;margin-top:var(--space-sm);padding:var(--space-sm) var(--space-md);border:0;border-radius:var(--rounded-sm);background:transparent;color:var(--color-secondary);font:var(--type-body-sm);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .home-first-save .home-share-help:active{background:var(--color-disabled)}
+.home-first-save .home-share-help:focus-visible{outline:2px solid var(--color-primary);outline-offset:4px}
 .home-share-guide{color:var(--color-on-surface);font:var(--type-body-md)}
 .home-share-guide>p{margin:0 0 var(--space-xl)}
 .home-share-guide ol{display:grid;gap:var(--space-xl);margin:0 0 var(--space-xl);padding-left:var(--space-xl)}

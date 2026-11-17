@@ -104,7 +104,6 @@ pages.library = function(){
       <label class="libsort"><span class="sr">정렬</span><select data-libsort>${Object.entries(LIB_SORTS).map(([k,v]) => `<option value="${k}" ${libSort===k?'selected':''}>${v}</option>`).join('')}</select>${icon('chevron')}</label>
     </div>
     <div id="results" class="libgrid ${galleryMode()?'gallerymode':''}">${resultCards()}</div>
-    <button class="libfab" data-action="save" aria-label="새로 저장">${icon('plus')}<span>새로 저장</span></button>
   </div>`;
 };
 
