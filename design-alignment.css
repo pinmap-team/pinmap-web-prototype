@@ -625,17 +625,13 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 .homecategories .prefchip::after{content:'';position:absolute;inset:-6px 0}
 .homecategories,.homecategories.two-rows,.chiprows.homecategories{row-gap:var(--space-md)}
 
-/* 2026-11-04 마이 프로필 카드: '>' 없이, 사진을 누르면 사진 변경·이름을 누르면 그 자리에서 이름 수정 */
+/* 마이 프로필 카드: 사진은 변경하고 이름은 읽기 전용으로 표시 */
 .myprofile{cursor:default}
 .myprofile-photo{position:relative;flex:none;display:block;padding:0;border-radius:50%;background:transparent}
 .myprofile-photo .pavatar{width:56px;height:56px}
 .myprofile .account-photo-edit{width:24px;height:24px;right:calc(-1 * var(--space-xs));bottom:calc(-1 * var(--space-xs))}
 .myprofile-name{display:flex;align-items:center;gap:var(--space-sm);min-height:44px;padding:0;background:transparent;color:var(--color-on-surface);text-align:left}
 .myprofile-name b{font:var(--type-headline-md);overflow-wrap:anywhere}
-.myprofile-name .icon{flex:none;width:16px;height:16px;color:var(--color-secondary)}
-.myprofile-form{flex:1;display:flex;align-items:center;gap:var(--space-sm);min-width:0}
-.myprofile-form input{flex:1;min-width:0;min-height:44px;padding:0 var(--space-md);border:1px solid var(--color-border);border-radius:var(--rounded-md);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-body-md)}
-.myprofile-form button{flex:none;min-height:44px;padding:0 var(--space-md);border-radius:var(--rounded-sm);font:var(--type-label-md)}
 /* 마이 맨 아래 로그아웃 | 회원 탈퇴 (프로필 및 계정 화면과 같은 모양) */
 .my-exit{display:flex;align-items:center;justify-content:center;gap:var(--space-xs);margin:var(--space-xl) 0 0;color:var(--color-secondary);font:var(--type-body-sm)}
 .my-exit button{min-height:44px;padding:0 var(--space-md);background:transparent;color:var(--color-secondary);font:var(--type-body-sm)}
@@ -648,9 +644,6 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 #onboarding .step3 .ob-option.on,[data-theme="dark"] #onboarding .step3 .ob-option.on{background:var(--color-accent)!important}
 /* 2026-11-04 관심 키워드 설명 한 단계 작게: body-md → label-md 크기(굵기는 regular로 설명답게) */
 .mypage.kwpage .kwdesc{font:var(--type-label-md);font-weight:var(--weight-regular)}
-/* 2026-11-04 프로필 이름 입력: 테두리 + 포커스 선이 두 겹으로 보이지 않게 포커스 때는 테두리 하나만 primary로 */
-.myprofile-form input,.myprofile-form input:focus,.myprofile-form input:focus-visible{outline:none!important;box-shadow:none!important}
-.myprofile-form input:focus,.myprofile-form input:focus-visible{border-color:var(--color-primary)!important}
 /* 2026-11-04 튜토리얼 단계 제목: body-md 크기 그대로, 굵기 한 단계 위(regular → semibold) */
 .cm-tip b{font-weight:var(--weight-semibold)}
 
@@ -1005,14 +998,14 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 
 /* Text fields keep their resting border when focused; the caret marks the active position. Button and link keyboard focus remains visible. */
 :is(input,textarea,select):not([type="checkbox"]):not([type="radio"]):not([type="range"]):is(:focus,:focus-visible){outline:none!important;box-shadow:none!important}
-:is(.search,.libsearch,.cf-picksearch,.psearch,.cm-search,.lm-search,.address-search,.auth-input-shell,.esinput,.esselect,.field,.myprofile-form,.address-edit-form .field):focus-within{outline:none!important}
+:is(.search,.libsearch,.cf-picksearch,.psearch,.cm-search,.lm-search,.address-search,.auth-input-shell,.esinput,.esselect,.field,.address-edit-form .field):focus-within{outline:none!important}
 .cfpage .libsearch:focus-within,.cf-picksearch:focus-within,.libsearch:focus-within,:is(.esselect,.esinput):focus-within{box-shadow:none!important}
 .libsearch:focus-within,:is(.esselect,.esinput):focus-within{border-color:var(--pm-line)!important}
 .cfpage .libsearch:focus-within{border-color:color-mix(in srgb,var(--color-surface) 88%,transparent)!important}
 .live-map .lm-header .lm-search-row .libsearch:focus-within,.main>.topbar .home-search .libsearch:focus-within{box-shadow:none!important}
 .live-map .lm-header .lm-search-row .libsearch:focus-within{border-color:var(--t-line,var(--color-disabled))!important}
 .main>.topbar .home-search .libsearch:focus-within{border-color:var(--color-disabled)!important}
-:is(.myprofile-form input,.address-edit-form :is(input,textarea)):is(:focus,:focus-visible){border-color:var(--color-border)!important}
+.address-edit-form :is(input,textarea):is(:focus,:focus-visible){border-color:var(--color-border)!important}
 .ob-chip .ob-num,[data-theme="dark"] .ob-chip .ob-num{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--color-neutral);color:var(--color-primary);font:var(--type-body-sm);font-weight:var(--weight-bold)}
 
 /* 2026-11-10 지도: '지도 종류' 버튼은 지도에서 빼고(마이 '지도 디자인'에서만 선택), 목록은 왼쪽 가장자리 책갈피 → 왼쪽에서 열리는 목록 */
