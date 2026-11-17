@@ -324,8 +324,8 @@ function saveSheet(){
     <div class="esbody">
       <button type="button" class="esshare" data-action="snsdemo"><span class="esshareicon" aria-hidden="true">${icon('share')}</span><div><b>SNS에서 공유로 저장하기</b><small>게시물에서 공유 → 핀맵, 저장 과정을 체험해요</small></div>${icon('arrow')}</button>
       <div class="esdivider"><span>또는 링크로 저장</span></div>
-      <label class="esfield">${label('link','링크', `<button type="button" class="essample" data-action="sample">예시 링크로 채우기</button>`)}
-        <span class="esinput withicon">${icon('link')}<input type="url" name="url" id="es-url" placeholder="https://" required inputmode="url"></span>
+      <label class="esfield">${label('link',PM_ENV.development ? 'Instagram 게시물 주소 (URL)' : '링크', `<button type="button" class="essample" data-action="sample">예시 링크로 채우기</button>`)}
+        <span class="esinput withicon">${icon('link')}<input type="url" name="url" id="es-url" placeholder="${PM_ENV.development ? 'https://www.instagram.com/p/…/' : 'https://'}" required inputmode="url"></span>
       </label>
       <label class="esfield">${label('text','제목', '<small class="esopt">선택</small>')}
         <span class="esinput"><input name="title" id="es-title" placeholder="${PM_ENV.cloudPlaceTest ? '비워두면 Instagram 장소 게시물로 저장' : '비워두면 링크 이름으로 저장'}" maxlength="50"><small class="escount" data-for="es-title"></small></span>

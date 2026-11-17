@@ -49,6 +49,10 @@ fs.mkdirSync(output,{recursive:true});
     });
     const count=await frame.locator('body').evaluate(()=>items.length);assert.equal(count,1);
     assert.equal(await frame.locator('.home-first-save').count(),0);
+    assert.equal(await frame.locator('.home-add-fab').count(),1);
+    await frame.locator('.home-add-fab').click();
+    await frame.locator('#es-url').waitFor({timeout:5000});
+    await frame.locator('.esclose').click();
     assert.match(await frame.locator('.pick').first().innerText(),/서울 전시 모음/);
     for(const [width,height] of [[320,640],[402,874],[1440,700],[1440,960]]){
       await page.setViewportSize({width,height});
@@ -75,6 +79,7 @@ fs.mkdirSync(output,{recursive:true});
     }
     await page.setViewportSize({width:402,height:874});
     await frame.locator('body').evaluate(()=>openDetail(items[0].id));
+    assert.equal(await frame.locator('.home-add-fab').count(),0);
     assert.match(await frame.locator('body').innerText(),/게시물에서 찾은 행사 일정/);
     assert.match(await frame.locator('body').innerText(),/2026.12.11 – 2027.04.11/);
     assert.equal(await frame.locator('.dtlocation').count(),0);
