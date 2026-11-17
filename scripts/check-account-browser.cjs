@@ -43,8 +43,37 @@ fs.mkdirSync(output,{recursive:true});
     await page.goto((process.env.PINMAP_BROWSER_ORIGIN||'http://127.0.0.1:8093')+'/index.html?mode=development&auth=required');
     const frame=page.frameLocator('.phone-frame');
     await frame.locator('.auth-gate').waitFor({state:'hidden',timeout:15000});
-    await frame.locator('.pick').first().waitFor({timeout:15000});
+    await frame.locator('.pick').first().waitFor({timeout:15000}).catch(async error=>{
+      console.error('home state:',(await frame.locator('body').innerText()).slice(0,1000));
+      throw error;
+    });
     const count=await frame.locator('body').evaluate(()=>items.length);assert.equal(count,1);
+    assert.equal(await frame.locator('.home-first-save').count(),0);
+    assert.match(await frame.locator('.pick').first().innerText(),/서울 전시 모음/);
+    for(const [width,height] of [[320,640],[402,874],[1440,700],[1440,960]]){
+      await page.setViewportSize({width,height});
+      await page.waitForTimeout(120);
+      if(width!==402 && height!==960) await page.screenshot({path:path.join(output,`pinmap-account-home-${width}x${height}.png`)});
+      const bounds=await page.locator('.phone-frame').evaluate(frame=>{
+        const rect=frame.getBoundingClientRect();
+        return {left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom,width:rect.width,height:rect.height,
+          pageWidth:document.documentElement.scrollWidth};
+      });
+      const scale=Math.min(1,width/402,height/874);
+      assert(Math.abs(bounds.width-402*scale)<1 && Math.abs(bounds.height-874*scale)<1,
+        `Frame must preserve 402:874 at ${width}x${height}: ${JSON.stringify(bounds)}`);
+      assert(Math.abs(bounds.left-(width-bounds.width)/2)<1 && Math.abs(bounds.top-(height-bounds.height)/2)<1,
+        `Frame must stay centered at ${width}x${height}: ${JSON.stringify(bounds)}`);
+      assert(bounds.left>=0 && bounds.right<=width && bounds.pageWidth<=width,
+        `Frame must fit ${width}x${height}: ${JSON.stringify(bounds)}`);
+      const nav=await frame.locator('.bottomnav').evaluate(node=>{
+        const rect=node.getBoundingClientRect();
+        return {top:rect.top,bottom:rect.bottom,viewport:innerHeight};
+      });
+      assert(nav.top>=0 && nav.bottom<=874 && nav.viewport===874,
+        `Navigation must fit ${width}x${height}: ${JSON.stringify(nav)}`);
+    }
+    await page.setViewportSize({width:402,height:874});
     await frame.locator('body').evaluate(()=>openDetail(items[0].id));
     assert.match(await frame.locator('body').innerText(),/게시물에서 찾은 행사 일정/);
     assert.match(await frame.locator('body').innerText(),/2026.12.11 – 2027.04.11/);
@@ -83,6 +112,18 @@ fs.mkdirSync(output,{recursive:true});
     assert.equal(records.length,1);
     await page.setViewportSize({width:1440,height:960});
     await page.screenshot({path:path.join(output,'pinmap-account-event-wide.png')});
+    await page.frame({url:/\/app\.html\?/}).waitForFunction(()=>typeof window.attachPinmapBasemap==='function',null,{timeout:15000});
+    await frame.locator('body').evaluate(()=>go('map'));
+    await frame.locator('.live-map').waitFor({timeout:15000});
+    for(const [width,height] of [[320,640],[1440,700]]){
+      await page.setViewportSize({width,height});
+      const map=await frame.locator('.live-map').evaluate(node=>{
+        const rect=node.getBoundingClientRect();
+        return {left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom};
+      });
+      assert(map.left>=0 && map.right<=402 && map.top===0 && map.bottom===874,
+        `Map must fit ${width}x${height}: ${JSON.stringify(map)}`);
+    }
     assert.equal(errors.length,0,errors.join('; ')+'\n'+JSON.stringify(resources));
     console.log('browser-check passed: account load, event detail, calendar, save, delete, mobile/wide');
   }finally{await browser.close();}

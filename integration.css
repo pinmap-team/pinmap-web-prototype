@@ -83,7 +83,7 @@ body.onboarding-open .bottomnav,body.login-open .bottomnav,body:has(dialog[open]
 
 /* Onboarding occupies the same phone viewport and isolates the home route. */
 body.onboarding-open #app{visibility:hidden!important;pointer-events:none!important}
-#onboarding{position:fixed!important;inset:0!important;margin:0 auto!important;width:100%!important;max-width:402px!important;height:100%!important;max-height:874px!important;transform:none!important;overflow-x:hidden!important}
+#onboarding{position:fixed!important;inset:0!important;margin:0 auto!important;width:100%!important;max-width:402px!important;height:100dvh!important;max-height:100dvh!important;transform:none!important;overflow-x:hidden!important}
 
 /* The browser preview has no native status bar above the home banner. */
 body:has(.main .strip)::before{display:none!important}

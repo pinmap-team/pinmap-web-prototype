@@ -52,6 +52,8 @@ function pinmapAccountItem(record, id) {
 
 if (PM_ENV.requiresAuth) (() => {
   let client, currentUserId = null, loadVersion = 0, nextLocalId = 9000000000000;
+  window.PinmapAccountLoaded = false;
+  window.PinmapAccountLoadError = false;
   const localIds = new Map();
   const localId = record => {
     const key = String(record.id || record.source_url || '');
@@ -87,6 +89,8 @@ if (PM_ENV.requiresAuth) (() => {
   function clearAccount() {
     loadVersion++;
     currentUserId = null;
+    window.PinmapAccountLoaded = false;
+    window.PinmapAccountLoadError = false;
     items = [];
     detailId = null;
     render();
@@ -94,6 +98,7 @@ if (PM_ENV.requiresAuth) (() => {
   async function loadAccount() {
     if (!client) return;
     const version = ++loadVersion;
+    window.PinmapAccountLoadError = false;
     const {data, error} = await client.auth.getUser();
     if (error || !data?.user?.id) { clearAccount(); return; }
     const userId = data.user.id;
@@ -116,12 +121,20 @@ if (PM_ENV.requiresAuth) (() => {
       }
       if (version !== loadVersion || currentUserId !== userId) return;
       items = records.map(record => pinmapAccountItem(record, localId(record)));
+      window.PinmapAccountLoaded = true;
+      window.PinmapAccountLoadError = false;
       render();
     } catch (error) {
-      if (version === loadVersion && currentUserId === userId) toast(error.message || '저장 목록을 불러오지 못했어요.');
+      if (version === loadVersion && currentUserId === userId) {
+        window.PinmapAccountLoaded = true;
+        window.PinmapAccountLoadError = true;
+        render();
+        toast(error.message || '저장 목록을 불러오지 못했어요.');
+      }
     }
   }
   const originalSave = actions.save;
+  actions.accountretry = () => loadAccount();
   actions.save = () => {
     originalSave();
     const form = document.getElementById('saveform');

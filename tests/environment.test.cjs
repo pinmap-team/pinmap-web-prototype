@@ -140,3 +140,17 @@ test('empty development home keeps decorative cards and offers one first-save ac
   assert(!html.includes('선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.'));
   assert(html.indexOf('mainpick')<html.indexOf('id="calendar"'));
 });
+test('home replaces the first-save prompt with account content after loading',()=>{
+  const source=read('home.js');
+  const start=source.indexOf('const shuffle = list =>');
+  const end=source.indexOf('function pickCard(',start);
+  const context=vm.createContext({
+    PM_ENV:{development:true,requiresAuth:true},items:[],preferences:[],
+    libPhoto:()=>false,homeSections:{},interestOf:()=>({short:'장소'})
+  });
+  vm.runInContext(source.slice(start,end),context);
+  assert.equal(vm.runInContext('homePicks().length',context),0);
+  vm.runInContext("items=[{id:1,title:'저장한 행사',pending:false},{id:2,title:'위치 확인 중인 장소',pending:true}]",context);
+  assert.deepEqual(JSON.parse(vm.runInContext('JSON.stringify(homePicks().map(p=>p.x.title))',context)),
+    ['저장한 행사','위치 확인 중인 장소']);
+});
