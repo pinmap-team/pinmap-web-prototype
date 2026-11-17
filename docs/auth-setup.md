@@ -1,6 +1,6 @@
 # 이메일 · 카카오 · 구글 로그인 연결
 
-2026-11-09 로컬 구현. 실제 Supabase 프로젝트의 인증과 메일 발송은 배포 후 확인해야 한다. GitHub 업로드·PR·Vercel 배포는 수행하지 않았다.
+공식 웹과 백엔드의 Vercel 환경 변수는 Pinmap Production Supabase 프로젝트(`ugoxnulralwvundbuwdn`)를 사용한다. 로그인, 저장, 메일 발송 및 소셜 로그인은 각각 배포 환경에서 검증한다.
 
 ## 연결 구조
 
@@ -12,7 +12,7 @@
 - `entry-router.js`: Supabase가 루트 Site URL로 돌려보낸 code/error/token을 `auth.html`로 전달한다.
 - `vendor/supabase.js`: 공식 `@supabase/supabase-js` 2.119.0 UMD 배포본. MIT 라이선스는 `vendor/supabase-LICENSE.txt`.
 
-로그인은 버전 선택 화면의 ‘이메일 · 카카오로 로그인하기’ 또는 개발 테스트 버전에서 시작한다. 인증 성공 후 빈 개발 모드 앱으로 진입한다. 구글 버튼과 OAuth 호출도 연결했으며, 실제 사용에는 Google Cloud와 Supabase의 공급자 설정이 필요하다. 가입·로그인은 저장 콘텐츠의 계정별 DB 동기화와 별개다. 개발 모드의 기존 빈 데이터 정책과 프로토타입의 기존 브라우저 저장을 바꾸지 않았다. 회원 탈퇴는 구현하지 않았으며, 실제 계정에 기존 체험용 데이터 삭제 동작을 실행하지 않는다.
+로그인은 버전 선택 화면의 ‘이메일 · 카카오로 로그인하기’ 또는 개발 테스트 버전에서 시작한다. 인증된 개발 모드에서는 계정에 저장된 콘텐츠를 백엔드 API로 불러온다. 프로토타입 체험 모드의 브라우저 저장 데이터와는 분리된다. 구글 버튼과 OAuth 호출도 연결했으며, 실제 사용에는 Google Cloud와 Supabase의 공급자 설정이 필요하다. 회원 탈퇴는 구현하지 않았으며, 실제 계정에 기존 체험용 데이터 삭제 동작을 실행하지 않는다.
 
 ## Vercel
 
@@ -80,13 +80,13 @@ node --env-file=.env.local scripts/dev-auth-server.cjs
 
 ## 화면 검토용 시작 순서 (최신)
 
-루트 `/`에서 프로토타입 체험 또는 로그인 테스트를 고른다. 장소 추출 개발 테스트는 [별도 온라인 화면](https://pinmap-backend.vercel.app/)에서 진행한다. 로그인 완료 후 실제 세션이 필요한 앱은 `index.html?mode=development&auth=required`로 연다. 이는 서버 데이터 동기화 구현과 별개이며 기존 프로토타입 데이터는 유지한다.
+루트 `/`에서 프로토타입 체험 또는 로그인 테스트를 고른다. 장소 추출 개발 테스트는 [별도 온라인 화면](https://pinmap-backend.vercel.app/)에서 진행한다. 로그인 완료 후 실제 세션이 필요한 앱은 `index.html?mode=development&auth=required`로 연다. 인증된 계정의 저장 콘텐츠는 서버에서 불러오며, 기존 프로토타입 체험 데이터는 분리되어 유지된다.
 
 ## 구글 로그인 (2026-11-10)
 
 1. Google Cloud → Google Auth Platform에서 프로젝트를 선택하고 Branding, Audience, Data Access를 설정한다. 기본 범위는 openid, userinfo.email, userinfo.profile이다.
 2. Clients → Create client → Web application. Authorized JavaScript origins에 `https://pinmap-prototype.vercel.app`과 필요한 로컬 테스트 주소를 등록한다.
-3. Authorized redirect URIs에는 Supabase Google 화면의 Callback URL을 그대로 등록한다. 현재 프로젝트: `https://tgwryxkdhkkqvmhuyzse.supabase.co/auth/v1/callback`.
+3. Authorized redirect URIs에는 새 Supabase Google 화면의 Callback URL을 그대로 등록한다. 현재 프로젝트: `https://ugoxnulralwvundbuwdn.supabase.co/auth/v1/callback`.
 4. Client ID와 Client Secret을 Supabase → Authentication → Sign In / Providers → Google에 입력하고 Enable Sign in with Google을 켜서 저장한다. Secret은 저장소나 브라우저 코드에 넣지 않는다.
 5. Supabase Site URL 및 Redirect URLs는 기존 설정을 공유한다. Vercel에 구글 전용 변수를 추가할 필요는 없다.
 6. 로그인 테스트에서 구글 버튼 → 계정 선택 → 동의 → 핀맵 복귀를 실제 계정으로 확인한다. 테스트 대상은 Google Auth Platform Audience에서 확인한다.
