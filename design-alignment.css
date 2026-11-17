@@ -1344,3 +1344,17 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .pm-refresh.is-pulling .pm-spinner{animation:none;transform:rotate(var(--pull-turn,0deg))}
 html.pm-refresh-enabled,html.pm-refresh-enabled body{overscroll-behavior-y:contain}
 @media(prefers-reduced-motion:reduce){.pm-spinner{animation-duration:1.6s}.pm-refresh{transition:none}}
+
+/* Home-only icon action; its accessible name stays in the button markup. */
+.home-add-fab{position:fixed;right:max(var(--gutter),calc((100vw - 480px)/2 + var(--gutter)));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;min-height:56px;padding:0;border:0;border-radius:var(--rounded-lg);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);box-shadow:var(--shadow-md);white-space:nowrap;cursor:pointer}
+.home-add-fab .icon{width:22px;height:22px;flex:none}
+.home-add-fab:active{background:var(--color-primary-pressed)}
+.home-add-fab:focus-visible{outline:2px solid var(--color-primary);outline-offset:4px}
+
+/* Relative movement leaves the fixed navigation and add button in place. */
+html.pm-refresh-enabled #app{position:relative;top:var(--pull-content,0px);transition:top .26s cubic-bezier(.22,1,.36,1)}
+html.pm-pulling #app{transition:none}
+html.pm-pulling,html.pm-pulling *{user-select:none!important;-webkit-user-select:none!important}
+.pm-refresh.is-ready{background:var(--color-primary);color:var(--color-neutral)}
+.pm-refresh.is-ready .pm-spinner{border-color:color-mix(in srgb,var(--color-neutral) 35%,transparent);border-top-color:var(--color-neutral)}
+@media(prefers-reduced-motion:reduce){html.pm-refresh-enabled #app{transition:none}}

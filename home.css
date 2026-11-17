@@ -268,11 +268,6 @@ body.notipanel-open .bottomnav{display:none!important}
 .homebrand img{display:block;width:130px;height:40px;object-fit:contain;object-position:left center}
 
 /* The content action belongs to Home and stays clear of the bottom navigation. */
-.home-add-fab{position:fixed;right:max(var(--gutter),calc((100vw - 480px)/2 + var(--gutter)));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;display:inline-flex;align-items:center;justify-content:center;gap:var(--space-sm);min-height:56px;padding:0 var(--space-lg);border:0;border-radius:var(--rounded-lg);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);box-shadow:var(--shadow-md);white-space:nowrap;cursor:pointer}
-.home-add-fab .icon{width:22px;height:22px;flex:none}
-.home-add-fab:active{background:var(--color-primary-pressed)}
-.home-add-fab:focus-visible{outline:2px solid var(--color-primary);outline-offset:4px}
-@media(max-width:360px){.home-add-fab{right:var(--space-lg);padding:0 var(--space-md)}}
 
 /* Empty content uses the same banner dimensions, stacking and text positions. */
 .mainpick[data-placeholder="true"]{cursor:default}
