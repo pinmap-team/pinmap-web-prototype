@@ -47,9 +47,7 @@ pages.my = function(){
   <div class="mprofile profilecard myprofile" role="group" aria-label="프로필">
     <button type="button" class="myprofile-photo" data-action="profilephoto" aria-label="프로필 사진 변경">${avatarHtml()}<span class="account-photo-edit" aria-hidden="true">${icon('image')}</span></button>
     <input type="file" id="avatarfile" accept="image/*" hidden>
-    ${typeof editingProfileName !== 'undefined' && editingProfileName
-      ? `<form id="profilepage" class="myprofile-form"><input name="nickname" aria-label="프로필 이름" value="${esc(settings.nickname || '')}" required maxlength="12" autocomplete="nickname"><button type="button" class="textbtn" data-action="profilecancel">취소</button><button type="submit" class="filled">저장</button></form>`
-      : `<button type="button" class="myprofile-name" data-action="profilename" aria-label="${esc(settings.nickname || '이름 설정')} 프로필 이름 변경"><b>${esc(settings.nickname || '이름 설정')}</b></button>`}
+    <span class="myprofile-name"><b>${esc(settings.nickname || '이름 설정')}</b></span>
   </div><!--myprofile-end-->
   <button class="sharepromo" data-action="snsdemo"><span aria-hidden="true">📲</span><div><b>SNS에서 바로 저장해보기</b><small>게시물에서 공유 → 핀맵, 저장 과정을 체험해요</small></div>${icon('arrow')}</button>
 

@@ -85,7 +85,7 @@ Object.assign(actions, {
   savesheet: () => go('saveset'),
   mapsheet: () => go('mapset'),
   appinfo: () => go('appinfo'),
-  account: () => { editingProfileName=false; go('account'); },
+  account: () => go('account'),
   guide: () => go('guide'),
   howto: () => go('howtopage')
 });
@@ -236,11 +236,11 @@ actions.intro = () => openOnboardingPreview();
 const goBeforeThemePreview = go;
 go = function(next){ if(page==='themeset'&&next!=='themeset')PinmapTheme.commitPreview();return goBeforeThemePreview.apply(this,arguments); };
 
-// 2026-11-10 프로필 카드: 사진 · 이름(편집) 밖 어디를 눌러도 계정 관리로 가요. 키보드는 오른쪽 '>' 버튼으로.
+// 프로필 사진 버튼 밖의 카드를 누르면 계정 관리로 가요.
 document.addEventListener('click', e => {
   if (page !== 'my' || detailId) return;
   const card = e.target.closest('.myprofile');
-  if (!card || e.target.closest('.myprofile-photo,.myprofile-name,.myprofile-form,.myprofile-go,input,button,form')) return;
+  if (!card || e.target.closest('.myprofile-photo,.myprofile-go,input,button,form')) return;
   go('account');
 });
 

@@ -3,7 +3,6 @@
 
 /* ---------- 프로필 사진 ---------- */
 const avatarHtml = (cls = '') => PM_ENV.development && !settings.avatar ? `<span class="pavatar ${cls}" aria-hidden="true">${icon('user')}</span>` : `<span class="pavatar ${cls}" aria-hidden="true"><img src="${settings.avatar || 'img/profile-demo.png'}" alt=""></span>`;
-let editingProfileName = false;
 const subHead = (title, back = 'my') => `<div class="subhead"><button class="subback" data-page="${back}" aria-label="${back === 'guide' ? '이용 가이드로' : back === 'account' ? '프로필 및 계정으로' : '마이로'} 돌아가기">${icon('back')}</button><h1>${title}</h1></div>`;
 
 pages.profile = function(){
@@ -39,7 +38,7 @@ document.addEventListener('submit', e => {
   if (e.target.id !== 'profilepage') return;
   e.preventDefault();
   const nick = e.target.nickname.value.trim(); if (!nick) return;
-  settings.nickname = nick; editingProfileName = false; afterChange(); render(); toast('프로필을 저장했어요.');
+  settings.nickname = nick; afterChange(); render(); toast('프로필을 저장했어요.');
 });
 
 /* ---------- SNS 계정 연동 ---------- */
@@ -77,8 +76,6 @@ actions.accadd = () => accAddSheet();
 actions.accounts = () => go('accounts');
 actions.profile = () => go('profile');
 actions.profilephoto = () => $('#avatarfile')?.click();
-actions.profilename = () => { editingProfileName = true; render(); const input=$('#profilepage input[name="nickname"]'); input?.focus({preventScroll:true}); input?.select(); };
-actions.profilecancel = () => { editingProfileName = false; render(); requestAnimationFrame(() => $('#app [data-action="profilename"]')?.focus()); };
 actions.avatarreset = () => { delete settings.avatar; afterChange(); render(); toast('기본 이미지로 바꿨어요.'); };
 actions.accoffyes = () => {
   const id = $('#sheet').dataset.acc, acc = myAccounts(), a = acc.find(x => x.id === id);
