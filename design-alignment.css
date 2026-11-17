@@ -1338,6 +1338,46 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 html.pm-refresh-enabled,html.pm-refresh-enabled body{overscroll-behavior-y:contain}
 @media(prefers-reduced-motion:reduce){.pm-spinner{animation-duration:1.6s}.pm-refresh{transition:none}}
 
+/* Current location: blue position and a compass cone only when heading is available. */
+.live-map .lm-current-position-dot{fill:#2789ef;stroke:#fff;filter:drop-shadow(0 2px 5px #163c7740)}
+.lm-location-person .lm-location-dot{background:#2789ef}
+.lm-heading-cone{background:conic-gradient(from -35deg at 50% 50%,#2789efad 0deg,#2789ef20 70deg,transparent 70deg);transition:transform .22s ease-out}
+
+/* Glass navigation: keep the map or page visible through the capsule. */
+.bottomnav .pm-nav-main{border-color:#ffffffbd!important;box-shadow:0 12px 32px #26334c29,0 2px 8px #26334c18,inset 0 1px 0 #ffffffdd!important}
+.bottomnav .pm-nav-main::before,.bottomnav .pm-nav-main[data-refraction="true"]::before{background:linear-gradient(145deg,#ffffffb8 0%,#ffffff80 46%,#f1f5ff99 100%);-webkit-backdrop-filter:blur(20px) saturate(1.85);backdrop-filter:blur(20px) saturate(1.85)}
+.bottomnav .pm-nav-main::after{content:'';background:conic-gradient(from 115deg,#ffffffeb,#ffffff38 15%,#c5d3f58c 29%,#ffffffec 43%,#ffffff69 65%,#cbd7f371 80%,#ffffffeb)}
+.bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffffed,#eef3ffaf 68%,#ffffffc4)!important;border-color:#ffffffdf!important;box-shadow:0 3px 12px #26334c2e,inset 0 1px 1px #fff!important;transition:left .34s cubic-bezier(.2,.9,.25,1.2)}
+[data-theme="dark"] .bottomnav .pm-nav-main::before,[data-theme="dark"] .bottomnav .pm-nav-main[data-refraction="true"]::before{background:linear-gradient(145deg,#434751b8,#272b36a8 60%,#3d4351a8)}
+[data-theme="dark"] .bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffff42,#ffffff13)!important;border-color:#ffffff52!important}
+
+/* Readable labels with an open photographic middle, not an even dark veil. */
+.mainpick .pick:not(.pick-placeholder) .pickimg::after{background:linear-gradient(180deg,#0009 0%,#0004 18%,transparent 38%,transparent 53%,#0001 67%,#000b 100%)!important}
+
+/* Date selection displays only that day's events. */
+.calw-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--space-xs);margin:var(--space-md) 0}
+.calw-days button{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:52px;border:0;border-radius:var(--rounded-md);background:transparent;color:var(--color-secondary);font:var(--type-body-sm)}
+.calw-days button b{font:var(--type-label-md);color:var(--color-on-surface)}
+.calw-days button[aria-pressed="true"]{background:var(--color-primary);color:var(--color-neutral)}
+.calw-days button[aria-pressed="true"] b{color:var(--color-neutral)}
+.calw-days button:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+.calnone{padding:var(--space-lg) var(--space-sm);font:var(--type-body-sm);color:var(--color-secondary)}
+
+/* Reels keep their 9:16 frame; landscape assets stay fully visible over a soft copy. */
+.cfpage .cf-items{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-md);justify-items:stretch}
+.cfpage .cf-item{width:100%;min-width:0;background:#111}
+.cfpage .cf-itemimg{aspect-ratio:9/16;background:#171719}
+.cfpage .cf-itemback{position:absolute;inset:0;overflow:hidden}
+.cfpage .cf-itemback img{display:block;width:100%;height:100%;object-fit:cover;filter:blur(20px) brightness(.65);transform:scale(1.12)}
+.cfpage .cf-itemimg>img,.cfpage .cf-itemimg>svg{position:relative;width:100%;height:100%;object-fit:cover}
+.cfpage .cf-itemimg::after{background:linear-gradient(180deg,#0003 0%,transparent 28%,transparent 55%,#0002 70%,#000c 100%)}
+.cfpage .cf-itembody{bottom:0;padding:0 var(--space-sm) var(--space-sm)}
+.cfpage .cf-itemtext h3{font:var(--type-body-md)!important;font-weight:var(--weight-semibold)!important;white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+.cfpage .cf-itemdesc{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;white-space:normal;overflow:hidden}
+.cfpage .cf-itemmeta{display:flex;margin-top:var(--space-xs)}
+.cfpage .cf-saved-time{top:var(--space-sm);right:var(--space-sm);padding:var(--space-xs) var(--space-sm)}
+.cfpage .cf-itemtext h3,.cfpage .cf-itemdesc,.cfpage .cf-itemmeta{color:#fff!important;text-shadow:0 1px 5px #0009}
+
 /* Home-only icon action; its accessible name stays in the button markup. */
 .home-add-fab{position:fixed;right:max(var(--gutter),calc((100vw - 480px)/2 + var(--gutter)));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;min-height:56px;padding:0;border:0;border-radius:var(--rounded-lg);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);box-shadow:var(--shadow-md);white-space:nowrap;cursor:pointer}
 .home-add-fab .icon{width:22px;height:22px;flex:none}

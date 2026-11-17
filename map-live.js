@@ -377,7 +377,7 @@
     // Draw the position as a geographic vector point, never a viewport overlay.
     // The decorative heading/label is separate and cannot take focus or pan the map.
     if(locationMarker)locationMarker.setLatLng(point);
-    else locationMarker=L.circleMarker(point,{radius:8,weight:3,color:'var(--color-surface)',fillColor:'var(--color-secondary)',fillOpacity:1,interactive:false,className:'lm-current-position-dot'}).addTo(liveMap);
+    else locationMarker=L.circleMarker(point,{radius:8,weight:3,color:'#ffffff',fillColor:'#2789ef',fillOpacity:1,interactive:false,className:'lm-current-position-dot'}).addTo(liveMap);
     const element=locationMarker.getElement();
     element?.setAttribute('role','img');element?.setAttribute('aria-label',label);
     const locationIcon=L.divIcon({className:'lm-location-marker',html:`<span class="lm-location-person${heading==null?' no-heading':''}" style="--heading:${heading??0}deg"><span class="lm-heading-cone" aria-hidden="true"></span>${demo?'<span class="lm-location-demo">예시 위치</span>':''}</span>`,iconSize:[92,92],iconAnchor:[46,46]});

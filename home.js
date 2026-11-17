@@ -89,13 +89,16 @@ function emptyPickCards(){
   </div>`).join('');
 }
 
-/* ---------- 캘린더 위젯: 다가오는 마감 2개, 제목 줄 오른쪽 '전체보기' (2026-11-10) ---------- */
+/* ---------- 캘린더 위젯: 선택한 날짜의 일정만 표시 ---------- */
 function calWidget(){
-  const due = calDueList().filter(x => calDue(x) >= calToday);
-  const next = due.slice(0, 2);
+  const selected = calSelDate();
+  const weekStart = new Date(selected); weekStart.setDate(selected.getDate() - selected.getDay());
+  const days = Array.from({length:7},(_,i)=>{const day=new Date(weekStart);day.setDate(weekStart.getDate()+i);return day;});
+  const due = calDueList().filter(x => calKey(calDue(x)) === calSel);
   return `<section class="hwidget calw">
     <div class="hwhead"><h2>${calToday.getMonth()+1}월 일정</h2><button type="button" class="calgo" data-action="gocal" aria-label="캘린더 전체보기">전체보기${icon('chevright')}</button></div>
-    ${next.length ? `<div class="calnext">${next.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cncontent"><span class="cntext">${esc(x.title)}</span></span><span class="cnbadge ${calDays(x) <= 3 ? 'soon' : ''}">${dLabel(x)}</span></button>`).join('')}</div>` : '<p class="hint calnone">다가오는 마감이 없어요.</p>'}
+    <div class="calw-days" role="group" aria-label="날짜 선택">${days.map(day=>`<button type="button" data-calday="${calKey(day)}" aria-pressed="${calKey(day)===calSel}" aria-label="${day.getMonth()+1}월 ${day.getDate()}일"><span>${['일','월','화','수','목','금','토'][day.getDay()]}</span><b>${day.getDate()}</b></button>`).join('')}</div>
+    ${due.length ? `<div class="calnext">${due.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cncontent"><span class="cntext">${esc(x.title)}</span></span><span class="cnbadge ${calDays(x) <= 3 ? 'soon' : ''}">${dLabel(x)}</span></button>`).join('')}</div>` : '<p class="hint calnone">이 날짜에 등록된 일정이 없어요.</p>'}
   </section>`;
 }
 
@@ -176,7 +179,7 @@ actions.sharehelp = () => modal('공유로 저장하기', `<div class="home-shar
 </div>`);
 
 /* 캘린더 위젯의 날짜를 누르면 그 날짜가 선택된 캘린더로 */
-document.addEventListener('click', e => { const d = e.target.closest('[data-calday]'); if (d && page === 'home') { calSel = d.dataset.calday; const date = calSelDate(); calMonth = new Date(date.getFullYear(),date.getMonth(),1); backHome = true; go('calendar'); } });
+document.addEventListener('click', e => { const d = e.target.closest('[data-calday]'); if (d && page === 'home') { calSel = d.dataset.calday; const date = calSelDate(); calMonth = new Date(date.getFullYear(),date.getMonth(),1); const y = window.scrollY; render(); window.scrollTo(0,y); } });
 
 /* 홈의 캘린더 위젯 · 전체 보기 · 검색으로 들어간 화면: 왼쪽 위 ← 버튼으로 홈으로 */
 let backHome = false;

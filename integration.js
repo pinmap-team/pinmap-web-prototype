@@ -37,7 +37,7 @@
       : lastNavIndex??index;
     queueMicrotask(()=>{lastNavIndex=index;});
     if(Math.abs(from-index)>.01)slideNav(index,from);
-    const entry=(p,label,glyph)=>{const active=activePage===p;return `<button class="navitem ${active?'active':''}" data-page="${p}" aria-label="${label}" ${active?'aria-current="page"':''}><span class="navicon">${active?solid(p==='library'?'bookmark':p):icon(glyph)}</span><span class="pm-nav-label" aria-hidden="true">${label}</span></button>`};
+    const entry=(p,label,glyph)=>{const active=activePage===p;return `<button class="navitem ${active?'active':''}" data-page="${p}" aria-label="${label}" ${active?'aria-current="page"':''}><span class="navicon">${active?solid(glyph):icon(glyph)}</span><span class="pm-nav-label" aria-hidden="true">${label}</span></button>`};
     return `<span class="pm-nav-main" data-nav-target="${index}" style="--nav-index:${index}"><span class="pm-nav-indicator" aria-hidden="true"></span>${entry('home','홈','home')}${entry('map','지도','map')}${entry('library','컬렉션','bookmark')}${entry('my','마이','user')}</span>`;
   };
   // Keep the loaded basemap in the same moving pane as the markers.
