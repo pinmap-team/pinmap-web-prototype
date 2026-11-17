@@ -2,7 +2,7 @@
 // 마이에서 누르는 기능은 아래에서 올라오는 시트 대신 새 페이지로 열리고, 왼쪽 위 ← 로 마이로 돌아가요.
 // 현재 위치 · 관심 키워드 · 알림 · 저장 · 위치/지도 · 저장하는 방법 · 앱 정보 · 핀맵 계정 설정
 
-const MY_PAGES = {calexport:'캘린더로 내보내기', favorites:'즐겨찾기', placeset:'위치 설정', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', mapset:'지도 디자인', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리', accountaccess:'로그아웃, 탈퇴'};
+const MY_PAGES = {calexport:'캘린더로 내보내기', favorites:'즐겨찾기', placeset:'위치 설정', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리', accountaccess:'로그아웃, 탈퇴'};
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
 const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
@@ -77,13 +77,11 @@ pages.saveset = () => myPage('저장 설정', pageFromModal(saveSettings), 'sett
 // 2026-11-04: 화면 모드도 아래 시트 대신 페이지로 (내용은 PinmapTheme.show()와 같음)
 pages.themeset = () => { PinmapTheme.beginPreview(); return myPage('화면 모드', pageFromModal(() => PinmapTheme.show()), 'settingpage themepage'); };
 actions.appearance = () => go('themeset');
-pages.mapset = () => myPage('지도 디자인', pageFromModal(mapSettings), 'mappage');
 Object.assign(actions, {
   placesheetmy: () => go('placeset'),
   notisheet: () => go('notiset'),
   notisettings: () => go('notiset'),
   savesheet: () => go('saveset'),
-  mapsheet: () => go('mapset'),
   appinfo: () => go('appinfo'),
   account: () => go('account'),
   guide: () => go('guide'),
@@ -126,7 +124,7 @@ pages.terms = () => myPage('약관 및 정책', infoRows([
   ['서비스 이용약관', '핀맵 서비스 이용에 관한 기본 약속이에요.'],
   ['개인정보 처리방침', '저장한 콘텐츠와 연동 계정 정보를 어떻게 다루는지 안내해요.'],
   ['위치기반서비스 이용약관', '현재 위치로 주변 저장 장소를 보여줄 때 적용돼요.'],
-  ['오픈소스 라이선스', '지도 표시에 Leaflet, MapLibre를 사용해요.']
+  ['오픈소스 라이선스', '지도 표시에 Leaflet을 사용해요.']
 ]), 'settingpage');
 Object.assign(actions, { faq: () => go('faq'), notice: () => go('notice'), terms: () => go('terms') });
 

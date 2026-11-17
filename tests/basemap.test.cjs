@@ -1,67 +1,53 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
-const crypto=require('node:crypto');
 const vm=require('node:vm');
-test('shared Positron layer keeps Leaflet controls, credit and load status without an API key',()=>{
-  const host={dataset:{}},events={},themeEvents={},paintChanges=[];let received,addedTo;
-  const layers=[{id:'background',type:'background',paint:{'background-color':'#F6F2E9'}}];
-  const layer={addTo(map){addedTo=map;return this},getMaplibreMap(){return {on(name,fn){events[name]=fn},getStyle(){return {layers}},setPaintProperty(...args){paintChanges.push(args)}}}};
-  const context={document:{documentElement:{dataset:{theme:'light'}}},window:{addEventListener(name,fn){themeEvents[name]=fn},removeEventListener(name){delete themeEvents[name]}},L:{maplibreGL(options){received=options;return layer}}};
-  vm.runInNewContext(fs.readFileSync('integration.js','utf8'),context);
-  const map={getContainer:()=>host,on(name,fn){events['map:'+name]=fn}};
-  assert.equal(context.window.attachPinmapBasemap(map),layer);
-  assert.equal(addedTo,map);
-  assert.match(received.style,/^map-style\.json\?v=/);
-  assert.equal(received.interactive,false);
-  for(const source of ['OpenFreeMap','OpenMapTiles','OpenStreetMap','행정안전부·Esri Korea'])assert(received.attributionControl.customAttribution.includes(source));
-  assert.equal(host.dataset.basemap,'warm-minimal');
-  assert.equal(host.dataset.basemapReady,undefined);
-  events['style.load']();events.load();assert.equal(host.dataset.basemapReady,'true');
-  context.document.documentElement.dataset.theme='dark';themeEvents['pinmap:theme-changed']();
-  assert.deepEqual(paintChanges.at(-1),['background','background-color','#111111']);
-  context.document.documentElement.dataset.theme='light';themeEvents['pinmap:theme-changed']();
-  assert.deepEqual(paintChanges.at(-1),['background','background-color','#F6F2E9']);
-  events['map:unload']();assert.equal(themeEvents['pinmap:theme-changed'],undefined);
+
+function setup(config){
+  const elements=[];
+  const element=tag=>({tag,style:{},dataset:{},children:[],setAttribute(){},remove(){},prepend(child){this.children.unshift(child)},append(child){this.children.push(child)},replaceChildren(...children){this.children=children},querySelector(selector){return selector==='.pm-map-error'?this.children.find(child=>child.className==='pm-map-error')||null:null}});
+  const host=element('div');
+  host.getBoundingClientRect=()=>({top:0,width:402,height:874});
+  host.closest=()=>null;
+  const map={getContainer:()=>host,getCenter:()=>({lat:37.5,lng:127}),getZoom:()=>14,containerPointToLatLng:()=>({lat:37.5,lng:127}),on(){}};
+  const window={};
+  let googleOptions;
+  const google={maps:{Map:class{constructor(surface,options){googleOptions=options;this.surface=surface}setCenter(){}setZoom(){}},event:{clearInstanceListeners(){}}}};
+  const document={createElement:tag=>{const node=element(tag);elements.push(node);return node},head:{append(script){window.__pinmapGoogleMapsReady()}}};
+  const context={window,document,google,fetch:async()=>({ok:true,json:async()=>config}),setTimeout,clearTimeout,requestAnimationFrame:callback=>{callback();return 1},cancelAnimationFrame(){}};
+  vm.runInNewContext(fs.readFileSync('map-providers.js','utf8'),context);
+  return {window,host,map,elements,getGoogleOptions:()=>googleOptions};
+}
+
+const flush=()=>new Promise(resolve=>setImmediate(resolve));
+
+test('every map view delegates to the single Google background',()=>{
+  const calls=[];
+  const window={PinmapMapProviders:{attach:(map,onChange)=>{calls.push({map,onChange});return 'google'}}};
+  vm.runInNewContext(fs.readFileSync('integration.js','utf8'),{window});
+  const map={};
+  assert.equal(window.attachPinmapBasemap(map,()=>{}),'google');
+  assert.equal(calls.length,1);
+  assert.equal(calls[0].map,map);
 });
 
-test('warm map style is valid, simplifies background detail and retains orientation labels',()=>{
-  const style=JSON.parse(fs.readFileSync('map-style.json','utf8'));
-  assert.equal(style.version,8);
-  assert.equal(style.sources.openmaptiles.url,'https://tiles.openfreemap.org/planet');
-  const byId=Object.fromEntries(style.layers.map(layer=>[layer.id,layer]));
-  assert.equal(byId.background.paint['background-color'],'#F6F2E9');
-  for(const id of ['highway-name-minor','highway-name-path','highway-shield-non-us'])assert.equal(byId[id].layout.visibility,'none');
-  for(const id of ['highway-name-major','label_city','water_name_line_label'])assert.notEqual(byId[id].layout.visibility,'none');
-  const hash=require('node:crypto').createHash('sha256').update(fs.readFileSync('map-style.json')).digest('hex').slice(0,12);
-  assert(fs.readFileSync('integration.js','utf8').includes('map-style.json?v='+hash));
+test('Google loads without a saved provider choice or alternate basemap',async()=>{
+  const app=setup({available:{google:true},googleBrowserKey:'test-browser-key',defaultProvider:'naver'});
+  app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'google');
+  assert(app.elements.some(node=>node.tag==='script'&&node.src.startsWith('https://maps.googleapis.com/maps/api/js?')));
+  assert.equal(app.getGoogleOptions().zoom,14);
+  assert.equal(app.host.querySelector('.pm-map-error'),null);
 });
 
-test('numbered subway exits and bus stops appear at readable zoom levels',()=>{
-  const style=JSON.parse(fs.readFileSync('map-style.json','utf8'));
-  const byId=Object.fromEntries(style.layers.map(layer=>[layer.id,layer]));
-  const overview=byId['pinmap-bus-stops-overview'];
-  const detail=byId['pinmap-bus-stops-detail'];
-  const exits=byId['pinmap-numbered-subway-exits'];
-  for(const layer of [overview,detail]){
-    assert.equal(layer.source,'openmaptiles');
-    assert.equal(layer['source-layer'],'poi');
-    assert.equal(layer.layout['icon-allow-overlap'],false);
-  }
-  assert.equal(overview.minzoom,15);
-  assert.equal(overview.maxzoom,detail.minzoom);
-  assert.equal(overview.layout['icon-image'],'bus_11');
-  assert(overview.filter.some(part=>JSON.stringify(part).includes('"rank"')));
-  assert.equal(exits.source,'numbered-subway-exits');
-  assert.equal(exits.minzoom,16);
-  assert.equal(exits.layout['icon-image'],'entrance_11');
-  assert(JSON.stringify(exits.layout['text-field']).includes('"number"'));
-  assert(!byId['pinmap-subway-entrances'],'unnumbered entrance icons must not overlap numbered exits');
-  const geojson=JSON.parse(fs.readFileSync('subway-exits.geojson','utf8'));
-  const hash=crypto.createHash('sha256').update(fs.readFileSync('subway-exits.geojson')).digest('hex').slice(0,12);
-  assert.equal(style.sources['numbered-subway-exits'].data,'subway-exits.geojson?v='+hash);
-  assert.equal(geojson.type,'FeatureCollection');
-  assert(geojson.features.length>4000);
-  assert(geojson.features.some(feature=>feature.properties.station==='뚝섬역'&&feature.properties.number===1));
-  assert(geojson.features.every(feature=>Number.isInteger(feature.properties.number)&&feature.properties.number>0));
+test('missing Google configuration shows an error instead of another map',async()=>{
+  const app=setup({available:{google:false},googleBrowserKey:''});
+  let message='';
+  app.window.PinmapMapProviders.attach(app.map,state=>{message=state.error||''});
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'google');
+  assert.equal(app.host.dataset.mapError,'true');
+  assert.match(message,/구글 지도 설정/);
+  assert.equal(app.elements.filter(node=>node.tag==='script').length,0);
 });

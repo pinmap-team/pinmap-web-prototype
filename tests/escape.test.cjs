@@ -17,7 +17,6 @@ const FIELDS=['title','memo','collection','address','desc','url','source','categ
 // Hashing the whole line also catches new raw output appended to that line.
 const ALLOWED=new Map([
   // counts and predicates — numbers/booleans, not field values
-  ['app.js address 542fabeecaa5','map-app URL is constructed with encodeURIComponent'],
   ['app.js collection cb7fd22493bf','count predicate renders a number'],
   ['library.js collection f455917b56a6','count predicate renders a number'],
   ['collection.js collection 22d2a02a7127','checked state renders a fixed string'],

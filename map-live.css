@@ -116,8 +116,6 @@ body.login-open #login-screen {
 .live-map .lm-area{margin-bottom:var(--space-md);}
 .live-map .lm-bottom:before{inset:50px -20px -95px;}
 
-.lm-embedded-basemap,.course-embedded-basemap{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:210;pointer-events:none;background:var(--color-disabled)}
-.using-embedded-basemap .leaflet-control-zoom{display:none}
 
 /* SVG category art shared by filters, map pins, and photo placeholders. */
 .live-map .lm-categories .lm-emoji{display:grid;place-items:center;width:36px;height:40px;filter:none}

@@ -19,7 +19,7 @@ detail = function(){
   const t = typeOf(x.type);
   const showPlaceInfo = t.place && (x.contentKind !== 'event' || (x.extractionPlaces || []).length > 0 || !!x.address);
   const ready = showPlaceInfo && x.address && !x.pending;
-  const app = MAP_APPS[settings.mapApp] || MAP_APPS.naver;
+  const app = GOOGLE_MAP;
   const mapHref = ready ? app.url(encodeURIComponent(x.mapQuery || x.address)) : '';
   const src = x.source || 'SNS';
   const author = /^[A-Za-z0-9._]{1,30}$/.test(x.authorUsername || '') ? x.authorUsername : '';
