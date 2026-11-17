@@ -2,6 +2,7 @@
 
 - 구현: ../../collection.js의 `CollectionFolder({id,title,icon,count,thumbnails,selected,attr})`, `cfItem(x)`; 홈 추천은 ../../home.js.
 - CollectionFolder의 기본값: thumbnails=[], selected=false. 실제 함수가 받지 않는 props를 문서에 추가하지 않는다.
+- `전체`는 저장 항목 전체에서 즉시 계산하는 기본 폴더다. 항목이 0개여도 표시하고 별도 저장 기록을 만들지 않는다. 새 폴더 추가 타일 뒤에 고정하며 나머지 폴더 정렬에 섞지 않는다.
 - 기존 사진·기울기·폴더 실루엣·저장 데이터·카테고리 순서를 유지한다. 제목/설명/개수는 실제 데이터에서 가져오고 사용자 텍스트를 escape한다.
 - 일반 카드 rounded-md, 작은 사진 rounded-sm, 큰 패널 rounded-lg. 폴더 외곽과 홈 대표 사진 스택은 기존 기하 예외.
 - 제목 label-md(좁은 카드), 보조 body-sm/secondary; 넓은 홈 대표 제목 headline-md. 사진 위 글자는 불투명 흰색+기존 스크림이며 합성 대비는 별도 검증한다.

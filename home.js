@@ -217,9 +217,9 @@ function layoutPicks(){
     const k = Math.min(a, 1), sc = 1 - k * (1 - PICK.scale);
     const x = a <= 1 ? d * x1 : sg * (x1 + (a - 1) * x1 * 0.35);
     c.style.transform = `translate3d(${x.toFixed(2)}px,0,0) scale(${sc.toFixed(4)})`;
-    // 겹친 카드가 비쳐 보이지 않게 옆 카드도 불투명하게 두고, 살짝 어둡게만 해요
-    c.style.opacity = a <= 1 ? '1' : String(Math.max(0, 1 - (a - 1) * 1.6));
-    c.style.filter = k > 0.01 ? `brightness(${(1 - k * 0.1).toFixed(3)})` : '';
+    // 보조 카드는 흐리고 살짝 옅게 두어 가운데 카드를 강조해요.
+    c.style.opacity = a <= 1 ? String((1 - k * 0.18).toFixed(3)) : String(Math.max(0, 0.82 - (a - 1) * 1.6));
+    c.style.filter = k > 0.01 ? `brightness(${(1 - k * 0.14).toFixed(3)}) blur(${(k * 2).toFixed(2)}px)` : '';
     c.style.zIndex = String(100 - Math.round(a * 10));
     c.style.visibility = a > 1.7 ? 'hidden' : '';
     c.setAttribute('aria-hidden', a > 0.5 ? 'true' : 'false'); c.tabIndex = track.dataset.placeholder==='true' || a > 0.5 ? -1 : 0;

@@ -40,6 +40,14 @@ button,input,select,textarea,svg text,.libpage,.live-map,#login-screen,.ob-phone
 .cfpage .cf-folder:not(.cf-add) .cf-shade{opacity:0}
 .cfpage .cf-folder .cf-hi{display:none}
 .cfpage .cf-folder:not(.cf-add) .cf-slot0:not(.cf-empty){width:48%;left:26%;top:2%;z-index:3}
+.cf-add .cf-back,.cf-add .cf-front,.cf-add .cf-hi,.cf-add .cf-addplus{transition:transform .3s cubic-bezier(.22,1,.36,1)}
+@media(hover:hover){
+  .cf-add:hover .cf-back{transform:translateY(-8px)}
+  .cf-add:hover .cf-front{transform:perspective(440px) rotateX(-14deg) translateY(5px)}
+  .cf-add:hover .cf-hi{transform:translateY(5px)}
+  .cf-add:hover .cf-addplus{transform:translate(-50%,-62%)}
+}
+@media(prefers-reduced-motion:reduce){.cf-add .cf-back,.cf-add .cf-front,.cf-add .cf-hi,.cf-add .cf-addplus{transition:none}}
 
 .cf-items,.esbody{gap:var(--space-xl)}
 .cf-meta,.my-shortcuts button,.live-map .lm-header .lm-location-title{gap:var(--space-sm)}
@@ -1000,6 +1008,7 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 /* 2026-11-10 정렬 드롭다운: 오른쪽 정렬로 화면 안에서 펼침(가로 스크롤 없음), 픽토그램 없음 */
 .pm-choice-sort{position:relative}
 .pm-choice-sort .pm-choice-options{left:auto;right:0;min-width:168px;max-width:calc(100vw - 2 * var(--space-xl))}
+.cfpage .pm-choice-sort .pm-choice-options{left:0;right:auto;transform-origin:top left}
 .pm-choice-sort .pm-choice-trigger{gap:var(--space-xs)}
 /* 2026-11-10 지도 목록 책갈피: 글자·개수 없이 목록 픽토그램만 (44×52, 접근 이름은 '장소 목록 열기, N곳') */
 .live-map #lm-selected-place button.lm-list-tab{min-height:52px;height:52px;justify-content:center;padding:0}
@@ -1254,9 +1263,10 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 [data-theme="dark"] .main .calbox{background:color-mix(in srgb,var(--color-surface) 64%,transparent)!important;border-color:color-mix(in srgb,var(--color-on-surface) 12%,transparent)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.main .calbox{background:var(--color-surface)!important}}
 
-/* Home hero breathes; schedule stays compact beneath it. */
-.main>.mainwrap{margin-top:var(--space-2xl)!important;margin-bottom:var(--space-2xl)}
+/* Equal visible space above and below the centered carousel (32px margin + 8px card inset). */
+.main>.mainwrap{margin-block:var(--space-2xl)!important}
 .main>.mainwrap+.calw{margin-top:0!important}
+.mainpick .pick,.mainpick .pickdots i{box-shadow:none!important}
 
 
 /* Loading uses the same vector wordmark as Home, in white on the dark backdrop. */

@@ -24,6 +24,7 @@ const CF_FOLDERS = [
 // 생활 정보 · 기타 콘텐츠는 칩 없이, 저장된 게 있을 때만 맨 뒤 폴더로 보여줘요 (데이터가 숨지 않게)
 const CF_EXTRA = {id:'기타', icon:'bookmark'};
 const CF_ALL = [...CF_FOLDERS, CF_EXTRA];
+const CF_ALL_FOLDER = {id:'전체 저장', title:'전체', icon:'bookmark'};
 const CF_GALLERY = new Set(['쇼핑', '레시피', '기타']); // 장소가 아닌 폴더 → 갤러리형 카드
 
 // 저장 콘텐츠 → 폴더 (맛집·카페는 카페 여부로 나눠요)
@@ -128,13 +129,13 @@ const libraryResultCards = resultCards;  // 기존 목록 (참고용으로 남�
 const cfQ = () => query.trim().toLowerCase();
 const cfHit = x => { const q = cfQ(); return !q || [x.title, x.desc, x.type, x.category, x.collection, x.memo, folderOf(x)].join(' ').toLowerCase().includes(q); };
 // 지금 열린 폴더: 카테고리 폴더(칩 · 폴더) 또는 모음 폴더(collection)
-const cfOpenTitle = () => collection || (cfSelected().length ? (CF_ALIAS[filter] ? filter : cfSelected()[0]) : '');
+const cfOpenTitle = () => collection || (filter === CF_ALL_FOLDER.id ? CF_ALL_FOLDER.title : (cfSelected().length ? (CF_ALIAS[filter] ? filter : cfSelected()[0]) : ''));
 const cfOpenList = () => collection ? items.filter(x => x.collection === collection && cfHit(x)) : cfMatches();
 
 // 열린 폴더의 전체 저장 개수 (검색과 상관없이)
-const cfTotal = () => collection ? items.filter(x => x.collection === collection).length : items.filter(x => cfSelected().includes(folderOf(x))).length;
+const cfTotal = () => collection ? items.filter(x => x.collection === collection).length : filter === CF_ALL_FOLDER.id ? items.length : items.filter(x => cfSelected().includes(folderOf(x))).length;
 function cfStatus(){
-  if (!cfOpenTitle() && !cfQ()) return `폴더 ${cfFolderData(items).length + cfCustom().length}개`;
+  if (!cfOpenTitle() && !cfQ()) return `폴더 ${1 + cfFolderData(items).length + cfCustom().length}개`;
   return `콘텐츠 ${cfOpenList().length}개`;
 }
 /* ---------- 폴더 안 콘텐츠: 1단 카드 리스트 ---------- */
@@ -228,7 +229,8 @@ resultCards = function(){
       <span class="cf-addplus">${icon('plus')}</span>
     </span>
   </button>`];
-  const folders = [...addTile, ...cfOrderFolders([...mine.filter(f => f.count > 0), ...cfFolderData(list)]).map(CollectionFolder)];
+  const allFolder = q ? [] : [CollectionFolder({...CF_ALL_FOLDER,count:items.length,thumbnails:cfThumbs(items)})];
+  const folders = [...addTile, ...allFolder, ...cfOrderFolders([...mine.filter(f => f.count > 0), ...cfFolderData(list)]).map(CollectionFolder)];
   const grid = folders.length ? `<div class="cf-grid">${folders.join('')}</div>` : '';
   if (!q) return cfFolderToolbar() + grid;
   if (!list.length) return cfEmpty('search', '찾는 콘텐츠가 없어요', '다른 키워드나 카테고리로 다시 찾아 보세요.', `<button class="tonal" data-action="resetfilter">전체 컬렉션 보기</button>`);
