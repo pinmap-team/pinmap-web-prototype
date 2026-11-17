@@ -6,6 +6,7 @@
 .layout .main:has(.strip){padding-top:calc(64px + var(--space-2xl))!important}
 .main:has(.homebrand) .homebrand{height:56px;min-height:56px;margin-bottom:0}
 .main>.topbar:has(.toptitle){display:flex;align-items:center;min-height:56px}
+.main:has(.calbox) .calfhead{height:56px;min-height:56px}
 .main>.topbar .toptitle{font:var(--type-headline-md);letter-spacing:-.6px}
 .main>.topbar .topactions,.main:has(.cfpage)>.topbar .topactions{top:6px;right:0}
 .main:has(.homebrand)>.topbar .topactions{top:6px}
