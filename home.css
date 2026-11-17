@@ -99,7 +99,6 @@
 
 /* 홈 검색 버튼 (알림 버튼 왼쪽) */
 .topactions{display:flex;gap:var(--space-sm)}
-.searchbtn .icon{width:20px;height:20px}
 
 /* 마이 하위 페이지 */
 .subhead{display:flex;align-items:center;gap:var(--space-xs);margin:calc(-1 * var(--space-xs)) 0 var(--space-lg) calc(-1 * var(--space-sm));padding-right:110px}

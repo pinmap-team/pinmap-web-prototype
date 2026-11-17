@@ -117,6 +117,7 @@ if (PM_ENV.requiresAuth) (() => {
   function clearAccount() {
     loadVersion++;
     currentUserId = null;
+    window.PinmapSaveProgress?.clear();
     window.PinmapAccountLoaded = false;
     window.PinmapAccountLoadError = false;
     items = [];
@@ -170,6 +171,7 @@ if (PM_ENV.requiresAuth) (() => {
     originalSave();
     const form = document.getElementById('saveform');
     if (!form) return;
+    PinmapSaveProgress.render();
     const header = form.querySelector('.eshead p');
     if (header) header.textContent = 'Instagram 게시물에서 장소와 행사 일정을 찾아 저장해요.';
     for (const selector of ['.esshare','.esdivider','.essample']) {
@@ -187,7 +189,11 @@ if (PM_ENV.requiresAuth) (() => {
     if (event.target.id !== 'saveform') return;
     event.preventDefault(); event.stopImmediatePropagation();
     const form = event.target;
-    if (form.dataset.busy) return;
+    if (PinmapSaveProgress.isRunning()) {
+      const errorNode = form.querySelector('#saveerror');
+      if (errorNode) errorNode.textContent = '다른 링크를 저장 중이에요. 완료될 때까지 기다려 주세요.';
+      return;
+    }
     const errorNode = form.querySelector('#saveerror');
     const url = form.elements.namedItem('url').value.trim();
     if (!/^https:\/\/(?:www\.)?instagram\.com\/(?:p|reel|tv)\/[A-Za-z0-9_-]+\/?(?:\?.*)?$/.test(url)) {
@@ -195,20 +201,16 @@ if (PM_ENV.requiresAuth) (() => {
       return;
     }
     if (errorNode) errorNode.textContent = '';
-    form.dataset.busy = '1';
-    const button = form.querySelector('button[type="submit"]');
-    const label = button?.textContent;
-    const progress = form.querySelector('#saveprogress');
-    if (button) {button.disabled = true; button.setAttribute('aria-busy','true'); button.textContent = '저장 중…';}
-    if (progress) {progress.hidden = false; progress.textContent = '게시물을 분석하고 계정에 저장 중이에요. 몇 분 걸릴 수 있어요.';}
+    if (!PinmapSaveProgress.start()) return;
     const userId = currentUserId;
     try {
       const result = await accountRequest('POST', {url,content_types:['place','event']}, '', userId);
       if (!result.item || typeof result.item !== 'object') throw Error('저장 결과를 확인하지 못했어요.');
-      if (currentUserId !== userId) return;
+      if (currentUserId !== userId) { PinmapSaveProgress.clear(); return; }
       const item = pinmapAccountItem(result.item, localId(result.item));
       item.collection=folderState.assignments[String(item.backendId)]||'';
       items = [item, ...items.filter(x => x.url !== item.url)];
+      PinmapSaveProgress.finish();
       document.getElementById('sheet')?.close();
       closeOnboarding();
       if (item.mapLocations.length && !item.events.length) {window.pmMapFocus = item.id; go('map');}
@@ -218,11 +220,11 @@ if (PM_ENV.requiresAuth) (() => {
         ? '링크를 저장했어요. 분석은 완료하지 못했어요. 상세에서 이유를 확인해 주세요.'
         : `저장했어요 · 장소 ${item.extractedPlaceCount}곳 · 행사 ${item.events.length}건${warningCount ? ' · 확인할 안내가 있어요' : ''}`);
     } catch (error) {
-      if (errorNode) errorNode.textContent = error.message || '저장하지 못했어요. 다시 시도해 주세요.';
-    } finally {
-      delete form.dataset.busy;
-      if (button) {button.disabled = false; button.removeAttribute('aria-busy'); button.textContent = label;}
-      if (progress) {progress.hidden = true; progress.textContent = '';}
+      const message = error.message || '저장하지 못했어요. 다시 시도해 주세요.';
+      PinmapSaveProgress.finish(message);
+      const currentError = document.querySelector('#saveform #saveerror');
+      if (currentError) currentError.textContent = message;
+      else toast(message);
     }
   }, true);
   window.PinmapAccountContent = {remove:async item => {

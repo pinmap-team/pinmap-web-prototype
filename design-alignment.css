@@ -556,29 +556,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 /* 홈: 캘린더 위젯 제목은 headline-md (한 단계 줄였다가 사용자 요청으로 다시 한 단계 키움) */
 .hwhead h2{font:var(--type-headline-md)}
 /* 홈: 오른쪽 위 검색·알림 아이콘 뒤 흰 원 없앰 (유리 재질 대체 배경 포함) */
-.main>.topbar .bellbtn,.main>.topbar .searchbtn{background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:0}
-/* 홈 검색: 컬렉션 검색과 같은 모양. 오른쪽 돋보기 자리에서 왼쪽으로 펼쳐지고 돋보기는 X로 바뀜 */
-.main>.topbar .home-search{position:absolute;right:44px;top:-6px;z-index:11;width:0;height:44px;opacity:0;visibility:hidden;pointer-events:none;transition:width .36s cubic-bezier(.22,1,.36,1),opacity .18s ease,visibility 0s .36s}
-.main>.topbar .home-search.is-open{left:0;width:calc(100% - 44px);opacity:1;visibility:visible;pointer-events:auto;transition:width .36s cubic-bezier(.22,1,.36,1),opacity .18s ease}
-.main>.topbar .home-search .libsearch{display:flex;align-items:center;width:100%;height:44px;margin:0;padding:0 var(--space-lg);border:1px solid var(--color-disabled);border-radius:999px;background:var(--color-surface)}
-.main>.topbar .home-search input{flex:1;min-width:0;height:42px;padding:0;border:0;outline:0;background:transparent;color:var(--color-on-surface);font:var(--type-body-md)}
-.main>.topbar .home-search input::placeholder{color:var(--color-secondary)}
-.main>.topbar .home-search input::-webkit-search-cancel-button{display:none}
-.main>.topbar .home-search .libsearch:focus-within{outline:2px solid var(--color-primary);outline-offset:-2px}
-.main>.topbar .hs-results:not(:empty){margin-top:var(--space-sm);padding:var(--space-xs);border-radius:var(--rounded-md);background:var(--color-surface);box-shadow:var(--shadow-md)}
-.main>.topbar .hs-row{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-xs);width:100%;min-height:44px;padding:var(--space-sm) var(--space-md);border-radius:var(--rounded-sm);background:transparent;color:var(--color-on-surface);text-align:left}
-.main>.topbar .hs-row:hover,.main>.topbar .hs-row:focus-visible{background:var(--color-neutral)}
-.main>.topbar .hs-row b{font:var(--type-label-md)}
-.main>.topbar .hs-row small{font:var(--type-body-sm);color:var(--color-secondary)}
-.main>.topbar .hs-empty{margin:0;padding:var(--space-md);font:var(--type-body-sm);color:var(--color-secondary)}
-.main>.topbar .searchbtn{position:relative}
-.main>.topbar .searchbtn>span{position:absolute;inset:0;display:grid;place-items:center;transition:opacity .24s ease,transform .32s cubic-bezier(.22,1,.36,1)}
-.main>.topbar .searchbtn .lm-search-close-icon{opacity:0;transform:rotate(-65deg) scale(.72)}
-.main>.topbar .searchbtn[aria-expanded="true"] .lm-search-open-icon{opacity:0;transform:rotate(65deg) scale(.72)}
-.main>.topbar .searchbtn[aria-expanded="true"] .lm-search-close-icon{opacity:1;transform:none}
-.main>.topbar:has(.home-search.is-open) .topactions .bellbtn:not(.searchbtn){display:none}
-@media(prefers-reduced-motion:reduce){.main>.topbar .home-search,.main>.topbar .searchbtn>span{transition:none}}
-
+.main>.topbar .bellbtn{background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:0}
 /* 2026-11-14: reference dock, expanded active capsule and outline icons. */
 .bottomnav,.live-map .bottomnav{width:min(calc(100% - 48px),336px)!important;max-width:336px!important;height:72px!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 .bottomnav .pm-nav-main{isolation:isolate;display:flex;align-items:center;box-sizing:border-box;width:100%;height:64px;padding:var(--space-xs);border-radius:999px;border:1px solid color-mix(in srgb,var(--color-surface) 88%,transparent)!important;box-shadow:var(--shadow-sm)!important}
@@ -994,9 +972,8 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .cfpage .libsearch:focus-within,.cf-picksearch:focus-within,.libsearch:focus-within,:is(.esselect,.esinput):focus-within{box-shadow:none!important}
 .libsearch:focus-within,:is(.esselect,.esinput):focus-within{border-color:var(--pm-line)!important}
 .cfpage .libsearch:focus-within{border-color:color-mix(in srgb,var(--color-surface) 88%,transparent)!important}
-.live-map .lm-header .lm-search-row .libsearch:focus-within,.main>.topbar .home-search .libsearch:focus-within{box-shadow:none!important}
+.live-map .lm-header .lm-search-row .libsearch:focus-within{box-shadow:none!important}
 .live-map .lm-header .lm-search-row .libsearch:focus-within{border-color:var(--t-line,var(--color-disabled))!important}
-.main>.topbar .home-search .libsearch:focus-within{border-color:var(--color-disabled)!important}
 .address-edit-form :is(input,textarea):is(:focus,:focus-visible){border-color:var(--color-border)!important}
 .ob-chip .ob-num,[data-theme="dark"] .ob-chip .ob-num{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--color-neutral);color:var(--color-primary);font:var(--type-body-sm);font-weight:var(--weight-bold)}
 
@@ -1319,6 +1296,18 @@ html.pm-refresh-enabled,html.pm-refresh-enabled body{overscroll-behavior-y:conta
 [data-theme="dark"] .bottomnav .pm-nav-main::before,[data-theme="dark"] .bottomnav .pm-nav-main[data-refraction="true"]::before{background:linear-gradient(145deg,#434751b8,#272b36a8 60%,#3d4351a8)}
 [data-theme="dark"] .bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffff42,#ffffff13)!important;border-color:#ffffff52!important;box-shadow:none!important}
 
+/* Keep the in-tab save job visible after its modal closes or the app page changes. */
+.pm-save-status{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom));z-index:1000;box-sizing:border-box;width:min(calc(100% - 48px),354px);padding:var(--space-lg);transform:translateX(-50%);border:1px solid var(--color-border);border-radius:var(--rounded-lg);background:var(--color-surface);color:var(--color-on-surface);box-shadow:var(--shadow-md);pointer-events:none}
+.pm-save-status[hidden],#sheet .esprogress[hidden]{display:none}
+#sheet .esprogress{display:block;color:var(--color-on-surface)}
+#sheet .esprogress::before{content:none}
+.pm-save-status-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);font:var(--type-label-md)}
+.pm-save-status-row span{font-variant-numeric:tabular-nums}
+.pm-save-meter{height:6px;margin-top:var(--space-sm);overflow:hidden;border-radius:999px;background:var(--color-neutral)}
+.pm-save-meter>span{display:block;height:100%;border-radius:inherit;background:var(--color-primary);transition:width .7s ease}
+.pm-save-status p,#sheet .esprogress p{margin:var(--space-sm) 0 0;font:var(--type-body-sm);color:var(--color-secondary)}
+@media(prefers-reduced-motion:reduce){.pm-save-meter>span{transition:none}}
+
 /* Readable labels with an open photographic middle, not an even dark veil. */
 .mainpick .pick:not(.pick-placeholder) .pickimg::after{background:linear-gradient(180deg,#0009 0%,#0004 18%,transparent 38%,transparent 53%,#0001 67%,#000b 100%)!important}
 
@@ -1347,10 +1336,34 @@ html.pm-refresh-enabled,html.pm-refresh-enabled body{overscroll-behavior-y:conta
 .cfpage .cf-itemtext h3,.cfpage .cf-itemdesc,.cfpage .cf-itemmeta{color:#fff!important;text-shadow:0 1px 5px #0009}
 
 /* Home-only icon action; its accessible name stays in the button markup. */
-.home-add-fab{position:fixed;right:max(var(--gutter),calc((100vw - 480px)/2 + var(--gutter)));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;min-height:56px;padding:0;border:0;border-radius:50%;background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);box-shadow:var(--shadow-md);white-space:nowrap;cursor:pointer}
+.home-add-fab{position:fixed;right:max(calc(12.5vw - 7px),calc(50vw - 151px));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;min-height:56px;padding:0;border:0;border-radius:50%;background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);box-shadow:var(--shadow-md);white-space:nowrap;cursor:pointer}
 .home-add-fab .icon{width:22px;height:22px;flex:none}
 .home-add-fab:active{background:var(--color-primary-pressed)}
 .home-add-fab:focus-visible{outline:2px solid var(--color-primary);outline-offset:4px}
+
+/* Keep the search surface above map controls while it is expanded. */
+.live-map:has(.lm-search-row.is-open) .lm-header{z-index:800}
+.live-map:has(.lm-search-row.is-open) .lm-search-results{z-index:810}
+.live-map:has(.lm-search-row.is-open) :is(.lm-locate-top,.lm-floating-actions){visibility:hidden;pointer-events:none}
+.cfpage:has(.cf-search-row.is-open) .cf-search-header{z-index:800}
+
+/* The current mark and wordmark share a balanced monochrome heading. */
+.homebrand .homebrand-symbol{flex:none;width:28px;height:33px;object-fit:contain}
+.homebrand .homebrand-name{color:var(--color-on-surface);font:var(--type-headline-lg);font-size:26px;line-height:33px;font-weight:var(--weight-bold);letter-spacing:-.5px}
+
+/* Calendar rows show their own square cover instead of a full-card photo. */
+.calrow{min-height:88px;background:var(--color-surface);color:var(--color-on-surface)}
+.calthumb{position:static;inset:auto;z-index:auto;width:64px;height:64px;flex:none;border-radius:var(--rounded-md);background:var(--color-neutral)}
+.calthumb::after{content:none}
+.caltext{padding-left:0}
+.caltext b{color:var(--color-on-surface);text-shadow:none}
+.caltext small{color:var(--color-secondary)}
+.calbadge{background:var(--color-neutral);color:var(--color-on-surface);-webkit-backdrop-filter:none;backdrop-filter:none}
+.calbadge.soon{background:var(--color-error);color:#fff}
+
+/* Home actions use a fill change for keyboard focus, without a ring. */
+body:has(.homebrand) :is(button,a):focus-visible{outline:none!important;box-shadow:none!important}
+body:has(.homebrand) :is(button,a):focus-visible:not(:disabled){filter:brightness(.88)}
 
 /* Relative movement leaves the fixed navigation and add button in place. */
 html.pm-refresh-enabled #app{position:relative;top:var(--pull-content,0px);transition:top .26s cubic-bezier(.22,1,.36,1)}
