@@ -72,7 +72,7 @@ function pickCard({x, id}, i, total = 1){
   // 관심사 이름을 보여주고, '기타(나중에 보기)'나 랜덤 추천이면 콘텐츠별 키워드(가구 · 전시 · 맛집 …)를 보여줘요
   const tag = id && id !== 'later' ? interestOf(id).short : (x.category || shortType(x.type));
   const desc = (x.desc || '').trim().replace(/[.。]+$/, '');
-  return `<button class="pick" data-detail="${x.id}" data-i="${i}" aria-label="${esc(x.title)} 상세 보기${total > 1 ? `, 추천 콘텐츠 ${i + 1} / ${total}` : ''}">
+  return `<button class="pick" data-detail="${x.id}" data-i="${i}">
     <span class="pickimg">${libThumb(x)}</span>
     <span class="pickword" aria-hidden="true">${esc(tag)}</span>
     <span class="picktext"><b>${esc(x.title)}</b>${desc ? `<small>${esc(desc)}</small>` : ''}</span>
@@ -160,7 +160,7 @@ pages.home = function(){
     : accountError
     ? '<div class="empty small" role="status"><p class="muted">저장한 콘텐츠를 불러오지 못했어요.</p><button class="tonal" data-action="accountretry">다시 불러오기</button></div>'
     : picks.length || emptyHome
-    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${emptyHome ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" data-action="save">${icon('plus')}콘텐츠 추가하기</button><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
+    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'role="group" aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${emptyHome ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" data-action="save">${icon('plus')}콘텐츠 추가하기</button><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
     : `<div class="empty small"><p class="muted">선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.</p><button class="tonal" data-action="save">새로 저장하기</button></div>`;
   const brand = '<div class="homebrand"><img src="img/pinmap-logo-splash.svg" alt="Pinmap 로고"></div>';
   return stripBar() + brand + main + (loadingAccount || accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + chips + (emptyHome || loadingAccount || accountError ? '' : subWidgets());
