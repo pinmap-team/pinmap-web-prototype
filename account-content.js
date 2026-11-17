@@ -68,6 +68,7 @@ if (PM_ENV.requiresAuth) (() => {
   // Only non-sensitive folder preferences use user metadata. Never use this
   // client-editable field for authorization or copy other users' organization.
   async function saveFolder(operation){
+    if(!window.PinmapAccountLoaded||window.PinmapAccountLoadError)throw Error('저장 목록을 불러온 뒤 폴더를 정리해 주세요.');
     if(folderSaving)throw Error('폴더를 저장 중이에요. 잠시 기다려 주세요.');
     folderSaving=true;
     const expected=currentUserId;

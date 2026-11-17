@@ -11,7 +11,7 @@
   const markerEntries=new Map();
   let userPosition = null;
   const locationTracker=window.PinmapLocation.createTracker();
-  let userHeading = null, locationWatch = null, orientationActive = false;
+  let userHeading = null, locationWatch = null, orientationActive = false, orientationGranted = false;
   let locationBusy = false;
   // A neutral city view remains until permission yields a real GPS fix.
   let center = [37.5665,126.978], zoom = 14, category = 'all';
@@ -406,7 +406,7 @@
   }
   function stopLocation() {
     if(locationWatch!==null)navigator.geolocation?.clearWatch(locationWatch);
-    locationWatch=null;locationBusy=false;followNextFix=false;
+    locationWatch=null;locationBusy=false;followNextFix=false;userHeading=null;
     window.removeEventListener('deviceorientation',updateHeading);
     window.removeEventListener('deviceorientationabsolute',updateHeading);orientationActive=false;
   }
@@ -415,8 +415,8 @@
     if(recenter)followNextFix=true;
     const request=window.DeviceOrientationEvent?.requestPermission;
     if(!automatic&&typeof request==='function'){
-      try{Promise.resolve(request.call(window.DeviceOrientationEvent,true)).then(result=>{if(result==='granted'&&page==='map'&&liveMap)startOrientation();}).catch(()=>{});}catch{}
-    }else if(typeof request!=='function')startOrientation();
+      try{Promise.resolve(request.call(window.DeviceOrientationEvent,true)).then(result=>{if(result==='granted'){orientationGranted=true;if(page==='map'&&liveMap)startOrientation();}}).catch(()=>{});}catch{}
+    }else if(typeof request!=='function'||orientationGranted)startOrientation();
     if(userPosition){if(recenter)liveMap.setView(userPosition,16);followNextFix=false;drawLocation();}
     if(locationWatch!==null||locationBusy)return;
     if(!navigator.geolocation){toast('이 기기에서는 현재 위치를 확인할 수 없어요.');return;}
