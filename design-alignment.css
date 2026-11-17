@@ -45,8 +45,10 @@ button,input,select,textarea,svg text,.libpage,.live-map,#login-screen,.ob-phone
   .cf-add:hover .cf-back{transform:translateY(-8px)}
   .cf-add:hover .cf-front{transform:perspective(440px) rotateX(-14deg) translateY(5px)}
   .cf-add:hover .cf-hi{transform:translateY(5px)}
-  .cf-add:hover .cf-addplus{transform:translate(-50%,-62%)}
+  .cf-add:hover .cf-shell{transform:none}
+  .cf-add:hover .cf-addplus{transform:translate(-50%,-50%)}
 }
+.cf-add:active .cf-shell{transform:none}
 @media(prefers-reduced-motion:reduce){.cf-add .cf-back,.cf-add .cf-front,.cf-add .cf-hi,.cf-add .cf-addplus{transition:none}}
 
 .cf-items,.esbody{gap:var(--space-xl)}
@@ -499,6 +501,8 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 
 .cf-folder-toolbar .pm-choice-trigger{color:var(--color-secondary)}
 .cf-folder-toolbar+.cf-grid{margin-top:var(--space-sm)}
+.cfpage.cf-infolder .cf-sec{margin-top:var(--space-md)}
+.cfpage :is(.cf-folder-toolbar,.cf-sec .cf-tools) .libsort .pm-choice-trigger{padding-inline:0;font:var(--type-label-md);font-weight:var(--weight-regular);color:var(--color-secondary)}
 
 /* 2026-11-04 온보딩 1/2 가로 카드 (레퍼런스: 라벨 칩 + 큰 이미지 카드 + 다음 카드 살짝 보임 + 점 표시). 기존 25개 토큰만 사용 */
 .ob-carousel{display:flex;flex-direction:column;min-height:0}
@@ -1267,6 +1271,13 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .main>.mainwrap{margin-block:var(--space-2xl)!important}
 .main>.mainwrap+.calw{margin-top:0!important}
 .mainpick .pick,.mainpick .pickdots i{box-shadow:none!important}
+
+/* Keep the card edges at the same 40px spacing while leaving room for the center shadow. */
+.mainwrap:not(:has(.home-first-save)) .mainpick{height:calc(var(--ph) + 56px)!important;margin-top:calc(-1 * var(--space-sm));margin-bottom:calc(-1 * var(--space-2xl))}
+.mainwrap:not(:has(.home-first-save)) .mainpick .pick{top:16px}
+.mainpick .pick:not(.pick-placeholder)[aria-hidden="false"]{box-shadow:var(--shadow-sm)!important}
+.main:has(.homebrand)>.mainwrap:not(:has(.home-first-save)){margin-top:calc(var(--space-xl) - var(--space-xs))!important}
+.main>.topbar .bellbtn .icon{width:28px;height:28px}
 
 
 /* Loading uses the same vector wordmark as Home, in white on the dark backdrop. */
