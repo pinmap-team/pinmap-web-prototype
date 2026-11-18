@@ -38,8 +38,18 @@ button,input,select,textarea,svg text,.libpage,.live-map,#login-screen,.ob-phone
 /* Preserve the folder geometry; clear upper glass and a readable solid base. */
 .cfpage .cf-folder:not(.cf-add) .cf-front{background:linear-gradient(180deg,color-mix(in srgb,var(--color-surface) 22%,transparent) 0%,color-mix(in srgb,var(--color-surface) 58%,transparent) 36%,color-mix(in srgb,var(--color-surface) 94%,transparent) 72%,var(--color-surface) 100%);-webkit-backdrop-filter:blur(6px) saturate(1.15);backdrop-filter:blur(6px) saturate(1.15)}
 .cfpage .cf-folder:not(.cf-add) .cf-photo{border:0;aspect-ratio:3/4;box-shadow:none;translate:0 0;transition:translate .3s cubic-bezier(.22,1,.36,1)}
-@media(hover:hover){.cfpage .cf-folder:not(.cf-add):hover .cf-photo{translate:0 calc(-1 * var(--space-sm))}}
-.cfpage .cf-folder:not(.cf-add):focus-visible .cf-photo{translate:0 calc(-1 * var(--space-sm))}
+/* Original collection only: reuse the reference hover motion, without shadow changes. */
+.cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder) .cf-photo{transform-origin:50% 50%;transition:translate .3s cubic-bezier(.22,1,.36,1),transform .3s cubic-bezier(.22,1,.36,1)}
+@media(hover:hover){
+  .cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):hover .cf-photo{translate:0 -10px}
+  .cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):hover .cf-slot0{transform:rotate(0deg)}
+  .cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):hover .cf-slot1{transform:rotate(12deg)}
+  .cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):hover .cf-slot2{transform:rotate(-12deg)}
+}
+.cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):focus-visible .cf-photo{translate:0 -10px}
+.cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):focus-visible .cf-slot0{transform:rotate(0deg)}
+.cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):focus-visible .cf-slot1{transform:rotate(12deg)}
+.cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):focus-visible .cf-slot2{transform:rotate(-12deg)}
 .cfpage .cf-folder:not(.cf-add) .cf-shade{opacity:0}
 .cfpage .cf-folder .cf-hi{display:none}
 .cfpage .cf-folder:not(.cf-add) .cf-slot0:not(.cf-empty){width:48%;left:26%;top:2%;z-index:3}
