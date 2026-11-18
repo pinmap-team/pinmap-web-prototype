@@ -1,0 +1,24 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="710.319" height="415.736" viewBox="0 0 710.319 415.736" fill="none" xmlns="http://www.w3.org/2000/svg">
+<foreignObject x="0" y="0" width="710.319" height="415.736" overflow="visible" data-figma-3d="true">
+<div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:710.3191px;height:415.7359px">
+<div style="position:absolute;left:0;top:0;margin:0;width:705.3403px;height:410.757px;transform-origin:0 0;transform:matrix(1, 0, 0, 1, 2.4894, 2.4894) translate(50%, 100%) rotateX(-26deg) translate(-50%, -100%)">
+<svg xmlns="http://www.w3.org/2000/svg" width="705.34" height="410.757" overflow="visible" style="position:absolute;left:0;top:0;overflow:visible">
+<foreignObject x="-23.2347" y="-23.2347" width="751.81" height="457.227"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(10.37px);clip-path:url(#bgblur_0_0_20_clip_path);height:100%;width:100%"></div></foreignObject><path id="Front Glass" data-figma-bg-blur-radius="20.7453" d="M0 45.6397C0 20.4341 20.4341 0 45.6397 0H244.795C298.732 0 302.881 66.385 356.819 66.385H659.701C684.906 66.385 705.34 86.8191 705.34 112.025V365.117C705.34 390.323 684.906 410.757 659.701 410.757H45.6397C20.4341 410.757 0 390.323 0 365.117V45.6397Z" fill="url(#paint0_linear_0_20)" stroke-width="4.97887" stroke="url(#paint1_linear_0_20)"/>
+</svg>
+</div>
+</div>
+</foreignObject>
+<defs>
+<clipPath id="bgblur_0_0_20_clip_path" transform="translate(23.2347 23.2347)"><path d="M0 45.6397C0 20.4341 20.4341 0 45.6397 0H244.795C298.732 0 302.881 66.385 356.819 66.385H659.701C684.906 66.385 705.34 86.8191 705.34 112.025V365.117C705.34 390.323 684.906 410.757 659.701 410.757H45.6397C20.4341 410.757 0 390.323 0 365.117V45.6397Z"/>
+</clipPath><linearGradient id="paint0_linear_0_20" x1="352.67" y1="0" x2="352.67" y2="410.757" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.16"/>
+<stop offset="0.42" stop-color="white" stop-opacity="0.5"/>
+<stop offset="1" stop-color="#FCFCFC" stop-opacity="0.93"/>
+</linearGradient>
+<linearGradient id="paint1_linear_0_20" x1="352.67" y1="0" x2="352.67" y2="410.757" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.95"/>
+<stop offset="0.35" stop-color="white" stop-opacity="0.35"/>
+<stop offset="1" stop-color="white" stop-opacity="0.12"/>
+</linearGradient>
+</defs>
+</svg>
