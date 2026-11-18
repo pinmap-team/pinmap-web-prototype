@@ -60,7 +60,7 @@
       return item && !item.pending ? {...position, image:libPhoto(item)||position.image, title:item.title, address:item.address || '주소 확인 필요', category:item.category || item.type, description:item.desc || '', savedLabel:savedAgo(item)+' 저장', source:'저장한 콘텐츠', saved:true, favorite:!!item.favorite} : null;
     }).filter(Boolean);
     const own = items.filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lng) && !x.pending && !savedCoords.some(y => y.id === x.id))
-      .map(x => ({id:x.id,lat:x.lat,lng:x.lng,kind:x.mapKind||kindOf(x.category || ''),image:libPhoto(x)||localPhoto(x.mapKind||kindOf(x.category || '')),title:x.title,address:x.address || '',category:x.category || x.type,description:x.desc || '',savedLabel:savedAgo(x)+' 저장',source:'저장한 콘텐츠',saved:true,favorite:!!x.favorite}));
+      .map(x => ({id:x.id,backendId:x.backendId,lat:x.lat,lng:x.lng,kind:x.mapKind||kindOf(x.category || ''),image:libPhoto(x)||localPhoto(x.mapKind||kindOf(x.category || '')),title:x.title,address:x.address || '',category:x.category || x.type,description:x.desc || '',savedLabel:savedAgo(x)+' 저장',source:'저장한 콘텐츠',saved:true,favorite:!!x.favorite}));
     return [...pinned,...own.flatMap(place=>{const item=items.find(x=>x.id===place.id);return item?.mapLocations?.length?item.mapLocations.filter(loc=>Number.isFinite(loc.coordinates?.lat)&&Number.isFinite(loc.coordinates?.lng)).map((loc,index)=>({...place,title:loc.name||place.title,lat:loc.coordinates.lat,lng:loc.coordinates.lng,address:loc.address||'주소 확인 필요',image:loc.image_data_url||PM_ENV.placeholderImage,savedLabel:loc.review_required?'지도 검색 위치 · 확인 필요':place.savedLabel,locationIndex:index})): [place];})];
   };
   function content() {
@@ -186,7 +186,7 @@
     const activeIndex=Math.max(0,list.findIndex(place=>placeKey(place)===expandedKey));
     host.setAttribute('aria-label','지도 장소 카드');
     // 2026-11-10 카드 전체가 상세로 가는 버튼(제목 버튼을 카드 크기로 늘림). 저장 시점 · 화살표는 두지 않음. 위로 밀면 목록 시트
-    host.innerHTML=list.length?`<button type="button" class="lm-list-tab" data-lm="open-list" aria-expanded="${listOpen}" aria-controls="lm-list-sheet" aria-label="장소 목록 열기, ${list.length}곳">${icon('list')}</button><div class="lm-carousel" role="region" aria-label="지도 장소 카드 캐러셀"><div class="lm-carousel-track" role="group" tabindex="0" aria-label="장소 카드, 좌우로 넘기기">${list.map((place,index)=>`<article class="lm-carousel-card" data-place-key="${safe(placeKey(place))}" aria-label="${index+1}번째 장소, ${safe(place.title)}"><div class="lm-carousel-photo"><img src="${safe(place.image||localPhoto(place.kind))}" alt=""></div><div class="lm-carousel-copy"><div class="lm-carousel-top"><button type="button" class="lm-card-open" data-lm="open-place" data-place-key="${safe(placeKey(place))}" aria-label="${safe(place.title)} ${place.saved?'상세 보기':'지도 앱에서 보기'}"><strong>${safe(place.title)}</strong></button>${favoriteButton(place)}</div><div class="lm-carousel-bottom"><small>${safe(place.category||'검색 결과')}</small>${place.address ? `<button type="button" class="lm-carousel-address" data-lm="focus-address" data-place-key="${safe(placeKey(place))}" aria-label="${safe(place.title)} 주소로 지도 이동: ${safe(place.address)}">${safe(place.address)}</button>` : `<p>주소 정보 없음</p>`}</div></div></article>`).join('')}</div></div>`:'<div class="lm-carousel-empty">표시할 장소가 없어요.</div>';
+    host.innerHTML=list.length?`<button type="button" class="lm-list-tab" data-lm="open-list" aria-expanded="${listOpen}" aria-controls="lm-list-sheet" aria-label="장소 목록 열기, ${list.length}곳">${icon('list')}</button><div class="lm-carousel" role="region" aria-label="지도 장소 카드 캐러셀"><div class="lm-carousel-track" role="group" tabindex="0" aria-label="장소 카드, 좌우로 넘기기">${list.map((place,index)=>`<article class="lm-carousel-card" data-place-key="${safe(placeKey(place))}" aria-label="${index+1}번째 장소, ${safe(place.title)}">${PinmapPlacePhotos.markup(place.backendId,place.locationIndex,place.image||localPhoto(place.kind),'lm-carousel-photo')}<div class="lm-carousel-copy"><div class="lm-carousel-top"><button type="button" class="lm-card-open" data-lm="open-place" data-place-key="${safe(placeKey(place))}" aria-label="${safe(place.title)} ${place.saved?'상세 보기':'지도 앱에서 보기'}"><strong>${safe(place.title)}</strong></button>${favoriteButton(place)}</div><div class="lm-carousel-bottom"><small>${safe(place.category||'검색 결과')}</small>${place.address ? `<button type="button" class="lm-carousel-address" data-lm="focus-address" data-place-key="${safe(placeKey(place))}" aria-label="${safe(place.title)} 주소로 지도 이동: ${safe(place.address)}">${safe(place.address)}</button>` : `<p>주소 정보 없음</p>`}</div></div></article>`).join('')}</div></div>`:'<div class="lm-carousel-empty">표시할 장소가 없어요.</div>';
     if(listOpen)renderList();
     const track=host.querySelector('.lm-carousel-track');
     if(!track)return;
@@ -222,7 +222,7 @@
   function renderList(){
     const sheet=$('#lm-list-sheet');if(!sheet)return;
     const list=visiblePlaces();
-    sheet.innerHTML=`<div class="lm-list-head"><h2>${searchResults?'검색 결과':'이 근처 저장한 곳'} <span>${list.length}곳</span></h2><button type="button" class="lm-list-close" data-lm="close-list" aria-label="목록 닫기">${icon('close')}</button></div><ul class="lm-list">${list.map(place=>`<li><button type="button" class="lm-list-row" data-lm="open-place" data-place-key="${safe(placeKey(place))}"><img src="${safe(place.image||localPhoto(place.kind))}" alt=""><span><b>${safe(place.title)}</b><small>${safe(place.category||'검색 결과')}</small><em>${safe(place.address||'주소 정보 없음')}</em></span></button>${favoriteButton(place)}</li>`).join('')}</ul>`;
+    sheet.innerHTML=`<div class="lm-list-head"><h2>${searchResults?'검색 결과':'이 근처 저장한 곳'} <span>${list.length}곳</span></h2><button type="button" class="lm-list-close" data-lm="close-list" aria-label="목록 닫기">${icon('close')}</button></div><ul class="lm-list">${list.map(place=>`<li><div class="lm-list-row" data-lm="open-place" data-place-key="${safe(placeKey(place))}">${PinmapPlacePhotos.markup(place.backendId,place.locationIndex,place.image||localPhoto(place.kind))}<button type="button" class="lm-list-copy" data-lm="open-place" data-place-key="${safe(placeKey(place))}"><span><b>${safe(place.title)}</b><small>${safe(place.category||'검색 결과')}</small><em>${safe(place.address||'주소 정보 없음')}</em></span></button></div>${favoriteButton(place)}</li>`).join('')}</ul>`;
   }
   function setList(open,focus=true){
     listOpen=open;const sheet=$('#lm-list-sheet'),map=$('#app .live-map');if(!sheet)return;
@@ -319,7 +319,9 @@
     const host=document.getElementById('detail-map-canvas');
     if(!host)return;
     const fallback=document.getElementById('detail-map-fallback');
-    const place=savedPlaces().find(p=>p.id===detailId);
+    const candidates=savedPlaces().filter(p=>p.id===detailId);
+    const index=window.pmDetailPlace?.id===detailId?window.pmDetailPlace.index:0;
+    const place=candidates.find(p=>p.locationIndex===(index||0))||candidates[0];
     if(!window.L || !place){
       fallback.hidden=false;
       if(!place)fallback.textContent='저장된 좌표가 없어요. 장소 위치를 먼저 확인해 주세요.';
@@ -497,7 +499,7 @@
       case 'select-place':{const place=markerEntries.get(button.dataset.placeKey)?.place;if(place)expandPlace(place);break;}
       case 'focus-address':{if(button.closest('.just-dragged'))break;const place=markerEntries.get(button.dataset.placeKey)?.place;if(place)expandPlace(place,true,false);break;}
       case 'close-place':clearSelection();renderSheet();break;
-      case 'open-place':{if(button.closest('.just-dragged'))break;const place=markerEntries.get(button.dataset.placeKey)?.place;if(!place)break;if(place.saved)openDetail(place.id,button);else window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place.lat+','+place.lng),'_blank','noopener,noreferrer');break;}
+      case 'open-place':{if(button.closest('.just-dragged'))break;const place=markerEntries.get(button.dataset.placeKey)?.place;if(!place)break;if(place.saved){window.pmDetailPlace={id:place.id,index:place.locationIndex};openDetail(place.id,button);}else window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place.lat+','+place.lng),'_blank','noopener,noreferrer');break;}
       case 'clear-search':searchResults=null;searchQuery='';$('#lm-search input').value='';$('#lm-search [data-lm="clear-search"]').hidden=true;$('#lm-search-results').hidden=true;refreshRecentSearches();markers();break;
     }
   });
