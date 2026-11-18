@@ -1,10 +1,29 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/api/map-config", "destination": "https://pinmap-backend.vercel.app/api/map-config" },
-    { "source": "/api/auth/config", "destination": "https://pinmap-backend.vercel.app/api/auth/config" },
-    { "source": "/api/place-extract", "destination": "https://pinmap-backend.vercel.app/api/place-extract" },
-    { "source": "/api/content-extract", "destination": "https://pinmap-backend.vercel.app/api/content-extract" },
-    { "source": "/api/content-save", "destination": "https://pinmap-backend.vercel.app/api/content-save" }
+    {
+      "source": "/api/map-config",
+      "destination": "https://pinmap-backend.vercel.app/api/map-config"
+    },
+    {
+      "source": "/api/auth/config",
+      "destination": "https://pinmap-backend.vercel.app/api/auth/config"
+    },
+    {
+      "source": "/api/place-extract",
+      "destination": "https://pinmap-backend.vercel.app/api/place-extract"
+    },
+    {
+      "source": "/api/content-extract",
+      "destination": "https://pinmap-backend.vercel.app/api/content-extract"
+    },
+    {
+      "source": "/api/content-save",
+      "destination": "https://pinmap-backend.vercel.app/api/content-save"
+    },
+    {
+      "source": "/api/content-photo",
+      "destination": "https://pinmap-backend.vercel.app/api/content-photo"
+    }
   ]
 }

@@ -15,12 +15,14 @@ function dtLogo(src){
 detail = function(){
   requestAnimationFrame(dtSheetLayout);
   const x = items.find(i => i.id === detailId);
+  const selectedPlaceIndex=window.pmDetailPlace?.id===detailId ? window.pmDetailPlace.index : 0;
+  const selectedPlace=x?.mapLocations?.[selectedPlaceIndex||0];
   if (!x) { detailId = null; return pages[page](); }
   const t = typeOf(x.type);
   const showPlaceInfo = t.place && (x.contentKind !== 'event' || (x.extractionPlaces || []).length > 0 || !!x.address);
   const ready = showPlaceInfo && x.address && !x.pending;
   const app = GOOGLE_MAP;
-  const mapHref = ready ? app.url(encodeURIComponent(x.mapQuery || x.address)) : '';
+  const mapHref = ready ? app.url(encodeURIComponent(selectedPlace?.address||x.mapQuery||x.address)) : '';
   const src = x.source || 'SNS';
   const author = /^[A-Za-z0-9._]{1,30}$/.test(x.authorUsername || '') ? x.authorUsername : '';
   const authorPhoto = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(x.authorProfilePhoto || '') ? x.authorProfilePhoto : '';
@@ -49,7 +51,7 @@ detail = function(){
   if (x.period) info += `<section class="dtsec"><h2>운영 기간</h2><div class="dtrow">${icon('calendar')}<span>${esc(x.period)}</span>${x.deadline ? `<b class="dtdue">마감 ${esc(x.deadline)}</b>` : ''}</div></section>`;
   const factRow = x.distance && ready ? `<div class="dtfacts"><span>${icon('walk')}${esc(x.distance)}</span></div>` : '';
   if (showPlaceInfo) info += ready
-    ? `<section class="dtsec dtlocation"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><div class="dtplacecard"><div class="dtaddress">${icon('pin')}<span>${esc(x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div><div class="dtmap-preview"><div id="detail-map-canvas" role="img" aria-label="${esc(x.title)} 저장 위치 지도"></div><button type="button" class="dtmaplink" data-action="dtgomap" aria-label="${esc(x.title)} 지도 탭에서 보기"></button><p class="dtmap-fallback" id="detail-map-fallback" hidden>지도를 불러오지 못했어요. 지도에서 위치를 확인해 주세요.</p></div>${factRow}</div></section>`
+    ? `<section class="dtsec dtlocation"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2>${selectedPlace?PinmapPlacePhotos.markup(x.backendId,selectedPlaceIndex||0,selectedPlace.image_data_url||PM_ENV.placeholderImage,'dt-place-photo'):''}<div class="dtplacecard"><div class="dtaddress">${icon('pin')}<span>${esc(selectedPlace?.address||x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div><div class="dtmap-preview"><div id="detail-map-canvas" role="img" aria-label="${esc(x.title)} 저장 위치 지도"></div><button type="button" class="dtmaplink" data-action="dtgomap" aria-label="${esc(x.title)} 지도 탭에서 보기"></button><p class="dtmap-fallback" id="detail-map-fallback" hidden>지도를 불러오지 못했어요. 지도에서 위치를 확인해 주세요.</p></div>${factRow}</div></section>`
     : `<section class="dtsec dtlocation"><h2>장소 정보</h2><div class="dtplacecard"><div class="dtwarn"><b>장소 확인 필요</b><p>${PM_ENV.requiresAuth ? '위치를 확정하지 못했어요. 원본에서 주소를 확인해 주세요.' : '위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.'}</p>${PM_ENV.requiresAuth ? '' : '<button class="dtsmall" data-action="edit">장소 직접 입력</button>'}</div></div></section>`;
   // 2026-11-10 가격을 크게(headline-md), 안내는 body-md. '예시 가격' → '참고 가격'
   if (x.type === '쇼핑') { const amount = String(x.price || '').replace(/,\s*(예시|참고) 가격$/, '').trim();
@@ -405,7 +407,9 @@ async function dtCopy(text){
 }
 actions.dtcopyaddr = async () => {
   const x = items.find(i => i.id === detailId); if (!x?.address) return;
-  toast(await dtCopy(x.address) ? '주소를 복사했어요.' : `주소: ${x.address}`);
+  const index=window.pmDetailPlace?.id===detailId?window.pmDetailPlace.index:0;
+  const address=x.mapLocations?.[index||0]?.address||x.address;
+  toast(await dtCopy(address) ? '주소를 복사했어요.' : `주소: ${address}`);
 };
 // 지도 누르면 핀맵 지도 탭으로 이동해 이 장소를 선택해요
 actions.dtgomap = () => {

@@ -1445,3 +1445,19 @@ html.pm-pulling,html.pm-pulling *{user-select:none!important;-webkit-user-select
 .cfpage .cf-folder.cf-glass-folder:not(.cf-add):focus-visible .cf-slot1{transform:translateY(-45.3%)}
 .cfpage .cf-folder.cf-glass-folder:not(.cf-add):focus-visible .cf-slot0{transform:translate(14.7%,-37.1%) rotate(5deg)}
 @media(prefers-reduced-motion:reduce){.cfpage .cf-folder.cf-glass-folder:not(.cf-add) .cf-photo{transition:none}}
+
+/* Saved-place photos retain original post imagery, with visible Google author credits. */
+.pm-place-photo{position:relative;display:block;margin:0;isolation:isolate;overflow:hidden}
+.pm-place-photo>img{display:block;width:100%;height:100%;object-fit:cover}
+.pm-place-photo .pm-photo-credit{position:absolute;z-index:4;left:0;right:0;bottom:0;padding:2px var(--space-xs);background:rgba(0,0,0,.72);color:#fff;font:var(--type-body-sm);line-height:1.2;max-height:50%;overflow:auto;white-space:normal;text-align:left;pointer-events:auto}
+.pm-place-photo .pm-photo-credit[hidden]{display:none}
+.pm-photo-credit a{color:inherit;text-decoration:underline;position:relative;z-index:5}
+.live-map .lm-list-row>.pm-place-photo{flex:none;width:72px;height:72px;border-radius:var(--rounded-sm)}
+.live-map .lm-list-row>.pm-place-photo>img{width:100%;height:100%}
+.live-map .lm-list-copy{flex:1;min-width:0;border:0;padding:0;background:transparent;text-align:left;color:inherit;cursor:pointer}
+.live-map .lm-list-copy>span{display:flex;flex-direction:column;gap:var(--space-xs)}
+.dt-place-photo{width:100%;height:180px;border-radius:var(--rounded-md);margin-bottom:var(--space-md)}
+.live-map .pm-photo-credit span{display:inline;gap:0}
+.live-map .lm-list-row>.pm-place-photo{width:88px;height:88px}
+.pm-photo-credit a:first-child{white-space:nowrap}
+.live-map button.lm-list-copy{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none;-webkit-backdrop-filter:none}

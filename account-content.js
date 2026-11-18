@@ -117,6 +117,7 @@ if (PM_ENV.requiresAuth) (() => {
   function clearAccount() {
     loadVersion++;
     currentUserId = null;
+    window.dispatchEvent(new Event('pinmap:account-cleared'));
     window.PinmapSaveProgress?.clear();
     window.PinmapAccountLoaded = false;
     window.PinmapAccountLoadError = false;
@@ -136,7 +137,7 @@ if (PM_ENV.requiresAuth) (() => {
       if(error)throw error;
       if(!data?.user?.id){clearAccount();return;}
       userId=data.user.id;
-      if(currentUserId&&currentUserId!==userId){items=[];applyFolders(null);detailId=null;}
+      if(currentUserId&&currentUserId!==userId){window.dispatchEvent(new Event('pinmap:account-cleared'));items=[];applyFolders(null);detailId=null;}
       currentUserId=userId;
       const records = [];
       let offset = 0;
