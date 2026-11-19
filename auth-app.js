@@ -50,7 +50,9 @@ if (PM_ENV.requiresAuth) (() => {
     try {
       const {data,error} = await PinmapAuth.verifiedUser(client);
       if (error || !data.user) {user = null; gate(); return;}
-      user = data.user; unlock();
+      const alreadyOpen = user?.id === data.user.id && !document.documentElement.classList.contains('auth-pending');
+      user = data.user;
+      if (!alreadyOpen) unlock();
     } catch {gate('로그인 상태를 확인하지 못했어요. 다시 연결해 주세요.');}
     finally {resolving = false;}
   }
@@ -61,6 +63,11 @@ if (PM_ENV.requiresAuth) (() => {
       if (event === 'SIGNED_OUT') {user = null; gate();}
       if (['SIGNED_IN','TOKEN_REFRESHED','USER_UPDATED'].includes(event)) setTimeout(verify,0);
     });
-    await verify();
+    const {data,error} = await client.auth.getSession();
+    if (error || !data?.session?.user) {gate(); return;}
+    // The app starts with an empty account view; server data still requires verification.
+    user = data.session.user;
+    unlock();
+    void verify();
   }).catch(error => gate(PinmapAuth.message(error)));
 })();

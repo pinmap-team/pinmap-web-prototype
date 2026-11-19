@@ -122,7 +122,7 @@ test('empty development home keeps decorative cards and one home-only save actio
   const source=read('home.js'),start=source.indexOf('pages.home = function(){'),end=source.indexOf('\n};',start)+3;
   const placeholderStart=source.indexOf('function emptyPickCards(){'),placeholderEnd=source.indexOf('\n/* ---------- 캘린더',placeholderStart);
   const html=vm.runInNewContext(source.slice(placeholderStart,placeholderEnd)+source.slice(start,end)+';pages.home();',{
-    PM_ENV:{development:true},items:[],pages:{},preferences:[],interestOptions:[],homePicks:()=>[],icon:()=>'<svg></svg>',
+    PM_ENV:{development:true,requiresAuth:true},window:{PinmapAccountLoaded:false,PinmapAccountLoadError:false},items:[],pages:{},preferences:[],interestOptions:[],homePicks:()=>[],icon:()=>'<svg></svg>',
     homeCategoryChips:()=>'',stripBar:()=>'',calWidget:()=>'<section id="calendar"></section>',subWidgets:()=>'<section>최근 저장한 목록</section>',PM_IMG:{logo:'logo.png'}
   });
   assert(html.includes('class="mainpick" data-placeholder="true" aria-hidden="true"'));
@@ -131,6 +131,7 @@ test('empty development home keeps decorative cards and one home-only save actio
   assert(!html.includes('data-detail='));
   assert.equal((html.match(/data-action="save"/g)||[]).length,1);
   assert(html.includes('class="home-add-fab"'));
+  assert(!html.includes('저장한 콘텐츠 불러오는 중'));
   assert(html.includes('aria-label="첫 콘텐츠 추가"'));
   assert(html.includes('콘텐츠 추가하기'));
   assert(html.includes('공유로 저장하는 방법'));
