@@ -21,7 +21,7 @@ pages.my = function(){
 };
 function myQuickCards(){
   return `<div class="my-quick" role="group" aria-label="바로가기">
-    <button type="button" class="myq-card" data-page="favorites"><span class="myq-ico" aria-hidden="true">${icon('star')}</span><b>즐겨찾기</b></button>
+    <button type="button" class="myq-card" data-page="favorites"><span class="myq-ico" aria-hidden="true">${likeHeartIcon()}</span><b>즐겨찾기</b></button>
     <button type="button" class="myq-card" data-page="courses"><span class="myq-ico" aria-hidden="true">${icon('route')}</span><b>내 코스</b></button>
     <button type="button" class="myq-card" data-action="accounts"><span class="myq-ico" aria-hidden="true">${icon('user')}</span><b>연동 계정 관리</b></button>
   </div>`;
@@ -99,7 +99,7 @@ pages.favorites = () => {
   const list = items.filter(x => x.favorite);
   return myPage('즐겨찾기', list.length
     ? `<p class="fav-count">${list.length}개</p><div class="cf-items fav-items">${list.map(cfItem).join('')}</div>`
-    : `<div class="empty fav-empty">${icon('star')}<h3>아직 즐겨찾기한 콘텐츠가 없어요</h3><p class="muted">콘텐츠 상세에서 별을 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="library">컬렉션으로 가기</button></div>`, 'favpage');
+    : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 콘텐츠가 없어요</h3><p class="muted">콘텐츠 상세에서 하트를 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="library">컬렉션으로 가기</button></div>`, 'favpage');
 };
 pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
     <div class="setrow"><div><b>핀맵</b><small>저장을 다시, 일상으로</small></div></div>

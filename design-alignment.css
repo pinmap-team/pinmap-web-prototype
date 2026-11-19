@@ -1390,13 +1390,57 @@ html.pm-refresh-enabled,html.pm-refresh-enabled body{overscroll-behavior-y:conta
 .cfpage .cf-itemdesc{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;white-space:normal;overflow:hidden}
 .cfpage .cf-itemmeta{display:flex;margin-top:var(--space-xs)}
 .cfpage .cf-saved-time{top:var(--space-sm);right:var(--space-sm);padding:var(--space-xs) var(--space-sm)}
+
+/* Bencho Like's Lucide heart and Bloom, without its pill or count. */
+:is(.live-map,.dt-photo) .lm-heart-motion{position:relative;isolation:isolate;-webkit-tap-highlight-color:transparent}
+:is(.live-map,.dt-photo) .lm-heart-motion:active{scale:.96;transition:scale .22s cubic-bezier(.22,1,.36,1)}
+:is(.live-map,.dt-photo) button.lm-heart-motion{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.dt.dt-photo .dttop button.dtbtn.dtfavorite.lm-heart-motion{border:1px solid rgba(255,255,255,.2)!important;border-radius:50%;background:rgba(17,17,17,.22)!important;-webkit-backdrop-filter:blur(16px)!important;backdrop-filter:blur(16px)!important;box-shadow:none!important}
+:is(.live-map,.dt-photo) .lm-heart-motion .lm-heart-glyph{position:relative;z-index:1;display:grid;place-items:center;width:20px;height:20px}
+:is(.live-map,.dt-photo) .lm-heart-motion .lm-heart-glyph .lm-like-heart{width:20px;height:20px;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+:is(.live-map,.dt-photo) button.lm-heart-motion.is-active{color:#e5484d!important}
+:is(.live-map,.dt-photo) .lm-heart-motion.is-bursting .lm-heart-glyph{animation:pinmap-heart-return .76s cubic-bezier(.3,1.6,.4,1) both}
+@keyframes pinmap-heart-return{0%,28%{scale:0}62%{scale:1.25}100%{scale:1}}
+:is(.live-map,.dt-photo) .lm-heart-burst{position:absolute;top:50%;left:50%;pointer-events:none}
+:is(.live-map,.dt-photo) .lm-heart-bloom{box-sizing:border-box;position:absolute;top:-17px;left:-17px;width:34px;height:34px;border:17px solid #cc8ef5;border-radius:50%;animation:pinmap-heart-bloom .56s cubic-bezier(.25,.8,.35,1) both}
+@keyframes pinmap-heart-bloom{0%{border-width:17px;border-color:#e5484d;scale:.15}40%{border-width:17px;border-color:#cc8ef5;scale:1}75%{opacity:1;border-width:2px}100%{opacity:0;border-width:0;scale:1.12}}
+:is(.live-map,.dt-photo) .lm-heart-spoke{position:absolute;top:0;left:0;rotate:var(--angle)}
+:is(.live-map,.dt-photo) .lm-heart-spoke i{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;animation:pinmap-heart-dot .62s cubic-bezier(.2,.8,.3,1) .2s both}
+:is(.live-map,.dt-photo) .lm-heart-spoke i:first-child{--side:-4px;--far:0px}
+:is(.live-map,.dt-photo) .lm-heart-spoke i:last-child{--side:4px;--far:-5px;width:4px;height:4px;margin:-2px 0 0 -2px}
+@keyframes pinmap-heart-dot{0%{translate:12px var(--side);opacity:0;scale:1}12%{opacity:1}100%{translate:calc(25px + var(--far)) calc(var(--side)*1.6);opacity:1;scale:0}}
+@media(prefers-reduced-motion:reduce){:is(.live-map,.dt-photo) .lm-heart-motion:active{scale:1;transition:none}:is(.live-map,.dt-photo) .lm-heart-motion.is-bursting .lm-heart-glyph,:is(.live-map,.dt-photo) .lm-heart-bloom,:is(.live-map,.dt-photo) .lm-heart-spoke i{animation:none}:is(.live-map,.dt-photo) .lm-heart-burst{display:none}}
 .cfpage .cf-itemtext h3,.cfpage .cf-itemdesc,.cfpage .cf-itemmeta{color:#fff!important;text-shadow:0 1px 5px #0009}
 
-/* Home-only icon action; its accessible name stays in the button markup. */
-.home-add-fab{position:fixed;right:max(calc(12.5vw - 7px),calc(50vw - 151px));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;min-height:56px;padding:0;border:0;border-radius:50%;background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md);box-shadow:var(--shadow-md);white-space:nowrap;cursor:pointer}
-.home-add-fab .icon{width:22px;height:22px;flex:none}
-.home-add-fab:active{background:var(--color-primary-pressed)}
-.home-add-fab:focus-visible{outline:2px solid var(--color-primary);outline-offset:4px}
+/* The home pill is the menu surface: one shape expands upward from the add action. */
+.home-add-menu{position:fixed;right:max(calc(12.5vw - 24px),calc(50vw - 168px));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;width:246px;height:116px;pointer-events:none}
+.home-add-body{position:absolute;right:0;bottom:0;width:90px;height:44px;border-radius:22px;background:var(--color-surface);box-shadow:var(--shadow-sm);transition:width .42s cubic-bezier(.22,1,.36,1),height .42s cubic-bezier(.22,1,.36,1),border-radius .42s cubic-bezier(.22,1,.36,1),scale .22s cubic-bezier(.22,1,.36,1)}
+.home-add-menu[data-open="true"] .home-add-body{width:246px;height:116px;border-radius:20px}
+.home-add-fab{position:absolute;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:var(--space-xs);width:90px;height:44px;min-height:44px;padding:0;border:0;border-radius:22px;background:transparent;color:var(--color-on-surface);font:var(--type-label-md);cursor:pointer;pointer-events:auto;transition:opacity .16s,scale .22s cubic-bezier(.22,1,.36,1)}
+.home-add-fab .icon{width:18px;height:18px;flex:none}
+.home-add-fab:focus-visible,.home-add-options button:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+.home-add-menu[data-sink="true"] :is(.home-add-body,.home-add-fab){scale:.94;transition:scale .16s cubic-bezier(.22,1,.36,1)}
+.home-add-menu[data-open="true"] .home-add-fab{opacity:0;pointer-events:none}
+.home-add-options{position:absolute;right:0;bottom:0;box-sizing:border-box;display:grid;align-content:center;gap:2px;width:246px;height:116px;padding:10px;visibility:hidden;pointer-events:none}
+.home-add-menu[data-open="true"] .home-add-options{visibility:visible;pointer-events:auto}
+.home-add-options button{display:flex;align-items:center;gap:var(--space-md);width:100%;height:46px;padding:0 var(--space-md);border:0;border-radius:var(--rounded-md);background:transparent;color:var(--color-on-surface);font:var(--type-label-md);text-align:left;white-space:nowrap;cursor:pointer;opacity:0;transform:translateY(6px);transition:background .16s,opacity .16s,transform .22s cubic-bezier(.22,1,.36,1)}
+.home-add-options button .icon{width:18px;height:18px;flex:none}
+.home-add-menu[data-open="true"] .home-add-options button{opacity:1;transform:none;transition-delay:30ms}
+.home-add-menu[data-open="true"] .home-add-options button:nth-child(2){transition-delay:52ms}
+.home-add-options button:hover,.home-add-options button:focus-visible{background:var(--color-neutral)}
+@media(prefers-reduced-motion:reduce){.home-add-body,.home-add-fab,.home-add-options button{transition-duration:0s!important}.home-add-menu[data-sink="true"] :is(.home-add-body,.home-add-fab){scale:1}}
+
+/* The two input screens keep their existing save and ZIP handling. */
+#sheet.zip-import-sheet{width:min(400px,calc(100% - var(--space-xl) * 2));padding:var(--space-xl);background:var(--color-surface);color:var(--color-on-surface)}
+.zip-import-form{display:grid;gap:var(--space-lg);font:var(--type-body-md)}
+.zip-import-form>p{margin:0}
+.zip-import-picker{display:grid;gap:var(--space-sm);padding:var(--space-lg);border:1px dashed var(--color-border);border-radius:var(--rounded-md);font:var(--type-label-md);cursor:pointer}
+.zip-import-picker:focus-within{outline:2px solid var(--color-primary);outline-offset:2px}
+.zip-import-picker input{width:100%;min-height:44px;min-width:0;font-size:0;color:var(--color-on-surface);cursor:pointer}
+.zip-import-picker input::file-selector-button{min-height:44px;padding:0 var(--space-lg);border:1px solid var(--color-border);border-radius:var(--rounded-md);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md);cursor:pointer}
+.zip-import-filename{overflow-wrap:anywhere;font:var(--type-body-sm);color:var(--color-secondary)}
+.zip-import-note{font:var(--type-body-sm);color:var(--color-secondary)}
+.zip-import-form .dialogactions{margin:0}
 
 /* Keep the search surface above map controls while it is expanded. */
 .live-map:has(.lm-search-row.is-open) .lm-header{z-index:800}
