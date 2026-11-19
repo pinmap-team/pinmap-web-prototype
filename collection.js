@@ -26,8 +26,6 @@ const CF_EXTRA = {id:'기타', icon:'bookmark'};
 const CF_ALL = [...CF_FOLDERS, CF_EXTRA];
 const CF_ALL_FOLDER = {id:'전체 저장', title:'전체', icon:'bookmark'};
 const CF_GALLERY = new Set(['쇼핑', '레시피', '기타']); // 장소가 아닌 폴더 → 갤러리형 카드
-// 공식 화면에서만 켜 보는 폴더 시안. 새로고침하면 기본 디자인으로 돌아갑니다.
-let cfGlassPreview = false;
 
 // 저장 콘텐츠 → 폴더 (맛집·카페는 카페 여부로 나눠요)
 const cfIsCafe = x => /카페|커피|cafe|coffee|디저트|베이커리/i.test(`${x.category||''} ${x.title||''}`);
@@ -74,13 +72,13 @@ function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected 
     return `<span class="cf-photo cf-slot${i}${src ? '' : ' cf-empty'}">${src
       ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('cf-empty');this.remove()">` : ''}</span>`;
   };
-  return `<button type="button" class="cf-folder${selected ? ' on' : ''}${cfGlassPreview ? ' cf-glass-folder' : ''}" ${attr || `data-cffolder="${esc(id)}"`}>
+  return `<button type="button" class="cf-folder${selected ? ' on' : ''}" ${attr || `data-cffolder="${esc(id)}"`}>
     <span class="cf-shell">
       <span class="cf-back"><span class="cf-backshape"></span></span>
-      ${cfGlassPreview ? `<span class="cf-files-clip">${[2, 1, 0].map(slot).join('')}</span>` : [2, 1, 0].map(slot).join('')}
-      ${cfGlassPreview ? '' : `<svg class="cf-shade" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>`}
+      ${[2, 1, 0].map(slot).join('')}
+      <svg class="cf-shade" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
       <span class="cf-front"></span>
-      ${cfGlassPreview ? '<img class="cf-glass-surface" src="img/glass-folder-front.svg" alt="" aria-hidden="true">' : `<svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>`}
+      <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
       <span class="cf-meta"><span class="cf-title">${esc(title)}</span><span class="cf-count">${count}<span class="sr">개 저장된 폴더</span></span></span>
     </span>
   </button>`;
@@ -89,7 +87,6 @@ function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected 
 const CF_DEFS = `<svg class="cf-defs" width="0" height="0" aria-hidden="true" focusable="false">
   <clipPath id="cfFrontClip" clipPathUnits="objectBoundingBox"><path d="M0 .17Q0 0 .09 0L.3 0C.39 0 .41 .2 .5 .2L.91 .2Q1 .2 1 .37L1 .83Q1 1 .91 1L.09 1Q0 1 0 .83Z"/></clipPath>
   <clipPath id="cfBackClip" clipPathUnits="objectBoundingBox"><path d="M0 .14Q0 0 .09 0L.32 0C.37 0 .39 .07 .44 .07L.91 .07Q1 .07 1 .21L1 .86Q1 1 .91 1L.09 1Q0 1 0 .86Z"/></clipPath>
-  <clipPath id="cfFigmaGlassClip" clipPathUnits="objectBoundingBox"><path d="M0 .19C0 .08 .035 0 .095 0H.34C.41 0 .43 .17 .49 .17H.9C.96 .17 1 .26 1 .36V.82C1 .94 .96 1 .9 1H.1C.04 1 0 .94 0 .82Z"/></clipPath>
   <filter id="cfBlur" x="-10%" y="-50%" width="120%" height="200%"><feGaussianBlur stdDeviation="1.4"/></filter>
 </svg>`;
 
@@ -118,7 +115,7 @@ function cfOrderFolders(folders){
   });
 }
 function cfFolderToolbar(){
-  return `<div class="cf-folder-toolbar"><label class="libsort"><span class="sr">폴더 정렬</span><select data-folder-sort aria-label="폴더 정렬">${CF_FOLDER_SORTS.map(([value,label])=>`<option value="${value}" ${value===(CF_FOLDER_SORTS.some(([k])=>k===settings.folderSort)?settings.folderSort:'saved')?'selected':''}>${label}</option>`).join('')}</select></label><button type="button" class="cf-trial-toggle" data-action="cfToggleGlassPreview" aria-pressed="${cfGlassPreview}">${cfGlassPreview ? '기존 컬렉션 보기' : '예시 컬렉션 보기'}</button></div>`;
+  return `<div class="cf-folder-toolbar"><label class="libsort"><span class="sr">폴더 정렬</span><select data-folder-sort aria-label="폴더 정렬">${CF_FOLDER_SORTS.map(([value,label])=>`<option value="${value}" ${value===(CF_FOLDER_SORTS.some(([k])=>k===settings.folderSort)?settings.folderSort:'saved')?'selected':''}>${label}</option>`).join('')}</select></label></div>`;
 }
 document.addEventListener('change',e=>{
   if(!e.target.matches('select[data-folder-sort]'))return;
@@ -224,11 +221,11 @@ resultCards = function(){
     return {id:n,title:n,icon:'folder',count:inFolder.length,thumbnails:cfThumbs(inFolder),attr:`data-collection="${esc(n)}"`};
   });
   // 새 폴더 추가 타일: 항상 맨 앞(좌측 상단) · 검색 중엔 숨겨요
-  const addTile = q ? [] : [`<button type="button" class="cf-folder cf-add${cfGlassPreview ? ' cf-glass-folder' : ''}" data-action="newfolder" aria-label="새 폴더 만들기">
+  const addTile = q ? [] : [`<button type="button" class="cf-folder cf-add" data-action="newfolder" aria-label="새 폴더 만들기">
     <span class="cf-shell" aria-hidden="true">
       <span class="cf-back"><span class="cf-backshape"></span></span>
       <span class="cf-front"></span>
-      ${cfGlassPreview ? '<img class="cf-glass-surface" src="img/glass-folder-front.svg" alt="">' : `<svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>`}
+      <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
       <span class="cf-addplus">${icon('plus')}</span>
     </span>
   </button>`];
@@ -321,11 +318,6 @@ actions.cftogglesearch = () => {
     row.querySelector('[data-action="clear"]').hidden=true;
     $('#results').innerHTML=resultCards();$('#resultcount').textContent=cfStatus();toggle.focus();
   }
-};
-actions.cfToggleGlassPreview = () => {
-  cfGlassPreview = !cfGlassPreview;
-  render();
-  requestAnimationFrame(() => document.querySelector('.cf-trial-toggle')?.focus());
 };
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape' && cfSearchOpen && e.target.closest('.cf-search-header')){

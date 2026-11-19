@@ -39,17 +39,17 @@ button,input,select,textarea,svg text,.libpage,.live-map,#login-screen,.ob-phone
 .cfpage .cf-folder:not(.cf-add) .cf-front{background:linear-gradient(180deg,color-mix(in srgb,var(--color-surface) 22%,transparent) 0%,color-mix(in srgb,var(--color-surface) 58%,transparent) 36%,color-mix(in srgb,var(--color-surface) 94%,transparent) 72%,var(--color-surface) 100%);-webkit-backdrop-filter:blur(6px) saturate(1.15);backdrop-filter:blur(6px) saturate(1.15)}
 .cfpage .cf-folder:not(.cf-add) .cf-photo{border:0;aspect-ratio:3/4;box-shadow:none;translate:0 0;transition:translate .3s cubic-bezier(.22,1,.36,1)}
 /* Original collection only: reuse the reference hover motion, without shadow changes. */
-.cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder) .cf-photo{transform-origin:50% 50%;transition:translate .3s cubic-bezier(.22,1,.36,1),transform .3s cubic-bezier(.22,1,.36,1)}
+.cfpage .cf-folder:not(.cf-add) .cf-photo{transform-origin:50% 50%;transition:translate .3s cubic-bezier(.22,1,.36,1),transform .3s cubic-bezier(.22,1,.36,1)}
 @media(hover:hover){
-  .cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):hover .cf-photo{translate:0 -10px}
-  .cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):hover .cf-slot0{transform:rotate(0deg)}
-  .cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):hover .cf-slot1{transform:rotate(12deg)}
-  .cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):hover .cf-slot2{transform:rotate(-12deg)}
+  .cfpage .cf-folder:not(.cf-add):hover .cf-photo{translate:0 -10px}
+  .cfpage .cf-folder:not(.cf-add):hover .cf-slot0{transform:rotate(0deg)}
+  .cfpage .cf-folder:not(.cf-add):hover .cf-slot1{transform:rotate(12deg)}
+  .cfpage .cf-folder:not(.cf-add):hover .cf-slot2{transform:rotate(-12deg)}
 }
-.cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):focus-visible .cf-photo{translate:0 -10px}
-.cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):focus-visible .cf-slot0{transform:rotate(0deg)}
-.cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):focus-visible .cf-slot1{transform:rotate(12deg)}
-.cfpage .cf-folder:not(.cf-add):not(.cf-glass-folder):focus-visible .cf-slot2{transform:rotate(-12deg)}
+.cfpage .cf-folder:not(.cf-add):focus-visible .cf-photo{translate:0 -10px}
+.cfpage .cf-folder:not(.cf-add):focus-visible .cf-slot0{transform:rotate(0deg)}
+.cfpage .cf-folder:not(.cf-add):focus-visible .cf-slot1{transform:rotate(12deg)}
+.cfpage .cf-folder:not(.cf-add):focus-visible .cf-slot2{transform:rotate(-12deg)}
 .cfpage .cf-folder:not(.cf-add) .cf-shade{opacity:0}
 .cfpage .cf-folder .cf-hi{display:none}
 .cfpage .cf-folder:not(.cf-add) .cf-slot0:not(.cf-empty){width:48%;left:26%;top:2%;z-index:3}
@@ -1406,45 +1406,6 @@ html.pm-pulling,html.pm-pulling *{user-select:none!important;-webkit-user-select
 .pm-refresh.is-ready{background:var(--color-primary);color:var(--color-neutral)}
 .pm-refresh.is-ready .pm-spinner{border-color:color-mix(in srgb,var(--color-neutral) 35%,transparent);border-top-color:var(--color-neutral)}
 @media(prefers-reduced-motion:reduce){html.pm-refresh-enabled #app{transition:none}}
-
-/* Collection root: original Figma panel assets are an optional, reversible trial. */
-.cfpage .cf-folder-toolbar{justify-content:space-between}
-.cfpage .cf-trial-toggle{flex:none;min-height:36px;padding:0 var(--space-md);border:1px solid var(--color-border);border-radius:999px;background:var(--color-surface);color:var(--color-on-surface);font:var(--type-body-sm);cursor:pointer}
-.cfpage .cf-trial-toggle[aria-pressed="true"]{background:var(--color-on-surface);color:var(--color-surface)}
-.cfpage .cf-trial-toggle:focus-visible{outline:2px solid var(--color-on-surface);outline-offset:2px}
-.cfpage .cf-folder.cf-glass-folder .cf-shell{aspect-ratio:705/676;filter:drop-shadow(0 4px 4px #0000001f)}
-.cfpage .cf-folder.cf-glass-folder .cf-back{top:21.6%;filter:none;transition:none}
-.cfpage .cf-folder.cf-glass-folder .cf-backshape,
-[data-theme="dark"] .cfpage .cf-folder.cf-glass-folder .cf-backshape{clip-path:none;background:url('img/glass-folder-back.svg') center / 100% 100% no-repeat;-webkit-mask:none;mask:none}
-.cfpage .cf-folder.cf-glass-folder .cf-files-clip{position:absolute;inset:0;z-index:1;overflow:hidden;border-radius:var(--rounded-lg);pointer-events:none}
-.cfpage .cf-folder.cf-glass-folder:not(.cf-add) .cf-photo{width:80%;aspect-ratio:564.272/381.714;border:0;border-radius:var(--rounded-md);box-shadow:none;translate:none;transition:transform .6s cubic-bezier(.45,1.45,.8,1);transform-origin:50% 100%}
-.cfpage .cf-folder.cf-glass-folder:not(.cf-add) .cf-slot2{left:10%;top:37.42%;z-index:1;transform:rotate(0deg)}
-.cfpage .cf-folder.cf-glass-folder:not(.cf-add) .cf-slot1{left:10.88%;top:42.03%;z-index:2;transform:rotate(0deg)}
-.cfpage .cf-folder.cf-glass-folder:not(.cf-add) .cf-slot0{left:8.82%;top:46.63%;z-index:3;transform:rotate(0deg)}
-.cfpage .cf-folder.cf-glass-folder .cf-front,
-.cfpage .cf-folder.cf-glass-folder .cf-glass-surface{position:absolute;left:0;right:0;top:39.25%;width:100%;height:60.75%;transform:none}
-.cfpage .cf-folder.cf-glass-folder .cf-front,
-[data-theme="dark"] .cfpage .cf-folder.cf-glass-folder .cf-front{z-index:5;bottom:auto;clip-path:url(#cfFigmaGlassClip);background:rgba(255,255,255,.12);-webkit-mask:none;mask:none;-webkit-backdrop-filter:blur(4.73px) saturate(1.1);backdrop-filter:blur(4.73px) saturate(1.1);transition:none}
-.cfpage .cf-folder.cf-glass-folder .cf-glass-surface{z-index:6;display:block;height:auto;aspect-ratio:710.319/415.736;object-fit:contain;pointer-events:none;filter:drop-shadow(0 -5px 4px #00000026)}
-.cfpage .cf-folder.cf-glass-folder .cf-meta{position:absolute;z-index:7;left:6.5%;right:6.5%;top:73.5%;bottom:auto;display:flex;flex-direction:column;align-items:flex-start;gap:0;margin:0;text-align:left;pointer-events:none}
-.cfpage .cf-folder.cf-glass-folder .cf-title{max-width:100%;font:var(--type-label-md);color:#39322e}
-.cfpage .cf-folder.cf-glass-folder .cf-count{padding:0;border-radius:0;background:none;font:var(--type-body-sm);color:#77716e}
-.cfpage .cf-folder.cf-glass-folder .cf-count::after{content:'개 저장';margin-left:2px}
-.cfpage .cf-folder.cf-glass-folder.cf-add .cf-addplus,
-.cfpage .cf-folder.cf-glass-folder.cf-add:hover .cf-addplus,
-[data-theme="dark"] .cfpage .cf-folder.cf-glass-folder.cf-add .cf-addplus{left:50%;top:75%;z-index:7;width:36px;height:36px;transform:translate(-50%,-50%);background:transparent!important;box-shadow:none!important;color:#fff!important;transition:none}
-.cfpage .cf-folder.cf-glass-folder.cf-add .cf-addplus .icon{width:32px;height:32px;stroke-width:3.2}
-@media(hover:hover){
-  .cfpage .cf-folder.cf-glass-folder:not(.cf-add):hover .cf-slot2{transform:translate(-14.7%,-53.5%) rotate(-5deg)}
-  .cfpage .cf-folder.cf-glass-folder:not(.cf-add):hover .cf-slot1{transform:translateY(-45.3%)}
-  .cfpage .cf-folder.cf-glass-folder:not(.cf-add):hover .cf-slot0{transform:translate(14.7%,-37.1%) rotate(5deg)}
-  .cfpage .cf-folder.cf-glass-folder.cf-add:hover .cf-back,
-  .cfpage .cf-folder.cf-glass-folder.cf-add:hover .cf-front{transform:none}
-}
-.cfpage .cf-folder.cf-glass-folder:not(.cf-add):focus-visible .cf-slot2{transform:translate(-14.7%,-53.5%) rotate(-5deg)}
-.cfpage .cf-folder.cf-glass-folder:not(.cf-add):focus-visible .cf-slot1{transform:translateY(-45.3%)}
-.cfpage .cf-folder.cf-glass-folder:not(.cf-add):focus-visible .cf-slot0{transform:translate(14.7%,-37.1%) rotate(5deg)}
-@media(prefers-reduced-motion:reduce){.cfpage .cf-folder.cf-glass-folder:not(.cf-add) .cf-photo{transition:none}}
 
 /* Saved-place photos retain original post imagery, with visible Google author credits. */
 .pm-place-photo{position:relative;display:block;margin:0;isolation:isolate;overflow:hidden}
