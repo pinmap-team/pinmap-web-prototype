@@ -80,7 +80,7 @@ node --env-file=.env.local scripts/dev-auth-server.cjs
 
 ## 화면 검토용 시작 순서 (최신)
 
-루트 `/`에서 프로토타입 체험 또는 로그인 테스트를 고른다. 장소 추출 개발 테스트는 [별도 온라인 화면](https://pinmap-backend.vercel.app/)에서 진행한다. 로그인 완료 후 실제 세션이 필요한 앱은 `index.html?mode=development&auth=required`로 연다. 인증된 계정의 저장 콘텐츠는 서버에서 불러오며, 기존 프로토타입 체험 데이터는 분리되어 유지된다.
+루트 `/`에서 프로토타입 체험 또는 로그인 테스트를 고른다. 로그인 완료 후 실제 세션이 필요한 앱은 `index.html?mode=development&auth=required`로 열고, 이 화면에서 Instagram 링크의 장소·일정 추출과 저장을 시험한다. 인증된 계정의 저장 콘텐츠는 서버에서 불러오며, 기존 프로토타입 체험 데이터는 분리되어 유지된다.
 
 ## 구글 로그인 (2026-11-10)
 
