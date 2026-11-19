@@ -26,7 +26,15 @@ function pinmapAccountItem(record, id) {
   const kind = ['place','event','mixed','unknown'].includes(record.content_kind)
     ? record.content_kind : events.length && places.length ? 'mixed' : events.length ? 'event' : places.length ? 'place' : 'unknown';
   const hasEvents = events.length > 0 || kind === 'event' || kind === 'mixed';
-  const type = hasEvents ? '전시/팝업' : places.length ? '맛집/카페' : '기타';
+  const classification = record.classification;
+  const categoryLabels = {restaurant:'맛집',cafe:'카페',bar:'주점',exhibition:'전시',pop_up:'팝업',other:'기타'};
+  const classified = classification?.source === 'gemini_decisions' && classification.status === 'classified'
+    && classification.model === 'gemini-decision-1' && Number.isFinite(classification.confidence)
+    && classification.confidence >= .8 && classification.confidence <= 1
+    && Object.hasOwn(categoryLabels, classification.category);
+  const aiCategory = classified ? classification.category : null;
+  const type = hasEvents || ['exhibition','pop_up'].includes(aiCategory) ? '전시/팝업'
+    : ['restaurant','cafe','bar'].includes(aiCategory) || places.length ? '맛집/카페' : '기타';
   const first = mapLocations[0];
   const eventName = text(events[0]?.title, 120);
   const title = text(record.ai_title, 120) || eventName || text(places[0]?.name, 120) || 'Instagram 게시물';
@@ -39,11 +47,11 @@ function pinmapAccountItem(record, id) {
     .map(x => typeof x === 'string' ? x : typeof x?.message === 'string' ? x.message : '')
     .filter(x => x.trim()).map(x => x.trim().slice(0, 300));
   return {id, backendId:record.id, title, type,
-    category:hasEvents ? ({exhibition:'전시',pop_up:'팝업'}[events[0]?.event_type] || '행사') : places.length ? '장소' : '기타',
+    category:classified ? categoryLabels[aiCategory] : hasEvents ? ({exhibition:'전시',pop_up:'팝업'}[events[0]?.event_type] || '행사') : places.length ? '장소' : '기타',
     contentKind:kind, status:text(record.status, 80),
     source:'Instagram', savedAt, desc:text(record.ai_summary, 500), aiSummary:!!text(record.ai_summary),
     art:hasEvents ? 'exhibit' : places.length ? 'cafe' : 'book', photo:cover,
-    url, memo:'', collection:'', aiClassified:false,
+    url, memo:'', collection:'', aiClassified:classified,
     authorUsername:text(record.author_username, 80), authorProfilePhoto:text(record.author_profile_data_url, 700000),
     extractionPlaces, extractedPlaceCount:extractionPlaces.length, events, extractionNotes:notes,
     mapLocations, address:text(first?.address), lat:first?.coordinates.lat, lng:first?.coordinates.lng,
