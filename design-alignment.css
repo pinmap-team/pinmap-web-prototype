@@ -10,6 +10,29 @@
 .main>.topbar .toptitle{font:var(--type-headline-md);letter-spacing:-.6px}
 .main>.topbar .topactions,.main:has(.cfpage)>.topbar .topactions{top:6px;right:0}
 .main:has(.homebrand)>.topbar .topactions{top:6px}
+/* Shared page headers: same title top (45px) and 44px back target as collections. */
+.main .subhead{position:relative;display:flex;align-items:center;gap:calc(var(--space-xs)/2);height:56px;min-height:56px;margin:0 0 var(--space-xl);padding:0}
+.main .subhead .subback{flex:none;width:44px;height:44px;min-width:44px;margin-left:calc(-1 * var(--space-md));padding:0}
+.main .subhead h1{margin:0;font:var(--type-headline-md)}
+.main .howtopage .subhead{margin-bottom:var(--space-xl)}
+.address-page .address-header{height:56px;min-height:56px;gap:calc(var(--space-xs)/2);margin:0 0 var(--space-xl)}
+.address-page .address-header>button:first-child,.location-confirm>.address-header>button:first-child{margin-left:calc(-1 * var(--space-md))}
+.address-page .address-header h1{font:var(--type-headline-md)}
+.coursepage .course-header{padding:var(--space-2xl) var(--space-xl) var(--space-xl)}
+.coursepage .course-toolbar{justify-content:flex-start;gap:calc(var(--space-xs)/2);height:56px;min-height:56px;margin:0}
+.coursepage .course-toolbar>.course-close{margin-left:calc(-1 * var(--space-md))}
+.coursepage .course-toolbar>h1{flex:1;margin:0;font:var(--type-headline-md)}
+.coursepage .course-header>p{margin:var(--space-xl) 0 0}
+.coursepage .course-header :is(.course-close,.course-share,.course-title-edit){width:44px;height:44px;min-width:44px;min-height:44px}
+.coursepage .course-header .course-save{height:44px;min-height:44px;padding:0 var(--space-md)}
+.coursepage .course-title-row{flex:1;min-width:0;margin:0;align-items:center}
+.coursepage .course-title-row>div{flex:1;min-width:0}
+.coursepage .course-title-row input{field-sizing:fixed;flex:1;width:100%;min-width:0;max-width:none;text-overflow:ellipsis;font:var(--type-headline-md)}
+.coursepage .course-header-actions{flex:none;gap:var(--space-xs)}
+.course-date-row{display:flex;justify-content:flex-end;margin-top:var(--space-md)}
+.course-date-row input{box-sizing:border-box;width:140px;height:44px;padding:0 var(--space-sm);border:1px solid var(--color-disabled);border-radius:var(--rounded-sm);background:var(--color-neutral);color:var(--color-secondary);font:var(--type-body-sm)}
+.pfedit .pfsave{height:56px;min-height:56px}
+.course-map-marker span{font:var(--type-label-md);font-weight:var(--weight-bold)}
 body{font:var(--type-body-md)}
 button,input,select,textarea,svg text,.libpage,.live-map,#login-screen,.ob-phone{font-family:var(--font-family)}
 :where(input,textarea)::placeholder{color:var(--color-secondary);opacity:1}
@@ -721,7 +744,7 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 
 /* Current-location confirmation: use the existing map and a fixed center pin. */
 .location-confirm{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;overflow:hidden;background:var(--color-surface);color:var(--color-on-surface)}
-.location-confirm>.address-header{flex:none;margin:0;padding:var(--space-lg) var(--space-xl);background:var(--color-surface)}
+.location-confirm>.address-header{box-sizing:border-box;height:calc(var(--space-2xl) + 56px);min-height:calc(var(--space-2xl) + 56px);gap:calc(var(--space-xs)/2);padding:var(--space-2xl) var(--space-xl) 0;flex:none;margin:0;background:var(--color-surface)}
 .location-confirm>.address-header h1{font:var(--type-headline-md)}
 .location-confirm-canvas{flex:1;min-height:140px;position:relative;background:var(--color-neutral)}
 #location-confirm-map{position:absolute;inset:0}
@@ -1106,7 +1129,7 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 :is(.pm-choice-options,.dtmenu,.lm-location-menu)>button+button{margin-top:var(--space-xs)}
 :is(.pm-choice-options,.dtmenu,.lm-location-menu)>button:is(:hover,:focus-visible):not(:disabled){background:var(--color-neutral)!important;color:var(--color-on-surface)!important;filter:none}
 :is(.pm-choice-options,.lm-location-menu)>button:is([aria-pressed="true"],.is-active){background:var(--color-neutral)!important;color:var(--color-on-surface)!important;font-weight:var(--weight-semibold)!important}
-:is(.pm-choice-options,.dtmenu,.lm-location-menu)>button:focus-visible{outline:2px solid var(--color-primary)!important;outline-offset:-2px}
+:is(.pm-choice-options,.dtmenu,.lm-location-menu)>button:focus-visible{outline:none!important}
 :is(.pm-choice-options,.dtmenu,.lm-location-menu)>button:disabled{color:var(--color-secondary)!important;opacity:.5;cursor:not-allowed}
 :is(.pm-choice-options,.dtmenu,.lm-location-menu)>button>.icon{width:20px;height:20px;flex:none;stroke-width:1.6;color:inherit}
 .pm-choice-options>button>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1254,7 +1277,7 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 
 /* Calendar: the same restrained glass and spacing as the home widgets. */
 .calfhead{gap:var(--space-sm);height:44px;margin:0 0 var(--space-xl);padding:0}
-.calfhead h1{font:var(--type-headline-md);font-weight:var(--weight-semibold);letter-spacing:normal}
+.calfhead h1{font:var(--type-headline-md);font-weight:var(--weight-bold);letter-spacing:normal}
 .calfhead .calback{width:44px;height:44px;min-width:44px}
 .main .calbox{padding:var(--space-lg);border:1px solid color-mix(in srgb,var(--color-surface) 72%,transparent);border-radius:var(--rounded-lg);background:color-mix(in srgb,var(--color-surface) 56%,transparent)!important;-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3);box-shadow:var(--shadow-sm)}
 .calbox .calhead{min-height:44px;padding:0 var(--space-sm);margin:0 0 var(--space-lg);gap:var(--space-sm)}
@@ -1426,3 +1449,7 @@ html.pm-pulling,html.pm-pulling *{user-select:none!important;-webkit-user-select
 /* Shared test login uses the existing primary button and spacing. */
 .pm-auth .auth-test-entry { margin-top: var(--space-lg, 16px); }
 .pm-auth .auth-test-entry .auth-field-help { text-align: center; margin-top: var(--space-sm, 8px); }
+
+/* One keyboard focus treatment for app buttons and menus, without an outline ring. */
+html body :is(button,a,[role="button"],[role="menuitem"]):is(:focus,:focus-visible){outline:none!important}
+html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:disabled){filter:brightness(.88)}

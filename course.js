@@ -48,7 +48,7 @@
   pageName.courses='저장한 코스';
   pages.courses=function(){
     return `<section class="coursepage course-list-page">
-      <header class="course-header"><div class="course-toolbar"><button class="course-close" data-page="my" aria-label="마이페이지로 돌아가기">${icon('back')}</button></div><h1>저장한 코스</h1><p>나만의 동선을 모아두고 다시 꺼내 보세요.</p></header>
+      <header class="course-header"><div class="course-toolbar"><button class="course-close" data-page="my" aria-label="마이페이지로 돌아가기">${icon('back')}</button><h1>저장한 코스</h1></div><p>나만의 동선을 모아두고 다시 꺼내 보세요.</p></header>
       <div class="course-list-body">
         <button class="course-new" data-course-new>${icon('plus')} 새 코스 만들기</button>
         <div class="course-list-heading">코스 ${courses.length}개</div>
@@ -61,9 +61,11 @@
     const available=eligible().filter(item=>!dayStops().some(stop=>stop.id===item.id));
     return `<section class="coursepage ${editing?'is-editing':''}">
       <header class="course-header">
-        <div class="course-toolbar"><button class="course-close" data-page="${courseOrigin}" aria-label="${courseOrigin==='map'?'지도로 돌아가기':'저장한 코스로 돌아가기'}">${icon('back')}</button><div class="course-header-actions">
-        <button class="course-share" data-course-share aria-label="코스 공유하기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 13v8h14v-8"/></svg></button><button class="course-save" data-course-save>저장</button></div></div>
-        <div class="course-title-row"><div><input data-course-field="title" aria-label="코스 이름" maxlength="50" value="${esc(course.title)}" readonly><button class="course-title-edit" data-course-edit-title aria-label="코스 제목 수정" title="코스 제목 수정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l11-11-4-4L4 16v4Zm9-13 4 4"/></svg></button></div><label><input data-course-field="date" type="date" aria-label="코스 출발일" value="${esc(course.date)}"></label></div>
+        <div class="course-toolbar"><button class="course-close" data-page="${courseOrigin}" aria-label="${courseOrigin==='map'?'지도로 돌아가기':'저장한 코스로 돌아가기'}">${icon('back')}</button>
+          <div class="course-title-row"><div><input data-course-field="title" aria-label="코스 이름" maxlength="50" value="${esc(course.title)}" readonly><button class="course-title-edit" data-course-edit-title aria-label="코스 제목 수정" title="코스 제목 수정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l11-11-4-4L4 16v4Zm9-13 4 4"/></svg></button></div></div>
+          <div class="course-header-actions"><button class="course-share" data-course-share aria-label="코스 공유하기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 13v8h14v-8"/></svg></button><button class="course-save" data-course-save>저장</button></div>
+        </div>
+        <label class="course-date-row"><span class="sr">코스 출발일</span><input data-course-field="date" type="date" aria-label="코스 출발일" value="${esc(course.date)}"></label>
       </header>
       ${courseSteps(stops.length)}
       <div class="course-map-wrap"><div id="course-map" aria-label="코스 장소 지도"></div></div>
