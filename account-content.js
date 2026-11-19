@@ -58,6 +58,30 @@ function pinmapAccountItem(record, id) {
     mapKind:hasEvents ? 'event' : 'eat', pending:places.length > 0 && !first};
 }
 
+async function pinmapReadAccountPages(requestPage) {
+  const records = [];
+  let offset = 0, width = 1, pageCount = 0;
+  while (pageCount < 100) {
+    const offsets = Array.from({length:Math.min(width, 100 - pageCount)}, (_, index) => offset + index * 2);
+    const pages = await Promise.all(offsets.map(requestPage));
+    for (let index = 0; index < pages.length; index++) {
+      const result = pages[index];
+      const pageOffset = offsets[index];
+      if (!Array.isArray(result.items) || result.items.length > 2)
+        throw Error('저장 목록 응답 형식이 올바르지 않습니다.');
+      if (result.next_offset != null &&
+          (result.items.length !== 2 || result.next_offset !== pageOffset + 2))
+        throw Error('저장 목록 페이지를 이어 읽지 못했어요.');
+      records.push(...result.items);
+      pageCount++;
+      if (result.next_offset == null) return records;
+    }
+    offset = offsets[offsets.length - 1] + 2;
+    width = Math.min(width * 2, 4);
+  }
+  throw Error('저장 목록이 너무 많아 모두 불러오지 못했어요.');
+}
+
 if (PM_ENV.requiresAuth) (() => {
   let client, currentUserId = null, loadVersion = 0, nextLocalId = 9000000000000;
   window.PinmapAccountLoaded = false;
@@ -107,14 +131,17 @@ if (PM_ENV.requiresAuth) (() => {
     return typeof response?.error === 'string' && response.error.length < 150
       ? response.error : '저장 서버에 연결하지 못했어요. 다시 시도해 주세요.';
   };
-  async function accountRequest(method, body, query = '', expectedUserId = currentUserId) {
+  async function accountRequest(method, body, query = '', expectedUserId = currentUserId, accessToken = null) {
     if (!client) throw Error('로그인 연결을 확인하고 있어요.');
-    const {data, error} = await client.auth.getSession();
-    if (error || !data?.session?.access_token) throw Error('로그인 상태가 만료됐어요. 다시 로그인해 주세요.');
+    if (!accessToken) {
+      const {data, error} = await client.auth.getSession();
+      if (error || !data?.session?.access_token) throw Error('로그인 상태가 만료됐어요. 다시 로그인해 주세요.');
+      accessToken = data.session.access_token;
+    }
     if (!expectedUserId || currentUserId !== expectedUserId)
       throw Error('계정이 변경됐어요. 다시 로그인한 뒤 시도해 주세요.');
     const response = await fetch('/api/content-save' + query, {
-      method, headers:{'Authorization':'Bearer ' + data.session.access_token,
+      method, headers:{'Authorization':'Bearer ' + accessToken,
         ...(body ? {'Content-Type':'application/json'} : {})},
       ...(body ? {body:JSON.stringify(body)} : {}), cache:'no-store'
     });
@@ -140,25 +167,19 @@ if (PM_ENV.requiresAuth) (() => {
     window.PinmapAccountLoadError = false;
     let userId=currentUserId;
     try {
-      const {data, error} = await client.auth.getUser();
+      const {data, error} = await PinmapAuth.verifiedUser(client);
       if(version!==loadVersion)return;
       if(error)throw error;
       if(!data?.user?.id){clearAccount();return;}
       userId=data.user.id;
       if(currentUserId&&currentUserId!==userId){window.dispatchEvent(new Event('pinmap:account-cleared'));items=[];applyFolders(null);detailId=null;}
       currentUserId=userId;
-      const records = [];
-      let offset = 0;
-      for (let pageNumber = 0; pageNumber < 100; pageNumber++) {
-        const result = await accountRequest('GET', null, `?limit=2&offset=${offset}`);
-        if (!Array.isArray(result.items)) throw Error('저장 목록 응답 형식이 올바르지 않습니다.');
-        records.push(...result.items);
-        const next = result.next_offset;
-        if (next == null) break;
-        if (!Number.isSafeInteger(next) || next <= offset) throw Error('저장 목록 페이지를 이어 읽지 못했어요.');
-        offset = next;
-        if (pageNumber === 99) throw Error('저장 목록이 너무 많아 모두 불러오지 못했어요.');
-      }
+      const {data:sessionData, error:sessionError} = await client.auth.getSession();
+      if (sessionError || !sessionData?.session?.access_token)
+        throw Error('로그인 상태가 만료됐어요. 다시 로그인해 주세요.');
+      const accessToken = sessionData.session.access_token;
+      const records = await pinmapReadAccountPages(offset =>
+        accountRequest('GET', null, `?limit=2&offset=${offset}`, userId, accessToken));
       if (version !== loadVersion || currentUserId !== userId) return;
       items = records.map(record => pinmapAccountItem(record, localId(record)));
       applyFolders(data.user.user_metadata?.pinmap_collections);

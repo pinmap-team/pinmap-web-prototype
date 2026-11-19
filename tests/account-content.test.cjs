@@ -29,15 +29,16 @@ test('event-only account content keeps schedules separate from map pins', () => 
 
 test('account history loads all pages using the backend page-size contract', async () => {
   const requests = [];
+  let sessionReads = 0;
   const records = [eventRecord, {...eventRecord,id:'11',source_url:'https://www.instagram.com/p/second/'},
     {...eventRecord,id:'12',source_url:'https://www.instagram.com/p/third/'}];
   const sdk = {auth:{getUser:async()=>({data:{user:{id:'user-a'}}}),
-    getSession:async()=>({data:{session:{access_token:'token'}}}),onAuthStateChange:()=>{}}};
+    getSession:async()=>{sessionReads++;return {data:{session:{access_token:'token'}}};},onAuthStateChange:()=>{}}};
   let finished;
   const done = new Promise(resolve=>{finished=resolve;});
   const context = {
     PinmapFolders:require('../account-folders.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
-    PM_ENV:{requiresAuth:true}, PinmapAuth:{ready:async()=>sdk},
+    PM_ENV:{requiresAuth:true}, PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
     document:{addEventListener:()=>{}}, window:{}, actions:{save:()=>{}},
     items:[], detailId:null, toast:()=>{},
     render:()=>{if(context.items.length===3) finished();},
@@ -55,9 +56,26 @@ test('account history loads all pages using the backend page-size contract', asy
   let timer;
   try { await Promise.race([done,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('History did not load')),1000);})]); }
   finally {clearTimeout(timer);}
-  assert.deepEqual(requests.map(x=>new URL(x.path,'https://pinmap.example').searchParams.get('offset')),['0','2']);
+  assert.deepEqual(requests.map(x=>new URL(x.path,'https://pinmap.example').searchParams.get('offset')),['0','2','4']);
   assert(requests.every(x=>x.authorization==='Bearer token'));
+  assert.equal(sessionReads,1);
   assert.equal(context.items.length,3);
+});
+
+test('account pages load concurrently but keep saved order', async () => {
+  const source = accountSource.split('\nif (PM_ENV.requiresAuth)')[0];
+  const records = Array.from({length:12},(_,index)=>({id:index}));
+  let active = 0, peak = 0;
+  const requestPage = async offset => {
+    active++; peak=Math.max(peak,active);
+    await new Promise(resolve=>setTimeout(resolve,offset===2?15:1));
+    active--;
+    const items=records.slice(offset,offset+2);
+    return {items,next_offset:items.length===2?offset+2:null};
+  };
+  const result = await vm.runInNewContext(`${source}\npinmapReadAccountPages(requestPage)`,{requestPage});
+  assert.deepEqual(Array.from(result,item=>item.id),records.map(item=>item.id));
+  assert.equal(peak,4);
 });
 
 test('bulk removal deletes on the server and keeps failed records visible', async () => {
@@ -69,7 +87,7 @@ test('bulk removal deletes on the server and keeps failed records visible', asyn
   const toasts = [], deletes = [];
   const context = {
     PinmapFolders:require('../account-folders.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
-    PM_ENV:{requiresAuth:true},PinmapAuth:{ready:async()=>sdk},
+    PM_ENV:{requiresAuth:true},PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
     document:{addEventListener:()=>{},getElementById:()=>({close:()=>{}}),querySelector:()=>null},
     window:{},actions:{save:()=>{}},items:[],detailId:null,cfSel:null,
     toast:message=>toasts.push(message),render:()=>{if(context.items.length===2) finished();},

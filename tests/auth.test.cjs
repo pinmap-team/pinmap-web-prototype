@@ -8,3 +8,20 @@ test('root forwards PKCE, implicit recovery and OAuth failure to standalone auth
     assert.equal(redirected,'auth.html'+search+hash);
   }
 });
+
+test('simultaneous app and content identity checks share one Supabase request',async()=>{
+  const context={window:{},location:{}};
+  vm.runInNewContext(fs.readFileSync('auth-client.js','utf8'),context);
+  let calls=0,resolveUser;
+  const client={auth:{getUser:()=>{calls++;return new Promise(resolve=>{resolveUser=resolve;});}}};
+  const first=context.window.PinmapAuth.verifiedUser(client);
+  const second=context.window.PinmapAuth.verifiedUser(client);
+  assert.equal(calls,1);
+  resolveUser({data:{user:{id:'user-a'}}});
+  const [a,b]=await Promise.all([first,second]);
+  assert.equal(a.data.user.id,b.data.user.id);
+  const third=context.window.PinmapAuth.verifiedUser(client);
+  assert.equal(calls,2);
+  resolveUser({data:{user:{id:'user-a'}}});
+  await third;
+});

@@ -48,7 +48,7 @@ if (PM_ENV.requiresAuth) (() => {
   async function verify() {
     if (resolving) return; resolving = true;
     try {
-      const {data,error} = await client.auth.getUser();
+      const {data,error} = await PinmapAuth.verifiedUser(client);
       if (error || !data.user) {user = null; gate(); return;}
       user = data.user; unlock();
     } catch {gate('로그인 상태를 확인하지 못했어요. 다시 연결해 주세요.');}

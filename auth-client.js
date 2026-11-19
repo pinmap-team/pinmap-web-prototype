@@ -2,6 +2,12 @@
 // The SDK owns session persistence/refresh; passwords are never saved by Pinmap.
 (() => {
   let pending;
+  let verifiedClient, verifiedPending;
+  function verifiedUser(client) {
+    if (verifiedClient !== client) {verifiedClient = client; verifiedPending = null;}
+    if (!verifiedPending) verifiedPending = client.auth.getUser().finally(() => {verifiedPending = null;});
+    return verifiedPending;
+  }
   function ready() {
     if (location.protocol === 'file:') return Promise.reject(new Error('AUTH_LOCAL_FILE'));
     if (!pending) pending = (async () => {
@@ -32,5 +38,5 @@
     if (error?.message === 'AUTH_CONFIG') return '로그인 연결을 준비 중이에요. 잠시 후 다시 시도해 주세요.';
     return '연결하지 못했어요. 네트워크를 확인하고 다시 시도해 주세요.';
   }
-  window.PinmapAuth = {ready, message, callback:() => location.origin + '/', login:() => {window.top.location.href = new URL('auth.html', location.href).href;}};
+  window.PinmapAuth = {ready, verifiedUser, message, callback:() => location.origin + '/', login:() => {window.top.location.href = new URL('auth.html', location.href).href;}};
 })();
