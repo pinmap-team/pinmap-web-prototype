@@ -67,6 +67,9 @@
     document.getElementById('auth-sent-email').textContent = lastEmail;
     updateResend(); resendTimer = setInterval(updateResend, 1000);
   }
+  function testEntry() {
+    return PinmapAuth.testLoginAvailable ? '<div class="auth-test-entry"><button class="filled auth-submit auth-submit-wide" type="button" data-auth="test-login">테스트 계정으로 시작하기</button><p class="auth-field-help">공용 테스트 계정 · 저장한 콘텐츠가 함께 보여요.</p></div>' : '';
+  }
   function render(next = mode) {
     clearInterval(resendTimer);
     mode = next; main.dataset.screen = mode;
@@ -74,7 +77,7 @@
     try {sessionStorage.removeItem(pendingKey);} catch {}
     resumeVerification = false;
     if (mode === 'welcome') {
-      content.innerHTML = `<div class="auth-social"><p>간편하게 시작하기</p><div class="auth-social-buttons">${kakao}${google}</div></div><nav class="auth-entry-links" aria-label="이메일 계정"><button type="button" data-auth="signin">이메일 로그인</button><span class="auth-entry-divider" aria-hidden="true"></span><button type="button" data-auth="signup">회원가입</button></nav><p class="auth-message" id="auth-message" role="status" aria-live="polite" aria-atomic="true"></p>`;
+      content.innerHTML = `<div class="auth-social"><p>간편하게 시작하기</p><div class="auth-social-buttons">${kakao}${google}</div></div><nav class="auth-entry-links" aria-label="이메일 계정"><button type="button" data-auth="signin">이메일 로그인</button><span class="auth-entry-divider" aria-hidden="true"></span><button type="button" data-auth="signup">회원가입</button></nav>${testEntry()}<p class="auth-message" id="auth-message" role="status" aria-live="polite" aria-atomic="true"></p>`;
       main.setAttribute('aria-busy','false'); return;
     }
     const title = {signin:'이메일 로그인',signup:'회원가입',reset:'비밀번호 재설정',password:'새 비밀번호 설정'}[mode];
@@ -150,6 +153,21 @@
     const button = event.target.closest('[data-auth]');
     if (!button || busy) return;
     const action = button.dataset.auth;
+    if (action === 'test-login' && client && PinmapAuth.testLoginAvailable) {
+      await PinmapButton.run(button, async () => {
+        loading(true); notice('');
+        try {
+          const response = await fetch('/api/auth/test-login', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}', cache:'no-store', signal:AbortSignal.timeout(35000)});
+          const session = await response.json();
+          if (!response.ok) throw new Error('TEST_LOGIN');
+          const {error} = await client.auth.setSession({access_token:session.access_token,refresh_token:session.refresh_token});
+          if (error) throw error;
+          enterApp();
+        } catch {notice('테스트 계정에 연결하지 못했어요. 다시 시도해 주세요.',true);}
+        finally {loading(false);}
+      }, '테스트 계정 연결 중');
+      return;
+    }
     if (action === 'retry') {await boot(); return;}
     if (action === 'verified-login') {
       render('signin'); notice('이메일 인증을 마쳤다면 비밀번호를 입력해 로그인해 주세요.');

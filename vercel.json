@@ -10,6 +10,10 @@
       "destination": "https://pinmap-backend.vercel.app/api/auth/config"
     },
     {
+      "source": "/api/auth/test-login",
+      "destination": "https://pinmap-backend.vercel.app/api/auth/test-login"
+    },
+    {
       "source": "/api/place-extract",
       "destination": "https://pinmap-backend.vercel.app/api/place-extract"
     },

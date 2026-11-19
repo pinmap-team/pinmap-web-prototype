@@ -1461,3 +1461,7 @@ html.pm-pulling,html.pm-pulling *{user-select:none!important;-webkit-user-select
 .live-map .lm-list-row>.pm-place-photo{width:88px;height:88px}
 .pm-photo-credit a:first-child{white-space:nowrap}
 .live-map button.lm-list-copy{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none;-webkit-backdrop-filter:none}
+
+/* Shared test login uses the existing primary button and spacing. */
+.pm-auth .auth-test-entry { margin-top: var(--space-lg, 16px); }
+.pm-auth .auth-test-entry .auth-field-help { text-align: center; margin-top: var(--space-sm, 8px); }

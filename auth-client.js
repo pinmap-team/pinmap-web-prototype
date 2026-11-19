@@ -8,6 +8,7 @@
       const response = await fetch('/api/auth/config', {cache:'no-store', signal:AbortSignal.timeout(12000)});
       if (!response.ok) throw new Error('AUTH_CONFIG');
       const config = await response.json();
+      window.PinmapAuth.testLoginAvailable = config.testLoginAvailable === true;
       if (!window.supabase?.createClient) throw new Error('AUTH_SDK');
       return window.supabase.createClient(config.url, config.publishableKey, {
         auth:{storageKey:'pinmap.auth.v1', persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, flowType:'pkce'}
