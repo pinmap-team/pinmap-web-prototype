@@ -107,3 +107,13 @@ test('only fully dated extracted events appear on the calendar', () => {
   assert.deepEqual(Array.from(entries,x=>x.eventDate),['2026-12-11','2027-04-11']);
   assert(entries.every(x=>x.eventCandidate));
 });
+
+test('account category uses trusted Decisions result and keeps old records compatible', () => {
+  const source=accountSource.split('\nif (PM_ENV.requiresAuth)')[0];
+  const record={...eventRecord,content_kind:'place',events:[],places:[{name:'테스트 바'}],classification:{source:'gemini_decisions',model:'gemini-decision-1',status:'classified',kind:'place',category:'bar',confidence:.95}};
+  let item=vm.runInNewContext(`${source}\npinmapAccountItem(record, 7)`,{record});
+  assert.equal(item.category,'주점');assert.equal(item.aiClassified,true);assert.equal(item.type,'맛집/카페');
+  record.classification.confidence=.2;
+  item=vm.runInNewContext(`${source}\npinmapAccountItem(record, 7)`,{record});
+  assert.equal(item.category,'장소');assert.equal(item.aiClassified,false);
+});
