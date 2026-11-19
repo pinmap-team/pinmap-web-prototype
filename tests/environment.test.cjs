@@ -118,7 +118,7 @@ test('disconnected external place search does not fetch outside data',async()=>{
   assert(messages.every(text=>text.includes('연결되지')));
 });
 
-test('empty development home keeps decorative cards and one home-only save action',()=>{
+test('empty development home keeps decorative cards and a two-path home add menu',()=>{
   const source=read('home.js'),start=source.indexOf('pages.home = function(){'),end=source.indexOf('\n};',start)+3;
   const placeholderStart=source.indexOf('function emptyPickCards(){'),placeholderEnd=source.indexOf('\n/* ---------- 캘린더',placeholderStart);
   const html=vm.runInNewContext(source.slice(placeholderStart,placeholderEnd)+source.slice(start,end)+';pages.home();',{
@@ -129,9 +129,13 @@ test('empty development home keeps decorative cards and one home-only save actio
   assert.equal((html.match(/class="pick pick-placeholder"/g)||[]).length,3);
   for(const slot of ['pickimg','pickword','picktext','pickdots'])assert(html.includes('class="'+slot+'"'));
   assert(!html.includes('data-detail='));
-  assert.equal((html.match(/data-action="save"/g)||[]).length,1);
+  assert.equal((html.match(/data-action="addoptions"/g)||[]).length,1);
   assert(html.includes('class="home-add-fab"'));
   assert(!html.includes('저장한 콘텐츠 불러오는 중'));
+  assert(html.includes('class="home-add-menu"'));
+  assert(html.includes('aria-expanded="false" aria-controls="home-add-options"'));
+  assert(html.includes('data-action="zipimport"'));
+  assert(html.includes('data-action="linkimport"'));
   assert(html.includes('aria-label="첫 콘텐츠 추가"'));
   assert(html.includes('콘텐츠 추가하기'));
   assert(html.includes('공유로 저장하는 방법'));

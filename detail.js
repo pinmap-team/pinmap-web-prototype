@@ -72,7 +72,7 @@ detail = function(){
     <div class="dthero">${libThumb(x)}<div class="dtshade" aria-hidden="true"></div>
       <div class="dttop"><button class="dtbtn" data-action="back" aria-label="돌아가기">${icon('chevleft')}</button>
         <div class="dttopr">
-          ${PM_ENV.requiresAuth ? '' : `<button type="button" class="dtbtn dtfavorite${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 즐겨찾기" aria-pressed="${!!x.favorite}">${icon('star')}</button>`}
+          ${PM_ENV.requiresAuth ? '' : `<button type="button" class="dtbtn dtfavorite lm-heart-motion${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 즐겨찾기" aria-pressed="${!!x.favorite}"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>`}
           <button class="dtbtn dtmorebtn" data-action="dtmore" aria-label="더보기" aria-haspopup="menu" aria-expanded="false" aria-controls="dtmenu">${icon('more')}</button>
           <div class="dtmenu" id="dtmenu" role="menu" aria-label="콘텐츠 메뉴" hidden>
             <button type="button" role="menuitem" data-action="dtshare">${icon('share')}공유</button>
@@ -209,11 +209,13 @@ actions.dtshare = async () => {
 paths.trash = 'M4 7h16 M10 11v6 M14 11v6 M6 7l1 13h10l1-13 M9 7V4h6v3';
 paths.walk = 'M13 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0 M9 21l2-6 2 2v4 M8 11l2-3 3 1 2 3 2 1 M11 15l1-5';
 
-// 즐겨찾기 (별표) · 브라우저에 함께 저장돼요
+// 즐겨찾기 하트 · 브라우저에 함께 저장돼요
 actions.fav = () => {
   const x = items.find(i => i.id === detailId); if (!x) return;
   x.favorite = !x.favorite; afterChange();
   const y = scrollY; render(); scrollTo(0, y);
+  const button = document.querySelector('.dt-photo .dtfavorite');
+  if (button) window.PinmapHeartMotion?.(button, x.favorite);
   toast(x.favorite ? '즐겨찾기에 추가했어요.' : '즐겨찾기에서 뺐어요.');
 };
 
@@ -323,7 +325,7 @@ function saveSheet(){
   const colChip = (name, text) => `<button type="button" class="eschip ${name===''?'on':''}" data-escol="${esc(name)}" aria-pressed="${name===''}">${esc(text)}</button>`;
   if (!PM_ENV.development) {
     modal('', `<form id="saveform" class="esform" novalidate>
-      <div class="eshead"><span class="esicon" aria-hidden="true">${icon('plus')}</span><div><h2>새로 저장</h2><p>콘텐츠 링크를 저장해요.</p></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
+      <div class="eshead"><span class="esicon" aria-hidden="true">${icon('link')}</span><div><h2>게시물 링크로 저장</h2><p>콘텐츠 링크를 저장해요.</p></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
       <div class="esbody">
         <label class="esfield">${label('link','게시물 주소 (URL)')}
           <span class="esinput withicon">${icon('link')}<input type="url" name="url" id="es-url" placeholder="https://www.instagram.com/p/…/" required inputmode="url"></span>
@@ -341,10 +343,8 @@ function saveSheet(){
     return;
   }
   modal('', `<form id="saveform" class="esform" novalidate>
-    <div class="eshead"><span class="esicon" aria-hidden="true">${icon('plus')}</span><div><h2>새로 저장</h2><p>SNS 링크를 붙여넣으면 바로 저장돼요.</p></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
+    <div class="eshead"><span class="esicon" aria-hidden="true">${icon('link')}</span><div><h2>게시물 링크로 저장</h2><p>SNS 링크를 붙여넣으면 바로 저장돼요.</p></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
     <div class="esbody">
-      <button type="button" class="esshare" data-action="snsdemo"><span class="esshareicon" aria-hidden="true">${icon('share')}</span><div><b>SNS에서 공유로 저장하기</b><small>게시물에서 공유 → 핀맵, 저장 과정을 체험해요</small></div>${icon('arrow')}</button>
-      <div class="esdivider"><span>또는 링크로 저장</span></div>
       <label class="esfield">${label('link',PM_ENV.development ? 'Instagram 게시물 주소 (URL)' : '링크', `<button type="button" class="essample" data-action="sample">예시 링크로 채우기</button>`)}
         <span class="esinput withicon">${icon('link')}<input type="url" name="url" id="es-url" placeholder="${PM_ENV.development ? 'https://www.instagram.com/p/…/' : 'https://'}" required inputmode="url"></span>
       </label>

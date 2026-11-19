@@ -179,7 +179,35 @@
       setSheetStage(stages[Math.max(0,Math.min(stages.length-1,stages.indexOf(sheetStage)+(event.key==='ArrowUp'?1:-1)))]);
     });
   }
-  const favoriteButton = place => place.saved && !PM_ENV.requiresAuth ? `<button type="button" class="lm-carousel-heart${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 즐겨찾기">${icon('star')}</button>` : '';
+  const favoriteButton = place => place.saved && !PM_ENV.requiresAuth ? `<button type="button" class="lm-carousel-heart lm-heart-motion${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" data-item-id="${place.id}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>` : '';
+  function playHeartMotion(button, liked) {
+    button.querySelector('.lm-heart-burst')?.remove();
+    button.classList.remove('is-bursting');
+    if(!liked || window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    const burst=document.createElement('span');
+    burst.className='lm-heart-burst';
+    burst.setAttribute('aria-hidden','true');
+    const bloom=document.createElement('span');
+    bloom.className='lm-heart-bloom';
+    burst.append(bloom);
+    const colors=['#f48ea7','#cc8ef5','#8ce8c3','#91d2fa','#f5a524','#e5484d','#9fc7fa'];
+    for(let index=0;index<7;index++){
+      const spoke=document.createElement('span');
+      spoke.className='lm-heart-spoke';
+      spoke.style.setProperty('--angle',`${index*360/7-90}deg`);
+      for(const color of [colors[index],colors[(index+3)%colors.length]]){
+        const dot=document.createElement('i');
+        dot.style.background=color;
+        spoke.append(dot);
+      }
+      burst.append(spoke);
+    }
+    burst.style.setProperty('--fly','.5');
+    button.append(burst);
+    button.classList.add('is-bursting');
+    window.setTimeout(()=>{if(!burst.isConnected)return;burst.remove();button.classList.remove('is-bursting');},830);
+  }
+  window.PinmapHeartMotion = playHeartMotion;
   function renderSheet() {
     const host=$('#lm-selected-place');if(!host)return;
     const list=visiblePlaces();
@@ -491,8 +519,10 @@
         if(PM_ENV.requiresAuth){toast('계정 즐겨찾기 기능은 준비 중이에요.');break;}
         item.favorite=!item.favorite;
         place.favorite=item.favorite;
+        searchResults?.forEach(result=>{if(result.saved&&result.id===item.id)result.favorite=item.favorite;});
+        for(const entry of markerEntries.values())if(entry.place?.id===item.id)entry.place.favorite=item.favorite;
         afterChange();
-        document.querySelectorAll('.lm-carousel-heart').forEach(node=>{if(node.dataset.placeKey!==button.dataset.placeKey)return;node.classList.toggle('is-active',item.favorite);node.setAttribute('aria-pressed',String(item.favorite));});
+        document.querySelectorAll('.lm-carousel-heart').forEach(node=>{if(node.dataset.itemId!==String(item.id))return;node.classList.toggle('is-active',item.favorite);node.setAttribute('aria-pressed',String(item.favorite));if(node.classList.contains('lm-heart-motion'))playHeartMotion(node,item.favorite);});
         toast(item.favorite?'즐겨찾기에 추가했어요.':'즐겨찾기에서 뺐어요.');
         break;
       }
