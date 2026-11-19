@@ -155,19 +155,16 @@ document.addEventListener('click', e => {
 pages.home = function(){
   const chips = homeCategoryChips();
   const picks = homePicks();
-  const loadingAccount = PM_ENV.requiresAuth && !window.PinmapAccountLoaded;
   const accountError = PM_ENV.requiresAuth && !items.length && window.PinmapAccountLoadError;
-  const emptyHome = PM_ENV.development && !items.length && !loadingAccount && !accountError;
-  const main = loadingAccount
-    ? '<div class="pm-loading" role="status" aria-label="저장한 콘텐츠 불러오는 중"><span class="pm-spinner" aria-hidden="true"></span></div>'
-    : accountError
+  const emptyHome = PM_ENV.development && !items.length && !accountError;
+  const main = accountError
     ? '<div class="empty small" role="status"><p class="muted">저장한 콘텐츠를 불러오지 못했어요.</p><button class="tonal" data-action="accountretry">다시 불러오기</button></div>'
     : picks.length || emptyHome
     ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'role="group" aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${emptyHome ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
     : `<div class="empty small"><p class="muted">선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.</p></div>`;
   const brand = '<div class="homebrand" aria-label="Pinmap"><img class="homebrand-symbol" src="img/pinmap-symbol-splash.svg" alt=""><span class="homebrand-name" aria-hidden="true">Pinmap</span></div>';
   const addButton = `<button type="button" class="home-add-fab" data-action="save" aria-label="콘텐츠 추가하기">${icon('plus')}</button>`;
-  return stripBar() + brand + main + (loadingAccount || accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + chips + (emptyHome || loadingAccount || accountError ? '' : subWidgets()) + (loadingAccount ? '' : addButton);
+  return stripBar() + brand + main + (accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + chips + (emptyHome || accountError ? '' : subWidgets()) + addButton;
 };
 
 // Android 공유 안내: 실제 설치나 공유 수신이 연결된 것으로 표시하지 않아요.

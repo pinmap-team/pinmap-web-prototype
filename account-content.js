@@ -58,6 +58,35 @@ function pinmapAccountItem(record, id) {
     mapKind:hasEvents ? 'event' : 'eat', pending:places.length > 0 && !first};
 }
 
+async function pinmapReadAccountPages(requestPage, onItem = () => {}) {
+  const records = [];
+  // The first response contains one post so it can appear before the rest.
+  let offset = 0, width = 1, pageCount = 0, limit = 1;
+  while (pageCount < 100) {
+    const offsets = Array.from({length:Math.min(width, 100 - pageCount)}, (_, index) => offset + index * limit);
+    const pages = await Promise.all(offsets.map(pageOffset => requestPage(pageOffset, limit)));
+    for (let index = 0; index < pages.length; index++) {
+      const result = pages[index];
+      const pageOffset = offsets[index];
+      if (!Array.isArray(result.items) || result.items.length > limit)
+        throw Error('저장 목록 응답 형식이 올바르지 않습니다.');
+      if (result.next_offset != null &&
+          (result.items.length !== limit || result.next_offset !== pageOffset + limit))
+        throw Error('저장 목록 페이지를 이어 읽지 못했어요.');
+      for (const item of result.items) {
+        records.push(item);
+        await onItem(item, records.length - 1);
+      }
+      pageCount++;
+      if (result.next_offset == null) return records;
+    }
+    offset = offsets[offsets.length - 1] + limit;
+    width = Math.min(width * 2, 4);
+    limit = 2;
+  }
+  throw Error('저장 목록이 너무 많아 모두 불러오지 못했어요.');
+}
+
 if (PM_ENV.requiresAuth) (() => {
   let client, currentUserId = null, loadVersion = 0, nextLocalId = 9000000000000;
   window.PinmapAccountLoaded = false;
@@ -96,6 +125,24 @@ if (PM_ENV.requiresAuth) (() => {
     if (!localIds.has(key)) localIds.set(key, nextLocalId++);
     return localIds.get(key);
   };
+  let pendingView = false;
+  function refreshVisibleContent() {
+    if (typeof page === 'undefined') { render(); return; }
+    if (detailId || !['home','library'].includes(page) || document.querySelector?.('dialog[open]')) {
+      pendingView = true; return;
+    }
+    if (document.activeElement?.matches?.('input,textarea,select,[contenteditable]')) {
+      pendingView = true; return;
+    }
+    pendingView = false;
+    render();
+  }
+  document.addEventListener('focusout', () => {
+    if (pendingView) setTimeout(refreshVisibleContent, 0);
+  });
+  document.addEventListener('close', () => {
+    if (pendingView) setTimeout(refreshVisibleContent, 0);
+  }, true);
   const message = (status, response) => {
     if (status === 401) return '로그인 상태가 만료됐어요. 다시 로그인해 주세요.';
     if (status === 403) return '이 계정의 저장 목록에 접근할 수 없어요.';
@@ -107,14 +154,17 @@ if (PM_ENV.requiresAuth) (() => {
     return typeof response?.error === 'string' && response.error.length < 150
       ? response.error : '저장 서버에 연결하지 못했어요. 다시 시도해 주세요.';
   };
-  async function accountRequest(method, body, query = '', expectedUserId = currentUserId) {
+  async function accountRequest(method, body, query = '', expectedUserId = currentUserId, accessToken = null) {
     if (!client) throw Error('로그인 연결을 확인하고 있어요.');
-    const {data, error} = await client.auth.getSession();
-    if (error || !data?.session?.access_token) throw Error('로그인 상태가 만료됐어요. 다시 로그인해 주세요.');
+    if (!accessToken) {
+      const {data, error} = await client.auth.getSession();
+      if (error || !data?.session?.access_token) throw Error('로그인 상태가 만료됐어요. 다시 로그인해 주세요.');
+      accessToken = data.session.access_token;
+    }
     if (!expectedUserId || currentUserId !== expectedUserId)
       throw Error('계정이 변경됐어요. 다시 로그인한 뒤 시도해 주세요.');
     const response = await fetch('/api/content-save' + query, {
-      method, headers:{'Authorization':'Bearer ' + data.session.access_token,
+      method, headers:{'Authorization':'Bearer ' + accessToken,
         ...(body ? {'Content-Type':'application/json'} : {})},
       ...(body ? {body:JSON.stringify(body)} : {}), cache:'no-store'
     });
@@ -140,36 +190,41 @@ if (PM_ENV.requiresAuth) (() => {
     window.PinmapAccountLoadError = false;
     let userId=currentUserId;
     try {
-      const {data, error} = await client.auth.getUser();
+      const {data, error} = await PinmapAuth.verifiedUser(client);
       if(version!==loadVersion)return;
       if(error)throw error;
       if(!data?.user?.id){clearAccount();return;}
       userId=data.user.id;
       if(currentUserId&&currentUserId!==userId){window.dispatchEvent(new Event('pinmap:account-cleared'));items=[];applyFolders(null);detailId=null;}
       currentUserId=userId;
-      const records = [];
-      let offset = 0;
-      for (let pageNumber = 0; pageNumber < 100; pageNumber++) {
-        const result = await accountRequest('GET', null, `?limit=2&offset=${offset}`);
-        if (!Array.isArray(result.items)) throw Error('저장 목록 응답 형식이 올바르지 않습니다.');
-        records.push(...result.items);
-        const next = result.next_offset;
-        if (next == null) break;
-        if (!Number.isSafeInteger(next) || next <= offset) throw Error('저장 목록 페이지를 이어 읽지 못했어요.');
-        offset = next;
-        if (pageNumber === 99) throw Error('저장 목록이 너무 많아 모두 불러오지 못했어요.');
-      }
-      if (version !== loadVersion || currentUserId !== userId) return;
-      items = records.map(record => pinmapAccountItem(record, localId(record)));
       applyFolders(data.user.user_metadata?.pinmap_collections);
+      refreshVisibleContent();
+      const {data:sessionData, error:sessionError} = await client.auth.getSession();
+      if (sessionError || !sessionData?.session?.access_token)
+        throw Error('로그인 상태가 만료됐어요. 다시 로그인해 주세요.');
+      const accessToken = sessionData.session.access_token;
+      const staged = [];
+      await pinmapReadAccountPages((offset, limit) =>
+        accountRequest('GET', null, `?limit=${limit}&offset=${offset}`, userId, accessToken), async record => {
+        if (version !== loadVersion || currentUserId !== userId) throw Error('stale_load');
+        const item = pinmapAccountItem(record, localId(record));
+        item.collection = folderState.assignments[String(item.backendId)] || '';
+        staged.push(item);
+        items = staged.slice();
+        refreshVisibleContent();
+        // Give the browser a paint opportunity before adding the next post.
+        if (typeof requestAnimationFrame === 'function') await new Promise(requestAnimationFrame);
+      });
+      if (version !== loadVersion || currentUserId !== userId) return;
+      items = staged;
       window.PinmapAccountLoaded = true;
       window.PinmapAccountLoadError = false;
-      render();
+      refreshVisibleContent();
     } catch (error) {
       if (version === loadVersion && currentUserId === userId) {
         window.PinmapAccountLoaded = true;
         window.PinmapAccountLoadError = true;
-        render();
+        refreshVisibleContent();
         toast(error.message || '저장 목록을 불러오지 못했어요.');
       }
     }
@@ -216,6 +271,8 @@ if (PM_ENV.requiresAuth) (() => {
       const result = await accountRequest('POST', {url,content_types:['place','event']}, '', userId);
       if (!result.item || typeof result.item !== 'object') throw Error('저장 결과를 확인하지 못했어요.');
       if (currentUserId !== userId) { PinmapSaveProgress.clear(); return; }
+      const wasLoading = !window.PinmapAccountLoaded;
+      loadVersion++; // A response based on the old offset must not overwrite this save.
       const item = pinmapAccountItem(result.item, localId(result.item));
       item.collection=folderState.assignments[String(item.backendId)]||'';
       items = [item, ...items.filter(x => x.url !== item.url)];
@@ -228,6 +285,7 @@ if (PM_ENV.requiresAuth) (() => {
       toast(item.contentKind === 'unknown'
         ? '링크를 저장했어요. 분석은 완료하지 못했어요. 상세에서 이유를 확인해 주세요.'
         : `저장했어요 · 장소 ${item.extractedPlaceCount}곳 · 행사 ${item.events.length}건${warningCount ? ' · 확인할 안내가 있어요' : ''}`);
+      if (wasLoading) void loadAccount();
     } catch (error) {
       const message = error.message || '저장하지 못했어요. 다시 시도해 주세요.';
       PinmapSaveProgress.finish(message);
@@ -239,15 +297,21 @@ if (PM_ENV.requiresAuth) (() => {
   window.PinmapAccountContent = {remove:async item => {
     if (!item?.url) throw Error('삭제할 콘텐츠 주소를 확인하지 못했어요.');
     const userId = currentUserId;
-    await accountRequest('DELETE', {url:item.url}, '', userId);
+    const wasLoading = !window.PinmapAccountLoaded;
+    if (wasLoading) loadVersion++;
+    try { await accountRequest('DELETE', {url:item.url}, '', userId); }
+    catch (error) { if (wasLoading && currentUserId === userId) void loadAccount(); throw error; }
     if (currentUserId !== userId) return;
     items = items.filter(x => x.id !== item.id);
     if (detailId === item.id) detailId = null;
     document.getElementById('sheet')?.close();
     render();
     toast('계정의 저장 목록에서 삭제했어요.');
+    if (wasLoading) void loadAccount();
   }, removeMany:async selected => {
     const userId = currentUserId, removed = [], failed = [];
+    const wasLoading = !window.PinmapAccountLoaded;
+    if (wasLoading) loadVersion++;
     for (const item of selected) {
       if (currentUserId !== userId) return;
       try { await accountRequest('DELETE', {url:item.url}, '', userId); removed.push(item.id); }
@@ -261,6 +325,7 @@ if (PM_ENV.requiresAuth) (() => {
     render();
     toast(failed.length ? `${removed.length}개를 삭제했어요. ${failed.length}개는 삭제하지 못해 목록에 남겼어요.`
       : `콘텐츠 ${removed.length}개를 삭제했어요.`);
+    if (wasLoading) void loadAccount();
   }, refresh:loadAccount};
   const unsupportedContent = () => toast('계정 콘텐츠의 수정·즐겨찾기는 준비 중이에요. 저장된 정보는 그대로예요.');
   for (const name of ['edit','fav']) actions[name] = unsupportedContent;

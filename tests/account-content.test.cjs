@@ -29,24 +29,26 @@ test('event-only account content keeps schedules separate from map pins', () => 
 
 test('account history loads all pages using the backend page-size contract', async () => {
   const requests = [];
+  let sessionReads = 0;
   const records = [eventRecord, {...eventRecord,id:'11',source_url:'https://www.instagram.com/p/second/'},
     {...eventRecord,id:'12',source_url:'https://www.instagram.com/p/third/'}];
   const sdk = {auth:{getUser:async()=>({data:{user:{id:'user-a'}}}),
-    getSession:async()=>({data:{session:{access_token:'token'}}}),onAuthStateChange:()=>{}}};
+    getSession:async()=>{sessionReads++;return {data:{session:{access_token:'token'}}};},onAuthStateChange:()=>{}}};
   let finished;
   const done = new Promise(resolve=>{finished=resolve;});
+  const visible = [];
   const context = {
     PinmapFolders:require('../account-folders.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
-    PM_ENV:{requiresAuth:true}, PinmapAuth:{ready:async()=>sdk},
+    PM_ENV:{requiresAuth:true}, PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
     document:{addEventListener:()=>{}}, window:{}, actions:{save:()=>{}},
     items:[], detailId:null, toast:()=>{},
-    render:()=>{if(context.items.length===3) finished();},
+    render:()=>{visible.push({count:context.items.length,loaded:context.window.PinmapAccountLoaded});if(context.items.length===3) finished();},
     fetch:async(path,options)=>{
       requests.push({path,method:options.method,authorization:options.headers.Authorization});
       const url = new URL(path,'https://pinmap.example');
       const limit = Number(url.searchParams.get('limit'));
       const offset = Number(url.searchParams.get('offset'));
-      assert.equal(limit,2);
+      assert.equal(limit,offset===0?1:2);
       const items = records.slice(offset,offset+limit);
       return {ok:true,json:async()=>({items,next_offset:items.length===limit?offset+limit:null})};
     }
@@ -55,9 +57,48 @@ test('account history loads all pages using the backend page-size contract', asy
   let timer;
   try { await Promise.race([done,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('History did not load')),1000);})]); }
   finally {clearTimeout(timer);}
-  assert.deepEqual(requests.map(x=>new URL(x.path,'https://pinmap.example').searchParams.get('offset')),['0','2']);
+  assert.deepEqual(requests.map(x=>new URL(x.path,'https://pinmap.example').searchParams.get('offset')),['0','1','3']);
   assert(requests.every(x=>x.authorization==='Bearer token'));
+  assert.equal(sessionReads,1);
+  assert(visible.findIndex(x=>x.count===0)<visible.findIndex(x=>x.count===1));
+  assert(visible.findIndex(x=>x.count===1)<visible.findIndex(x=>x.count===3));
+  assert(visible.some(x=>x.count===1 && x.loaded===false));
   assert.equal(context.items.length,3);
+});
+
+test('account pages load concurrently but keep saved order', async () => {
+  const source = accountSource.split('\nif (PM_ENV.requiresAuth)')[0];
+  const records = Array.from({length:12},(_,index)=>({id:index}));
+  let active = 0, peak = 0;
+  const requestPage = async (offset,limit) => {
+    active++; peak=Math.max(peak,active);
+    await new Promise(resolve=>setTimeout(resolve,offset===3?15:1));
+    active--;
+    const items=records.slice(offset,offset+limit);
+    return {items,next_offset:items.length===limit?offset+limit:null};
+  };
+  const seen=[];
+  const result = await vm.runInNewContext(`${source}\npinmapReadAccountPages(requestPage, item => seen.push(item.id))`,{requestPage,seen});
+  assert.deepEqual(Array.from(result,item=>item.id),records.map(item=>item.id));
+  assert.deepEqual(seen,records.map(item=>item.id));
+  assert.equal(peak,4);
+});
+
+test('the first saved post appears before later page requests complete', async () => {
+  const source=accountSource.split('\nif (PM_ENV.requiresAuth)')[0];
+  let releaseLater;
+  const later=new Promise(resolve=>{releaseLater=resolve;});
+  const seen=[];
+  const requestPage=async (offset,limit) => {
+    if (offset===0) return {items:[{id:1}],next_offset:1};
+    await later;
+    return {items:[],next_offset:null};
+  };
+  const loading=vm.runInNewContext(`${source}\npinmapReadAccountPages(requestPage, item => seen.push(item.id))`,{requestPage,seen});
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(seen,[1]);
+  releaseLater();
+  await loading;
 });
 
 test('bulk removal deletes on the server and keeps failed records visible', async () => {
@@ -69,7 +110,7 @@ test('bulk removal deletes on the server and keeps failed records visible', asyn
   const toasts = [], deletes = [];
   const context = {
     PinmapFolders:require('../account-folders.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
-    PM_ENV:{requiresAuth:true},PinmapAuth:{ready:async()=>sdk},
+    PM_ENV:{requiresAuth:true},PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
     document:{addEventListener:()=>{},getElementById:()=>({close:()=>{}}),querySelector:()=>null},
     window:{},actions:{save:()=>{}},items:[],detailId:null,cfSel:null,
     toast:message=>toasts.push(message),render:()=>{if(context.items.length===2) finished();},
@@ -81,8 +122,9 @@ test('bulk removal deletes on the server and keeps failed records visible', asyn
       }
       const url=new URL(path,'https://pinmap.example');
       const offset=Number(url.searchParams.get('offset'));
-      const items=records.slice(offset,offset+2);
-      return {ok:true,json:async()=>({items,next_offset:items.length===2?offset+2:null})};
+      const limit=Number(url.searchParams.get('limit'));
+      const items=records.slice(offset,offset+limit);
+      return {ok:true,json:async()=>({items,next_offset:items.length===limit?offset+limit:null})};
     }
   };
   vm.runInNewContext(accountSource,context);
