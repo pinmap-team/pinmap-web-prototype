@@ -141,9 +141,9 @@ pages.howtopage = function(){
   const keep = onboardStep; onboardStep = 1;
   const html = onboardScreen().replace(/<div class="ob-actions">[\s\S]*?<\/div>\s*$/, '')
     // 제목은 '저장하는 방법 다시 보기', 온보딩 제목은 그 아래 서브 문구로
-    .replace(/<h1 class="ob-title"[^>]*>[\s\S]*?<\/h1>/, '<h1 class="ob-title">저장하는 방법 다시 보기</h1><p class="ob-desc howtosub">마음에 드는 콘텐츠를 발견했다면?</p>');
+    .replace(/<h1 class="ob-title"[^>]*>[\s\S]*?<\/h1>/, '<p class="ob-desc howtosub">마음에 드는 콘텐츠를 발견했다면?</p>');
   onboardStep = keep;
-  return myPage('', `<div class="ob-screen step2 howtobody">${html}
+  return myPage('저장하는 방법 다시 보기', `<div class="ob-screen step2 howtobody">${html}
     <div class="ob-actions"><button class="filled ob-next" data-action="snsdemo">SNS 저장 체험 해보기</button></div></div>`, 'howtopage', 'guide');
 };
 

@@ -13,3 +13,5 @@
 await PinmapButton.run(searchButton, () => searchPlaces(query), '장소 검색 중');
 ```
 반례: CSS로만 흐리게 하고 클릭을 허용하기; 로딩 스피너만 보이며 중복 요청하기; 존재하지 않는 React Button을 import하기.
+
+- 2026-11-19 로컬 정리: 초점은 추가 outline 테두리 대신 밝기 변화로 표시한다. 메뉴는 기존 배경 변화도 함께 사용한다. 원래 테두리·선택 표시는 유지하며 키보드 Tab·Enter로 같은 동작을 검증한다.
