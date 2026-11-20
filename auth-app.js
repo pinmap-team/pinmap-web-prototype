@@ -25,9 +25,7 @@ if (PM_ENV.requiresAuth) (() => {
     document.documentElement.classList.remove('auth-pending');
     app.inert = false; render();
   }
-  // Expose identity in the account page without persisting it into shared settings.
-  const accountPage = pages.account;
-  pages.account = () => accountPage().replace('<section class="account-identity"', `<section class="auth-account-status" aria-label="로그인 계정"><b>로그인 계정</b><p>${esc(user?.email || '연결된 계정으로 로그인됨')}</p><small>저장 콘텐츠는 이 계정에 연결돼요.</small></section><section class="account-identity"`);
+  // Account identity is read by the common account page, never copied to demo settings.
   const logout = async () => {
     if (!client) {login(); return;}
     const button = document.querySelector('[data-action="logoutyes"]');
@@ -35,7 +33,7 @@ if (PM_ENV.requiresAuth) (() => {
       await PinmapButton.run(button, async () => {
         const {error} = await client.auth.signOut({scope:'local'});
         if (error) throw error;
-        user = null; window.top.location.replace(new URL('auth.html',location.href).href);
+        user = null; window.PinmapAccountIdentity = null; window.top.location.replace(new URL('auth.html',location.href).href);
       },'로그아웃 중');
     } catch (error) {toast(PinmapAuth.message(error));}
   };
@@ -49,9 +47,10 @@ if (PM_ENV.requiresAuth) (() => {
     if (resolving) return; resolving = true;
     try {
       const {data,error} = await PinmapAuth.verifiedUser(client);
-      if (error || !data.user) {user = null; gate(); return;}
+      if (error || !data.user) {user = null; window.PinmapAccountIdentity = null; gate(); return;}
       const alreadyOpen = user?.id === data.user.id && !document.documentElement.classList.contains('auth-pending');
       user = data.user;
+      window.PinmapAccountIdentity = {email:user.email || ''};
       if (!alreadyOpen) unlock();
     } catch {gate('로그인 상태를 확인하지 못했어요. 다시 연결해 주세요.');}
     finally {resolving = false;}
@@ -60,13 +59,14 @@ if (PM_ENV.requiresAuth) (() => {
   PinmapAuth.ready().then(async sdk => {
     client = sdk;
     client.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT') {user = null; gate();}
+      if (event === 'SIGNED_OUT') {user = null; window.PinmapAccountIdentity = null; gate();}
       if (['SIGNED_IN','TOKEN_REFRESHED','USER_UPDATED'].includes(event)) setTimeout(verify,0);
     });
     const {data,error} = await client.auth.getSession();
     if (error || !data?.session?.user) {gate(); return;}
     // The app starts with an empty account view; server data still requires verification.
     user = data.session.user;
+    window.PinmapAccountIdentity = {email:user.email || ''};
     unlock();
     void verify();
   }).catch(error => gate(PinmapAuth.message(error)));

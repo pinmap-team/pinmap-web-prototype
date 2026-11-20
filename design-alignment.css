@@ -1007,6 +1007,7 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .accountpage .account-identity .pavatar{width:48px;height:48px}
 .accountpage .account-identity b{display:block;font:var(--type-body-md);font-weight:var(--weight-semibold);color:var(--color-on-surface)}
 .accountpage .account-identity small{display:block;margin-top:var(--space-xs);font:var(--type-body-sm);color:var(--color-secondary)}
+.accountpage .account-edit{margin-left:auto;flex:none}
 .accountpage .account-info{padding:0}
 .accountpage .account-info>div{padding:var(--space-lg)}
 .accountpage .account-info>div+div{border-top:1px solid var(--color-disabled)}

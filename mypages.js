@@ -52,7 +52,7 @@ actions.placesheet = () => { if (page === 'placeset') placeSheet(); else placeSh
 pages.interestset = function(){
   const opts = interestOptions.filter(o => o.id !== 'later');
   return myPage('관심 키워드 설정', `
-    <p class="muted mpdesc kwdesc">고른 키워드에 맞는 저장 콘텐츠를 홈에서 먼저 보여드려요.\n아무것도 고르지 않으면 홈에서 랜덤으로 추천해요.</p>
+    <p class="muted mpdesc kwdesc">고른 키워드에 맞는 저장 콘텐츠를 홈에서 먼저 보여드려요.\n아무것도 고르지 않으면 최근 저장한 순서로 보여드려요.</p>
     <div class="kwgrid" role="group" aria-label="관심 키워드">${opts.map(o => { const on = preferences.includes(o.id);
       return `<button class="kwopt ${on ? 'on' : ''}" data-kw="${o.id}" role="checkbox" aria-checked="${on}"><span class="kwico" aria-hidden="true">${window.obIcon ? obIcon(o.id, on) : o.emoji}</span><span>${o.short}</span></button>`; }).join('')}</div>
 `, 'kwpage');
@@ -152,13 +152,14 @@ pages.howtopage = function(){
 // 사진 · 이름은 마이 프로필 카드에서 바로 바꿔요. 연락처 · 생년월일은 프로토타입 예시 값이에요.
 const ACCOUNT_EXAMPLE = {email:'seoyeon@example.com', phone:'010-0000-0000', birth:'2002년 3월 14일'};
 pages.account = () => myPage('계정 관리', `<h2 class="account-sub">프로필</h2>
-  <section class="account-identity account-card" aria-label="프로필"><span class="account-avatar">${avatarHtml()}</span><span><b>${esc(settings.nickname || '이름 설정')}</b><small>핀맵 프로필</small></span></section>
+  <section class="account-identity account-card" aria-label="프로필"><span class="account-avatar">${avatarHtml()}</span><span><b>${esc(settings.nickname || '이름 설정')}</b><small>핀맵 프로필</small></span><button type="button" class="account-edit iconbtn" data-page="profile" aria-label="프로필 편집">${icon('chevright')}</button></section>
   <h2 class="account-sub">개인정보</h2>
   <dl class="account-card account-info">
-    <div><dt>연락처 정보</dt><dd>${esc(settings.contactEmail || ACCOUNT_EXAMPLE.email)}, ${esc(settings.contactPhone || ACCOUNT_EXAMPLE.phone)}</dd></div>
-    <div><dt>생년월일</dt><dd>${esc(settings.birth || ACCOUNT_EXAMPLE.birth)}</dd></div>
+    <div><dt>이메일</dt><dd>${esc(PM_ENV.requiresAuth ? (window.PinmapAccountIdentity?.email || '확인 중') : (settings.contactEmail || ACCOUNT_EXAMPLE.email))}</dd></div>
+    <div><dt>연락처</dt><dd>${esc(PM_ENV.requiresAuth ? (settings.contactPhone || '등록된 정보 없음') : (settings.contactPhone || ACCOUNT_EXAMPLE.phone))}</dd></div>
+    <div><dt>생년월일</dt><dd>${esc(PM_ENV.requiresAuth ? (settings.birth || '등록된 정보 없음') : (settings.birth || ACCOUNT_EXAMPLE.birth))}</dd></div>
   </dl>
-  <p class="account-note">예시 정보예요. 실제 서비스에서는 가입할 때 입력한 정보가 보여요.</p>
+  ${PM_ENV.requiresAuth ? '' : '<p class="account-note">프로토타입 예시 정보예요.</p>'}
   <nav class="account-exit" aria-label="로그아웃 및 회원 탈퇴">
     <button type="button" data-action="logoutask">로그아웃</button><span aria-hidden="true">|</span><button type="button" data-action="leaveask">회원 탈퇴</button>
   </nav>`, 'accountpage');

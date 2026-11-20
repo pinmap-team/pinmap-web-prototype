@@ -146,7 +146,7 @@ test('empty development home keeps decorative cards and a two-path home add menu
 });
 test('home replaces the first-save prompt with account content after loading',()=>{
   const source=read('home.js');
-  const start=source.indexOf('const shuffle = list =>');
+  const start=source.indexOf('function homePicks(){');
   const end=source.indexOf('function pickCard(',start);
   const context=vm.createContext({
     PM_ENV:{development:true,requiresAuth:true},items:[],preferences:[],

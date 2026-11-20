@@ -179,7 +179,7 @@
       setSheetStage(stages[Math.max(0,Math.min(stages.length-1,stages.indexOf(sheetStage)+(event.key==='ArrowUp'?1:-1)))]);
     });
   }
-  const favoriteButton = place => place.saved && !PM_ENV.requiresAuth ? `<button type="button" class="lm-carousel-heart lm-heart-motion${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" data-item-id="${place.id}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>` : '';
+  const favoriteButton = place => place.saved ? `<button type="button" class="lm-carousel-heart lm-heart-motion${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" data-item-id="${place.id}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>` : '';
   function playHeartMotion(button, liked) {
     button.querySelector('.lm-heart-burst')?.remove();
     button.classList.remove('is-bursting');
@@ -516,14 +516,12 @@
         const place=markerEntries.get(button.dataset.placeKey)?.place;
         const item=place?.saved&&items.find(x=>x.id===place.id);
         if(!item)break;
-        if(PM_ENV.requiresAuth){toast('계정 즐겨찾기 기능은 준비 중이에요.');break;}
-        item.favorite=!item.favorite;
-        place.favorite=item.favorite;
-        searchResults?.forEach(result=>{if(result.saved&&result.id===item.id)result.favorite=item.favorite;});
-        for(const entry of markerEntries.values())if(entry.place?.id===item.id)entry.place.favorite=item.favorite;
-        afterChange();
-        document.querySelectorAll('.lm-carousel-heart').forEach(node=>{if(node.dataset.itemId!==String(item.id))return;node.classList.toggle('is-active',item.favorite);node.setAttribute('aria-pressed',String(item.favorite));if(node.classList.contains('lm-heart-motion'))playHeartMotion(node,item.favorite);});
-        toast(item.favorite?'즐겨찾기에 추가했어요.':'즐겨찾기에서 뺐어요.');
+        const favorite=PinmapFavorites.toggle(item);if(favorite===null)break;
+        place.favorite=favorite;
+        searchResults?.forEach(result=>{if(result.saved&&result.id===item.id)result.favorite=favorite;});
+        for(const entry of markerEntries.values())if(entry.place?.id===item.id)entry.place.favorite=favorite;
+        document.querySelectorAll('.lm-carousel-heart').forEach(node=>{if(node.dataset.itemId!==String(item.id))return;node.classList.toggle('is-active',favorite);node.setAttribute('aria-pressed',String(favorite));if(node.classList.contains('lm-heart-motion'))playHeartMotion(node,favorite);});
+        toast(favorite?'즐겨찾기에 추가했어요.':'즐겨찾기에서 뺐어요.');
         break;
       }
       case 'select-place':{const place=markerEntries.get(button.dataset.placeKey)?.place;if(place)expandPlace(place);break;}

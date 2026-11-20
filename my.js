@@ -130,6 +130,7 @@ document.addEventListener('submit', e => {
   e.preventDefault();
   const f = e.target, nick = f.nickname.value.trim();
   if (!nick) return;
-  settings.nickname = nick; afterChange();
-  $('#sheet').close(); render(); toast('프로필을 저장했어요.');
+  if(PM_ENV.requiresAuth){
+    window.PinmapAccountProfile?.save({nickname:nick}).then(()=>{$('#sheet').close();toast('프로필을 저장했어요.');}).catch(error=>toast(error.message||'프로필을 저장하지 못했어요.'));
+  }else{settings.nickname=nick;afterChange();$('#sheet').close();render();toast('프로필을 저장했어요.');}
 });

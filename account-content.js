@@ -94,6 +94,65 @@ if (PM_ENV.requiresAuth) (() => {
   window.PinmapAccountLoadError = false;
   const localIds = new Map();
   let folderState=PinmapFolders.normalize(null),folderSaving=false;
+  let favoriteState=PinmapFavorites.normalize(null),favoriteSaving=false;
+  let memoState=Object.create(null),memoSaving=false;
+  function normalizeMemos(value){
+    const result=Object.create(null);
+    if(value && typeof value==='object' && !Array.isArray(value)){
+      for(const [id,memo] of Object.entries(value).slice(0,100))
+        if(id.length<=200 && typeof memo==='string')result[id]=memo.slice(0,200);
+    }
+    return result;
+  }
+  function applyMemos(value){
+    memoState=normalizeMemos(value);
+    for(const item of items)item.memo=memoState[String(item.backendId)]||'';
+  }
+  let profileSaving=false;
+  function applyProfile(value){
+    const profile=value && typeof value==='object' ? value : {};
+    settings.nickname=typeof profile.nickname==='string' ? profile.nickname.slice(0,12) : '';
+    settings.avatar=typeof profile.avatar==='string' && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]{1,60000}$/.test(profile.avatar) ? profile.avatar : '';
+  }
+  window.PinmapAccountProfile={save:async change=>{
+    if(profileSaving)throw Error('프로필을 저장 중이에요. 잠시 기다려 주세요.');
+    profileSaving=true;
+    const expected=currentUserId;
+    try{
+      const {data,error}=await client.auth.getUser();
+      if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)throw Error('로그인 계정을 다시 확인해 주세요.');
+      const current=data.user.user_metadata?.pinmap_profile||{};
+      const profile={nickname:'',avatar:'',...current,...change};
+      if(typeof profile.nickname!=='string'||profile.nickname.trim().length>12)throw Error('닉네임은 12자 이내로 입력해 주세요.');
+      if(profile.avatar && !/^data:image\/jpeg;base64,[A-Za-z0-9+/=]{1,60000}$/.test(profile.avatar))throw Error('사진이 너무 커요. 다른 사진을 선택해 주세요.');
+      const result=await client.auth.updateUser({data:{pinmap_profile:profile}});
+      if(result.error)throw result.error;
+      if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
+      applyProfile(profile);
+      render();
+    }finally{profileSaving=false;}
+  }};
+  function applyFavorites(value){
+    favoriteState=PinmapFavorites.normalize(value);
+    const selected=new Set(favoriteState);
+    for(const item of items)item.favorite=selected.has(String(item.backendId));
+  }
+  PinmapFavorites.connect(async(item,favorite)=>{
+    if(!window.PinmapAccountLoaded||window.PinmapAccountLoadError)throw Error('저장 목록을 불러온 뒤 즐겨찾기해 주세요.');
+    if(favoriteSaving)throw Error('즐겨찾기를 저장 중이에요. 잠시 기다려 주세요.');
+    favoriteSaving=true;
+    const expected=currentUserId;
+    try{
+      const {data,error}=await client.auth.getUser();
+      if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)throw Error('로그인 계정을 다시 확인해 주세요.');
+      const value=PinmapFavorites.change(data.user.user_metadata?.pinmap_favorites,item.backendId,favorite);
+      const result=await client.auth.updateUser({data:{pinmap_favorites:value}});
+      if(result.error)throw result.error;
+      if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
+      loadVersion++;
+      applyFavorites(value);
+    }finally{favoriteSaving=false;}
+  });
   function applyFolders(value){
     for(const name of cfCustom()){
       const index=COLLECTIONS.findIndex(entry=>entry[0]===name);
@@ -182,6 +241,9 @@ if (PM_ENV.requiresAuth) (() => {
     window.PinmapAccountLoadError = false;
     items = [];
     applyFolders(null);
+    applyFavorites(null);
+    applyMemos(null);
+    applyProfile(null);
     detailId = null;
     render();
   }
@@ -196,9 +258,12 @@ if (PM_ENV.requiresAuth) (() => {
       if(error)throw error;
       if(!data?.user?.id){clearAccount();return;}
       userId=data.user.id;
-      if(currentUserId&&currentUserId!==userId){window.dispatchEvent(new Event('pinmap:account-cleared'));items=[];applyFolders(null);detailId=null;}
+      if(currentUserId&&currentUserId!==userId){window.dispatchEvent(new Event('pinmap:account-cleared'));items=[];applyFolders(null);applyFavorites(null);applyMemos(null);applyProfile(null);detailId=null;}
       currentUserId=userId;
       applyFolders(data.user.user_metadata?.pinmap_collections);
+      applyFavorites(data.user.user_metadata?.pinmap_favorites);
+      applyMemos(data.user.user_metadata?.pinmap_memos);
+      applyProfile(data.user.user_metadata?.pinmap_profile);
       refreshVisibleContent();
       const {data:sessionData, error:sessionError} = await client.auth.getSession();
       if (sessionError || !sessionData?.session?.access_token)
@@ -210,6 +275,8 @@ if (PM_ENV.requiresAuth) (() => {
         if (version !== loadVersion || currentUserId !== userId) throw Error('stale_load');
         const item = pinmapAccountItem(record, localId(record));
         item.collection = folderState.assignments[String(item.backendId)] || '';
+        item.favorite = favoriteState.includes(String(item.backendId));
+        item.memo = memoState[String(item.backendId)] || '';
         staged.push(item);
         items = staged.slice();
         refreshVisibleContent();
@@ -276,6 +343,8 @@ if (PM_ENV.requiresAuth) (() => {
       loadVersion++; // A response based on the old offset must not overwrite this save.
       const item = pinmapAccountItem(result.item, localId(result.item));
       item.collection=folderState.assignments[String(item.backendId)]||'';
+      item.favorite=favoriteState.includes(String(item.backendId));
+      item.memo=memoState[String(item.backendId)]||'';
       items = [item, ...items.filter(x => x.url !== item.url)];
       PinmapSaveProgress.finish();
       document.getElementById('sheet')?.close();
@@ -328,8 +397,34 @@ if (PM_ENV.requiresAuth) (() => {
       : `콘텐츠 ${removed.length}개를 삭제했어요.`);
     if (wasLoading) void loadAccount();
   }, refresh:loadAccount};
-  const unsupportedContent = () => toast('계정 콘텐츠의 수정·즐겨찾기는 준비 중이에요. 저장된 정보는 그대로예요.');
-  for (const name of ['edit','fav']) actions[name] = unsupportedContent;
+  actions.edit = () => {
+    const item=items.find(x=>x.id===detailId);if(!item)return;
+    modal('내 메모',`<form id="account-memo-form"><label class="field"><span>메모</span><textarea name="memo" rows="4" maxlength="200" placeholder="어떤 순간에 다시 보고 싶나요?">${esc(item.memo||'')}</textarea></label><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장</button></div></form>`);
+    document.querySelector('#account-memo-form textarea')?.focus();
+  };
+  document.addEventListener('submit',async event=>{
+    if(event.target.id!=='account-memo-form')return;
+    event.preventDefault();event.stopImmediatePropagation();
+    if(memoSaving)return;
+    const item=items.find(x=>x.id===detailId);if(!item)return;
+    const memo=String(new FormData(event.target).get('memo')||'').trim().slice(0,200);
+    const expected=currentUserId;
+    memoSaving=true;
+    try{
+      const {data,error}=await client.auth.getUser();
+      if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)throw Error('로그인 계정을 다시 확인해 주세요.');
+      const value=normalizeMemos(data.user.user_metadata?.pinmap_memos);
+      if(memo)value[String(item.backendId)]=memo;
+      else delete value[String(item.backendId)];
+      const result=await client.auth.updateUser({data:{pinmap_memos:value}});
+      if(result.error)throw result.error;
+      if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
+      loadVersion++;applyMemos(value);
+      document.getElementById('sheet')?.close();render();toast('메모를 저장했어요.');
+    }catch(error){toast(error.message||'메모를 저장하지 못했어요.');}
+    finally{memoSaving=false;}
+  },true);
+  const unsupportedContent = () => toast('계정 콘텐츠의 위치와 분석 결과는 아직 수정할 수 없어요.');
   actions.cfdelfolderok=async()=>{
     const name=cfFolderToDelete;if(!name)return;
     const button=document.querySelector('[data-action="cfdelfolderok"]');

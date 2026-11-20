@@ -479,7 +479,7 @@ document.addEventListener('input', e => {
 const navCore = nav;
 nav = function(){
   const lib = page === 'library' && !detailId;
-  const fab = lib && !PM_ENV.requiresAuth
+  const fab = lib
     ? `<button type="button" class="navfab" data-action="newfolder" aria-label="새 폴더 만들기">${icon('folderplus')}</button>`
     : `<button type="button" class="navfab" data-action="save" aria-label="새로 저장">${icon('plus')}</button>`;
   return `<span class="navcap">${navCore()}</span>${fab}`;

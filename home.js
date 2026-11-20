@@ -48,17 +48,13 @@ actions.striphide = () => {
 };
 
 /* ---------- 메인 추천 카드 (크게 · 좌우로 넘기기) ---------- */
-// 온보딩에서 고른 관심사(preferences)의 콘텐츠를 보여주고, 고르지 않았으면 랜덤으로 추천해요
-const shuffle = list => { const a = [...list]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-let randomPickIds = null; // 랜덤 추천은 새로고침할 때마다 바뀌고, 앱 안에서는 그대로 유지돼요
+// 고른 관심사를 우선하고, 선택하지 않았다면 최근 저장 순서를 유지해요.
 function homePicks(){
-  const ready = PM_ENV.requiresAuth ? items : items.filter(x => !x.pending);
+  const ready = items;
   const photoFirst = (a,b) => (libPhoto(b)?1:0) - (libPhoto(a)?1:0);
-  // Account content belongs on the home screen even when its map position needs review.
-  if (PM_ENV.requiresAuth) return ready.slice(0, 8).map(x => ({x, id:null}));
+  // Every saved post remains visible even if its map position needs review.
   if (!preferences.length) {
-    if (!randomPickIds || (!randomPickIds.length && ready.length) || randomPickIds.some(id => !ready.some(x => x.id === id))) randomPickIds = shuffle(ready).slice(0, 8).map(x => x.id);
-    return randomPickIds.map(id => ({x: ready.find(x => x.id === id), id:null})).filter(p => p.x);
+    return ready.slice(0,8).map(x => ({x,id:null}));
   }
   const seen = new Set(), lists = preferences.map(id => ({id, list: homeSections[id]().list.filter(x => !x.pending).sort(photoFirst)})), picks = [];
   // 관심사를 번갈아 하나씩 꺼내 고르게 섞어요
@@ -69,7 +65,7 @@ function homePicks(){
   return picks;
 }
 function pickCard({x, id}, i, total = 1){
-  // 관심사 이름을 보여주고, '기타(나중에 보기)'나 랜덤 추천이면 콘텐츠별 키워드(가구 · 전시 · 맛집 …)를 보여줘요
+  // 관심사 이름을 보여주고, '기타(나중에 보기)'나 최근 저장 순서이면 콘텐츠별 키워드를 보여줘요.
   const tag = id && id !== 'later' ? interestOf(id).short : (x.category || shortType(x.type));
   const desc = (x.desc || '').trim().replace(/[.。]+$/, '');
   return `<button class="pick" data-detail="${x.id}" data-i="${i}">
