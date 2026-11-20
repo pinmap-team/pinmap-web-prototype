@@ -148,6 +148,7 @@ fs.mkdirSync(output,{recursive:true});
     await frame.locator('.lm-pin-confirm').click();
     await frame.locator('#lm-pin-form [name="title"]').fill('직접 찍은 핀');
     await frame.locator('#lm-pin-form [name="address"]').fill('서울 성동구');
+    assert.deepEqual(await frame.locator('#lm-pin-form').evaluate(form=>[form.elements.namedItem('title').value,form.elements.namedItem('address').value]),['직접 찍은 핀','서울 성동구']);
     await frame.locator('#lm-pin-form [type="submit"]').click();
     await frame.locator('#lm-pin-form').waitFor({state:'hidden',timeout:5000});
     const created=await frame.locator('body').evaluate(()=>items.find(item=>item.title==='직접 찍은 핀')?.manualId);
