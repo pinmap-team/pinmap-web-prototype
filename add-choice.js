@@ -54,6 +54,7 @@
   document.addEventListener('pointerdown', event => {
     const stage = document.getElementById('home-add-menu');
     if (!stage || stage.dataset.open !== 'true') return;
+    if(stage.contains(event.target))return;
     const box = stage.querySelector('.home-add-body').getBoundingClientRect();
     if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) setAddMenuOpen(false);
   });

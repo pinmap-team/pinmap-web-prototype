@@ -78,6 +78,19 @@ let dueDismissed = false; // 마감 임박 배너를 닫으면 이번 방문 동
 let unreadCount = () => 0; // my.js가 알림 개수 계산을 연결합니다
 const pages = {};          // 화면 렌더 함수 (pinmap.js가 home을 개인화 버전으로 바꿉니다)
 let afterChange = () => {}; // 데이터가 바뀌면 호출 (pinmap.js가 브라우저 저장을 연결합니다)
+// Screens call the same persistence boundary in both modes. The account data
+// source replaces these methods after authentication is initialized.
+globalThis.PinmapContentPersistence={
+  async saveEdit(item,draft,{folder}){
+    Object.assign(item,draft);
+    if(folder==='new:'){
+      settings.customFolders=[...new Set([...(settings.customFolders||[]),draft.collection])];
+      cfSyncCollections();
+    }
+    afterChange();
+  },
+  async savePin(item){items.unshift(item);afterChange();}
+};
 
 /* ---------- 저장 시점: 실제 타임스탬프를 기준으로 표시 ---------- */
 const SAVED_DAY = 86400000;
@@ -267,7 +280,7 @@ document.addEventListener('click',e=>{
   else action(d.action);
 });
 document.addEventListener('input',e=>{if(e.target.id==='search'){query=e.target.value;$('#results').innerHTML=resultCards();$('#resultcount').textContent=filtered().length+'개의 콘텐츠'}});
-document.addEventListener('submit',e=>{
+document.addEventListener('submit',async e=>{
   if(e.target.id==='saveform'){
     e.preventDefault();const f=e.target;let u;
     try{u=new URL(f.url.value);if(!['https:','http:'].includes(u.protocol))throw Error()}catch{$('#saveerror').textContent='http 또는 https 링크를 입력해 주세요.';return}
@@ -279,6 +292,8 @@ document.addEventListener('submit',e=>{
     toast(ai?`저장했어요. AI가 ‘${type}’로 분류했어요.`:'저장했어요. 필요할 때 다시 꺼내 보세요.');
   } else if(e.target.id==='editform'){
     e.preventDefault();const data=new FormData(e.target),x=items.find(x=>x.id===detailId);
+    if(!x)return;
+    const draft={...x};
     const folderValue=String(data.get('folder')||'');
     if(folderValue==='new:'){
       const name=String(data.get('collection')||'').trim();
@@ -289,28 +304,46 @@ document.addEventListener('submit',e=>{
     }
     const previousFolder=cfCustom().includes(x.collection)?'custom:'+x.collection:'category:'+folderOf(x), previousCollection=x.collection||'';
     const type=String(data.get('type'));
-    if(type!==x.type){delete x.folderCategory;x.aiClassified=false;x.category=shortType(type);x.art=x.art||typeOf(type).art;}
-    x.type=type;
-    for(const k of ['title','address','memo','collection']) x[k]=String(data.get(k)||'').trim();
+    if(type!==draft.type){delete draft.folderCategory;draft.aiClassified=false;draft.category=shortType(type);draft.art=draft.art||typeOf(type).art;}
+    draft.type=type;
+    for(const k of ['title','address','memo','collection']) draft[k]=String(data.get(k)||'').trim();
     const folder = String(data.get('folder') || '');
     if(folder.startsWith('category:')){
       const name = folder.slice(9);
       if(CF_ALL.some(f=>f.id===name)){
-        x.folderCategory = name;
-        const folderType = ['맛집','카페'].includes(name) ? '맛집/카페' : name==='기타' ? (['생활 정보','기타'].includes(x.type)?x.type:'기타') : name;
-        if(x.type!==folderType || x.category!==name)x.aiClassified=false;
-        x.type=folderType; x.category=name; x.collection=folder===previousFolder?previousCollection:'';
+        draft.folderCategory = name;
+        const folderType = ['맛집','카페'].includes(name) ? '맛집/카페' : name==='기타' ? (['생활 정보','기타'].includes(draft.type)?draft.type:'기타') : name;
+        if(draft.type!==folderType || draft.category!==name)draft.aiClassified=false;
+        draft.type=folderType; draft.category=name; draft.collection=folder===previousFolder?previousCollection:'';
       }
     } else if(folder.startsWith('custom:') || folder==='new:'){
-      const name = folder==='new:' ? x.collection : folder.slice(7);
+      const name = folder==='new:' ? draft.collection : folder.slice(7);
       if(name){
-        x.collection=name;
-        settings.customFolders=[...new Set([...(settings.customFolders||[]),name])];
-        cfSyncCollections();
+        draft.collection=name;
       }
     }
-    x.pending=isPlace(x)&&!x.address; if(x.address)x.mapQuery=x.mapQuery||x.address;
-    $('#sheet').close();render();toast('저장 정보를 수정했어요.');afterChange();
+    try{
+      if(draft.address!==x.address){
+        if(draft.address){
+          const response=await fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(draft.address)+'&limit=1');
+          if(!response.ok)throw Error('주소의 지도 위치를 찾지 못했어요. 다시 확인해 주세요.');
+          const feature=(await response.json()).features?.[0];
+          const [lng,lat]=feature?.geometry?.coordinates||[];
+          if(!Number.isFinite(lat)||!Number.isFinite(lng))throw Error('주소의 지도 위치를 찾지 못했어요. 다시 확인해 주세요.');
+          draft.lat=lat;draft.lng=lng;
+          const first=draft.mapLocations?.[0]||{};
+          draft.mapLocations=[{...first,name:draft.title,address:draft.address,coordinates:{lat,lng},review_required:true},...(draft.mapLocations||[]).slice(1)];
+        }else{delete draft.lat;delete draft.lng;draft.mapLocations=(draft.mapLocations||[]).slice(1);}
+        draft.mapQuery=draft.address;
+      }
+      draft.pending=isPlace(draft)&&!draft.address;
+      await window.PinmapContentPersistence.saveEdit(x,draft,{folder,previousFolder});
+      $('#sheet').close();render();toast('저장 정보를 수정했어요.');
+    }catch(error){
+      const node=document.getElementById('es-save-error');
+      if(node)node.textContent=error.message||'저장하지 못했어요. 다시 시도해 주세요.';
+      else toast(error.message||'저장하지 못했어요. 다시 시도해 주세요.');
+    }
   }
 });
 $('#sheet').addEventListener('click',e=>{if(e.target===$('#sheet')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close()}});
