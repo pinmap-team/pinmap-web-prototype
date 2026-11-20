@@ -152,7 +152,7 @@ function nav(){return NAV.map(([p,i,l])=>`<button class="navitem ${page===p&&!de
 function head(title,sub,save=true){return `<div class="heading"><div><h1>${title}</h1></div>${save?`<button class="filled" data-action="save" aria-label="새로 저장">${icon('plus')}<span>새로 저장</span></button>`:''}</div>`}
 let locbar = () => `<button class="locbar" data-action="location"><span aria-hidden="true">📍</span><b>${esc((settings.places||['성수동'])[0])}</b><span class="hint">${settings.locPerm!=='none'?'현재 위치, 예시':'예시 위치, 위치 권한 체험'}</span></button>`;
 function chips(){return `<div class="chips" role="group" aria-label="콘텐츠 유형 필터">${categories.map(c=>`<button class="chip ${filter===c?'active':''}" data-filter="${c}" aria-pressed="${filter===c}">${filter===c?icon('check'):(c==='전체'?'':typeOf(c).emoji+' ')}${c}</button>`).join('')}</div>`}
-function filtered(){const q=query.toLowerCase();return items.filter(x=>(filter==='전체'||x.type===filter)&&(!collection||x.collection===collection)&&(!q||[x.title,x.desc,x.type,x.category,x.collection,x.memo].join(' ').toLowerCase().includes(q)))}
+function filtered(){return items.filter(x=>(filter==='전체'||x.type===filter)&&(!collection||x.collection===collection)&&PinmapContentSearch.matches(x,query))}
 const galleryMode = () => !collection && filter!=='전체' && !typeOf(filter).place;
 
 /* ---------- 화면 ---------- */
