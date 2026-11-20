@@ -12,6 +12,36 @@ function dtLogo(src){
   return '';
 }
 
+// map_locations follows the order of places with coordinates. Prefer an exact
+// name/address match, then that original order when a user has edited a place.
+function dtPlacePhotoIndexes(places, locations){
+  const mapped=places.filter(place=>place.hasCoordinates).length,used=new Set(),indexes=places.map(()=>-1);
+  const clean=value=>String(value||'').trim().replace(/\s+/g,' ').toLocaleLowerCase();
+  for(const rule of ['both','name','address']){
+    places.forEach((place,placeIndex)=>{
+      if(!place.hasCoordinates||indexes[placeIndex]>=0)return;
+      const name=clean(place.name),address=clean(place.address);
+      const index=locations.findIndex((loc,i)=>!used.has(i)&&(
+        rule==='both'?name&&address&&clean(loc.name)===name&&clean(loc.address)===address:
+        rule==='name'?name&&clean(loc.name)===name:
+        address&&clean(loc.address)===address));
+      if(index>=0){indexes[placeIndex]=index;used.add(index);}
+    });
+  }
+  if(locations.length===mapped){
+    let order=0;
+    places.forEach((place,placeIndex)=>{
+      if(!place.hasCoordinates)return;
+      if(indexes[placeIndex]<0&&!used.has(order)){indexes[placeIndex]=order;used.add(order);}
+      order++;
+    });
+    const remaining=places.map((place,i)=>place.hasCoordinates&&indexes[i]<0?i:-1).filter(i=>i>=0);
+    const unused=locations.map((_,i)=>used.has(i)?-1:i).filter(i=>i>=0);
+    if(remaining.length===1&&unused.length===1)indexes[remaining[0]]=unused[0];
+  }
+  return indexes;
+}
+
 detail = function(){
   requestAnimationFrame(dtSheetLayout);
   const x = items.find(i => i.id === detailId);
@@ -28,7 +58,9 @@ detail = function(){
   const authorPhoto = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(x.authorProfilePhoto || '') ? x.authorProfilePhoto : '';
   const extracted = Array.isArray(x.extractionPlaces) ? x.extractionPlaces : [];
   const mappedCount = extracted.filter(place => place.hasCoordinates).length;
-  const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 확인 · 지도 표시 ${mappedCount}곳 · 위치 확인 필요 ${extracted.length - mappedCount}곳</p><ul>${extracted.map(place => `<li><div><strong>${esc(place.name || '이름 확인 필요')}</strong><span class="${place.hasCoordinates ? 'dt-extraction-ready' : 'dt-extraction-pending'}">${place.hasCoordinates ? '지도 표시' : '위치 확인 필요'}</span></div><p>${esc(place.hasCoordinates ? (place.address || '지도 위치 확인됨') : (place.reason || '주소를 확인하지 못했어요.'))}</p></li>`).join('')}</ul></section>` : '';
+  const locations=Array.isArray(x.mapLocations)?x.mapLocations:[];
+  const photoIndexes=dtPlacePhotoIndexes(extracted,locations);
+  const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 확인 · 지도 표시 ${mappedCount}곳 · 위치 확인 필요 ${extracted.length - mappedCount}곳</p><ul>${extracted.map((place,i) => {const index=photoIndexes[i],photo=index>=0?locations[index]?.image_data_url:'';return `<li class="dt-extraction-place">${PinmapPlacePhotos.markup(x.backendId,index,photo||PM_ENV.placeholderImage,'dt-extraction-photo')}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong><span class="${place.hasCoordinates ? 'dt-extraction-ready' : 'dt-extraction-pending'}">${place.hasCoordinates ? '지도 표시' : '위치 확인 필요'}</span></div><p>${esc(place.hasCoordinates ? (place.address || '지도 위치 확인됨') : (place.reason || '주소를 확인하지 못했어요.'))}</p></div></li>`;}).join('')}</ul></section>` : '';
   const events = Array.isArray(x.events) ? x.events : [];
   const eventDate = value => {
     if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
