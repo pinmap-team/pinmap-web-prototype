@@ -40,9 +40,9 @@ const cfSelected = () => filter === '전체' ? [] : (CF_ALIAS[filter] || (CF_ALL
 
 // 검색어와 선택한 폴더에 맞는 콘텐츠 (items는 최신 저장 순)
 function cfMatches(){
-  const q = query.trim().toLowerCase(), sel = cfSelected();
+  const sel = cfSelected();
   return items.filter(x => (!sel.length || sel.includes(folderOf(x)))
-    && (!q || [x.title, x.desc, x.type, x.category, x.collection, x.memo, folderOf(x)].join(' ').toLowerCase().includes(q)));
+    && PinmapContentSearch.matches(x, query, [folderOf(x)]));
 }
 
 // 썸네일 URL: 사진이 있으면 사진, 없으면 기존 콘텐츠 썸네일(일러스트)을 이미지로
@@ -127,7 +127,7 @@ document.addEventListener('change',e=>{
 /* ---------- 화면 ---------- */
 const libraryResultCards = resultCards;  // 기존 목록 (참고용으로 남겨둬요)
 const cfQ = () => query.trim().toLowerCase();
-const cfHit = x => { const q = cfQ(); return !q || [x.title, x.desc, x.type, x.category, x.collection, x.memo, folderOf(x)].join(' ').toLowerCase().includes(q); };
+const cfHit = x => PinmapContentSearch.matches(x, query, [folderOf(x)]);
 // 지금 열린 폴더: 카테고리 폴더(칩 · 폴더) 또는 모음 폴더(collection)
 const cfOpenTitle = () => collection || (filter === CF_ALL_FOLDER.id ? CF_ALL_FOLDER.title : (cfSelected().length ? (CF_ALIAS[filter] ? filter : cfSelected()[0]) : ''));
 const cfOpenList = () => collection ? items.filter(x => x.collection === collection && cfHit(x)) : cfMatches();
@@ -279,7 +279,7 @@ pages.library = function(){
     ? `<button type="button" class="subback cf-back-btn" data-action="cfback" aria-label="컬렉션으로 돌아가기">${icon('back')}</button>`
     : ((typeof backHome !== "undefined" && backHome) ? `<button type="button" class="subback cf-back-btn" data-action="backhome" aria-label="홈으로 돌아가기">${icon('back')}</button>` : '');
   if(query)cfSearchOpen=true;
-  const ph = open ? `${open}에서 찾기` : '저장한 콘텐츠 찾기';
+  const ph = open ? `${open}에서 찾기` : '제목·요약·장소 검색';
   const n = cfSel?.size || 0;
   const selbar = cfSel ? `<div class="cf-selbar" role="toolbar" aria-label="선택한 콘텐츠">
       <button type="button" class="cf-selall" data-action="cfselall">${cfOpenList().length && cfOpenList().every(x => cfSel.has(x.id)) ? '선택 해제' : '전체 선택'}</button>
