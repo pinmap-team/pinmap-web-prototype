@@ -17,6 +17,20 @@ const PinmapContentSearch = (() => {
     const text = [...fields(item), ...extra].map(normalize).filter(Boolean).join(' ');
     return words.every(word => text.includes(word));
   }
-  return {matches};
+  function placeRank(place, query) {
+    const words = normalize(query).split(/\s+/).filter(Boolean);
+    if (!words.length) return 0;
+    const direct = [place.title, place.address, place.areaHint, place.category].map(normalize).join(' ');
+    if (words.every(word => direct.includes(word))) return 2;
+    const context = [direct, place.sourceTitle, place.description, place.searchSummary].map(normalize).join(' ');
+    return words.every(word => context.includes(word)) ? 1 : 0;
+  }
+  function findPlaces(places, query) {
+    return places.map((place, index) => ({place, index, rank:placeRank(place, query)}))
+      .filter(result => result.rank > 0)
+      .sort((a, b) => b.rank - a.rank || a.index - b.index)
+      .map(result => result.place);
+  }
+  return {matches, placeRank, findPlaces};
 })();
 if (typeof module === 'object' && module.exports) module.exports = PinmapContentSearch;
