@@ -2,7 +2,20 @@ const {test} = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-const {matches} = require('../search-content.js');
+const {matches, findPlaces} = require('../search-content.js');
+
+test('map search returns individual places and ranks place details above post context', () => {
+  const places = [
+    {id:1,locationIndex:0,title:'느린 서점',address:'서울 종로구 북촌로 5',sourceTitle:'북촌 산책 코스',searchSummary:'서점과 카페를 방문해요.'},
+    {id:1,locationIndex:1,title:'달빛 카페',address:'서울 종로구 삼청로 8',sourceTitle:'북촌 산책 코스',searchSummary:'서점과 카페를 방문해요.'},
+    {id:2,locationIndex:0,title:'북촌 사진관',address:'서울 종로구 북촌로 8',sourceTitle:'사진 기록'}
+  ];
+  assert.deepEqual(findPlaces(places,'달빛 카페').map(x=>x.locationIndex),[1]);
+  assert.deepEqual(findPlaces(places,'삼청로').map(x=>x.title),['달빛 카페']);
+  assert.deepEqual(findPlaces(places,'카페 서점').map(x=>x.title),['느린 서점','달빛 카페']);
+  assert.deepEqual(findPlaces(places,'북촌').map(x=>x.title),['느린 서점','북촌 사진관','달빛 카페']);
+  assert.deepEqual(findPlaces(places,'부산').map(x=>x.title),[]);
+});
 
 test('searches title, summary and place fields across words', () => {
   const item = {

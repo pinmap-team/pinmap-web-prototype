@@ -57,18 +57,18 @@
   const savedPlaces = () => {
     const pinned = savedCoords.map(position => {
       const item = items.find(x => x.id === position.id);
-      return item && !item.pending ? {...position, image:libPhoto(item)||position.image, title:item.title, address:item.address || '주소 확인 필요', category:item.category || item.type, description:item.desc || '', savedLabel:savedAgo(item)+' 저장', source:'저장한 콘텐츠', saved:true, favorite:!!item.favorite} : null;
+      return item && !item.pending ? {...position, image:libPhoto(item)||position.image, title:item.title, address:item.address || '주소 확인 필요', category:item.category || item.type, description:item.desc || '', searchSummary:item.searchSummary || '', savedLabel:savedAgo(item)+' 저장', source:'저장한 콘텐츠', saved:true, favorite:!!item.favorite} : null;
     }).filter(Boolean);
     const own = items.filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lng) && !x.pending && !savedCoords.some(y => y.id === x.id))
-      .map(x => ({id:x.id,backendId:x.backendId,lat:x.lat,lng:x.lng,kind:x.mapKind||kindOf(x.category || ''),image:libPhoto(x)||localPhoto(x.mapKind||kindOf(x.category || '')),title:x.title,address:x.address || '',category:x.category || x.type,description:x.desc || '',savedLabel:savedAgo(x)+' 저장',source:'저장한 콘텐츠',saved:true,favorite:!!x.favorite}));
-    return [...pinned,...own.flatMap(place=>{const item=items.find(x=>x.id===place.id);return item?.mapLocations?.length?item.mapLocations.filter(loc=>Number.isFinite(loc.coordinates?.lat)&&Number.isFinite(loc.coordinates?.lng)).map((loc,index)=>({...place,title:loc.name||place.title,lat:loc.coordinates.lat,lng:loc.coordinates.lng,address:loc.address||'주소 확인 필요',image:loc.image_data_url||PM_ENV.placeholderImage,savedLabel:loc.review_required?'지도 검색 위치 · 확인 필요':place.savedLabel,locationIndex:index})): [place];})];
+      .map(x => ({id:x.id,backendId:x.backendId,lat:x.lat,lng:x.lng,kind:x.mapKind||kindOf(x.category || ''),image:libPhoto(x)||localPhoto(x.mapKind||kindOf(x.category || '')),title:x.title,address:x.address || '',category:x.category || x.type,description:x.desc || '',searchSummary:x.searchSummary || '',savedLabel:savedAgo(x)+' 저장',source:'저장한 콘텐츠',saved:true,favorite:!!x.favorite}));
+    return [...pinned,...own.flatMap(place=>{const item=items.find(x=>x.id===place.id);return item?.mapLocations?.length?item.mapLocations.map((loc,index)=>({loc,index})).filter(({loc})=>Number.isFinite(loc.coordinates?.lat)&&Number.isFinite(loc.coordinates?.lng)).map(({loc,index})=>({...place,sourceTitle:place.title,title:loc.name||place.title,lat:loc.coordinates.lat,lng:loc.coordinates.lng,address:loc.address||'주소 확인 필요',areaHint:loc.area_hint||'',image:loc.image_data_url||PM_ENV.placeholderImage,savedLabel:loc.review_required?'지도 검색 위치 · 확인 필요':place.savedLabel,locationIndex:index})): [place];})];
   };
   function content() {
     return `<section class="live-map" aria-label="지도에서 장소 탐색"><div id="live-map-canvas"></div>
       <header class="lm-header">
         <h1 class="lm-sr-only">지도에서 저장한 장소 찾기</h1>
         <div class="lm-location-header"><button type="button" class="lm-location-title" data-action="mapaddresses">${icon('pin')}<span>${safe((n => n ? (settings.placeLabels?.[n] || n) : '현재 위치')(mapLocationName))}</span>${icon('chevron')}</button><button type="button" class="lm-header-search" data-lm="toggle-search" aria-label="${searchOpen?'검색창 닫기':'지도에서 장소 검색'}" aria-expanded="${searchOpen}" aria-controls="lm-search-row"><span class="lm-search-open-icon">${icon('search')}</span><span class="lm-search-close-icon">${icon('close')}</span></button></div>
-        <div class="lm-search-row cfpage${searchOpen?' is-open':''}" id="lm-search-row" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="어디로 가고 싶어요?" value="${safe(searchQuery)}" autocomplete="off" maxlength="80" ${searchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button></form></div>
+        <div class="lm-search-row cfpage${searchOpen?' is-open':''}" id="lm-search-row" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="장소명·주소 검색" value="${safe(searchQuery)}" autocomplete="off" maxlength="80" ${searchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button></form></div>
         <section class="cf-recent lm-recent" id="lm-recent" aria-label="최근 지도 검색어" ${searchOpen&&!searchQuery.trim()?'':'hidden'}>${mapRecentContent()}</section>
         <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,cats.findIndex(([id])=>id===category))*100}%">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
       </header>
@@ -453,11 +453,11 @@
     const panel=$('#lm-search-results'); if(!panel) return;
     if(!searchResults) { panel.hidden=true; return; }
     const list=visiblePlaces(); panel.hidden=false;
-    panel.innerHTML=`<div class="lm-results-head"><b>장소 검색, ${list.length}곳</b><button data-lm="clear-search" aria-label="검색 닫기">✕</button></div><small class="lm-result-credit">저장한 장소 우선 검색, 외부 장소 © OpenStreetMap / Photon</small>`+
+    panel.innerHTML=`<div class="lm-results-head"><b>장소 검색, ${list.length}곳</b><button data-lm="clear-search" aria-label="검색 닫기">✕</button></div><small class="lm-result-credit">${searchResults.some(place=>!place.saved)?'외부 장소 © OpenStreetMap / Photon':'저장한 장소 검색 결과'}</small>`+
       (list.length ? list.map((x,i) => `<button class="lm-result-row" data-result="${i}"><img src="${safe(x.image)}" alt=""><span><b>${safe(x.title)}</b><small>${safe(x.address)}</small></span>${icon('arrow')}</button>`).join('') : '<p>일치하는 장소가 없어요. 다른 이름이나 주소로 검색해 보세요.</p>');
   }
   async function searchPlaces(q) {
-    if(PM_ENV.development){toast('장소 데이터가 아직 연결되지 않았어요.');return;}
+    if(PM_ENV.development && !PM_ENV.requiresAuth){toast('장소 데이터가 아직 연결되지 않았어요.');return;}
     if (q.length < 2) { status('검색어를 2자 이상 입력해 주세요.'); return; }
     rememberSearch(q);refreshRecentSearches();
     searchController?.abort(); searchController=new AbortController();
@@ -465,7 +465,7 @@
     status('실제 장소를 검색하고 있어요…');
     const input=$('#lm-search input'); if(input) input.disabled=true;
     try {
-      const local=savedPlaces().filter(x=>[x.title,x.address,x.category].join(' ').toLowerCase().includes(q.toLowerCase()));
+      const local=PinmapContentSearch.findPlaces(savedPlaces(),q);
       let found=local;
       if(!local.length){
         const response=await fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(q)+'&lat='+center[0]+'&lon='+center[1]+'&limit=12',{signal:current.signal});
