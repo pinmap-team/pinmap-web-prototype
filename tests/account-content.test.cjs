@@ -32,15 +32,19 @@ test('account history loads all pages using the backend page-size contract', asy
   let sessionReads = 0;
   const records = [eventRecord, {...eventRecord,id:'11',source_url:'https://www.instagram.com/p/second/'},
     {...eventRecord,id:'12',source_url:'https://www.instagram.com/p/third/'}];
-  const sdk = {auth:{getUser:async()=>({data:{user:{id:'user-a'}}}),
+  const profileUpdates=[];
+  const sdk = {auth:{getUser:async()=>({data:{user:{id:'user-a',user_metadata:{pinmap_favorites:['10']}}}}),
+    updateUser:async payload=>{profileUpdates.push(payload);return {data:{user:{id:'user-a'}}};},
     getSession:async()=>{sessionReads++;return {data:{session:{access_token:'token'}}};},onAuthStateChange:()=>{}}};
   let finished;
   const done = new Promise(resolve=>{finished=resolve;});
   const visible = [];
+  const submitHandlers=[];
   const context = {
-    PinmapFolders:require('../account-folders.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
+    PinmapFolders:require('../account-folders.js'),PinmapFavorites:require('../favorite-state.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
     PM_ENV:{requiresAuth:true}, PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
-    document:{addEventListener:()=>{}}, window:{}, actions:{save:()=>{}},
+    document:{addEventListener:(type,handler)=>{if(type==='submit')submitHandlers.push(handler);},getElementById:()=>({close:()=>{}})}, window:{}, actions:{save:()=>{}},
+    FormData:class{get(){return '현장 메모';}},
     items:[], detailId:null, toast:()=>{},
     render:()=>{visible.push({count:context.items.length,loaded:context.window.PinmapAccountLoaded});if(context.items.length===3) finished();},
     fetch:async(path,options)=>{
@@ -64,6 +68,18 @@ test('account history loads all pages using the backend page-size contract', asy
   assert(visible.findIndex(x=>x.count===1)<visible.findIndex(x=>x.count===3));
   assert(visible.some(x=>x.count===1 && x.loaded===false));
   assert.equal(context.items.length,3);
+  assert.equal(context.items[0].favorite,true);
+  assert.equal(context.items[1].favorite,false);
+  await context.window.PinmapAccountProfile.save({nickname:'테스트 이름'});
+  assert.equal(context.settings.nickname,'테스트 이름');
+  assert.equal(profileUpdates[0].data.pinmap_profile.nickname,'테스트 이름');
+  await context.window.PinmapAccountProfile.save({avatar:'data:image/jpeg;base64,AA=='});
+  assert.equal(profileUpdates[1].data.pinmap_profile.avatar,'data:image/jpeg;base64,AA==');
+  context.detailId=context.items[0].id;
+  const event={target:{id:'account-memo-form'},preventDefault:()=>{},stopImmediatePropagation:()=>{}};
+  await Promise.all(submitHandlers.map(handler=>handler(event)));
+  assert.equal(context.items[0].memo,'현장 메모');
+  assert.equal(profileUpdates[2].data.pinmap_memos['10'],'현장 메모');
 });
 
 test('account pages load concurrently but keep saved order', async () => {
@@ -109,7 +125,7 @@ test('bulk removal deletes on the server and keeps failed records visible', asyn
   const done = new Promise(resolve=>{finished=resolve;});
   const toasts = [], deletes = [];
   const context = {
-    PinmapFolders:require('../account-folders.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
+    PinmapFolders:require('../account-folders.js'),PinmapFavorites:require('../favorite-state.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
     PM_ENV:{requiresAuth:true},PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
     document:{addEventListener:()=>{},getElementById:()=>({close:()=>{}}),querySelector:()=>null},
     window:{},actions:{save:()=>{}},items:[],detailId:null,cfSel:null,

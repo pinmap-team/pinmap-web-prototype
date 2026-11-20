@@ -17,8 +17,8 @@ if(PM_ENV.development) {
   ['sample','snsdemo','accadd','accsync','pushdemo','pushallow','localways','logoutyes','leaveyes','resetdata','location'].forEach(name=>actions[name]=unavailable);
   const blockedActions='[data-acc-sns],[data-acc-sync],[data-locperm],[data-course-save],[data-course-share]';
   document.addEventListener('click',event=>{if(event.target.closest(blockedActions)){event.preventDefault();event.stopImmediatePropagation();unavailable();}},true);
-  document.addEventListener('submit',event=>{if(['saveform','accform','profilepage','profileform'].includes(event.target.id)&&!((PM_ENV.cloudPlaceTest||PM_ENV.requiresAuth)&&event.target.id==='saveform')){event.preventDefault();event.stopImmediatePropagation();unavailable();}},true);
-  document.addEventListener('change',event=>{if(event.target.matches('[data-setting],#avatarfile')){event.preventDefault();event.stopImmediatePropagation();if(event.target.type==='checkbox')event.target.checked=false;else event.target.value='';unavailable();}},true);
+  document.addEventListener('submit',event=>{if(['saveform','accform','profilepage','profileform'].includes(event.target.id)&&!(((PM_ENV.cloudPlaceTest||PM_ENV.requiresAuth)&&event.target.id==='saveform')||(PM_ENV.requiresAuth&&['profilepage','profileform'].includes(event.target.id)))){event.preventDefault();event.stopImmediatePropagation();unavailable();}},true);
+  document.addEventListener('change',event=>{if(event.target.matches('[data-setting],#avatarfile')&&!(PM_ENV.requiresAuth&&event.target.id==='avatarfile')){event.preventDefault();event.stopImmediatePropagation();if(event.target.type==='checkbox')event.target.checked=false;else event.target.value='';unavailable();}},true);
 
   const originalRender=render;
   render=function(){originalRender();const note=$('#app .footer span:last-child');if(note)note.textContent=PM_ENV.requiresAuth?'로그인 계정에 저장된 콘텐츠예요.':'아직 데이터가 연결되지 않았어요.';};

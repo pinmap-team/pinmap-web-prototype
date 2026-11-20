@@ -44,7 +44,7 @@ detail = function(){
   }).join('')}</ul></section>` : '';
   const analysisNotes = Array.isArray(x.extractionNotes) ? x.extractionNotes.filter(note => typeof note === 'string').slice(0, 8) : [];
   const reviewInfo = analysisNotes.length || x.contentKind === 'unknown' ? `<section class="dtsec dt-extraction dt-analysis-notes"><h2>분석 안내</h2><ul>${(analysisNotes.length ? analysisNotes : ['게시물에서 장소 또는 행사 정보를 확인하지 못했어요.']).map(note => `<li><p>${esc(note)}</p></li>`).join('')}</ul></section>` : '';
-  const memoInfo = PM_ENV.requiresAuth ? '' : `<section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>`;
+  const memoInfo = `<section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>`;
 
   // 유형별 정보
   let info = '';
@@ -72,11 +72,11 @@ detail = function(){
     <div class="dthero">${libThumb(x)}<div class="dtshade" aria-hidden="true"></div>
       <div class="dttop"><button class="dtbtn" data-action="back" aria-label="돌아가기">${icon('chevleft')}</button>
         <div class="dttopr">
-          ${PM_ENV.requiresAuth ? '' : `<button type="button" class="dtbtn dtfavorite lm-heart-motion${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 즐겨찾기" aria-pressed="${!!x.favorite}"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>`}
+          <button type="button" class="dtbtn dtfavorite lm-heart-motion${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 즐겨찾기" aria-pressed="${!!x.favorite}"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>
           <button class="dtbtn dtmorebtn" data-action="dtmore" aria-label="더보기" aria-haspopup="menu" aria-expanded="false" aria-controls="dtmenu">${icon('more')}</button>
           <div class="dtmenu" id="dtmenu" role="menu" aria-label="콘텐츠 메뉴" hidden>
             <button type="button" role="menuitem" data-action="dtshare">${icon('share')}공유</button>
-            ${PM_ENV.requiresAuth ? '' : `<button type="button" role="menuitem" data-action="edit">${icon('pen')}수정</button>`}
+            <button type="button" role="menuitem" data-action="edit">${icon('pen')}${PM_ENV.requiresAuth?'메모 수정':'수정'}</button>
             <button type="button" role="menuitem" class="dtmenu-danger" data-unsave="${x.id}">${icon('trash')}삭제</button>
           </div>
         </div></div>
@@ -209,14 +209,14 @@ actions.dtshare = async () => {
 paths.trash = 'M4 7h16 M10 11v6 M14 11v6 M6 7l1 13h10l1-13 M9 7V4h6v3';
 paths.walk = 'M13 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0 M9 21l2-6 2 2v4 M8 11l2-3 3 1 2 3 2 1 M11 15l1-5';
 
-// 즐겨찾기 하트 · 브라우저에 함께 저장돼요
+// 즐겨찾기 하트 · 프로토타입과 로그인 계정에서 같은 동작을 사용해요.
 actions.fav = () => {
   const x = items.find(i => i.id === detailId); if (!x) return;
-  x.favorite = !x.favorite; afterChange();
+  const favorite = PinmapFavorites.toggle(x); if (favorite === null) return;
   const y = scrollY; render(); scrollTo(0, y);
   const button = document.querySelector('.dt-photo .dtfavorite');
-  if (button) window.PinmapHeartMotion?.(button, x.favorite);
-  toast(x.favorite ? '즐겨찾기에 추가했어요.' : '즐겨찾기에서 뺐어요.');
+  if (button) window.PinmapHeartMotion?.(button, favorite);
+  toast(favorite ? '즐겨찾기에 추가했어요.' : '즐겨찾기에서 뺐어요.');
 };
 
 /* ---------- 저장 정보 수정 (흰 시트) ---------- */

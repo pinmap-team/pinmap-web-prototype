@@ -14,7 +14,7 @@ pages.profile = function(){
     <div class="pfbtns"><label class="tonal small" for="avatarfile">사진 변경</label>${settings.avatar ? '<button class="textbtn" data-action="avatarreset">기본 이미지로</button>' : ''}</div>
     <form id="profilepage" class="pfform">
       <label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label>
-      <p class="hint">위치는 ‘위치 편집’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p>
+      <p class="hint">${PM_ENV.requiresAuth ? '닉네임과 사진은 로그인 계정에 저장돼요.' : '위치는 ‘위치 편집’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.'}</p>
       <button class="filled pfsave" type="submit">저장</button>
     </form>
   </div>`;
@@ -26,19 +26,25 @@ document.addEventListener('change', e => {
   if (!file.type.startsWith('image/')) { toast('이미지 파일만 올릴 수 있어요.'); return; }
   const img = new Image(), url = URL.createObjectURL(file);
   img.onload = () => {
-    const s = Math.min(img.width, img.height), c = document.createElement('canvas'); c.width = c.height = 240;
-    c.getContext('2d').drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, 240, 240);
+    const s = Math.min(img.width, img.height), c = document.createElement('canvas'), size=PM_ENV.requiresAuth?120:240; c.width = c.height = size;
+    c.getContext('2d').drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
     URL.revokeObjectURL(url);
-    settings.avatar = c.toDataURL('image/jpeg', .85); afterChange(); render(); toast('프로필 사진을 바꿨어요.');
+    const avatar=c.toDataURL('image/jpeg', .72);
+    if(PM_ENV.requiresAuth){
+      window.PinmapAccountProfile?.save({avatar}).then(()=>toast('프로필 사진을 바꿨어요.')).catch(error=>toast(error.message||'사진을 저장하지 못했어요.'));
+    }else{settings.avatar=avatar;afterChange();render();toast('프로필 사진을 바꿨어요.');}
   };
   img.onerror = () => toast('사진을 불러오지 못했어요.');
   img.src = url;
 });
-document.addEventListener('submit', e => {
+document.addEventListener('submit', async e => {
   if (e.target.id !== 'profilepage') return;
   e.preventDefault();
   const nick = e.target.nickname.value.trim(); if (!nick) return;
-  settings.nickname = nick; afterChange(); render(); toast('프로필을 저장했어요.');
+  if(PM_ENV.requiresAuth){
+    try{await window.PinmapAccountProfile.save({nickname:nick});toast('프로필을 저장했어요.');}
+    catch(error){toast(error.message||'프로필을 저장하지 못했어요.');}
+  }else{settings.nickname=nick;afterChange();render();toast('프로필을 저장했어요.');}
 });
 
 /* ---------- SNS 계정 연동 ---------- */
@@ -76,7 +82,10 @@ actions.accadd = () => accAddSheet();
 actions.accounts = () => go('accounts');
 actions.profile = () => go('profile');
 actions.profilephoto = () => $('#avatarfile')?.click();
-actions.avatarreset = () => { delete settings.avatar; afterChange(); render(); toast('기본 이미지로 바꿨어요.'); };
+actions.avatarreset = () => {
+  if(PM_ENV.requiresAuth)window.PinmapAccountProfile?.save({avatar:''}).then(()=>toast('기본 이미지로 바꿨어요.')).catch(error=>toast(error.message||'사진을 변경하지 못했어요.'));
+  else{delete settings.avatar;afterChange();render();toast('기본 이미지로 바꿨어요.');}
+};
 actions.accoffyes = () => {
   const id = $('#sheet').dataset.acc, acc = myAccounts(), a = acc.find(x => x.id === id);
   if (a) { settings.accounts = acc.filter(x => x.id !== id); afterChange(); toast(`${a.handle} 연동을 중지했어요.`); }
