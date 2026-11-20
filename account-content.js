@@ -95,19 +95,39 @@ if (PM_ENV.requiresAuth) (() => {
   const localIds = new Map();
   let folderState=PinmapFolders.normalize(null),folderSaving=false;
   let favoriteState=PinmapFavorites.normalize(null),favoriteSaving=false;
+  let manualPins=[],editState=PinmapAccountMapData.normalizeEdits(null),contentSaving=false;
   let memoState=Object.create(null),memoSaving=false;
   function normalizeMemos(value){
     const result=Object.create(null);
     if(value && typeof value==='object' && !Array.isArray(value)){
       for(const [id,memo] of Object.entries(value).slice(0,100))
-        if(id.length<=200 && typeof memo==='string')result[id]=memo.slice(0,200);
+        if(id.length<=200 && typeof memo==='string')result[id]=memo.slice(0,300);
     }
     return result;
   }
   function applyMemos(value){
     memoState=normalizeMemos(value);
-    for(const item of items)item.memo=memoState[String(item.backendId)]||'';
+    for(const item of items)item.memo=memoState[String(item.backendId)]??item.manualMemo??'';
   }
+  function applyMapData(metadata){
+    manualPins=PinmapAccountMapData.normalizePins(metadata?.pinmap_manual_pins);
+    editState=PinmapAccountMapData.normalizeEdits(metadata?.pinmap_content_edits);
+  }
+  const accountItem = record => {
+    const item=pinmapAccountItem(record,localId(record));
+    PinmapAccountMapData.applyEdit(item,editState[String(item.backendId)]);
+    item.collection=folderState.assignments[String(item.backendId)]||'';
+    item.favorite=favoriteState.includes(String(item.backendId));
+    item.memo=memoState[String(item.backendId)]||'';
+    return item;
+  };
+  const manualItems = () => manualPins.map(pin => {
+    const item=PinmapAccountMapData.manualItem(pin,localId({id:'manual:'+pin.id}));
+    item.collection=folderState.assignments[String(item.backendId)]||'';
+    item.favorite=favoriteState.includes(String(item.backendId));
+    item.memo=memoState[String(item.backendId)]??item.manualMemo;
+    return item;
+  });
   let profileSaving=false;
   function applyProfile(value){
     const profile=value && typeof value==='object' ? value : {};
@@ -243,6 +263,7 @@ if (PM_ENV.requiresAuth) (() => {
     applyFolders(null);
     applyFavorites(null);
     applyMemos(null);
+    applyMapData(null);
     applyProfile(null);
     detailId = null;
     render();
@@ -258,12 +279,14 @@ if (PM_ENV.requiresAuth) (() => {
       if(error)throw error;
       if(!data?.user?.id){clearAccount();return;}
       userId=data.user.id;
-      if(currentUserId&&currentUserId!==userId){window.dispatchEvent(new Event('pinmap:account-cleared'));items=[];applyFolders(null);applyFavorites(null);applyMemos(null);applyProfile(null);detailId=null;}
+      if(currentUserId&&currentUserId!==userId){window.dispatchEvent(new Event('pinmap:account-cleared'));items=[];applyFolders(null);applyFavorites(null);applyMemos(null);applyMapData(null);applyProfile(null);detailId=null;}
       currentUserId=userId;
       applyFolders(data.user.user_metadata?.pinmap_collections);
       applyFavorites(data.user.user_metadata?.pinmap_favorites);
       applyMemos(data.user.user_metadata?.pinmap_memos);
+      applyMapData(data.user.user_metadata);
       applyProfile(data.user.user_metadata?.pinmap_profile);
+      items=manualItems();
       refreshVisibleContent();
       const {data:sessionData, error:sessionError} = await client.auth.getSession();
       if (sessionError || !sessionData?.session?.access_token)
@@ -273,18 +296,15 @@ if (PM_ENV.requiresAuth) (() => {
       await pinmapReadAccountPages((offset, limit) =>
         accountRequest('GET', null, `?limit=${limit}&offset=${offset}`, userId, accessToken), async record => {
         if (version !== loadVersion || currentUserId !== userId) throw Error('stale_load');
-        const item = pinmapAccountItem(record, localId(record));
-        item.collection = folderState.assignments[String(item.backendId)] || '';
-        item.favorite = favoriteState.includes(String(item.backendId));
-        item.memo = memoState[String(item.backendId)] || '';
+        const item = accountItem(record);
         staged.push(item);
-        items = staged.slice();
+        items = [...staged, ...manualItems()];
         refreshVisibleContent();
         // Give the browser a paint opportunity before adding the next post.
         if (typeof requestAnimationFrame === 'function') await new Promise(requestAnimationFrame);
       });
       if (version !== loadVersion || currentUserId !== userId) return;
-      items = staged;
+      items = [...staged, ...manualItems()];
       window.PinmapAccountLoaded = true;
       window.PinmapAccountLoadError = false;
       refreshVisibleContent();
@@ -341,10 +361,7 @@ if (PM_ENV.requiresAuth) (() => {
       if (currentUserId !== userId) { PinmapSaveProgress.clear(); return; }
       const wasLoading = !window.PinmapAccountLoaded;
       loadVersion++; // A response based on the old offset must not overwrite this save.
-      const item = pinmapAccountItem(result.item, localId(result.item));
-      item.collection=folderState.assignments[String(item.backendId)]||'';
-      item.favorite=favoriteState.includes(String(item.backendId));
-      item.memo=memoState[String(item.backendId)]||'';
+      const item = accountItem(result.item);
       items = [item, ...items.filter(x => x.url !== item.url)];
       PinmapSaveProgress.finish();
       document.getElementById('sheet')?.close();
@@ -364,12 +381,109 @@ if (PM_ENV.requiresAuth) (() => {
       else toast(message);
     }
   }, true);
+  async function verifiedMetadata(expected){
+    const {data,error}=await client.auth.getUser();
+    if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)
+      throw Error('로그인 계정을 다시 확인해 주세요.');
+    return data.user.user_metadata||{};
+  }
+  async function removeManual(item,expected){
+    const metadata=await verifiedMetadata(expected);
+    const pins=PinmapAccountMapData.normalizePins(metadata.pinmap_manual_pins);
+    if(!pins.some(pin=>pin.id===item.manualId))throw Error('저장된 핀을 찾지 못했어요.');
+    const next=pins.filter(pin=>pin.id!==item.manualId);
+    const key='manual:'+item.manualId;
+    const folders=PinmapFolders.normalize(metadata.pinmap_collections);
+    delete folders.assignments[key];
+    const memos=normalizeMemos(metadata.pinmap_memos);
+    delete memos[key];
+    const favorites=PinmapFavorites.normalize(metadata.pinmap_favorites).filter(id=>id!==key);
+    const result=await client.auth.updateUser({data:{pinmap_manual_pins:next,
+      pinmap_collections:folders,pinmap_memos:memos,pinmap_favorites:favorites}});
+    if(result.error)throw result.error;
+    if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
+    manualPins=next;loadVersion++;applyFolders(folders);applyMemos(memos);applyFavorites(favorites);
+  }
+  window.PinmapContentPersistence={
+    async savePin(item){
+      if(!window.PinmapAccountLoaded||window.PinmapAccountLoadError)throw Error('저장 목록을 불러온 뒤 핀을 추가해 주세요.');
+      if(contentSaving)throw Error('다른 저장 작업이 진행 중이에요. 잠시 기다려 주세요.');
+      contentSaving=true;
+      const expected=currentUserId;
+      try{
+        const metadata=await verifiedMetadata(expected);
+        const pins=PinmapAccountMapData.normalizePins(metadata.pinmap_manual_pins);
+        if(pins.length>=50)throw Error('직접 찍은 핀은 50개까지 저장할 수 있어요.');
+        const id=crypto.randomUUID();
+        const record={id,title:item.title,address:item.address,type:item.type,memo:item.memo,
+          lat:item.lat,lng:item.lng,savedAt:item.savedAt};
+        const next=PinmapAccountMapData.normalizePins([record,...pins]);
+        if(next.length!==pins.length+1)throw Error('핀의 위치와 내용을 확인해 주세요.');
+        const result=await client.auth.updateUser({data:{pinmap_manual_pins:next}});
+        if(result.error)throw result.error;
+        if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
+        manualPins=next;loadVersion++;
+        item.backendId='manual:'+id;item.manualId=id;item.manualMemo=item.memo;
+        item.mapLocations=[{name:item.title,address:item.address,coordinates:{lat:item.lat,lng:item.lng},review_required:false}];
+        localIds.set(item.backendId,item.id);
+        items.unshift(item);
+      }finally{contentSaving=false;}
+    },
+    async saveEdit(item,draft,{folder}){
+      if(!window.PinmapAccountLoaded||window.PinmapAccountLoadError)throw Error('저장 목록을 불러온 뒤 수정해 주세요.');
+      if(contentSaving)throw Error('다른 저장 작업이 진행 중이에요. 잠시 기다려 주세요.');
+      contentSaving=true;
+      const expected=currentUserId;
+      try{
+        const metadata=await verifiedMetadata(expected),id=String(item.backendId);
+        const folders=PinmapFolders.normalize(metadata.pinmap_collections);
+        if(folder==='new:'){
+          const name=draft.collection;
+          if(!name||name.length>20||folders.names.includes(name)||folders.names.length>=100)
+            throw Error('새 폴더 이름을 확인해 주세요. 폴더는 20자 이내로 입력해 주세요.');
+          folders.names.push(name);folders.assignments[id]=name;
+        }else if(folder.startsWith('custom:')){
+          const name=folder.slice(7);
+          if(!folders.names.includes(name))throw Error('폴더를 찾지 못했어요. 목록을 새로고침해 주세요.');
+          folders.assignments[id]=name;
+        }else delete folders.assignments[id];
+        const memos=normalizeMemos(metadata.pinmap_memos);
+        if(draft.memo)memos[id]=draft.memo.slice(0,300);else delete memos[id];
+        const payload={pinmap_collections:folders,pinmap_memos:memos};
+        if(item.manualId){
+          if(!PinmapAccountMapData.coords(draft.lat,draft.lng))
+            throw Error('직접 찍은 핀의 지도 위치를 확인해 주세요.');
+          const pins=PinmapAccountMapData.normalizePins(metadata.pinmap_manual_pins);
+          const index=pins.findIndex(pin=>pin.id===item.manualId);
+          if(index<0)throw Error('저장된 핀을 찾지 못했어요.');
+          pins[index]={...pins[index],title:draft.title,address:draft.address,type:draft.type,
+            memo:draft.memo,lat:draft.lat,lng:draft.lng};
+          payload.pinmap_manual_pins=pins;
+        }else{
+          const edits=PinmapAccountMapData.normalizeEdits(metadata.pinmap_content_edits);
+          edits[id]={title:draft.title,address:draft.address,type:draft.type,category:draft.category,
+            ...(PinmapAccountMapData.coords(draft.lat,draft.lng)?{lat:draft.lat,lng:draft.lng}:{})};
+          payload.pinmap_content_edits=edits;
+        }
+        const result=await client.auth.updateUser({data:payload});
+        if(result.error)throw result.error;
+        if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
+        loadVersion++;
+        if(payload.pinmap_manual_pins)manualPins=payload.pinmap_manual_pins;
+        if(payload.pinmap_content_edits)editState=payload.pinmap_content_edits;
+        Object.assign(item,draft);
+        if(item.manualId)item.manualMemo=draft.memo;
+        applyFolders(folders);applyMemos(memos);
+      }finally{contentSaving=false;}
+    }
+  };
   window.PinmapAccountContent = {remove:async item => {
-    if (!item?.url) throw Error('삭제할 콘텐츠 주소를 확인하지 못했어요.');
+    if (!item?.url&&!item?.manualId) throw Error('삭제할 콘텐츠를 확인하지 못했어요.');
     const userId = currentUserId;
     const wasLoading = !window.PinmapAccountLoaded;
     if (wasLoading) loadVersion++;
-    try { await accountRequest('DELETE', {url:item.url}, '', userId); }
+    try { if(item.manualId)await removeManual(item,userId);
+      else await accountRequest('DELETE', {url:item.url}, '', userId); }
     catch (error) { if (wasLoading && currentUserId === userId) void loadAccount(); throw error; }
     if (currentUserId !== userId) return;
     items = items.filter(x => x.id !== item.id);
@@ -384,7 +498,8 @@ if (PM_ENV.requiresAuth) (() => {
     if (wasLoading) loadVersion++;
     for (const item of selected) {
       if (currentUserId !== userId) return;
-      try { await accountRequest('DELETE', {url:item.url}, '', userId); removed.push(item.id); }
+      try { if(item.manualId)await removeManual(item,userId);
+        else await accountRequest('DELETE', {url:item.url}, '', userId); removed.push(item.id); }
       catch { failed.push(item.id); }
     }
     if (currentUserId !== userId) return;
@@ -397,34 +512,6 @@ if (PM_ENV.requiresAuth) (() => {
       : `콘텐츠 ${removed.length}개를 삭제했어요.`);
     if (wasLoading) void loadAccount();
   }, refresh:loadAccount};
-  actions.edit = () => {
-    const item=items.find(x=>x.id===detailId);if(!item)return;
-    modal('내 메모',`<form id="account-memo-form"><label class="field"><span>메모</span><textarea name="memo" rows="4" maxlength="200" placeholder="어떤 순간에 다시 보고 싶나요?">${esc(item.memo||'')}</textarea></label><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장</button></div></form>`);
-    document.querySelector('#account-memo-form textarea')?.focus();
-  };
-  document.addEventListener('submit',async event=>{
-    if(event.target.id!=='account-memo-form')return;
-    event.preventDefault();event.stopImmediatePropagation();
-    if(memoSaving)return;
-    const item=items.find(x=>x.id===detailId);if(!item)return;
-    const memo=String(new FormData(event.target).get('memo')||'').trim().slice(0,200);
-    const expected=currentUserId;
-    memoSaving=true;
-    try{
-      const {data,error}=await client.auth.getUser();
-      if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)throw Error('로그인 계정을 다시 확인해 주세요.');
-      const value=normalizeMemos(data.user.user_metadata?.pinmap_memos);
-      if(memo)value[String(item.backendId)]=memo;
-      else delete value[String(item.backendId)];
-      const result=await client.auth.updateUser({data:{pinmap_memos:value}});
-      if(result.error)throw result.error;
-      if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
-      loadVersion++;applyMemos(value);
-      document.getElementById('sheet')?.close();render();toast('메모를 저장했어요.');
-    }catch(error){toast(error.message||'메모를 저장하지 못했어요.');}
-    finally{memoSaving=false;}
-  },true);
-  const unsupportedContent = () => toast('계정 콘텐츠의 위치와 분석 결과는 아직 수정할 수 없어요.');
   actions.cfdelfolderok=async()=>{
     const name=cfFolderToDelete;if(!name)return;
     const button=document.querySelector('[data-action="cfdelfolderok"]');
@@ -464,11 +551,6 @@ if (PM_ENV.requiresAuth) (() => {
       toast(error.message || '계정의 콘텐츠를 삭제하지 못했어요.');
     });
   };
-  document.addEventListener('submit', event => {
-    if (!['editform','lm-pin-form'].includes(event.target.id)) return;
-    event.preventDefault(); event.stopImmediatePropagation();
-    unsupportedContent();
-  }, true);
   PinmapAuth.ready().then(sdk => {
     client = sdk;
     sdk.auth.onAuthStateChange(event => {

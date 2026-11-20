@@ -52,7 +52,7 @@ detail = function(){
   const factRow = x.distance && ready ? `<div class="dtfacts"><span>${icon('walk')}${esc(x.distance)}</span></div>` : '';
   if (showPlaceInfo) info += ready
     ? `<section class="dtsec dtlocation"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2>${selectedPlace?PinmapPlacePhotos.markup(x.backendId,selectedPlaceIndex||0,selectedPlace.image_data_url||PM_ENV.placeholderImage,'dt-place-photo'):''}<div class="dtplacecard"><div class="dtaddress">${icon('pin')}<span>${esc(selectedPlace?.address||x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div><div class="dtmap-preview"><div id="detail-map-canvas" role="img" aria-label="${esc(x.title)} 저장 위치 지도"></div><button type="button" class="dtmaplink" data-action="dtgomap" aria-label="${esc(x.title)} 지도 탭에서 보기"></button><p class="dtmap-fallback" id="detail-map-fallback" hidden>지도를 불러오지 못했어요. 지도에서 위치를 확인해 주세요.</p></div>${factRow}</div></section>`
-    : `<section class="dtsec dtlocation"><h2>장소 정보</h2><div class="dtplacecard"><div class="dtwarn"><b>장소 확인 필요</b><p>${PM_ENV.requiresAuth ? '위치를 확정하지 못했어요. 원본에서 주소를 확인해 주세요.' : '위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.'}</p>${PM_ENV.requiresAuth ? '' : '<button class="dtsmall" data-action="edit">장소 직접 입력</button>'}</div></div></section>`;
+    : `<section class="dtsec dtlocation"><h2>장소 정보</h2><div class="dtplacecard"><div class="dtwarn"><b>장소 확인 필요</b><p>위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.</p><button class="dtsmall" data-action="edit">장소 직접 입력</button></div></div></section>`;
   // 2026-11-10 가격을 크게(headline-md), 안내는 body-md. '예시 가격' → '참고 가격'
   if (x.type === '쇼핑') { const amount = String(x.price || '').replace(/,\s*(예시|참고) 가격$/, '').trim();
     info += `<section class="dtsec dtbuy"><h2>구매 정보</h2>${amount ? `<p class="dtprice"><span class="sr">참고 가격 </span>${esc(amount)}</p>` : '<p class="dtprice none">가격 정보 없음</p>'}<p class="dtpricehint">${x.shop ? `${esc(x.shop)}에서 본 참고 가격이에요.` : '판매처 정보가 없어요.'}<br>가격과 재고는 원본에서 한 번 더 확인해 주세요.</p></section>`; }
@@ -62,9 +62,9 @@ detail = function(){
   // 아래 고정 버튼: 길찾기 · 원본 보기 (장소가 아니면 원본 보기만)
   const bottom = [];
   if (ready) bottom.push(`<a class="dtghost" href="${mapHref}" target="_blank" rel="noopener noreferrer">${icon('send')}길찾기</a>`);
-  else if (showPlaceInfo && !PM_ENV.requiresAuth) bottom.push(`<button class="dtghost" data-action="edit">${icon('pin')}장소 입력</button>`);
+  else if (showPlaceInfo) bottom.push(`<button class="dtghost" data-action="edit">${icon('pin')}장소 입력</button>`);
   if (!x.deleted) bottom.push(`<button class="dtprimary" data-action="original">${icon('image')}원본 보기</button>`);
-  else if (!ready && !PM_ENV.requiresAuth) bottom.push(`<button class="dtprimary" data-action="edit">${icon('pen')}정보 수정</button>`);
+  else if (!ready) bottom.push(`<button class="dtprimary" data-action="edit">${icon('pen')}정보 수정</button>`);
   if (bottom.length === 1) bottom[0] = bottom[0].replace('class="dtghost"', 'class="dtprimary"');
 
   return `<article class="dt dt-photo">
@@ -76,7 +76,7 @@ detail = function(){
           <button class="dtbtn dtmorebtn" data-action="dtmore" aria-label="더보기" aria-haspopup="menu" aria-expanded="false" aria-controls="dtmenu">${icon('more')}</button>
           <div class="dtmenu" id="dtmenu" role="menu" aria-label="콘텐츠 메뉴" hidden>
             <button type="button" role="menuitem" data-action="dtshare">${icon('share')}공유</button>
-            <button type="button" role="menuitem" data-action="edit">${icon('pen')}${PM_ENV.requiresAuth?'메모 수정':'수정'}</button>
+            <button type="button" role="menuitem" data-action="edit">${icon('pen')}수정</button>
             <button type="button" role="menuitem" class="dtmenu-danger" data-unsave="${x.id}">${icon('trash')}삭제</button>
           </div>
         </div></div>
@@ -243,7 +243,7 @@ function editSheet(){
         <span class="esinput area"><textarea name="memo" id="es-memo" rows="3" maxlength="200" placeholder="어떤 순간에 다시 보고 싶나요?">${esc(x.memo||'')}</textarea></span><small class="escount" data-for="es-memo"></small>
       </label>
       <input type="hidden" name="collection" id="es-col" value="${esc(x.collection||'')}">
-      <p class="eshint">카테고리를 직접 바꾸면 ‘직접 분류’로 표시돼요.</p>
+      <p class="eshint">카테고리를 직접 바꾸면 ‘직접 분류’로 표시돼요. 새 주소의 지도 위치는 저장 전에 검색해요.</p><p id="es-save-error" class="eserror" role="alert"></p>
     </div>
     <div class="esfoot"><button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">수정 완료</button></div>
   </form>`);

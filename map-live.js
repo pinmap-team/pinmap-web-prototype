@@ -75,7 +75,7 @@
       <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">ⓘ</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p>지도 © Google</p></div></details>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
-      <div class="lm-floating-actions">${PM_ENV.requiresAuth ? '' : `<button type="button" class="lm-pin-button" data-lm="pin-start" aria-label="지도에 직접 핀 찍기" title="지도에 직접 핀 찍기">${icon('pin')}</button>`}<button type="button" class="lm-course-button" data-lm="new-course" aria-label="새 코스 만들기" title="새 코스 만들기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="4.2" cy="4.2" r="2.1"/><path d="M6.3 4.2h9.2a5.1 5.1 0 0 1 0 10.2H10a3.2 3.2 0 0 0 0 6.4h7.7"/><circle cx="19.8" cy="20.8" r="2.1"/></svg></button></div>
+      <div class="lm-floating-actions"><button type="button" class="lm-pin-button" data-lm="pin-start" aria-label="지도에 직접 핀 찍기" title="지도에 직접 핀 찍기">${icon('pin')}</button><button type="button" class="lm-course-button" data-lm="new-course" aria-label="새 코스 만들기" title="새 코스 만들기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="4.2" cy="4.2" r="2.1"/><path d="M6.3 4.2h9.2a5.1 5.1 0 0 1 0 10.2H10a3.2 3.2 0 0 0 0 6.4h7.7"/><circle cx="19.8" cy="20.8" r="2.1"/></svg></button></div>
       <div class="lm-locate-top">${round('현재 위치로 이동','target')}</div>
       <div class="lm-pin-target" aria-hidden="true">${icon('pin')}</div>
       <div class="lm-pin-bar" role="group" aria-label="직접 핀 찍기"><p>지도를 움직여 핀을 원하는 곳에 맞춰 주세요.</p><div><button type="button" class="lm-pin-cancel" data-lm="pin-cancel">취소</button><button type="button" class="lm-pin-confirm" data-lm="pin-confirm">이 위치 저장</button></div></div>
@@ -297,7 +297,7 @@
     }catch{}
     if(address){address.placeholder='예: 서울 성동구 성수동';}
   }
-  document.addEventListener('submit',event=>{
+  document.addEventListener('submit',async event=>{
     if(event.target.id!=='lm-pin-form')return;
     event.preventDefault();
     const data=new FormData(event.target);
@@ -306,10 +306,13 @@
     if(!title||!address||!typeOf(type).place||!Number.isFinite(lat)||!Number.isFinite(lng))return;
     const mapKind=type==='전시/팝업'?'event':type==='여행'?'walk':'cafe';
     const item={id:Date.now(),title,address,type,category:shortType(type),source:'직접 추가',ago:'방금',savedAt:new Date().toISOString(),desc:'',memo:String(data.get('memo')||'').trim(),art:typeOf(type).art,lat,lng,mapKind,aiClassified:false};
-    items.unshift(item);afterChange();$('#sheet').close();
-    setPinning(false);markers();
-    const entry=markerEntries.get(placeKey({saved:true,id:item.id}));if(entry)expandPlace(entry.place);
-    toast(`${josa(title,'을/를')} 지도에 저장했어요.`);
+    const button=event.target.querySelector('[type="submit"]');
+    try{
+      await PinmapButton.run(button,()=>window.PinmapContentPersistence.savePin(item),'핀 저장 중');
+      $('#sheet').close();setPinning(false);markers();
+      const entry=markerEntries.get(placeKey({saved:true,id:item.id}));if(entry)expandPlace(entry.place);
+      toast(`${josa(title,'을/를')} 지도에 저장했어요.`);
+    }catch(error){toast(error.message||'핀을 저장하지 못했어요. 다시 시도해 주세요.');}
   });
   function expandPlace(place,moveMap=true,scrollCard=true) {
     const key=placeKey(place),entry=markerEntries.get(key);if(!entry)return;
@@ -457,7 +460,7 @@
       (list.length ? list.map((x,i) => `<button class="lm-result-row" data-result="${i}"><img src="${safe(x.image)}" alt=""><span><b>${safe(x.title)}</b><small>${safe(x.address)}</small></span>${icon('arrow')}</button>`).join('') : '<p>일치하는 장소가 없어요. 다른 이름이나 주소로 검색해 보세요.</p>');
   }
   async function searchPlaces(q) {
-    if(PM_ENV.development){toast('장소 데이터가 아직 연결되지 않았어요.');return;}
+    if(PM_ENV.development&&!PM_ENV.requiresAuth&&!items.length){toast('장소 데이터가 아직 연결되지 않았어요.');return;}
     if (q.length < 2) { status('검색어를 2자 이상 입력해 주세요.'); return; }
     rememberSearch(q);refreshRecentSearches();
     searchController?.abort(); searchController=new AbortController();
@@ -493,7 +496,7 @@
       case 'new-course':window.startNewCourse?.(expandedKey&&expandedKey.startsWith('saved:')?[Number(expandedKey.slice(6))]:[]);break;
       case 'open-list':if(Date.now()<suppressSheetClickUntil)break;setList(!listOpen);break;
       case 'close-list':if(Date.now()<suppressSheetClickUntil)break;setList(false);break;
-      case 'pin-start':if (!PM_ENV.requiresAuth) setPinning(true);break;
+      case 'pin-start':setPinning(true);break;
       case 'pin-cancel':setPinning(false);break;
       case 'pin-confirm':dropPin();break;
       case 'locate':mapLocationName=null;$('#app .lm-location-title span').textContent='현재 위치';locate();break;
@@ -544,7 +547,7 @@
     searchPlaces(q);
   });
   window.addEventListener('pinmap:place-changed',async event=>{
-    if(page!=='map'||!liveMap||PM_ENV.development)return;
+    if(page!=='map'||!liveMap||(PM_ENV.development&&!PM_ENV.requiresAuth))return;
     const name=event.detail?.name;
     if(!name)return;
     mapLocationName=name;

@@ -21,9 +21,11 @@ fs.mkdirSync(output,{recursive:true});
       {title:'둘째 전시',event_type:'exhibition',start_date:null,end_date:null,date_text:'12.11~04.11',venue_name:'부산 전시관',needs_review:true}],
     places:[],map_locations:[],extraction_notes:[],media_warnings:[]});
   records.push(record('one','https://www.instagram.com/p/Dfvw0zmE3kW/'));
-  await page.route('**/vendor/supabase.js*',route=>route.fulfill({contentType:'text/javascript',body:`window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'11111111-1111-4111-8111-111111111111',email:'test@example.com'}}}),getSession:async()=>({data:{session:{access_token:'x'.repeat(30)}}}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})}})};`}));
+  await page.route('**/vendor/supabase.js*',route=>route.fulfill({contentType:'text/javascript',body:`const mockUser={id:'11111111-1111-4111-8111-111111111111',email:'test@example.com',user_metadata:{}};window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:mockUser}}),getSession:async()=>({data:{session:{access_token:'x'.repeat(30),user:mockUser}}}),updateUser:async({data})=>{Object.assign(mockUser.user_metadata,data);return {data:{user:mockUser}};},onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})}})};`}));
   await page.route('**/api/auth/config',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({url:'https://example.supabase.co',publishableKey:'pk_test'})}));
   await page.route('**/api/map-config',route=>route.fulfill({contentType:'application/json',body:'{}'}));
+  await page.route('https://photon.komoot.io/api/**',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({features:[{geometry:{coordinates:[127.1,37.5]},properties:{name:'테스트 장소'}}]})}));
+  await page.route('https://photon.komoot.io/reverse?*',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({features:[{properties:{city:'서울',district:'성동구'}}]})}));
   await page.route('**/api/content-save*',async route=>{
     const request=route.request(),url=new URL(request.url());
     if(request.method()==='GET'){
@@ -51,7 +53,11 @@ fs.mkdirSync(output,{recursive:true});
     assert.equal(await frame.locator('.home-first-save').count(),0);
     assert.equal(await frame.locator('.home-add-fab').count(),1);
     await frame.locator('.home-add-fab').click();
-    await frame.locator('#es-url').waitFor({timeout:5000});
+    await frame.locator('[data-action="linkimport"]').click();
+    await frame.locator('#es-url').waitFor({timeout:5000}).catch(async error=>{
+      console.error('add state:',await frame.locator('body').evaluate(()=>({menu:document.getElementById('home-add-menu')?.dataset.open,sheet:document.getElementById('sheet')?.innerHTML.slice(0,500),errors:window.PinmapAccountLoadError})));
+      console.error('page errors:',errors);throw error;
+    });
     await frame.locator('.esclose').click();
     assert.match(await frame.locator('.pick').first().innerText(),/서울 전시 모음/);
     for(const [width,height] of [[320,640],[402,874],[1440,700],[1440,960]]){
@@ -102,6 +108,14 @@ fs.mkdirSync(output,{recursive:true});
       'The first extracted event date must be visible above the fixed action bar: '+JSON.stringify(visible));
     console.log('event-date-viewport:',JSON.stringify(visible));
     await page.screenshot({path:path.join(output,'pinmap-account-event-detail.png')});
+    await frame.locator('body').evaluate(()=>actions.edit());
+    await frame.locator('#es-address').fill('서울 송파구 올림픽로 424');
+    await frame.locator('#editform [type="submit"]').click();
+    await frame.locator('#editform').waitFor({state:'hidden',timeout:5000});
+    assert.equal(await frame.locator('body').evaluate(()=>items[0].address),'서울 송파구 올림픽로 424');
+    await frame.locator('body').evaluate(()=>window.PinmapAccountContent.refresh());
+    await frame.locator('body').waitFor({state:'visible'});
+    assert.equal(await frame.locator('body').evaluate(()=>items[0].mapLocations[0].coordinates.lng),127.1);
     await frame.locator('body').evaluate(()=>{go('calendar');calMonth=new Date(2026,11,1);render();});
     assert.equal(await frame.locator('[data-calday="2026-12-11"] .caldot').count(),1);
     await frame.locator('body').evaluate(()=>actions.save());
@@ -129,7 +143,21 @@ fs.mkdirSync(output,{recursive:true});
       assert(map.left>=0 && map.right<=402 && map.top===0 && map.bottom===874,
         `Map must fit ${width}x${height}: ${JSON.stringify(map)}`);
     }
+    await page.setViewportSize({width:402,height:874});
+    await frame.locator('.lm-pin-button').click();
+    await frame.locator('.lm-pin-confirm').click();
+    await frame.locator('#lm-pin-form [name="title"]').fill('직접 찍은 핀');
+    await frame.locator('#lm-pin-form [name="address"]').fill('서울 성동구');
+    await frame.locator('#lm-pin-form [type="submit"]').click();
+    await frame.locator('#lm-pin-form').waitFor({state:'hidden',timeout:5000});
+    const created=await frame.locator('body').evaluate(()=>items.find(item=>item.title==='직접 찍은 핀')?.manualId);
+    if(!created)console.error('pin state:',await frame.locator('body').evaluate(()=>({items:items.map(item=>({title:item.title,manualId:item.manualId})),sheet:document.getElementById('sheet')?.innerText,snackbar:document.getElementById('snackbar')?.innerText})));
+    assert(created);
+    await frame.locator('body').evaluate(()=>window.PinmapAccountContent.refresh());
+    assert.equal(await frame.locator('body').evaluate(()=>items.filter(item=>item.manualId).length),1);
+    await frame.locator('body').evaluate(()=>window.PinmapAccountContent.remove(items.find(item=>item.manualId)));
+    assert.equal(await frame.locator('body').evaluate(()=>items.filter(item=>item.manualId).length),0);
     assert.equal(errors.length,0,errors.join('; ')+'\n'+JSON.stringify(resources));
-    console.log('browser-check passed: account load, event detail, calendar, save, delete, mobile/wide');
+    console.log('browser-check passed: account load, address edit, direct pin, reload, calendar, save, delete, mobile/wide');
   }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exit(1);});

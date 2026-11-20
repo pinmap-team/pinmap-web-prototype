@@ -27,6 +27,55 @@ test('event-only account content keeps schedules separate from map pins', () => 
   assert.equal(item.events[0].end_date, '2027-04-11');
 });
 
+test('account edits and direct pins survive account reload and can be removed', async () => {
+  let metadata={};
+  const record={...eventRecord,id:'place-1',content_kind:'place',events:[],places:[{name:'카페'}],map_locations:[]};
+  const sdk={auth:{
+    getUser:async()=>({data:{user:{id:'user-a',user_metadata:metadata}}}),
+    updateUser:async({data})=>{metadata={...metadata,...data};return {data:{user:{id:'user-a',user_metadata:metadata}}};},
+    getSession:async()=>({data:{session:{access_token:'token'}}}),onAuthStateChange:()=>{}
+  }};
+  const context={PinmapFolders:require('../account-folders.js'),PinmapFavorites:require('../favorite-state.js'),
+    PinmapAccountMapData:require('../account-map-data.js'),PM_ENV:{requiresAuth:true},
+    PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
+    window:{},document:{addEventListener:()=>{},getElementById:()=>null,querySelector:()=>null},
+    actions:{save:()=>{}},settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
+    items:[],detailId:null,render:()=>{},toast:()=>{},crypto:require('node:crypto'),
+    fetch:async(path,options)=>({ok:true,json:async()=>options.method==='GET'
+      ? {items:new URL(path,'https://pinmap.example').searchParams.get('offset')==='0'?[record]:[],next_offset:null}
+      : {deleted:true}})
+  };
+  vm.runInNewContext(accountSource,context);
+  for(let attempt=0;attempt<30&&!context.window.PinmapAccountLoaded;attempt++)
+    await new Promise(resolve=>setImmediate(resolve));
+  assert(context.window.PinmapAccountLoaded);
+  const original=context.items[0];
+  await context.window.PinmapContentPersistence.saveEdit(original,
+    {...original,title:'수정한 카페',address:'서울 송파구 올림픽로 424',category:'카페',
+      memo:'직접 확인',lat:37.5,lng:127.1,mapLocations:[{name:'수정한 카페',address:'서울 송파구 올림픽로 424',coordinates:{lat:37.5,lng:127.1}}]},
+    {folder:'category:카페'});
+  const pin={id:123,title:'직접 찍은 핀',address:'서울 성동구',type:'여행',memo:'산책',
+    lat:37.55,lng:127.04,savedAt:'2026-11-20T01:00:00Z'};
+  await context.window.PinmapContentPersistence.savePin(pin);
+  assert.equal(metadata.pinmap_manual_pins.length,1);
+  metadata.pinmap_favorites=['manual:'+pin.manualId];
+  metadata.pinmap_memos={...metadata.pinmap_memos,['manual:'+pin.manualId]:'산책'};
+  metadata.pinmap_collections={names:['여행 후보'],assignments:{['manual:'+pin.manualId]:'여행 후보'}};
+  await context.window.PinmapAccountContent.refresh();
+  assert.equal(context.items.length,2);
+  assert.equal(context.items.find(item=>item.backendId==='place-1').address,'서울 송파구 올림픽로 424');
+  assert.equal(context.items.find(item=>item.backendId==='place-1').memo,'직접 확인');
+  const restoredPin=context.items.find(item=>item.manualId===pin.manualId);
+  assert.equal(restoredPin.mapLocations[0].coordinates.lng,127.04);
+  await context.window.PinmapAccountContent.remove(restoredPin);
+  assert.equal(metadata.pinmap_manual_pins.length,0);
+  assert.equal(metadata.pinmap_favorites.length,0);
+  assert.equal(metadata.pinmap_memos['manual:'+pin.manualId],undefined);
+  assert.equal(metadata.pinmap_memos['place-1'],'직접 확인');
+  assert.equal(Object.keys(metadata.pinmap_collections.assignments).length,0);
+  assert.equal(context.items.length,1);
+});
+
 test('account history loads all pages using the backend page-size contract', async () => {
   const requests = [];
   let sessionReads = 0;
@@ -41,7 +90,7 @@ test('account history loads all pages using the backend page-size contract', asy
   const visible = [];
   const submitHandlers=[];
   const context = {
-    PinmapFolders:require('../account-folders.js'),PinmapFavorites:require('../favorite-state.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
+    PinmapFolders:require('../account-folders.js'),PinmapFavorites:require('../favorite-state.js'),PinmapAccountMapData:require('../account-map-data.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
     PM_ENV:{requiresAuth:true}, PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
     document:{addEventListener:(type,handler)=>{if(type==='submit')submitHandlers.push(handler);},getElementById:()=>({close:()=>{}})}, window:{}, actions:{save:()=>{}},
     FormData:class{get(){return '현장 메모';}},
@@ -75,9 +124,8 @@ test('account history loads all pages using the backend page-size contract', asy
   assert.equal(profileUpdates[0].data.pinmap_profile.nickname,'테스트 이름');
   await context.window.PinmapAccountProfile.save({avatar:'data:image/jpeg;base64,AA=='});
   assert.equal(profileUpdates[1].data.pinmap_profile.avatar,'data:image/jpeg;base64,AA==');
-  context.detailId=context.items[0].id;
-  const event={target:{id:'account-memo-form'},preventDefault:()=>{},stopImmediatePropagation:()=>{}};
-  await Promise.all(submitHandlers.map(handler=>handler(event)));
+  await context.window.PinmapContentPersistence.saveEdit(context.items[0],
+    {...context.items[0],memo:'현장 메모'}, {folder:'category:전시'});
   assert.equal(context.items[0].memo,'현장 메모');
   assert.equal(profileUpdates[2].data.pinmap_memos['10'],'현장 메모');
 });
@@ -125,7 +173,7 @@ test('bulk removal deletes on the server and keeps failed records visible', asyn
   const done = new Promise(resolve=>{finished=resolve;});
   const toasts = [], deletes = [];
   const context = {
-    PinmapFolders:require('../account-folders.js'),PinmapFavorites:require('../favorite-state.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
+    PinmapFolders:require('../account-folders.js'),PinmapFavorites:require('../favorite-state.js'),PinmapAccountMapData:require('../account-map-data.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
     PM_ENV:{requiresAuth:true},PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
     document:{addEventListener:()=>{},getElementById:()=>({close:()=>{}}),querySelector:()=>null},
     window:{},actions:{save:()=>{}},items:[],detailId:null,cfSel:null,

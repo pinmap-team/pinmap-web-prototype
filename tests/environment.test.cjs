@@ -109,7 +109,7 @@ test('login-free development can display backend place results, while signed-in 
 test('disconnected external place search does not fetch outside data',async()=>{
   const source=read('map-live.js');
   let messages=[],networkCalls=0;
-  const context=vm.createContext({PM_ENV:{development:true},toast:text=>messages.push(text),fetch:()=>{networkCalls++;throw Error('Unexpected network');},navigator:{get geolocation(){throw Error('Unexpected geolocation');}}});
+  const context=vm.createContext({PM_ENV:{development:true,requiresAuth:false},items:[],toast:text=>messages.push(text),fetch:()=>{networkCalls++;throw Error('Unexpected network');},navigator:{get geolocation(){throw Error('Unexpected geolocation');}}});
   const search=source.slice(source.indexOf('  async function searchPlaces('),source.indexOf("  document.addEventListener('click',event =>"));
   vm.runInContext(search,context);
   await vm.runInContext("searchPlaces('서울숲')",context);
