@@ -167,12 +167,15 @@ pages.notice = () => myPage('공지사항', infoRows([
   ['핀맵 프로토타입 03 공개', '연동 계정 관리, 위치 편집, 마이 바로가기가 새로 생겼어요.'],
   ['예시 데이터 안내', '지금은 예시 데이터로 체험하는 프로토타입이에요.\n데이터는 이 브라우저에만 저장돼요.']
 ]), 'settingpage');
-pages.terms = () => myPage('약관 및 정책', infoRows([
-  ['서비스 이용약관', '핀맵 서비스 이용에 관한 기본 약속이에요.'],
-  ['개인정보 처리방침', '저장한 콘텐츠와 연동 계정 정보를 어떻게 다루는지 안내해요.'],
-  ['위치기반서비스 이용약관', '현재 위치로 주변 저장 장소를 보여줄 때 적용돼요.'],
+pages.terms = () => myPage('약관 및 정책', `<div class="mycard settings policy-list">
+  <a class="setrow" href="terms.html" target="_top"><div><b>서비스 이용약관</b><small>계정·콘텐츠 분석·월간 이용권의 이용 조건이에요.</small></div></a>
+  <a class="setrow" href="privacy.html" target="_top"><div><b>개인정보 처리방침</b><small>계정·콘텐츠·구독 정보의 처리와 삭제 안내예요.</small></div></a>
+  <a class="setrow" href="refunds.html" target="_top"><div><b>환불·해지 정책</b><small>구독 해지와 Paddle 환불 요청 방법을 확인해요.</small></div></a>
+  <a class="setrow" href="plans.html" target="_top"><div><b>서비스·요금제 및 문의</b><small>월 5,000원·매월 분석 300개와 문의처를 확인해요.</small></div></a>
+</div>${infoRows([
+  ['위치기반서비스 안내', '현재 위치의 처리와 권한 설정은 개인정보 처리방침에서 확인할 수 있어요.'],
   ['오픈소스 라이선스', '지도 표시에 Leaflet을 사용해요.']
-]), 'settingpage');
+])}`, 'settingpage');
 Object.assign(actions, { faq: () => go('faq'), notice: () => go('notice'), terms: () => go('terms') });
 
 /* ---------- 이용 가이드 ---------- */
