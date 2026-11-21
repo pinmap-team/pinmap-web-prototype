@@ -1207,3 +1207,10 @@ Figma의 colors/accent 변수(VariableID:1393:207), 선택 카드·관심 키워
 - 판정: 웹 자동 검사 96개, API 검사 49개, Python 103개 통과. PGlite PostgreSQL 엔진으로 301개 예약의 300회 제한, 실패 반환, 갱신·환불·중복/오래된 이벤트 및 브라우저 역할의 DB 접근 차단을 확인했다. 로컬 프로토타입의 월 300개 문구와 버튼 렌더링을 확인했다. 실제 로그인 계정 UI와 Paddle→서버→Supabase의 종단간 반영은 아직 검증하지 않았다.
 - 근거: 사용자 지정 월 5,000원·월 분석 300개. Paddle 공식 raw-body signature verification, transaction 및 subscription API 문서.
 - 배포 필요: backend database/005_billing.sql, 서버 Paddle API 키·웹훅 secret, notification destination 및 API/웹 배포. 공개 배포는 수행하지 않았다. 기존 익명 테스트 결제는 자동으로 사용자 계정에 귀속시키지 않는다.
+
+### 2026-11-21 서버 설정과 공개 배포 검증 완료
+- Supabase migration 005 적용, Vercel 서버 전용 API 키·웹훅 secret·sandbox 환경·월간 price·billing 활성 플래그를 저장했다. 웹 PR #118과 backend PR #30을 병합해 공개 배포했다. 웹 97개/API 49개 검사와 GitHub CI가 통과했다.
+- 기본 결제 링크를 https://pinmap-prototype.vercel.app/checkout.html 로 변경했다. 이 페이지는 공식 Paddle.js 초기화로 transaction 및 결제 수단 갱신 링크를 연다. 실결제 환경은 활성화하지 않았다.
+- 공개 로그인 계정에서 테스트 카드 4242로 거래 txn_01m7z5j9v1ttpsc1r7svkd7b0n을 완료했다. 구독 sub_01m7z5kj6p5tv56q5k09bs8qwn이 웹훅을 통해 계정에 반영되어 월간 이용권/300개 남음/다음 주기 2026-12-21이 표시됐다. 고객 포털도 열렸다.
+- 실제 Instagram 링크 DfzWAmCkwmy 분석·저장 후 화면에 1/300개 사용·299개 남음을 확인했다. 브라우저 새로 진입 후 서버 조회로 확인했으며 임의 DB 권한 부여는 하지 않았다. 서명 없는 웹훅은 401, 인증 없는 계정 조회는 401을 반환했다.
+- 결제/분석 차감은 공개 환경에서 확인했다. 갱신·전액 환불·300회 초과·중복/역순 이벤트는 로컬 PostgreSQL 엔진과 단위 검사로 확인했으며 실제 300건 분석이나 실결제는 수행하지 않았다. 서버 키 만료일은 2027-02-19이다.
