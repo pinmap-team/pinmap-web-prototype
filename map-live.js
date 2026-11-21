@@ -70,7 +70,6 @@
       <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">ⓘ</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p>지도 © Google</p></div></details>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
-      <div class="lm-floating-actions"><button type="button" class="lm-pin-button" data-lm="pin-start" aria-label="지도에 직접 핀 찍기" title="지도에 직접 핀 찍기">${icon('pin')}</button><button type="button" class="lm-course-button" data-lm="new-course" aria-label="새 코스 만들기" title="새 코스 만들기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="4.2" cy="4.2" r="2.1"/><path d="M6.3 4.2h9.2a5.1 5.1 0 0 1 0 10.2H10a3.2 3.2 0 0 0 0 6.4h7.7"/><circle cx="19.8" cy="20.8" r="2.1"/></svg></button></div>
       <div class="lm-locate-top">${round('현재 위치로 이동','target')}</div>
       <div class="lm-pin-target" aria-hidden="true">${icon('pin')}</div>
       <div class="lm-pin-bar" role="group" aria-label="직접 핀 찍기"><p>지도를 움직여 핀을 원하는 곳에 맞춰 주세요.</p><div><button type="button" class="lm-pin-cancel" data-lm="pin-cancel">취소</button><button type="button" class="lm-pin-confirm" data-lm="pin-confirm">이 위치 저장</button></div></div>
@@ -259,7 +258,7 @@
   function setPinning(on){
     pinning=on;const map=$('#app .live-map');if(!map)return;
     map.classList.toggle('is-pinning',on);if(on){setList(false,false);requestAnimationFrame(()=>$('#app .lm-pin-confirm')?.focus());}
-    else $('#app .lm-pin-button')?.focus();
+    else $('#app .lm-locate-top .lm-round')?.focus();
   }
   // 아래 카드 · 목록 손잡이를 위/아래로 밀면 목록 시트를 열고 닫아요(가로로 넘기는 동작과 구분)
   document.addEventListener('pointerdown',event=>{
@@ -490,10 +489,8 @@
     if(cat){selectCategory(cat.dataset.lmCat);markers();showResults();return;}
     const button=event.target.closest('[data-lm]'); if(!button)return;
     switch(button.dataset.lm){
-      case 'new-course':window.startNewCourse?.(expandedKey&&expandedKey.startsWith('saved:')?[Number(expandedKey.slice(6))]:[]);break;
       case 'open-list':if(Date.now()<suppressSheetClickUntil)break;setList(!listOpen);break;
       case 'close-list':if(Date.now()<suppressSheetClickUntil)break;setList(false);break;
-      case 'pin-start':setPinning(true);break;
       case 'pin-cancel':setPinning(false);break;
       case 'pin-confirm':dropPin();break;
       case 'locate':mapLocationName=null;$('#app .lm-location-title span').textContent='현재 위치';locate();break;
