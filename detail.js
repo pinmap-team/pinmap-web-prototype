@@ -49,7 +49,8 @@ detail = function(){
   const selectedPlace=x?.mapLocations?.[selectedPlaceIndex||0];
   if (!x) { detailId = null; return pages[page](); }
   const t = typeOf(x.type);
-  const showPlaceInfo = t.place && (x.contentKind !== 'event' || (x.extractionPlaces || []).length > 0 || !!x.address);
+  const showPlaceInfo = t.place && x.contentKind !== 'unknown' &&
+    (x.contentKind !== 'event' || (x.extractionPlaces || []).length > 0 || !!x.address);
   const ready = showPlaceInfo && x.address && !x.pending;
   const app = GOOGLE_MAP;
   const mapHref = ready ? app.url(encodeURIComponent(selectedPlace?.address||x.mapQuery||x.address)) : '';
@@ -75,7 +76,7 @@ detail = function(){
     return `<li><div><strong>${esc(event.title || '행사 이름 확인 필요')}</strong><span class="dt-extraction-pending">${kind} · 확인 필요</span></div><p>${icon('calendar')}${esc(date)}${start ? '' : ' · 확정 날짜 아님'}</p>${event.time_text ? `<p>${icon('clock')}${esc(event.time_text)}</p>` : ''}${event.venue_name || event.address ? `<p>${icon('pin')}${esc([event.venue_name,event.address].filter(Boolean).join(' · '))}</p>` : ''}${notes.map(note => `<p>${esc(note)}</p>`).join('')}</li>`;
   }).join('')}</ul></section>` : '';
   const analysisNotes = Array.isArray(x.extractionNotes) ? x.extractionNotes.filter(note => typeof note === 'string').slice(0, 8) : [];
-  const reviewInfo = analysisNotes.length || x.contentKind === 'unknown' ? `<section class="dtsec dt-extraction dt-analysis-notes"><h2>분석 안내</h2><ul>${(analysisNotes.length ? analysisNotes : ['게시물에서 장소 또는 행사 정보를 확인하지 못했어요.']).map(note => `<li><p>${esc(note)}</p></li>`).join('')}</ul></section>` : '';
+  const reviewInfo = analysisNotes.length || (x.contentKind === 'unknown' && x.status !== 'extracted') ? `<section class="dtsec dt-extraction dt-analysis-notes"><h2>분석 안내</h2><ul>${(analysisNotes.length ? analysisNotes : ['게시물에서 장소 또는 행사 정보를 확인하지 못했어요.']).map(note => `<li><p>${esc(note)}</p></li>`).join('')}</ul></section>` : '';
   const memoInfo = `<section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>`;
 
   // 유형별 정보

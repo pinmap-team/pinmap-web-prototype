@@ -27,6 +27,26 @@ test('event-only account content keeps schedules separate from map pins', () => 
   assert.equal(item.events[0].end_date, '2027-04-11');
 });
 
+test('summary-only account content uses AI category without creating a place or schedule', () => {
+  const source=accountSource.split('\nif (PM_ENV.requiresAuth)')[0];
+  for(const [category,type] of [['travel','여행'],['shopping','쇼핑'],['recipe','레시피'],['lifestyle','기타']]) {
+    const record={...eventRecord,content_kind:'unknown',status:'extracted',places:[],events:[],
+      ai_title:'일상의 아이디어',ai_summary:'게시물의 주요 내용을 요약했어요.',
+      classification:{source:'gemini_decisions',model:'gemini-decision-1',status:'classified',
+        kind:'unknown',category,confidence:.93}};
+    const item=vm.runInNewContext(`${source}\npinmapAccountItem(record, 7)`,{record});
+    assert.equal(item.type,type);
+    assert.equal(item.category,category==='lifestyle'?'생활 정보':type);
+    assert.equal(item.contentKind,'unknown');
+    assert.equal(item.status,'extracted');
+    assert.equal(item.desc,'게시물의 주요 내용을 요약했어요.');
+    assert.equal(item.aiClassified,true);
+    assert.equal(item.mapLocations.length,0);
+    assert.equal(item.events.length,0);
+    assert.equal(item.pending,false);
+  }
+});
+
 test('account edits and direct pins survive account reload and can be removed', async () => {
   let metadata={};
   const record={...eventRecord,id:'place-1',content_kind:'place',events:[],places:[{name:'카페'}],map_locations:[]};
