@@ -175,6 +175,23 @@ if (PM_ENV.requiresAuth) (() => {
       applyFavorites(value);
     }finally{favoriteSaving=false;}
   });
+  PinmapFavorites.connectMany(async chosen=>{
+    if(!window.PinmapAccountLoaded||window.PinmapAccountLoadError)throw Error('저장 목록을 불러온 뒤 즐겨찾기를 변경해 주세요.');
+    if(favoriteSaving)throw Error('즐겨찾기를 저장 중이에요. 잠시 기다려 주세요.');
+    favoriteSaving=true;
+    const expected=currentUserId;
+    try{
+      const {data,error}=await client.auth.getUser();
+      if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)throw Error('로그인 계정을 다시 확인해 주세요.');
+      const removed=new Set(chosen.map(item=>String(item.backendId)));
+      const value=PinmapFavorites.normalize(data.user.user_metadata?.pinmap_favorites).filter(id=>!removed.has(id));
+      const result=await client.auth.updateUser({data:{pinmap_favorites:value}});
+      if(result.error)throw result.error;
+      if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
+      loadVersion++;
+      applyFavorites(value);
+    }finally{favoriteSaving=false;}
+  });
   function applyFolders(value){
     for(const name of cfCustom()){
       const index=COLLECTIONS.findIndex(entry=>entry[0]===name);
@@ -210,7 +227,7 @@ if (PM_ENV.requiresAuth) (() => {
   let pendingView = false;
   function refreshVisibleContent() {
     if (typeof page === 'undefined') { render(); return; }
-    if (detailId || !['home','library'].includes(page) || document.querySelector?.('dialog[open]')) {
+    if (detailId || !['home','library','favorites'].includes(page) || document.querySelector?.('dialog[open]')) {
       pendingView = true; return;
     }
     if (document.activeElement?.matches?.('input,textarea,select,[contenteditable]')) {

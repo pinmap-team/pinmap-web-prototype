@@ -10,6 +10,7 @@
     return next.slice(-100);
   };
   let persist = null;
+  let persistMany = null;
   const pending = new Set();
   function toggle(item){
     if (!item) return null;
@@ -29,6 +30,24 @@
     }).finally(() => pending.delete(key));
     return favorite;
   }
-  root.PinmapFavorites = {normalize,change,toggle,connect:fn => {persist=fn;}};
+  async function removeMany(items){
+    const chosen=[...new Map(items.filter(item=>item?.favorite).map(item=>[String(item.backendId ?? item.id),item])).values()];
+    if (!chosen.length) return 0;
+    const keys=chosen.map(item=>String(item.backendId ?? item.id));
+    if (keys.some(key=>pending.has(key))) throw Error('즐겨찾기 변경을 마친 뒤 다시 시도해 주세요.');
+    keys.forEach(key=>pending.add(key));
+    chosen.forEach(item=>{item.favorite=false;});
+    try {
+      if (persistMany) await persistMany(chosen);
+      else if (persist) for (const item of chosen) await persist(item,false);
+      else if (typeof afterChange === 'function') afterChange();
+      return chosen.length;
+    } catch(error) {
+      chosen.forEach(item=>{item.favorite=true;});
+      root.render?.();
+      throw error;
+    } finally { keys.forEach(key=>pending.delete(key)); }
+  }
+  root.PinmapFavorites = {normalize,change,toggle,removeMany,connect:fn => {persist=fn;},connectMany:fn => {persistMany=fn;}};
   if (typeof module !== 'undefined' && module.exports) module.exports = root.PinmapFavorites;
 })(typeof window !== 'undefined' ? window : globalThis);
