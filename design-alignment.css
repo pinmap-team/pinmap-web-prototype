@@ -1353,7 +1353,8 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .pm-refresh{position:fixed;z-index:900;top:0;left:50%;display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:var(--color-surface);box-shadow:var(--shadow-sm);transform:translate(-50%,-60px);opacity:0;pointer-events:none;transition:transform .2s ease,opacity .2s ease}
 .pm-refresh.is-pulling{transition:none}
 .pm-refresh.is-pulling .pm-spinner{animation:none;transform:rotate(var(--pull-turn,0deg))}
-html.pm-refresh-enabled,html.pm-refresh-enabled body{overscroll-behavior-y:contain}
+/* Disable browser pull-to-refresh while keeping normal vertical scrolling. */
+html,body{overscroll-behavior-y:contain}
 @media(prefers-reduced-motion:reduce){.pm-spinner{animation-duration:1.6s}.pm-refresh{transition:none}}
 
 /* Current location: blue position and a compass cone only when heading is available. */
