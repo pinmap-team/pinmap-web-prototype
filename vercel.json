@@ -32,6 +32,10 @@
     {
       "source": "/api/billing/account",
       "destination": "https://pinmap-backend.vercel.app/api/billing/account"
+    },
+    {
+      "source": "/api/billing/config",
+      "destination": "https://pinmap-backend.vercel.app/api/billing/config"
     }
   ]
 }
