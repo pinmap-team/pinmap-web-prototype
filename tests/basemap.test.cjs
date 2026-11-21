@@ -9,15 +9,17 @@ function setup(config){
   const host=element('div');
   host.getBoundingClientRect=()=>({top:0,width:402,height:874});
   host.closest=()=>null;
-  const map={getContainer:()=>host,getCenter:()=>({lat:37.5,lng:127}),getZoom:()=>14,containerPointToLatLng:()=>({lat:37.5,lng:127}),on(){}};
+  const mapListeners={};
+  const map={getContainer:()=>host,getCenter:()=>({lat:37.5,lng:127}),getZoom:()=>14,containerPointToLatLng:()=>({lat:37.5,lng:127}),on(name,handler){mapListeners[name]=handler}};
   const listeners={};
   const window={addEventListener(name,handler){listeners[name]=handler},removeEventListener(name){delete listeners[name]}};
   let googleOptions,updatedOptions;
-  const google={maps:{Map:class{constructor(surface,options){googleOptions=options;this.surface=surface}setCenter(){}setZoom(){}setOptions(options){updatedOptions=options}},event:{clearInstanceListeners(){}}}};
+  const cameraMoves=[];
+  const google={maps:{Map:class{constructor(surface,options){googleOptions=options;this.surface=surface}moveCamera(options){cameraMoves.push(options)}setOptions(options){updatedOptions=options}},event:{clearInstanceListeners(){}}}};
   const document={documentElement:{dataset:{theme:'light'}},createElement:tag=>{const node=element(tag);elements.push(node);return node},head:{append(script){window.__pinmapGoogleMapsReady()}}};
   const context={window,document,google,fetch:async()=>({ok:true,json:async()=>config}),setTimeout,clearTimeout,requestAnimationFrame:callback=>{callback();return 1},cancelAnimationFrame(){}};
   vm.runInNewContext(fs.readFileSync('map-providers.js','utf8'),context);
-  return {window,host,map,elements,document,listeners,getGoogleOptions:()=>googleOptions,getUpdatedOptions:()=>updatedOptions};
+  return {window,host,map,mapListeners,cameraMoves,elements,document,listeners,getGoogleOptions:()=>googleOptions,getUpdatedOptions:()=>updatedOptions};
 }
 
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
@@ -59,4 +61,16 @@ test('map uses the unstyled Google default in every appearance mode',async()=>{
   await flush();
   assert.equal(app.getGoogleOptions().styles,undefined);
   assert.equal(app.listeners['pinmap:theme-changed'],undefined);
+});
+
+test('Google camera follows a Leaflet move in the same event',async()=>{
+  const app=setup({available:{google:true},googleBrowserKey:'test-browser-key'});
+  app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  const before=app.cameraMoves.length;
+  app.map.containerPointToLatLng=()=>({lat:37.6,lng:127.1});
+  app.mapListeners['move zoom resize']();
+  assert.equal(app.cameraMoves.length,before+1);
+  assert.equal(app.cameraMoves.at(-1).center.lat,37.6);
+  assert.equal(app.cameraMoves.at(-1).zoom,14);
 });
