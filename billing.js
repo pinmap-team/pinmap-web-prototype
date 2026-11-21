@@ -31,12 +31,13 @@
   async function refreshAccount(){
     if(!PM_ENV.requiresAuth)return;
     if(accountPending)return accountPending;
-    accountPending=Promise.all([loadConfig(),request()]).then(([,value])=>{if(value.environment!==config.environment)throw Error('결제 환경이 변경됐어요. 다시 확인해 주세요.');account=value;accountError='';}).catch(error=>{account=null;config=null;accountError=error.message;}).finally(()=>{accountPending=null;if(page==='billing')render();});
+    accountPending=Promise.all([loadConfig(),request()]).then(([,value])=>{if(value.environment!==config.environment)throw Error('결제 환경이 변경됐어요. 다시 확인해 주세요.');account=value;accountError='';}).catch(error=>{account=null;config=null;accountError=error.message;}).finally(()=>{accountPending=null;if(page==='billing'||page==='my')render();});
     return accountPending;
   }
-  window.PinmapBilling={refresh:refreshAccount};
+  let myRequested=false;
+  window.PinmapBilling={refresh:refreshAccount,view:()=>({account,error:accountError,loading:!!accountPending}),maybeRefresh:()=>{if(PM_ENV.requiresAuth&&!myRequested){myRequested=true;queueMicrotask(refreshAccount);}}};
   if(PM_ENV.requiresAuth)document.addEventListener('DOMContentLoaded',()=>{
-    PinmapAuth.ready().then(client=>client.auth.onAuthStateChange(()=>{account=null;accountError='';})).catch(()=>{});
+    PinmapAuth.ready().then(client=>client.auth.onAuthStateChange(()=>{account=null;accountError='';myRequested=false;})).catch(()=>{});
   });
   function paddle(){
     if(loading)return loading;
@@ -74,7 +75,7 @@
       <p class="muted">매월 콘텐츠 분석 300개를 제공해요.</p>
       <dl class="billing-details"><div><dt>결제 주기</dt><dd>매월</dd></div><div><dt>이용 요금</dt><dd>월 5,000원</dd></div><div><dt>분석 한도</dt><dd>결제 주기마다 300개</dd></div><div><dt>결제 서비스</dt><dd>Paddle</dd></div></dl>
       <p class="billing-note">${isLive()?'매월 5,000원(세금 포함)이 자동 결제돼요. 구독 관리에서 해지할 수 있어요.':ready()?'테스트 결제 모드예요. 실제 요금은 청구되지 않아요.':'결제 서비스 연결을 확인하고 있어요.'}</p>
-      ${PM_ENV.requiresAuth?`<div class="billing-account" role="status"><b>${account?.active?'월간 이용권 이용 중':account?'이용권 확인':'구독 상태'}</b><p>${accountError?esc(accountError):account?account.active?`이번 주기 ${account.used} / 300개 사용 · ${account.remaining}개 남음`:account.status==='free'?'아직 구독 중인 이용권이 없어요.':'이용권이 활성 상태가 아니에요.':'구독 정보를 확인하려면 아래 버튼을 눌러 주세요.'}</p>${account?.periodEnd?`<p>${account.cancelAt?'해지 예정 · ':'다음 주기 · '}${esc(new Date(account.periodEnd).toLocaleDateString('ko-KR'))}</p>`:''}<button type="button" class="textbtn" data-action="billingrefresh">이용권 새로고침</button>${account&&account.status!=='free'?'<button type="button" class="outlined" data-action="billingportal">구독 관리 · 해지</button>':''}</div>`:''}
+      ${PM_ENV.requiresAuth?`<div class="billing-account" role="status"><b>${account?.active?'월간 이용권 이용 중':account?'무료 이용 중':'구독 상태'}</b><p>${accountError?esc(accountError):account?account.active?`이번 주기 ${account.used} / 300개 사용 · ${account.remaining}개 남음`:`이번 달 무료 분석 ${account.used} / 50회 사용 · ${account.remaining}회 남음`:'구독 정보를 확인하려면 아래 버튼을 눌러 주세요.'}</p>${account?.periodEnd?`<p>${account.cancelAt?'해지 예정 · ':'다음 주기 · '}${esc(new Date(account.periodEnd).toLocaleDateString('ko-KR'))}</p>`:''}<button type="button" class="textbtn" data-action="billingrefresh">이용권 새로고침</button>${account&&account.status!=='free'?'<button type="button" class="outlined" data-action="billingportal">구독 관리 · 해지</button>':''}</div>`:''}
       <button type="button" class="filled billing-checkout" data-action="paddlecheckout" ${ready()&&!account?.active?'':'disabled'}>${account?.active?'구독 중':isLive()?'월 5,000원 구독하기':'테스트 결제하기'}</button>
       <p id="billing-message" class="muted" role="status">${account?.active?'구독 관리에서 결제 내역과 해지를 확인할 수 있어요.':ready()?isLive()?'Paddle 결제창에서 요금과 결제 주기를 확인해 주세요.':'Paddle의 테스트 결제창으로 이동해요.':'결제 연결 후 이용할 수 있어요.'}</p>
     </section>
