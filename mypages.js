@@ -38,16 +38,17 @@ actions.placesheet = () => { if (page === 'placeset') placeSheet(); else placeSh
 
 /* ---------- 관심 키워드 설정 (온보딩으로 가지 않고 이 페이지에서 바로 바꿔요) ---------- */
 pages.interestset = function(){
-  const opts = interestOptions.filter(o => o.id !== 'later');
+  const opts = PinmapCategories.all.map(c=>({id:c.id,short:c.label}));
   return myPage('관심 키워드 설정', `
     <p class="muted mpdesc kwdesc">고른 키워드에 맞는 저장 콘텐츠를 홈에서 먼저 보여드려요.\n아무것도 고르지 않으면 최근 저장한 순서로 보여드려요.</p>
-    <div class="kwgrid" role="group" aria-label="관심 키워드">${opts.map(o => { const on = preferences.includes(o.id);
-      return `<button class="kwopt ${on ? 'on' : ''}" data-kw="${o.id}" role="checkbox" aria-checked="${on}"><span class="kwico" aria-hidden="true">${window.obIcon ? obIcon(o.id, on) : o.emoji}</span><span>${o.short}</span></button>`; }).join('')}</div>
+    <div class="kwgrid" role="group" aria-label="관심 키워드">${opts.map(o => { const on = preferences.some(id=>PinmapCategories.get(id)?.id===o.id);
+      return `<button class="kwopt ${on ? 'on' : ''}" data-kw="${o.id}" role="checkbox" aria-checked="${on}"><span class="kwico" aria-hidden="true">${PinmapCategories.icon(o.id,on)}</span><span>${o.short}</span></button>`; }).join('')}</div>
 `, 'kwpage');
 };
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-kw]'); if (!b) return;
   const id = b.dataset.kw;
+  preferences = [...new Set(preferences.map(v=>PinmapCategories.get(v)?.id).filter(Boolean))];
   preferences = preferences.includes(id) ? preferences.filter(x => x !== id) : [...preferences, id];
   homeViewIds = null; afterChange(); render();
 });

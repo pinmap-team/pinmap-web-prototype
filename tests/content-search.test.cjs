@@ -32,7 +32,7 @@ test('searches title, summary and place fields across words', () => {
 });
 
 test('account analysis keeps unlocated places and event venues searchable', () => {
-  const source = fs.readFileSync('account-content.js','utf8').split('\nif (PM_ENV.requiresAuth)')[0];
+  const source = (fs.readFileSync('categories.js','utf8')+'\n'+fs.readFileSync('account-content.js','utf8')).split('\nif (PM_ENV.requiresAuth)')[0];
   const record = {
     id:'record-1',source_url:'https://www.instagram.com/p/Example123/',
     content_kind:'mixed',status:'needs_review',ai_title:'하루 코스',

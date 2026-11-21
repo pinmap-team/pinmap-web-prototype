@@ -3,18 +3,10 @@ const STORAGE = PM_ENV.storageKey;
 const LEGACY_KEYS = PM_ENV.development ? [] : ['pinmap.v2', 'pinmap.v1'];
 
 // 온보딩 3단계에서 고르는 관심사 · 활용 목적 (홈 구성에 사용)
-const interestOptions = [
-  {id:'nearby', emoji:'📍', label:'주변에 갈 곳을 찾을 때', short:'주변 장소'},
-  {id:'plan',   emoji:'🗓️', label:'여행이나 약속을 계획할 때', short:'여행'},
-  {id:'shop',   emoji:'🛍️', label:'사고 싶은 것을 찾을 때', short:'쇼핑'},
-  {id:'food',   emoji:'🍴', label:'먹을 곳을 찾을 때', short:'맛집'},
-  {id:'study',  emoji:'📚', label:'공부/자료를 찾을 때', short:'공부/자료'},
-  {id:'idea',   emoji:'💡', label:'아이디어를 찾을 때', short:'아이디어'},
-  {id:'later',  emoji:'🔖', label:'그 외 다른 목적으로 찾을 때', short:'나중에 보기'}
-];
+const interestOptions = PinmapCategories.all.map(c=>({id:c.id,label:c.label,short:c.label}));
 const interestIds = interestOptions.map(x => x.id);
 const MAX_INTERESTS = Infinity; // 관심사 키워드 개수 제한 없음
-const interestOf = id => interestOptions.find(x => x.id === id);
+const interestOf = id => interestOptions.find(x => x.id === (PinmapCategories.get(id)?.id || id)) || {short:'',label:'',emoji:''};
 let preferences = [], onboardStep = 0, onboardDone = false, onboardDraft = [], onboardTimer = null;
 
 /* ---------- 브라우저 저장 · 이전 버전 변환 ---------- */
@@ -47,7 +39,7 @@ try {
   const saved = PM_ENV.development ? null : JSON.parse(fixSummary(fixDots(localStorage.getItem(STORAGE))));
   if (saved && validItems(saved.items) && saved.items.every(x => typeIds.includes(x.type))) {
     items = saved.items;
-    preferences = Array.isArray(saved.preferences) ? saved.preferences.filter(x => interestIds.includes(x)).slice(0, MAX_INTERESTS) : [];
+    preferences = Array.isArray(saved.preferences) ? [...new Set(saved.preferences.map(x=>PinmapCategories.get(x)?.id).filter(x => interestIds.includes(x)))].slice(0, MAX_INTERESTS) : [];
     onboardDone = saved.onboardDone === true;
     if (saved.settings && typeof saved.settings === 'object') settings = {...settings, ...saved.settings};
   } else {
@@ -199,7 +191,7 @@ function onboardScreen() {
     <h1 class="ob-title ob-mixtitle" tabindex="-1"><b>저장한 콘텐츠</b>를<br>언제 다시 찾아보나요?</h1>
     <p class="ob-desc">여러 개를 골라도 돼요<span class="ob-pickcount" aria-live="polite">${onboardDraft.length ? `${onboardDraft.length}개 선택했어요` : ''}</span></p>
     <div class="ob-options" role="group" aria-label="관심사, 활용 목적">
-      ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${window.obIcon ? obIcon(o.id, on) : o.emoji}</span><span class="ob-label">${o.label}</span></button>`; }).join('')}
+      ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${PinmapCategories.icon(o.id,on)}</span><span class="ob-label">${o.label}</span></button>`; }).join('')}
     </div>
     <div class="ob-actions"><button class="ob-action-back" data-ob="back">이전</button><button class="filled ob-next" data-ob="next">${onboardPreview ? '종료하기' : '시작하기'}</button></div>`;
   // 마지막 화면: 문구 없이, 저장 카드에서 핀맵으로 점이 하나씩 채워지며 이어지는 애니메이션

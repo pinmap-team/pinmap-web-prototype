@@ -32,7 +32,7 @@
       panel.id='pm-choice-panel-'+(++panelId);trigger.setAttribute('aria-controls',panel.id);
       panel.setAttribute('role','group');panel.setAttribute('aria-label',isSort?'정렬 선택':(/선택$/.test(fieldName)?fieldName:fieldName+' 선택'));
       // 2026-11-10 정렬 선택은 앞 픽토그램 없이 글자만(카테고리 선택은 그대로)
-      const iconFor=option=>isSort?'':icon(option.dataset.icon || categoryIcons[option.value] || 'grid');
+      const iconFor=option=>isSort?'':PinmapCategories.get(option.value.replace(/^category:/,''))?PinmapCategories.icon(option.value.replace(/^category:/,''),option.selected):icon(option.dataset.icon || categoryIcons[option.value] || 'grid');
       if(isSort)host.classList.add('pm-choice-sort');
       const update=()=>{
         const selected=select.selectedOptions[0];if(!selected)return;

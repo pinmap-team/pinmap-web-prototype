@@ -2,24 +2,7 @@
 // 구성: 마감 임박 띠배너(맨 위 고정) → 내 동네 · 알림 → 관심 키워드 → 메인 추천 카드 → 캘린더 위젯 → 작은 위젯 · 최근 저장
 
 /* ---------- 홈 관심 키워드 추가 (온보딩 선택지에는 나오지 않아요) ---------- */
-interestOptions.push(
-  {id:'cafe', emoji:'☕', label:'카페 갈 때', short:'카페', extra:true},
-  {id:'exhibit', emoji:'🖼', label:'전시/팝업 볼 때', short:'전시/팝업', extra:true},
-  {id:'recipe', emoji:'🍳', label:'레시피 볼 때', short:'레시피', extra:true},
-  {id:'tips', emoji:'🏠', label:'생활 정보 찾을 때', short:'생활 정보', extra:true},
-  {id:'weekend', emoji:'🌳', label:'주말 나들이', short:'주말 나들이', extra:true},
-  {id:'due', emoji:'⏰', label:'마감 전에 볼 것', short:'마감 임박', extra:true}
-);
-const listOf = f => () => ({list: items.filter(x => !x.pending && f(x))});
-Object.assign(homeSections, {
-  cafe: listOf(x => x.type === '맛집/카페' && /카페|디저트/.test(x.category || '')),
-  exhibit: listOf(x => x.type === '전시/팝업'),
-  recipe: listOf(x => x.type === '레시피'),
-  tips: listOf(x => x.type === '생활 정보'),
-  weekend: listOf(x => x.collection === '이번 주말 성수'),
-  due: listOf(x => x.deadline)
-});
-
+PinmapCategories.all.forEach(c=>{homeSections[c.id]=()=>({list:items.filter(x=>PinmapCategories.of(x).id===c.id)});});
 /* ---------- 마감 임박 띠배너: 맨 위 고정 · 자동 롤링 · 오늘 다시 보지 않기 ---------- */
 // 개발 단계라 저장하지 않아요: 새로고침하면 다시 뜨고, 앱 안에서 다른 화면에 갔다 와도 숨긴 상태가 유지돼요
 let stripHidden = false;
@@ -56,7 +39,7 @@ function homePicks(){
   if (!preferences.length) {
     return ready.slice(0,8).map(x => ({x,id:null}));
   }
-  const seen = new Set(), lists = preferences.map(id => ({id, list: homeSections[id]().list.filter(x => !x.pending).sort(photoFirst)})), picks = [];
+  const seen = new Set(), lists = preferences.map(id => ({id, list: (homeSections[PinmapCategories.get(id)?.id]?.().list || []).filter(x => !x.pending).sort(photoFirst)})), picks = [];
   // 관심사를 번갈아 하나씩 꺼내 고르게 섞어요
   for (let round = 0; picks.length < 8 && lists.some(l => l.list.length > round); round++)
     lists.forEach(({id, list}) => { const x = list[round]; if (x && !seen.has(x.id) && picks.length < 8) { seen.add(x.id); picks.push({x, id}); } });
@@ -66,7 +49,7 @@ function homePicks(){
 }
 function pickCard({x, id}, i, total = 1){
   // 관심사 이름을 보여주고, '기타(나중에 보기)'나 최근 저장 순서이면 콘텐츠별 키워드를 보여줘요.
-  const tag = id && id !== 'later' ? interestOf(id).short : (x.category || shortType(x.type));
+  const tag = PinmapCategories.of(x).label;
   const desc = (x.desc || '').trim().replace(/[.。]+$/, '');
   return `<button class="pick" data-detail="${x.id}" data-i="${i}">
     <span class="pickimg">${libThumb(x)}</span>
@@ -126,12 +109,12 @@ document.addEventListener('click', e => {
 /* ---------- 저장된 카테고리만 표시 ---------- */
 function savedHomeCategories(){
   const saved = new Set(items.map(folderOf));
-  return CF_ALL.filter(category => saved.has(category.id));
+  return cfCategories().filter(category => saved.has(category.id));
 }
 function homeCategoryChips(){
   const categories = savedHomeCategories();
   if (!categories.length) return '';
-  return `<div class="chiprows homecategories" role="group" aria-label="저장한 카테고리 바로가기">${categories.map(category => `<button class="prefchip" data-homecategory="${esc(category.id)}">${icon(category.icon)} ${esc(category.id)}</button>`).join('')}</div>`;
+  return `<div class="chiprows homecategories" role="group" aria-label="저장한 카테고리 바로가기">${categories.map(category => `<button class="prefchip" data-homecategory="${esc(category.id)}">${PinmapCategories.icon(category.id, false)} ${esc(category.id)}</button>`).join('')}</div>`;
 }
 function layoutHomeCategories(){
   const host = document.querySelector('.homecategories');

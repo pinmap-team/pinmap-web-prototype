@@ -62,7 +62,7 @@ pages.my = function(){
     ${myRow('calexport',icon('calendar'),'캘린더로 내보내기', typeof calExportList === 'function' ? `마감 ${calExportList().length}개` : '')}
   </section>
   <section class="mgroup my-section" aria-label="도움말">
-    ${myRow('guide',interestOf('study').emoji,'이용 가이드')}
+    ${myRow('guide','📚','이용 가이드')}
     ${myRow('faq','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7 M12 17h.01"/></svg>','자주 묻는 질문')}
     ${myRow('notice','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l7 4V6l-7 4z M17 9.5a4 4 0 0 1 0 5"/></svg>','공지사항')}
     ${myRow('terms','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z M14 3v5h5 M9 12h7 M9 16h7"/></svg>','약관 및 정책')}

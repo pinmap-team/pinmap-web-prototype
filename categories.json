@@ -1,0 +1,225 @@
+[
+  {
+    "id": "food",
+    "label": "맛집",
+    "aliases": [
+      "restaurant",
+      "bar",
+      "맛집/카페",
+      "주점",
+      "식당",
+      "브런치"
+    ],
+    "description": "맛집"
+  },
+  {
+    "id": "cafe",
+    "label": "카페",
+    "aliases": [
+      "디저트",
+      "카페·디저트"
+    ],
+    "description": "카페·디저트"
+  },
+  {
+    "id": "exhibition",
+    "label": "전시",
+    "aliases": [
+      "pop_up",
+      "팝업",
+      "전시/팝업",
+      "exhibit",
+      "event",
+      "전시·팝업"
+    ],
+    "description": "전시·팝업"
+  },
+  {
+    "id": "festival",
+    "label": "공연",
+    "aliases": [
+      "축제",
+      "공연·축제"
+    ],
+    "description": "공연·축제"
+  },
+  {
+    "id": "nature",
+    "label": "산책",
+    "aliases": [
+      "공원",
+      "walk",
+      "weekend",
+      "산책·자연"
+    ],
+    "description": "산책·자연"
+  },
+  {
+    "id": "travel",
+    "label": "여행",
+    "aliases": [
+      "plan",
+      "여행·명소"
+    ],
+    "description": "여행·명소"
+  },
+  {
+    "id": "stay",
+    "label": "숙소",
+    "aliases": [],
+    "description": "숙소"
+  },
+  {
+    "id": "activity",
+    "label": "체험",
+    "aliases": [
+      "액티비티",
+      "체험·액티비티"
+    ],
+    "description": "체험·액티비티"
+  },
+  {
+    "id": "fashion",
+    "label": "쇼핑",
+    "aliases": [
+      "shopping",
+      "shop",
+      "패션·쇼핑"
+    ],
+    "description": "패션·쇼핑"
+  },
+  {
+    "id": "beauty",
+    "label": "뷰티",
+    "aliases": [],
+    "description": "뷰티"
+  },
+  {
+    "id": "interior",
+    "label": "인테리어",
+    "aliases": [],
+    "description": "인테리어"
+  },
+  {
+    "id": "tech",
+    "label": "디지털",
+    "aliases": [
+      "기기",
+      "디지털·기기"
+    ],
+    "description": "디지털·기기"
+  },
+  {
+    "id": "recipe",
+    "label": "요리",
+    "aliases": [
+      "레시피",
+      "요리·레시피"
+    ],
+    "description": "요리·레시피"
+  },
+  {
+    "id": "fitness",
+    "label": "운동",
+    "aliases": [
+      "건강",
+      "운동·건강"
+    ],
+    "description": "운동·건강"
+  },
+  {
+    "id": "pets",
+    "label": "반려동물",
+    "aliases": [],
+    "description": "반려동물"
+  },
+  {
+    "id": "family",
+    "label": "육아",
+    "aliases": [
+      "가족",
+      "육아·가족"
+    ],
+    "description": "육아·가족"
+  },
+  {
+    "id": "learning",
+    "label": "공부",
+    "aliases": [
+      "공부/자료",
+      "study",
+      "공부·학습"
+    ],
+    "description": "공부·학습"
+  },
+  {
+    "id": "career",
+    "label": "커리어",
+    "aliases": [
+      "기회",
+      "커리어·기회"
+    ],
+    "description": "커리어·기회"
+  },
+  {
+    "id": "finance",
+    "label": "재테크",
+    "aliases": [
+      "경제",
+      "재테크·경제"
+    ],
+    "description": "재테크·경제"
+  },
+  {
+    "id": "life",
+    "label": "생활팁",
+    "aliases": [
+      "lifestyle",
+      "생활 정보",
+      "tips"
+    ],
+    "description": "생활팁"
+  },
+  {
+    "id": "creative",
+    "label": "창작",
+    "aliases": [
+      "아이디어",
+      "idea",
+      "디자인",
+      "디자인·창작"
+    ],
+    "description": "디자인·창작"
+  },
+  {
+    "id": "media",
+    "label": "콘텐츠",
+    "aliases": [
+      "음악",
+      "음악·콘텐츠"
+    ],
+    "description": "음악·콘텐츠"
+  },
+  {
+    "id": "humor",
+    "label": "유머",
+    "aliases": [
+      "밈",
+      "유머·밈"
+    ],
+    "description": "유머·밈"
+  },
+  {
+    "id": "other",
+    "label": "분류보류",
+    "aliases": [
+      "기타",
+      "미분류",
+      "분류 대기",
+      "장소",
+      "later",
+      "기타·분류보류"
+    ],
+    "description": "기타·분류보류"
+  }
+]

@@ -257,7 +257,7 @@ document.addEventListener('submit',async e=>{
     const folderValue=String(data.get('folder')||'');
     if(folderValue==='new:'){
       const name=String(data.get('collection')||'').trim();
-      if(!name || ['전체',...CF_ALL.map(f=>f.id)].includes(name)){
+      if(!name || ['전체',...cfCategories().map(f=>f.id)].includes(name)){
         const error=$('#es-folder-error');if(error)error.textContent=name?'다른 폴더 이름을 입력해 주세요.':'새 폴더 이름을 입력해 주세요.';
         $('#es-newcol')?.focus();return;
       }
@@ -270,9 +270,9 @@ document.addEventListener('submit',async e=>{
     const folder = String(data.get('folder') || '');
     if(folder.startsWith('category:')){
       const name = folder.slice(9);
-      if(CF_ALL.some(f=>f.id===name)){
+      if(cfCategories().some(f=>f.id===name)){
         draft.folderCategory = name;
-        const folderType = ({맛집:'맛집/카페',카페:'맛집/카페',주점:'맛집/카페',전시:'전시/팝업',팝업:'전시/팝업',여행:'여행',쇼핑:'쇼핑',레시피:'레시피'}[name] || '기타');
+        const folderType = PinmapCategories.presentation(name);
         if(draft.type!==folderType || draft.category!==name)draft.aiClassified=false;
         draft.type=folderType; draft.category=name; draft.collection=folder===previousFolder?previousCollection:'';
       }
