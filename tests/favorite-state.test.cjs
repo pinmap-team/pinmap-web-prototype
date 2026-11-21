@@ -24,3 +24,29 @@ test('prototype favorite action stores the shared item immediately',()=>{
   assert.equal(item.favorite,false);
   assert.equal(saves,2);
 });
+
+test('removing several prototype favorites saves once and keeps the posts',async()=>{
+  let saves=0;
+  const context={window:{},afterChange:()=>{saves++;}};
+  vm.runInNewContext(source,context);
+  const items=[{id:1,favorite:true},{id:2,favorite:true},{id:3,favorite:false}];
+  assert.equal(await context.window.PinmapFavorites.removeMany(items),2);
+  assert.deepEqual(items.map(item=>item.favorite),[false,false,false]);
+  assert.equal(items.length,3);
+  assert.equal(saves,1);
+});
+
+test('failed batch save restores every selected favorite',async()=>{
+  const context={window:{}};
+  vm.runInNewContext(source,context);
+  const items=[{id:1,backendId:'a',favorite:true},{id:2,backendId:'b',favorite:true}];
+  let requests=0;
+  context.window.PinmapFavorites.connectMany(async chosen=>{
+    requests++;
+    assert.equal(chosen.length,2);
+    throw Error('저장 실패');
+  });
+  await assert.rejects(context.window.PinmapFavorites.removeMany(items),/저장 실패/);
+  assert.deepEqual(items.map(item=>item.favorite),[true,true]);
+  assert.equal(requests,1);
+});

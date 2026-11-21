@@ -148,6 +148,12 @@ test('account history loads all pages using the backend page-size contract', asy
     {...context.items[0],memo:'현장 메모'}, {folder:'category:전시'});
   assert.equal(context.items[0].memo,'현장 메모');
   assert.equal(profileUpdates[2].data.pinmap_memos['10'],'현장 메모');
+  context.items[1].favorite=true;
+  await context.PinmapFavorites.removeMany([context.items[0],context.items[1]]);
+  assert.equal(profileUpdates.length,4);
+  assert.deepEqual(Array.from(profileUpdates[3].data.pinmap_favorites),[]);
+  assert.equal(context.items[0].favorite,false);
+  assert.equal(context.items[1].favorite,false);
 });
 
 test('account pages load concurrently but keep saved order', async () => {

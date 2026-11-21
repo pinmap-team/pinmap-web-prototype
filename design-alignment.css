@@ -984,12 +984,20 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .my-quick .myq-card b{word-break:keep-all}
 .favpage .fav-count{margin:0 0 var(--space-md);font:var(--type-body-sm);color:var(--color-secondary)}
 .favpage .fav-items{display:grid;gap:var(--space-md)}
-.favpage .fav-row{min-height:96px;color:var(--color-on-surface)}
+.favpage .fav-row{min-height:96px;color:var(--color-on-surface);position:relative}
 .favpage .fav-text{gap:var(--space-xs)}
 .favpage .fav-text .fav-desc{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--color-secondary)}
 .favpage .fav-text .fav-meta{display:flex;min-width:0;gap:var(--space-xs);color:var(--color-secondary)}
 .favpage .fav-meta>span:first-of-type{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .favpage .fav-meta .fav-time{flex:none;margin-left:auto;white-space:nowrap}
+.favpage .fav-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md)}
+.favpage .fav-header .fav-count{margin:0}
+.favpage .fav-remove .icon{fill:currentColor}
+.favpage.cf-selecting .fav-row{padding-right:48px}
+.favpage .fav-choice{position:absolute;top:12px;right:12px;width:24px;height:24px;display:grid;place-items:center;border:1.5px solid var(--color-border);border-radius:50%;color:transparent}
+.favpage .fav-choice .icon{width:14px;height:14px;stroke-width:3}
+.favpage .fav-row.on{outline:2px solid var(--color-primary);outline-offset:0}
+.favpage .fav-row.on .fav-choice{background:var(--color-primary);border-color:var(--color-primary);color:var(--color-neutral)}
 .favpage .fav-empty{display:flex;flex-direction:column;align-items:center;gap:var(--space-sm);padding:var(--space-2xl) 0;text-align:center}
 .favpage .fav-empty .icon{width:32px;height:32px;color:var(--color-secondary)}
 .favpage .fav-go{min-height:48px;margin-top:var(--space-sm);padding:0 var(--space-xl);border:0;border-radius:var(--rounded-sm);background:var(--color-primary);color:var(--color-neutral);font:var(--type-label-md)}

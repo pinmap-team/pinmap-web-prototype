@@ -81,23 +81,72 @@ document.addEventListener('click', e => {
   if (b && page === 'my') { e.stopImmediatePropagation(); go('placeset'); }
 }, true);
 
-/* ---------- 앱 정보 ---------- */
-// 2026-11-10 지도 카드에서 하트를 누른 장소(찜) 모아보기. 누르면 상세로 가요.
+/* ---------- 즐겨찾기 ---------- */
+let favSel = null, favRemoving = false;
+const favoriteItems = () => items.filter(item => item.favorite);
+function favSyncSelection(){
+  if (!favSel) return;
+  const list=favoriteItems(), count=favSel.size;
+  const label=document.querySelector('.fav-selcount');
+  if(label)label.textContent=count ? `${count}개 선택` : '콘텐츠를 골라 주세요';
+  const all=document.querySelector('.fav-selall');
+  if(all)all.textContent=list.length&&list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택';
+  const remove=document.querySelector('.fav-remove');
+  if(remove)remove.disabled=!count||favRemoving;
+}
 pages.favorites = () => {
-  const list = items.filter(x => x.favorite);
+  const list = favoriteItems();
+  if(!list.length)favSel=null;
+  else if(favSel)favSel=new Set([...favSel].filter(id=>list.some(item=>item.id===id)));
+  const count=favSel?.size||0;
   const row = x => {
     const description = x.desc || x.memo;
     const place = x.address ? `${icon('pin')}<span>${esc(x.address)}</span>` : `<span>${esc(x.category || x.type || '')}</span>`;
-    return `<button type="button" class="calrow fav-row" data-detail="${x.id}" aria-label="${esc(x.title)} 상세 보기">
+    const on=favSel?.has(x.id);
+    return `<button type="button" class="calrow fav-row${on?' on':''}" ${favSel?`role="checkbox" aria-checked="${!!on}"`:`data-detail="${x.id}"`} data-favitem="${x.id}" aria-label="${esc(x.title)}${favSel?' 선택':' 상세 보기'}">
     <span class="calthumb">${libThumb(x)}</span>
     <span class="caltext fav-text"><b>${esc(x.title)}</b>${description ? `<small class="fav-desc">${esc(description)}</small>` : ''}
       <small class="fav-meta">${place}<span class="fav-time">${esc(savedAgo(x))} 저장</span></small></span>
+    ${favSel?`<span class="fav-choice" aria-hidden="true">${icon('check')}</span>`:''}
   </button>`;
   };
   return myPage('즐겨찾기', list.length
-    ? `<p class="fav-count">${list.length}개</p><div class="fav-items">${list.map(row).join('')}</div>`
-    : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 콘텐츠가 없어요</h3><p class="muted">콘텐츠 상세에서 하트를 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="library">컬렉션으로 가기</button></div>`, 'favpage');
+    ? `<div class="fav-header"><p class="fav-count">${list.length}개</p><button type="button" class="cf-textbtn" data-action="${favSel?'favselectoff':'favselect'}">${favSel?'취소':'선택'}</button></div>
+      <div class="fav-items">${list.map(row).join('')}</div>
+      ${favSel?`<div class="cf-selbar" role="toolbar" aria-label="선택한 즐겨찾기"><button type="button" class="cf-selall fav-selall" data-action="favselall">${list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택'}</button><span class="cf-selcount fav-selcount" aria-live="polite">${count?`${count}개 선택`:'콘텐츠를 골라 주세요'}</span><button type="button" class="cf-seldel fav-remove" data-action="favremove" ${count&&!favRemoving?'':'disabled'}>${likeHeartIcon()}좋아요 취소</button></div>`:''}`
+    : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 콘텐츠가 없어요</h3><p class="muted">콘텐츠 상세에서 하트를 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="library">컬렉션으로 가기</button></div>`, `favpage${favSel?' cf-selecting':''}`);
 };
+actions.favselect=()=>{favSel=new Set();render();};
+actions.favselectoff=()=>{favSel=null;render();};
+actions.favselall=()=>{
+  if(!favSel||favRemoving)return;
+  const list=favoriteItems(), all=list.every(item=>favSel.has(item.id));
+  list.forEach(item=>all?favSel.delete(item.id):favSel.add(item.id));
+  render();
+};
+actions.favremove=async()=>{
+  if(!favSel?.size||favRemoving)return;
+  const selected=favoriteItems().filter(item=>favSel.has(item.id));
+  favRemoving=true;favSyncSelection();
+  try{
+    const count=await PinmapFavorites.removeMany(selected);
+    favSel=null;render();toast(`${count}개의 좋아요를 취소했어요.`);
+  }catch(error){toast(error.message||'좋아요를 취소하지 못했어요.');}
+  finally{favRemoving=false;favSyncSelection();}
+};
+document.addEventListener('click',event=>{
+  if(page!=='favorites'||!favSel)return;
+  const card=event.target.closest('[data-favitem]');
+  if(card){
+    event.stopPropagation();
+    if(favRemoving)return;
+    const id=Number(card.dataset.favitem);
+    favSel.has(id)?favSel.delete(id):favSel.add(id);
+    card.classList.toggle('on',favSel.has(id));
+    card.setAttribute('aria-checked',String(favSel.has(id)));
+    favSyncSelection();
+  }else if(event.target.closest('[data-page]'))favSel=null;
+},true);
 pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
     <div class="setrow"><div><b>핀맵</b><small>저장을 다시, 일상으로</small></div></div>
     <div class="setrow"><div><b>버전</b><small>Prototype 03</small></div></div>
