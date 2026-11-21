@@ -48,13 +48,12 @@ pages.my = function(){
     <button type="button" class="myprofile-photo" data-action="profilephoto" aria-label="프로필 사진 변경">${avatarHtml()}<span class="account-photo-edit" aria-hidden="true">${icon('image')}</span></button>
     <input type="file" id="avatarfile" accept="image/*" hidden>
     <span class="myprofile-name"><b>${esc(settings.nickname || '이름 설정')}</b></span>
-  </div><!--myprofile-end-->
-  <button class="sharepromo" data-action="snsdemo"><span aria-hidden="true">📲</span><div><b>SNS에서 바로 저장해보기</b><small>게시물에서 공유 → 핀맵, 저장 과정을 체험해요</small></div>${icon('arrow')}</button>
+    <button type="button" class="myprofile-go" data-page="account" aria-label="계정 관리로 이동">${icon('chevright')}</button>
+  </div>${myQuickCards()}
 
   <section class="mgroup my-section" aria-label="위치와 관심 키워드">
     ${myRow('myaddresses','📍','위치 편집', esc(myPlaces().join(', ')))}
-    <button class="mrow" data-page="courses"><span class="mrico" aria-hidden="true">${icon('route')}</span><span class="mrlabel">저장한 코스 보기</span>${icon('chevron')}</button>
-    ${myRow('interests','💡','관심사, 활용 목적', esc(prefText))}
+    ${myRow('interests','💡','관심 키워드 설정', esc(prefText))}
   </section>
   <section class="mgroup my-section" aria-label="앱 설정">
     ${myRow('savesheet','✨','저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
@@ -68,8 +67,7 @@ pages.my = function(){
     ${myRow('notice','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l7 4V6l-7 4z M17 9.5a4 4 0 0 1 0 5"/></svg>','공지사항')}
     ${myRow('terms','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z M14 3v5h5 M9 12h7 M9 16h7"/></svg>','약관 및 정책')}
     ${myRow('appinfo','ℹ️','앱 정보','Prototype 03')}
-  </section>
-  <button class="logout" data-action="logout">로그아웃</button>`;
+  </section>`;
 };
 
 /* ---------- 마이 설정 시트 (하단 시트) ---------- */

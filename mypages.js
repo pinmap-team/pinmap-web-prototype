@@ -6,19 +6,7 @@ const MY_PAGES = {calexport:'캘린더로 내보내기', favorites:'즐겨찾기
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
 const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
-/* ---------- 마이 첫 화면: 'SNS에서 바로 저장해보기' 빼고, 문구 · 메뉴 정리 ---------- */
-const myBase = pages.my;
-pages.my = function(){
-  return myBase()
-    .replace(/<button class="sharepromo"[\s\S]*?<\/button>\s*/, '')
-    .replace('관심사, 활용 목적', '관심 키워드 설정')
-    .replace(/<button class="logout"[^>]*>[\s\S]*?<\/button>/, '')
-    // 2026-11-10 프로필 카드 오른쪽 '>' · 사진/이름 밖을 누르면 계정 관리로
-    .replace('</div><!--myprofile-end-->', `<button type="button" class="myprofile-go" data-page="account" aria-label="계정 관리로 이동">${icon('chevright')}</button></div><!--myprofile-end-->`)
-    // 2026-11-03: 코스 · 연동 새로고침을 프로필 아래 둥근 사각형 카드로 (목록의 '저장한 코스 보기'는 중복이라 뺌)
-    .replace(/<button class="mrow" data-page="courses">[\s\S]*?<\/button>\s*/, '')
-    .replace('<!--myprofile-end-->', myQuickCards());
-};
+/* ---------- 마이 첫 화면의 공통 바로가기 ---------- */
 function myQuickCards(){
   return `<div class="my-quick" role="group" aria-label="바로가기">
     <button type="button" class="myq-card" data-page="favorites"><span class="myq-ico" aria-hidden="true">${likeHeartIcon()}</span><b>즐겨찾기</b></button>

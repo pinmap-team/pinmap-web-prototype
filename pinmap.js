@@ -144,35 +144,6 @@ document.addEventListener('click', e => {
   homeViewIds = v.includes(id) ? v.filter(x => x !== id) : [...v, id];
   const y = window.scrollY; render(); window.scrollTo(0, y);
 });
-pages.home = function() {
-  const view = homeView(), active = view.length ? view : ['nearby','plan','later'];
-  // 섹션끼리 같은 카드가 반복되지 않도록, 위에서 보여준 콘텐츠는 뒤로 미룹니다.
-  const seen = new Set();
-  const sections = active.map(id => {
-    const s = {id, ...homeSections[id]()};
-    const fresh = s.list.filter(x => !seen.has(x.id));
-    const n = fresh.length >= 2 ? Math.min(4, fresh.length) : Math.min(2, s.list.length);
-    s.list = [...fresh, ...s.list.filter(x => seen.has(x.id))].slice(0, n);
-    s.list.forEach(x => seen.add(x.id));
-    return s;
-  });
-  // 관심사 키워드: 모두 보여주고, 누른 키워드만 홈에 표시 (기본값 = 마이에서 정한 관심사)
-  const isDefault = view.length === preferences.length && view.every(id => preferences.includes(id));
-  const prefRow = `<div class="prefchips" role="group" aria-label="홈에서 볼 관심사">${[...interestOptions].sort((a,b) => (preferences.includes(b.id)?1:0)-(preferences.includes(a.id)?1:0)).map(o => { const on = view.includes(o.id); return `<button class="prefchip ${on?'on':''}" data-homeint="${o.id}" aria-pressed="${on}">${o.emoji} ${o.short}</button>`; }).join('')}${preferences.length && !isDefault ? '<button class="prefreset" data-action="homeintreset">기본값으로</button>' : ''}</div>`;
-  // 켜진 관심사마다 추천 카드 1장 · 좌우로 넘겨서 봐요
-  const hero = `<div class="herocar" aria-label="관심사별 추천 카드">${sections.map(s2 => `<section class="forhero" data-hero="${s2.id}"><div class="forhero-emoji" aria-hidden="true">${interestOf(s2.id).emoji}</div><div class="fhbody"><h2>${s2.hero.title}</h2><p>${s2.hero.desc}</p><button class="filled" ${s2.hero.attr}>${s2.hero.btn} ${icon('arrow')}</button></div></section>`).join('')}</div>${sections.length > 1 ? `<div class="herodots" aria-hidden="true">${sections.map((_, k) => `<i class="${k ? '' : 'on'}"></i>`).join('')}</div>` : ''}`;
-  // 홈 카드는 모두 같은 크기의 2열 격자 (줄마다 위아래 정렬)
-  const grid = list => `<div class="grid homegrid">${list.map(card).join('')}</div>`;
-  const body = sections.map(s => `<section class="forsection"><div class="sectionhead"><div><h2>${s.title}</h2><p class="muted">${s.sub}</p></div><button class="textbtn" ${s.more}>${s.moreLabel} ${icon('arrow')}</button></div>${s.list.length ? grid(s.list) : `<div class="empty small"><p class="muted">아직 저장한 콘텐츠가 없어요.</p><button class="tonal" data-action="save">새로 저장하기</button></div>`}</section>`).join('');
-  const popular = items.filter(x => x.saves && !seen.has(x.id)).sort((a,b) => b.saves-a.saves).slice(0,2);
-  popular.forEach(x => seen.add(x.id));
-  const recent = items.filter(x => !seen.has(x.id)).slice(0,4);
-  return placebar() + dueBar()
-    + prefRow + hero + body
-    + (popular.length ? `<div class="sectionhead"><h2>저장 수가 많은 콘텐츠</h2><span class="hint">예시 집계</span></div><div class="grid">${popular.map(x => `<div>${card(x)}<p class="hint savecount">${x.saves}명이 저장했어요</p></div>`).join('')}</div>` : '')
-    + (recent.length ? `<div class="sectionhead"><h2>그 밖의 최근 저장</h2><button class="textbtn" data-page="library">전체 보기 ${icon('arrow')}</button></div><div class="grid">${recent.map(card).join('')}</div>` : '');
-};
-
 /* ---------- 전체 화면 온보딩 (4단계) ---------- */
 const photo = (kind, cls='') => `<div class="ob-tile photo ${cls}">${art(kind)}</div>`;
 const loader = text => `<div class="ob-loader" role="status"><div class="ob-bar"><i></i></div><p>${text}</p></div>`;
