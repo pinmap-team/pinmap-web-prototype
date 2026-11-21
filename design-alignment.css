@@ -1015,6 +1015,13 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .myprofile{cursor:pointer}
 .myprofile .myprofile-go{display:grid;place-items:center;flex:none;width:44px;height:44px;margin-left:auto;padding:0;border:0;background:transparent;color:var(--color-secondary)}
 .myprofile .myprofile-go .icon{width:20px;height:20px}
+.my-quota{margin:0 0 var(--space-lg);padding:var(--space-lg);background:var(--color-surface)}
+.my-quota-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md)}
+.my-quota-head b,.my-quota-head strong{font:var(--type-label-md)}
+.my-quota-head small{display:block;margin-top:var(--space-xs);font:var(--type-body-sm);color:var(--color-secondary)}
+.my-quota-track{height:8px;margin-top:var(--space-md);overflow:hidden;border-radius:var(--rounded-sm);background:var(--color-disabled)}
+.my-quota-track span{display:block;height:100%;border-radius:inherit;background:var(--color-primary)}
+.my-quota p{margin:var(--space-sm) 0 0;font:var(--type-body-sm);color:var(--color-secondary)}
 .accountpage .account-lead{margin:0 0 var(--space-xl);font:var(--type-body-md);color:var(--color-secondary);word-break:keep-all}
 .accountpage .account-sub{margin:0 0 var(--space-sm);font:var(--type-label-md);color:var(--color-on-surface)}
 .accountpage .account-card{margin:0 0 var(--space-xl);border:1px solid var(--color-disabled);border-radius:var(--rounded-md);background:var(--color-surface)}

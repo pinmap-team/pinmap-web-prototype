@@ -10,7 +10,7 @@ function boot(auth=true,environment='sandbox',configurationEnvironment=environme
 test('account checkout uses a server transaction; callback alone cannot grant access',async()=>{
  const b=boot();await b.c.actions.paddlecheckout();assert.equal(b.opened().transactionId,'txn_server');assert.equal(b.opened().items,undefined);
  assert.equal(JSON.parse(b.calls.find(x=>x.method==='POST').body).action,'checkout');
- b.callback()({name:'checkout.completed'});await b.c.window.PinmapBilling.refresh();assert.match(b.c.pages.billing(),/아직 구독 중인 이용권이 없어요/);
+ b.callback()({name:'checkout.completed'});await b.c.window.PinmapBilling.refresh();assert.match(b.c.pages.billing(),/무료 이용 중/);
  b.activate();await b.c.window.PinmapBilling.refresh();assert.match(b.c.pages.billing(),/월간 이용권 이용 중/);assert.match(b.c.pages.billing(),/구독 중/);
 });
 test('prototype uses only sandbox checkout and never requests account billing',async()=>{

@@ -39,6 +39,14 @@ const sw = (key, label, desc) => `<label class="setrow"><div><b>${label}</b><sma
 // 마이: 첫 화면은 요약만 · 자세한 설정은 누르면 아래에서 올라오는 시트에서 바꿔요
 const myRow = (act, emoji, label, value='') => `<button class="mrow" data-action="${act}"><span class="mrico" aria-hidden="true">${emoji}</span><span class="mrlabel">${label}</span>${value ? `<span class="mrval">${value}</span>` : ''}${icon('chevron')}</button>`;
 pages.my = function(){
+  window.PinmapBilling?.maybeRefresh();
+  const billing = window.PinmapBilling?.view();
+  const quota = billing?.account;
+  const quotaLimit = quota?.active ? 300 : 50;
+  const quotaUsed = Number.isInteger(quota?.used) ? Math.max(0,Math.min(quota.used,quotaLimit)) : null;
+  const quotaPercent = quotaUsed === null ? 0 : Math.round(quotaUsed / quotaLimit * 100);
+  const quotaTitle = quota?.active ? '월간 이용권 분석' : '무료 분석';
+  const quotaDetail = PM_ENV.requiresAuth ? billing?.error ? '사용량을 불러오지 못했어요.' : quotaUsed === null ? '사용량을 확인하고 있어요.' : `${quotaUsed}회 사용 · ${Math.max(0,quotaLimit-quotaUsed)}회 남음` : '로그인하면 사용량을 확인할 수 있어요.';
   const cols = collectionNames(), places = items.filter(isPlace).length;
   const prefs = preferences.map(id => interestOf(id).short);
   const prefText = prefs.length ? (prefs.length > 1 ? `${prefs[0]} 외 ${prefs.length-1}개` : prefs[0]) : '선택 안 함';
@@ -50,6 +58,11 @@ pages.my = function(){
     <span class="myprofile-name"><b>${esc(settings.nickname || '이름 설정')}</b></span>
     <button type="button" class="myprofile-go" data-page="account" aria-label="계정 관리로 이동">${icon('chevright')}</button>
   </div>${myQuickCards()}
+  <section class="my-quota mgroup my-section" aria-label="월간 분석 사용량">
+    <div class="my-quota-head"><div><b>${quotaTitle}</b><small>매월 ${quotaLimit}회</small></div><strong>${quotaUsed === null ? '—' : `${quotaUsed} / ${quotaLimit}`}</strong></div>
+    <div class="my-quota-track" role="progressbar" aria-label="${quotaTitle} 사용량" aria-valuemin="0" aria-valuemax="${quotaLimit}" ${quotaUsed === null ? '' : `aria-valuenow="${quotaUsed}"`}><span style="width:${quotaPercent}%"></span></div>
+    <p role="status">${esc(quotaDetail)}</p>
+  </section>
 
   <section class="mgroup my-section" aria-label="위치와 관심 키워드">
     ${myRow('myaddresses','📍','위치 편집', esc(myPlaces().join(', ')))}
