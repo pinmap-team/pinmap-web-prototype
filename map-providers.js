@@ -4,16 +4,17 @@
   let authenticationFailed = false;
   const failureListeners = new Set();
   const lightStyles = [
-    {elementType:'geometry',stylers:[{color:'#F7F2EA'}]},
+    {elementType:'geometry',stylers:[{color:'#FCFAF6'}]},
     {elementType:'labels.text.fill',stylers:[{color:'#665C52'}]},
-    {elementType:'labels.text.stroke',stylers:[{color:'#FFFDF9'}]},
-    {featureType:'road',elementType:'geometry',stylers:[{color:'#FFFDF9'}]},
-    {featureType:'road.highway',elementType:'geometry',stylers:[{color:'#EADCCB'}]},
+    {elementType:'labels.text.stroke',stylers:[{color:'#FFFFFF'}]},
+    {featureType:'road',elementType:'geometry',stylers:[{color:'#FFFFFF'}]},
+    {featureType:'road.highway',elementType:'geometry',stylers:[{color:'#F4E9D9'}]},
     {featureType:'road',elementType:'labels.text.fill',stylers:[{color:'#594F46'}]},
-    {featureType:'poi.park',elementType:'geometry',stylers:[{color:'#DCE8CF'}]},
-    {featureType:'water',elementType:'geometry',stylers:[{color:'#D9DED9'}]},
+    {featureType:'poi.park',elementType:'geometry',stylers:[{color:'#EDF3E4'}]},
+    {featureType:'water',elementType:'geometry',stylers:[{color:'#E8ECE7'}]},
     {featureType:'poi.business',elementType:'labels',stylers:[{visibility:'off'}]},
     {featureType:'road.local',elementType:'labels',stylers:[{visibility:'off'}]},
+    {featureType:'administrative.locality',elementType:'labels',stylers:[{visibility:'off'}]},
     {featureType:'administrative.neighborhood',elementType:'labels',stylers:[{visibility:'off'}]}
   ];
   const darkStyles = [
@@ -26,6 +27,7 @@
     {featureType:'water',elementType:'geometry',stylers:[{color:'#333A37'}]},
     {featureType:'poi.business',elementType:'labels',stylers:[{visibility:'off'}]},
     {featureType:'road.local',elementType:'labels',stylers:[{visibility:'off'}]},
+    {featureType:'administrative.locality',elementType:'labels',stylers:[{visibility:'off'}]},
     {featureType:'administrative.neighborhood',elementType:'labels',stylers:[{visibility:'off'}]}
   ];
   const currentStyles = () => document.documentElement?.dataset?.theme === 'dark' ? darkStyles : lightStyles;
