@@ -28,6 +28,10 @@
     {
       "source": "/api/content-photo",
       "destination": "https://pinmap-backend.vercel.app/api/content-photo"
+    },
+    {
+      "source": "/api/billing/account",
+      "destination": "https://pinmap-backend.vercel.app/api/billing/account"
     }
   ]
 }

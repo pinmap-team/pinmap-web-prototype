@@ -248,6 +248,8 @@ if (PM_ENV.requiresAuth) (() => {
     if (pendingView) setTimeout(refreshVisibleContent, 0);
   }, true);
   const message = (status, response) => {
+    if (status === 402 && response?.error === 'monthly_analysis_limit') return '이번 결제 주기의 분석 300개를 모두 사용했어요. 다음 갱신일에 다시 이용할 수 있어요.';
+    if (status === 402) return '이용권이 활성 상태가 아니에요. 마이의 요금제 및 결제에서 확인해 주세요.';
     if (status === 401) return '로그인 상태가 만료됐어요. 다시 로그인해 주세요.';
     if (status === 403) return '이 계정의 저장 목록에 접근할 수 없어요.';
     if (status === 409 && response?.error === 'saved_content_limit') return '저장할 수 있는 콘텐츠 100개에 도달했어요. 기존 콘텐츠를 정리한 뒤 다시 시도해 주세요.';
