@@ -1545,3 +1545,17 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .billing-checkout-page .billing-plan{max-width:480px;box-sizing:border-box}
 .billing-checkout-page h1{font:var(--type-headline-lg)}
 .billing-checkout-page a{color:var(--color-primary);font:var(--type-label-md)}
+
+/* Policy drafts reuse existing tokens. */
+.legal-page{margin:0;background:var(--color-neutral);color:var(--color-on-surface);font:var(--type-body-md);font-family:var(--font-family);line-height:1.7}
+.legal-page main{max-width:800px;margin:auto;padding:var(--space-2xl) var(--space-xl)}
+.legal-page h1{font:var(--type-headline-lg);margin:var(--space-2xl) 0}
+.legal-page h2{font:var(--type-headline-md);margin:var(--space-xl) 0 var(--space-md)}
+.legal-page section{background:var(--color-surface);padding:var(--space-xl);margin:var(--space-xl) 0;border-radius:var(--rounded-lg)}
+.legal-page a{color:var(--color-primary);overflow-wrap:anywhere}
+.legal-brand{font:var(--type-headline-md)}
+.legal-nav{display:flex;flex-wrap:wrap;gap:var(--space-md);margin:var(--space-lg) 0}
+.legal-nav a{display:inline-flex;align-items:center;min-height:44px;font:var(--type-label-md)}
+.legal-draft{padding:var(--space-md);border-radius:var(--rounded-sm);background:var(--color-accent);font:var(--type-label-md)}
+
+.policy-list a{text-decoration:none;color:var(--color-on-surface);min-height:56px}
