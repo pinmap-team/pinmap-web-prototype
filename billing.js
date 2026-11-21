@@ -1,8 +1,22 @@
-/* Sandbox checkout only. Browser events never grant subscription access. */
+/* Server-selected account checkout; the dummy prototype always uses sandbox. */
 (() => {
-  const config = window.PINMAP_PADDLE || {};
-  const ready = () => config.environment === 'sandbox' && /^test_[A-Za-z0-9_]+$/.test(config.clientToken || '') && /^pri_[a-z0-9]{26}$/.test(config.monthlyPriceId || '');
-  let loading, account=null, accountError='', accountPending;
+  let config = PM_ENV.requiresAuth ? null : window.PINMAP_PADDLE;
+  const valid = value => !!value && ['sandbox','live'].includes(value.environment) && new RegExp('^'+(value.environment==='live'?'live':'test')+'_[A-Za-z0-9_]+$').test(value.clientToken||'') && /^pri_[a-z0-9]{26}$/.test(value.monthlyPriceId||'');
+  const ready = () => valid(config) && (PM_ENV.requiresAuth || config.environment==='sandbox');
+  const isLive = () => ready() && config.environment==='live';
+  let loading, loadedEnvironment, configPending, account=null, accountError='', accountPending;
+  async function loadConfig(){
+    if(!PM_ENV.requiresAuth)return config;
+    if(configPending)return configPending;
+    configPending=(async()=>{
+      const response=await fetch('/api/billing/config',{cache:'no-store',signal:AbortSignal.timeout(10000)});
+      const value=await response.json();
+      if(!response.ok||!valid(value))throw Error('결제 서비스 연결을 확인하지 못했어요. 잠시 후 다시 시도해 주세요.');
+      if(loadedEnvironment&&loadedEnvironment!==value.environment)throw Error('결제 환경이 변경됐어요. 페이지를 새로고침해 주세요.');
+      config=value;return config;
+    })().finally(()=>{configPending=null;});
+    return configPending;
+  }
   async function request(action){
     const client=await PinmapAuth.ready();
     const {data}=await client.auth.getSession();
@@ -17,7 +31,7 @@
   async function refreshAccount(){
     if(!PM_ENV.requiresAuth)return;
     if(accountPending)return accountPending;
-    accountPending=request().then(value=>{account=value;accountError='';}).catch(error=>{account=null;accountError=error.message;}).finally(()=>{accountPending=null;if(page==='billing')render();});
+    accountPending=Promise.all([loadConfig(),request()]).then(([,value])=>{if(value.environment!==config.environment)throw Error('결제 환경이 변경됐어요. 다시 확인해 주세요.');account=value;accountError='';}).catch(error=>{account=null;config=null;accountError=error.message;}).finally(()=>{accountPending=null;if(page==='billing')render();});
     return accountPending;
   }
   window.PinmapBilling={refresh:refreshAccount};
@@ -30,7 +44,8 @@
       const script=document.createElement('script');script.src='https://cdn.paddle.com/paddle/v2/paddle.js';
       script.onload=()=>{
         try {
-          window.Paddle.Environment.set('sandbox');
+          if(config.environment==='sandbox')window.Paddle.Environment.set('sandbox');
+          loadedEnvironment=config.environment;
           window.Paddle.Initialize({token:config.clientToken,eventCallback:event=>{
             if(event.name==='checkout.completed'){
               window.Paddle.Checkout.close();
@@ -58,10 +73,10 @@
       <p class="billing-price"><strong>5,000원</strong><span>/ 월</span></p>
       <p class="muted">매월 콘텐츠 분석 300개를 제공해요.</p>
       <dl class="billing-details"><div><dt>결제 주기</dt><dd>매월</dd></div><div><dt>이용 요금</dt><dd>월 5,000원</dd></div><div><dt>분석 한도</dt><dd>결제 주기마다 300개</dd></div><div><dt>결제 서비스</dt><dd>Paddle</dd></div></dl>
-      <p class="billing-note">${ready()?'테스트 결제 모드예요. 실제 요금은 청구되지 않아요.':'현재는 테스트 결제 준비 중이에요. 실제 요금은 청구되지 않아요.'}</p>
+      <p class="billing-note">${isLive()?'매월 5,000원(세금 포함)이 자동 결제돼요. 구독 관리에서 해지할 수 있어요.':ready()?'테스트 결제 모드예요. 실제 요금은 청구되지 않아요.':'결제 서비스 연결을 확인하고 있어요.'}</p>
       ${PM_ENV.requiresAuth?`<div class="billing-account" role="status"><b>${account?.active?'월간 이용권 이용 중':account?'이용권 확인':'구독 상태'}</b><p>${accountError?esc(accountError):account?account.active?`이번 주기 ${account.used} / 300개 사용 · ${account.remaining}개 남음`:account.status==='free'?'아직 구독 중인 이용권이 없어요.':'이용권이 활성 상태가 아니에요.':'구독 정보를 확인하려면 아래 버튼을 눌러 주세요.'}</p>${account?.periodEnd?`<p>${account.cancelAt?'해지 예정 · ':'다음 주기 · '}${esc(new Date(account.periodEnd).toLocaleDateString('ko-KR'))}</p>`:''}<button type="button" class="textbtn" data-action="billingrefresh">이용권 새로고침</button>${account&&account.status!=='free'?'<button type="button" class="outlined" data-action="billingportal">구독 관리 · 해지</button>':''}</div>`:''}
-      <button type="button" class="filled billing-checkout" data-action="paddlecheckout" ${ready()&&!account?.active?'':'disabled'}>${account?.active?'구독 중':'테스트 결제하기'}</button>
-      <p id="billing-message" class="muted" role="status">${ready()?'Paddle의 테스트 결제창으로 이동해요.':'결제 서비스 연결 후 테스트할 수 있어요.'}</p>
+      <button type="button" class="filled billing-checkout" data-action="paddlecheckout" ${ready()&&!account?.active?'':'disabled'}>${account?.active?'구독 중':isLive()?'월 5,000원 구독하기':'테스트 결제하기'}</button>
+      <p id="billing-message" class="muted" role="status">${account?.active?'구독 관리에서 결제 내역과 해지를 확인할 수 있어요.':ready()?isLive()?'Paddle 결제창에서 요금과 결제 주기를 확인해 주세요.':'Paddle의 테스트 결제창으로 이동해요.':'결제 연결 후 이용할 수 있어요.'}</p>
     </section>
     <p class="muted billing-caption">분석에 성공한 콘텐츠만 차감돼요. 남은 횟수는 다음 결제 주기로 이월되지 않아요.</p>`, 'billingpage');
   actions.billing=()=>{account=null;accountError='';go('billing');refreshAccount();};
@@ -71,11 +86,15 @@
     catch(error){toast(error.message);}
   };
   actions.paddlecheckout=async()=>{
-    if(!ready())return;
     const button=document.querySelector('[data-action="paddlecheckout"]');
     try{await PinmapButton.run(button,async()=>{
-      const sdk=await paddle();
+      await loadConfig();
+      if(!ready())throw Error('결제 연결을 확인하지 못했어요.');
+      if(PM_ENV.requiresAuth)await refreshAccount();
+      if(!ready()||account?.active)return;
       const checkout=PM_ENV.requiresAuth?await request('checkout'):null;
+      if(checkout&&checkout.environment!==config.environment)throw Error('결제 환경이 변경됐어요. 페이지를 새로고침해 주세요.');
+      const sdk=await paddle();
       sdk.Checkout.open({...checkout?{transactionId:checkout.transactionId}:{items:[{priceId:config.monthlyPriceId,quantity:1}]},settings:{displayMode:'overlay',locale:'ko',theme:document.documentElement.dataset.theme==='dark'?'dark':'light'}});
     },'결제창 여는 중');}
     catch(error){const message=document.getElementById('billing-message');if(message)message.textContent=error.message||'결제창을 열지 못했어요.';}

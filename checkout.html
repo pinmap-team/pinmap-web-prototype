@@ -9,14 +9,14 @@
   <link rel="stylesheet" href="design-alignment.css?v=bfb47120e538">
   <script src="paddle-config.js?v=af14b93f3882" defer></script>
   <script src="https://cdn.paddle.com/paddle/v2/paddle.js" defer></script>
-  <script src="checkout.js?v=19cf68732392" defer></script>
+  <script src="checkout.js?v=07ff6f172c7b" defer></script>
 </head>
 <body class="billing-checkout-page">
   <main class="billing-plan">
-    <span class="billing-tag">테스트 결제</span>
+    <span class="billing-tag" id="checkout-mode">결제 확인</span>
     <h1>핀맵 결제</h1>
     <p id="checkout-status" role="status">결제 정보를 확인하고 있어요.</p>
-    <p class="billing-note">샌드박스 환경으로 실제 요금은 청구되지 않아요. 이용권은 서버에서 결제를 확인한 뒤 계정에 반영돼요.</p>
+    <p class="billing-note" id="checkout-note">결제 환경을 확인하고 있어요. 이용권은 서버에서 결제를 확인한 뒤 계정에 반영돼요.</p>
     <a href="auth.html">핀맵으로 돌아가기</a>
   </main>
 </body>
