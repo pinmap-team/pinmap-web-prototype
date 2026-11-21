@@ -2,7 +2,7 @@
 // 하단 메뉴와 화면 이름을 ‘컬렉션’으로 바꿔요
 NAV[2][2] = '컬렉션'; pageName.library = '컬렉션';
 // 기존 기능(검색 · 카테고리 필터 · 모음 · 갤러리 보기 · 상세 열기 · 새로 저장)은 그대로 쓰고 화면 모양만 바꿉니다.
-// app.js의 pages.library와 resultCards를 이 파일에서 다시 정의합니다. 다른 파일은 수정하지 않았어요.
+// 공통 카드·정렬·검색 결과는 여기서 정의하고, 최종 컬렉션 화면은 collection.js에서 등록합니다.
 
 // 추가 아이콘
 Object.assign(paths, {
@@ -84,27 +84,6 @@ resultCards = function(){
   const list = libList(), gallery = galleryMode();
   return list.map(x => libCard(x, gallery)).join('')
     || `<div class="empty">${icon('search')}<h3>아직 찾는 콘텐츠가 없어요</h3><p class="muted">다른 키워드나 유형으로 다시 찾아 보세요.</p><button class="tonal" data-action="resetfilter">전체 콘텐츠 보기</button></div>`;
-};
-
-pages.library = function(){
-  const title = collection ? esc(collection) : '컬렉션';
-  const sub = collection ? '하나의 계획으로 연결되는 다양한 취향' : '필요한 순간을 위해 모아둔 콘텐츠';
-  const chipRow = `<div class="libchips" role="group" aria-label="카테고리 필터">${categories.map(c =>
-    `<button class="libchip ${filter===c?'on':''}" data-filter="${c}" aria-pressed="${filter===c}">${c}</button>`).join('')}</div>`;
-  const cols = collection ? '' : `<div class="libcols" aria-label="내 모음">${collectionNames().map(n =>
-    `<button class="libcol" data-collection="${esc(n)}">${icon('folder')}${esc(n)} <span>${items.filter(x => x.collection===n).length}</span></button>`).join('')}</div>`;
-  return `<div class="libpage">
-    ${collection ? `<button class="back" data-page="library">${icon('back')} 전체 컬렉션</button>` : ''}
-    <div class="libhead"><h1>${title}</h1></div>
-    <label class="libsearch">${icon('search')}<input id="search" aria-label="저장 콘텐츠 검색" placeholder="저장한 콘텐츠 찾기" value="${esc(query)}"><button class="iconbtn" data-action="clear" aria-label="검색 지우기" ${query?'':'hidden'}>${icon('close')}</button></label>
-    ${chipRow}
-    ${cols}
-    <div class="libsection">
-      <h2>저장된 콘텐츠 <span id="resultcount" class="libcount">${filtered().length}</span></h2>
-      <label class="libsort"><span class="sr">정렬</span><select data-libsort>${Object.entries(LIB_SORTS).map(([k,v]) => `<option value="${k}" ${libSort===k?'selected':''}>${v}</option>`).join('')}</select>${icon('chevron')}</label>
-    </div>
-    <div id="results" class="libgrid ${galleryMode()?'gallerymode':''}">${resultCards()}</div>
-  </div>`;
 };
 
 // 검색할 때 개수 배지와 지우기 버튼 갱신 (app.js의 검색 처리 다음에 실행돼요)
