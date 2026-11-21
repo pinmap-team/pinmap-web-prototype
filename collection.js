@@ -13,30 +13,13 @@ Object.assign(paths, {
   chef:'M7 14a4 4 0 0 1-.7-7.9 5 5 0 0 1 11.4 0A4 4 0 0 1 17 14 M7 14v6h10v-6 M7 17h10'
 });
 // 칩과 폴더에 쓰는 카테고리 (순서 = 화면 순서)
-const CF_FOLDERS = [
-  {id:'맛집', icon:'fork'},
-  {id:'카페', icon:'coffee'},
-  {id:'전시/팝업', icon:'ticket'},
-  {id:'여행', icon:'plane'},
-  {id:'쇼핑', icon:'bag'},
-  {id:'레시피', icon:'chef'}
-];
-// 생활 정보 · 기타 콘텐츠는 칩 없이, 저장된 게 있을 때만 맨 뒤 폴더로 보여줘요 (데이터가 숨지 않게)
-const CF_EXTRA = {id:'기타', icon:'bookmark'};
-const CF_ALL = [...CF_FOLDERS, CF_EXTRA];
+const CF_FOLDERS = PinmapCategories.all.map(c=>({id:c.label,icon:c.id}));
+function cfCategories(){return CF_FOLDERS;}
 const CF_ALL_FOLDER = {id:'전체 저장', title:'전체', icon:'bookmark'};
-const CF_GALLERY = new Set(['쇼핑', '레시피', '기타']); // 장소가 아닌 폴더 → 갤러리형 카드
-
-// 저장 콘텐츠 → 폴더 (맛집·카페는 카페 여부로 나눠요)
-const cfIsCafe = x => /카페|커피|cafe|coffee|디저트|베이커리/i.test(`${x.category||''} ${x.title||''}`);
-function folderOf(x){
-  if (CF_ALL.some(f=>f.id===x.folderCategory)) return x.folderCategory;
-  if (x.type === '맛집/카페') return cfIsCafe(x) ? '카페' : '맛집';
-  return CF_FOLDERS.some(f => f.id === x.type) ? x.type : '기타';
-}
+function folderOf(x){return PinmapCategories.of(x).label;}
 // 다른 화면에서 넘어온 필터(예: 홈의 '맛집·카페')도 폴더로 바꿔요
-const CF_ALIAS = {'맛집/카페':['맛집','카페'], '생활 정보':['기타']};
-const cfSelected = () => filter === '전체' ? [] : (CF_ALIAS[filter] || (CF_ALL.some(f => f.id === filter) ? [filter] : []));
+const CF_ALIAS = {};
+const cfSelected = () => filter === '전체' ? [] : (cfCategories().some(f => f.id === filter) ? [filter] : []);
 
 // 검색어와 선택한 폴더에 맞는 콘텐츠 (items는 최신 저장 순)
 function cfMatches(){
@@ -52,7 +35,8 @@ const cfThumbs = list => [...list].sort((a,b) => ((savedTimestamp(b) ?? -Infinit
 
 function cfFolderData(list){
   const q = query.trim(), sel = cfSelected();
-  let defs = sel.length ? CF_ALL.filter(f => sel.includes(f.id)) : CF_ALL;
+  const categories=cfCategories();
+  let defs = sel.length ? categories.filter(f => sel.includes(f.id)) : categories;
   return defs.map(f => {
     const inFolder = list.filter(x => folderOf(x) === f.id);
     return {id:f.id, title:f.id, icon:f.icon, count:inFolder.length, thumbnails:cfThumbs(inFolder), selected:sel.includes(f.id)};
@@ -111,7 +95,7 @@ function cfOrderFolders(folders){
     const ai=custom.indexOf(a.id),bi=custom.indexOf(b.id);
     if(ai>=0 && bi>=0)return mode==='old'?ai-bi:bi-ai;
     if(ai>=0 || bi>=0)return ai>=0?-1:1;
-    return CF_ALL.findIndex(f=>f.id===a.id)-CF_ALL.findIndex(f=>f.id===b.id);
+    return cfCategories().findIndex(f=>f.id===a.id)-cfCategories().findIndex(f=>f.id===b.id);
   });
 }
 function cfFolderToolbar(){
@@ -425,7 +409,7 @@ document.addEventListener('submit', e => {
   if (e.target.id === 'cfnewform') {
     e.preventDefault();
     const name = String(new FormData(e.target).get('name') || '').trim().replace(/\s+/g, ' ');
-    const taken = [...CF_ALL.map(f => f.id), '전체', ...collectionNames(), ...cfCustom()];
+    const taken = [...cfCategories().map(f => f.id), '전체', ...collectionNames(), ...cfCustom()];
     const err = !name ? '폴더 이름을 입력해 주세요.' : taken.includes(name) ? '같은 이름의 폴더가 이미 있어요. 다른 이름을 입력해 주세요.' : '';
     if (err) { $('#cferr').textContent = err; $('#cfname').focus(); return; }
     settings.customFolders = [...cfCustom(), name]; cfSyncCollections(); afterChange();

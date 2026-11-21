@@ -7,6 +7,7 @@ function boot(mode,entries={}) {
   const stored=new Map(Object.entries(entries));
   const context=vm.createContext({location:{search:mode?'?mode='+mode:''},URLSearchParams,encodeURIComponent,NAV:[],pageName:{},localStorage:{getItem:key=>stored.get(key)??null,setItem:(key,value)=>stored.set(key,value)},console});
   vm.runInContext(read('environment.js'),context);
+  vm.runInContext(read('categories.js'),context);
   vm.runInContext(read('app.js').split('/* ---------- 일러스트')[0],context);
   vm.runInContext(read('pinmap.js').split('/* ---------- 관심사 기반 홈')[0],context);
   vm.runInContext(read('calendar.js').split('/* ---------- 날짜 계산')[0],context);

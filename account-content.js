@@ -27,16 +27,20 @@ function pinmapAccountItem(record, id) {
     ? record.content_kind : events.length && places.length ? 'mixed' : events.length ? 'event' : places.length ? 'place' : 'unknown';
   const hasEvents = events.length > 0 || kind === 'event' || kind === 'mixed';
   const classification = record.classification;
-  const categoryLabels = {restaurant:'맛집',cafe:'카페',bar:'주점',exhibition:'전시',pop_up:'팝업',
-    travel:'여행',shopping:'쇼핑',recipe:'레시피',lifestyle:'생활 정보',other:'기타'};
-  const classified = classification?.source === 'gemini_decisions' && classification.status === 'classified'
+  const categoryLabels = Object.fromEntries(PinmapCategories.all.flatMap(c=>[c.id,...c.aliases].map(id=>[id,c.label])));
+  const keywords = classification?.source === 'gemini_keywords' && classification.status === 'classified' &&
+    classification.category === 'keyword' && /^gemini-[A-Za-z0-9.-]+$/.test(classification.model || '')
+    ? [...new Set((Array.isArray(classification.keywords)?classification.keywords:[])
+      .filter(word=>typeof word==='string').map(word=>word.normalize('NFKC').trim().replace(/\s+/g,' '))
+      .filter(word=>word.length>=2&&word.length<=24&&/^[\p{L}\p{N}_ ·-]+$/u.test(word)&&
+        !['기타','일반','생활정보','콘텐츠','미분류','전체','전체저장'].includes(word.replace(/\s/g,''))))].slice(0,4) : [];
+  const fixedClassified = classification?.source === 'gemini_decisions' && classification.status === 'classified'
     && classification.model === 'gemini-decision-1' && Number.isFinite(classification.confidence)
     && classification.confidence >= .8 && classification.confidence <= 1
     && Object.hasOwn(categoryLabels, classification.category);
-  const aiCategory = classified ? classification.category : null;
-  const type = hasEvents || ['exhibition','pop_up'].includes(aiCategory) ? '전시/팝업'
-    : ['restaurant','cafe','bar'].includes(aiCategory) || places.length ? '맛집/카페'
-    : ({travel:'여행',shopping:'쇼핑',recipe:'레시피'}[aiCategory] || '기타');
+  const classified = fixedClassified || keywords.length > 0;
+  const aiCategory = fixedClassified ? classification.category : null;
+  const type = hasEvents ? '전시/팝업' : fixedClassified ? PinmapCategories.presentation(aiCategory) : places.length ? '맛집/카페' : '기타';
   const first = mapLocations[0];
   const eventName = text(events[0]?.title, 120);
   const title = text(record.ai_title, 120) || eventName || text(places[0]?.name, 120) || 'Instagram 게시물';
@@ -49,7 +53,8 @@ function pinmapAccountItem(record, id) {
     .map(x => typeof x === 'string' ? x : typeof x?.message === 'string' ? x.message : '')
     .filter(x => x.trim()).map(x => x.trim().slice(0, 300));
   return {id, backendId:record.id, title, type,
-    category:classified ? categoryLabels[aiCategory] : hasEvents ? ({exhibition:'전시',pop_up:'팝업'}[events[0]?.event_type] || '행사') : places.length ? '장소' : '기타',
+    category:fixedClassified ? categoryLabels[aiCategory] : (PinmapCategories.get(keywords[0]) || PinmapCategories.get(hasEvents?'exhibition':'other')).label,
+    keywords,
     contentKind:kind, status:text(record.status, 80),
     source:'Instagram', savedAt, desc:text(record.ai_summary, 500),
     searchSummary:text(record.ai_summary, 800), aiSummary:!!text(record.ai_summary),
@@ -547,7 +552,7 @@ if (PM_ENV.requiresAuth) (() => {
     event.preventDefault();event.stopImmediatePropagation();
     const creating=form.id==='cfnewform',data=new FormData(form);
     const name=creating?String(data.get('name')||'').trim().replace(/\s+/g,' '):collection;
-    if(creating&&(!name||[...CF_ALL.map(x=>x.id),'전체',...cfCustom()].includes(name))){
+    if(creating&&(!name||[...cfCategories().map(x=>x.id),'전체',...cfCustom()].includes(name))){
       document.getElementById('cferr').textContent=name?'같은 이름의 폴더가 이미 있어요.':'폴더 이름을 입력해 주세요.';return;
     }
     const button=form.querySelector('[type="submit"]');

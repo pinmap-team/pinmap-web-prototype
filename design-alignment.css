@@ -1514,3 +1514,14 @@ html.pm-pulling,html.pm-pulling *{user-select:none!important;-webkit-user-select
 /* One keyboard focus treatment for app buttons and menus, without an outline ring. */
 html body :is(button,a,[role="button"],[role="menuitem"]):is(:focus,:focus-visible){outline:none!important}
 html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:disabled){filter:brightness(.88)}
+
+/* Shared Figma masters. Map keeps its original six-slot spacing while overflowing. */
+.pm-category-icon{display:inline-block;width:24px;height:24px;flex:none;object-fit:contain;vertical-align:middle}
+.live-map .lm-header .lm-categories{display:flex;overflow-x:auto;justify-content:flex-start;scrollbar-width:none}
+.live-map .lm-header .lm-categories>button{flex:0 0 calc(100% / 6);min-width:0;width:calc(100% / 6)}
+.live-map .lm-header .lm-categories .pm-category-icon{width:26px;height:26px}
+.live-map .lm-header .lm-categories>button b{white-space:normal;word-break:keep-all;line-height:1.2;min-height:2.4em;text-align:center}
+.live-map .lm-header .lm-categories .lm-category-indicator{width:calc(100% / 6);bottom:0}
+
+/* Keep the sliding underline on the header/map boundary, including horizontal scroll. */
+.live-map .lm-header .lm-categories{padding-bottom:var(--space-sm);margin-bottom:calc(-1 * var(--space-sm))}

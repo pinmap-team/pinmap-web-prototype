@@ -263,7 +263,7 @@ function editSheet(){
     <div class="esbody">
       <div class="esfield">${label('grid','카테고리')}
         <input type="hidden" name="type" id="es-type" value="${esc(x.type)}">
-        <span class="esselect"><select name="folder" id="es-folder" aria-label="카테고리 및 폴더 선택">${CF_ALL.map(f=>`<option value="category:${esc(f.id)}" data-icon="${esc(f.icon)}" ${currentFolder==='category:'+f.id?'selected':''}>${esc(f.id)}</option>`).join('')}${cfCustom().length?`<optgroup label="내가 만든 폴더">${cfCustom().map(name=>`<option value="custom:${esc(name)}" data-icon="folder" ${currentFolder==='custom:'+name?'selected':''}>${esc(name)}</option>`).join('')}</optgroup>`:''}<option value="new:" data-icon="folderplus">새 폴더 만들기</option></select></span>
+        <span class="esselect"><select name="folder" id="es-folder" aria-label="카테고리 및 폴더 선택">${cfCategories().map(f=>`<option value="category:${esc(f.id)}" data-icon="${esc(f.icon)}" ${currentFolder==='category:'+f.id?'selected':''}>${esc(f.id)}</option>`).join('')}${cfCustom().length?`<optgroup label="내가 만든 폴더">${cfCustom().map(name=>`<option value="custom:${esc(name)}" data-icon="folder" ${currentFolder==='custom:'+name?'selected':''}>${esc(name)}</option>`).join('')}</optgroup>`:''}<option value="new:" data-icon="folderplus">새 폴더 만들기</option></select></span>
       </div>
       <div class="esfield" id="es-newfolder" hidden><label for="es-newcol" class="eslabel">${icon('folderplus')}새 폴더 이름</label><span class="esinput"><input id="es-newcol" maxlength="30" placeholder="예: 이번 주말 가고 싶은 곳" autocomplete="off"></span><p class="eshint">수정 완료를 누르면 새 폴더를 만들고 여기에 담아요.</p><p id="es-folder-error" class="eserror" role="alert"></p></div>
       <label class="esfield">${label('text','제목')}
@@ -328,7 +328,7 @@ document.addEventListener('change', e => {
     if(newFolder){$('#es-col').value=$('#es-newcol').value.trim();$('#es-newcol').focus();}
     else if(value.startsWith('custom:'))$('#es-col').value=value.slice(7);
     else if(value.startsWith('category:')){
-      const name=value.slice(9),type=['맛집','카페'].includes(name)?'맛집/카페':name;
+      const name=value.slice(9),type=PinmapCategories.presentation(name);
       $('#es-type').value=type;
       $('#es-addrwrap').hidden=!typeOf(type).place;
     }
@@ -338,7 +338,7 @@ document.addEventListener('change', e => {
   const ai = e.target.value === 'ai', t = typeOf(e.target.value);
   const emoji = $('.esform .esemoji'); if(emoji)emoji.textContent = ai ? '✨' : t.emoji;
   const folderSelect = $('#es-folder');
-  if(folderSelect){ const folder = t.id==='맛집/카페' ? '카페' : CF_FOLDERS.some(f=>f.id===t.id) ? t.id : '기타'; folderSelect.value='category:'+folder; }
+  if(folderSelect){ const folder = t.id==='맛집/카페' ? '카페' : t.id==='전시/팝업' ? '전시' : CF_FOLDERS.some(f=>f.id===t.id) ? t.id : ''; if(folder)folderSelect.value='category:'+folder; }
   const addr = $('#es-addrwrap'); if (addr) addr.hidden = !t.place;
 });
 document.addEventListener('click', e => {

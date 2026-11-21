@@ -24,8 +24,6 @@ const ALLOWED=new Map([
   ['my.js title 22ee3f364199','notification text is escaped when rendered'],
   ['my.js period 767a15f12514','notification body is escaped when rendered'],
   ['detail.js desc c49510988482','condition only; description is escaped when rendered'],
-  ['collection.js title 75a5731d4d77','regex source, not HTML output'],
-  ['collection.js category 75a5731d4d77','regex source, not HTML output'],
 ]);
 
 const lineHash=line=>crypto.createHash('sha256').update(line.trim()).digest('hex').slice(0,12);

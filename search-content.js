@@ -6,6 +6,7 @@ const PinmapContentSearch = (() => {
     const eventFields = event => [event?.title, event?.venue_name, event?.address];
     return [item.title, item.desc, item.summary, item.searchSummary, item.type, item.category,
       item.collection, item.memo, item.address, item.mapQuery, item.shop,
+      ...(Array.isArray(item.keywords) ? item.keywords : []),
       ...(Array.isArray(item.extractionPlaces) ? item.extractionPlaces.flatMap(placeFields) : []),
       ...(Array.isArray(item.places) ? item.places.flatMap(placeFields) : []),
       ...(Array.isArray(item.mapLocations) ? item.mapLocations.flatMap(placeFields) : []),

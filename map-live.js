@@ -24,17 +24,11 @@
     {id:13, lat:37.5447, lng:127.0557, kind:'event', image:'img/popup-store.jpg'}, // 성수 오브젝트 팝업 (예시 위치)
     {id:9, lat:37.7720, lng:128.9470, kind:'walk', image:'img/sea-room.jpg'}  // 바다 앞 작은 숙소 · 강릉 (예시 위치)
   ];
-  const cats = [['all','전체'],['eat','맛집'],['cafe','카페'],['event','전시/팝업'],['walk','산책'],['shop','쇼핑']];
-  // Figma: Pinmap / Category icon (24px, same geometry for both states).
-  // App category keys stay unchanged so existing filters and saved places are preserved.
-  const categoryGlyphs = {
-    eat: "<g class=\"lm-category-face\"><circle cx=\"14\" cy=\"12\" r=\"7\"/></g><path d=\"M4 3v18 M2 3v5a2 2 0 0 0 4 0V3\"/><path class=\"lm-category-detail\" d=\"M14 8a4 4 0 0 1 0 8\"/>",
-    cafe: "<g class=\"lm-category-face\"><path d=\"M4 5h12v9a6 6 0 0 1-12 0Z\"/></g><path d=\"M16 7h2a3 3 0 0 1 0 6h-2 M3 22h15\"/><path class=\"lm-category-detail\" d=\"M7 8h6\"/>",
-    event: "<g class=\"lm-category-face\"><path d=\"M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4Z\"/></g><path class=\"lm-category-detail\" d=\"M16 7v2 M16 11v2 M16 15v2 M7 9h5 M7 13h3\"/>",
-    walk: "<g class=\"lm-category-face\"><path d=\"M12 3a4 4 0 0 0-4 4 4 4 0 0 0 0 8h8a4 4 0 0 0 0-8 4 4 0 0 0-4-4Z\"/></g><path d=\"M12 15v6 M8 21h8\"/><path class=\"lm-category-detail\" d=\"M12 7v6 M9 10l3 2 3-2\"/>",
-    shop: "<g class=\"lm-category-face\"><path d=\"M8 3l-6 4 3 5 3-2v11h8V10l3 2 3-5-6-4a4 4 0 0 1-8 0Z\"/></g><path class=\"lm-category-detail\" d=\"M9 6a5 5 0 0 0 6 0\"/>"
+  const mapCategories = () => {
+    const savedIds = new Set(savedPlaces().map(place=>place.categoryId));
+    return [['all','전체'],...PinmapCategories.all.filter(c=>savedIds.has(c.id)).map(c=>[c.id,c.label])];
   };
-  const categoryIcon = kind => `<svg class="lm-category-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${kind==='all'?`<path class="lm-category-all" d="${paths.spark}"/>`:categoryGlyphs[kind] || `<path d="${paths.pin}"/>`}</svg>`;
+  const categoryIcon = (kind,active=false) => kind==='all'?`<svg class="lm-category-svg" viewBox="0 0 24 24" aria-hidden="true"><path class="lm-category-all" d="${paths.spark}"/></svg>`:PinmapCategories.icon(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind),active);
   const localPhoto = kind => PM_ENV.development ? PM_ENV.placeholderImage : ({eat:'img/brunch.jpg',cafe:'img/cafe.jpg',event:'img/exhibit.jpg',walk:'img/park.jpg',shop:'img/lamp.jpg'})[kind] || 'img/park.jpg';
   const categoryLabel = tag => ({station:'역',stop:'정류장',park:'공원',restaurant:'식당',cafe:'카페',museum:'박물관',gallery:'갤러리',shop:'상점',water:'호수',residential:'주거 지역'})[tag] || tag;
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
@@ -57,20 +51,21 @@
   const savedPlaces = () => {
     const pinned = savedCoords.map(position => {
       const item = items.find(x => x.id === position.id);
-      return item && !item.pending ? {...position, image:libPhoto(item)||position.image, title:item.title, address:item.address || '주소 확인 필요', category:item.category || item.type, description:item.desc || '', searchSummary:item.searchSummary || '', savedLabel:savedAgo(item)+' 저장', source:'저장한 콘텐츠', saved:true, favorite:!!item.favorite} : null;
+      return item && !item.pending ? {...position, categoryId:PinmapCategories.of(item).id, image:libPhoto(item)||position.image, title:item.title, address:item.address || '주소 확인 필요', category:item.category || item.type, description:item.desc || '', searchSummary:item.searchSummary || '', savedLabel:savedAgo(item)+' 저장', source:'저장한 콘텐츠', saved:true, favorite:!!item.favorite} : null;
     }).filter(Boolean);
     const own = items.filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lng) && !x.pending && !savedCoords.some(y => y.id === x.id))
-      .map(x => ({id:x.id,backendId:x.backendId,lat:x.lat,lng:x.lng,kind:x.mapKind||kindOf(x.category || ''),image:libPhoto(x)||localPhoto(x.mapKind||kindOf(x.category || '')),title:x.title,address:x.address || '',category:x.category || x.type,description:x.desc || '',searchSummary:x.searchSummary || '',savedLabel:savedAgo(x)+' 저장',source:'저장한 콘텐츠',saved:true,favorite:!!x.favorite}));
+      .map(x => ({id:x.id,backendId:x.backendId,categoryId:PinmapCategories.of(x).id,lat:x.lat,lng:x.lng,kind:x.mapKind||kindOf(x.category || ''),image:libPhoto(x)||localPhoto(x.mapKind||kindOf(x.category || '')),title:x.title,address:x.address || '',category:x.category || x.type,description:x.desc || '',searchSummary:x.searchSummary || '',savedLabel:savedAgo(x)+' 저장',source:'저장한 콘텐츠',saved:true,favorite:!!x.favorite}));
     return [...pinned,...own.flatMap(place=>{const item=items.find(x=>x.id===place.id);return item?.mapLocations?.length?item.mapLocations.map((loc,index)=>({loc,index})).filter(({loc})=>Number.isFinite(loc.coordinates?.lat)&&Number.isFinite(loc.coordinates?.lng)).map(({loc,index})=>({...place,sourceTitle:place.title,title:loc.name||place.title,lat:loc.coordinates.lat,lng:loc.coordinates.lng,address:loc.address||'주소 확인 필요',areaHint:loc.area_hint||'',image:PinmapPlacePhotos.preferredImage(loc,item.photo),savedLabel:loc.review_required?'지도 검색 위치 · 확인 필요':place.savedLabel,locationIndex:index})): [place];})];
   };
   function content() {
+    if(!mapCategories().some(([id])=>id===category))category='all';
     return `<section class="live-map" aria-label="지도에서 장소 탐색"><div id="live-map-canvas"></div>
       <header class="lm-header">
         <h1 class="lm-sr-only">지도에서 저장한 장소 찾기</h1>
         <div class="lm-location-header"><button type="button" class="lm-location-title" data-action="mapaddresses">${icon('pin')}<span>${safe((n => n ? (settings.placeLabels?.[n] || n) : '현재 위치')(mapLocationName))}</span>${icon('chevron')}</button><button type="button" class="lm-header-search" data-lm="toggle-search" aria-label="${searchOpen?'검색창 닫기':'지도에서 장소 검색'}" aria-expanded="${searchOpen}" aria-controls="lm-search-row"><span class="lm-search-open-icon">${icon('search')}</span><span class="lm-search-close-icon">${icon('close')}</span></button></div>
         <div class="lm-search-row cfpage${searchOpen?' is-open':''}" id="lm-search-row" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="장소명·주소 검색" value="${safe(searchQuery)}" autocomplete="off" maxlength="80" ${searchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button></form></div>
         <section class="cf-recent lm-recent" id="lm-recent" aria-label="최근 지도 검색어" ${searchOpen&&!searchQuery.trim()?'':'hidden'}>${mapRecentContent()}</section>
-        <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,cats.findIndex(([id])=>id===category))*100}%">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
+        <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,mapCategories().findIndex(([id])=>id===category))*100}%">${mapCategories().map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id,category===id)}</span><b>${label.replace('·','·<wbr>')}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
       </header>
       <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">ⓘ</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p>지도 © Google</p></div></details>
       <div class="lm-status" role="status" hidden></div>
@@ -95,22 +90,24 @@
   function selectCategory(next) {
     category=next;
     const bar=document.querySelector('.lm-categories');
-    bar?.style.setProperty('--lm-category-position',`${Math.max(0,cats.findIndex(([id])=>id===next))*100}%`);
+    bar?.style.setProperty('--lm-category-position',`${Math.max(0,mapCategories().findIndex(([id])=>id===next))*100}%`);
     bar?.querySelectorAll('[data-lm-cat]').forEach(button=>{
       const selected=button.dataset.lmCat===next;
+      if(selected)button.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});
       button.classList.toggle('selected',selected);
       button.setAttribute('aria-pressed',String(selected));
+      const art=button.querySelector('.lm-category-art');if(art)art.innerHTML=categoryIcon(button.dataset.lmCat,selected);
     });
   }
   function visiblePlaces() {
     const list = searchResults || savedPlaces();
-    return list.filter(x => category === 'all' || x.kind === category);
+    return list.filter(x => category === 'all' || (x.categoryId || PinmapCategories.get(x.kind)?.id) === category);
   }
   const placeKey=place=>`${place.saved?'saved':'search'}:${place.id}${place.locationIndex==null?'':':'+place.locationIndex}`;
   function markerIcon(place,expanded=false) {
     const photo=safe(place.image||localPhoto(place.kind));
     return L.divIcon({className:`lm-photo-marker${expanded?' is-selected':''}`,
-      html:`<span class="lm-place-badge"><span class="lm-badge-image"><img class="lm-badge-backdrop" src="${photo}" alt=""><img class="lm-badge-photo" src="${photo}" alt=""></span><span class="lm-badge-category">${categoryIcon(place.kind)}</span></span>`,
+      html:`<span class="lm-place-badge"><span class="lm-badge-image"><img class="lm-badge-backdrop" src="${photo}" alt=""><img class="lm-badge-photo" src="${photo}" alt=""></span><span class="lm-badge-category">${categoryIcon(place.categoryId||place.kind)}</span></span>`,
       iconSize:[60,60],iconAnchor:[30,30]});
   }
   function updateMarker(entry,expanded) {
@@ -129,7 +126,7 @@
   }
   function nearbyPlaces() {
     const bounds=liveMap?.getBounds().pad(1);
-    return savedPlaces().filter(place=>(category==='all'||place.kind===category)&&(!bounds||bounds.contains([place.lat,place.lng])));
+    return savedPlaces().filter(place=>(category==='all'||(place.categoryId || PinmapCategories.get(place.kind)?.id)===category)&&(!bounds||bounds.contains([place.lat,place.lng])));
   }
   function setSheetStage(stage) {
     sheetStage=stage;

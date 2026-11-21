@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 
-const accountSource = fs.readFileSync('account-content.js', 'utf8');
+const accountSource = fs.readFileSync('categories.js','utf8')+'\n'+fs.readFileSync('account-content.js', 'utf8');
 const eventRecord = {
   id:'10', source_url:'https://www.instagram.com/p/Dfvw0zmE3kW/',
   content_kind:'event', status:'needs_review', created_at:'2026-11-16T00:00:00Z',
@@ -29,14 +29,14 @@ test('event-only account content keeps schedules separate from map pins', () => 
 
 test('summary-only account content uses AI category without creating a place or schedule', () => {
   const source=accountSource.split('\nif (PM_ENV.requiresAuth)')[0];
-  for(const [category,type] of [['travel','여행'],['shopping','쇼핑'],['recipe','레시피'],['lifestyle','기타']]) {
+  for(const [category,type] of [['travel','여행'],['shopping','쇼핑'],['recipe','레시피'],['lifestyle','생활 정보']]) {
     const record={...eventRecord,content_kind:'unknown',status:'extracted',places:[],events:[],
       ai_title:'일상의 아이디어',ai_summary:'게시물의 주요 내용을 요약했어요.',
       classification:{source:'gemini_decisions',model:'gemini-decision-1',status:'classified',
         kind:'unknown',category,confidence:.93}};
     const item=vm.runInNewContext(`${source}\npinmapAccountItem(record, 7)`,{record});
     assert.equal(item.type,type);
-    assert.equal(item.category,category==='lifestyle'?'생활 정보':type);
+    assert.equal(item.category,require('../categories.js').get(category).label);
     assert.equal(item.contentKind,'unknown');
     assert.equal(item.status,'extracted');
     assert.equal(item.desc,'게시물의 주요 내용을 요약했어요.');
@@ -244,8 +244,8 @@ test('account category uses trusted Decisions result and keeps old records compa
   const source=accountSource.split('\nif (PM_ENV.requiresAuth)')[0];
   const record={...eventRecord,content_kind:'place',events:[],places:[{name:'테스트 바'}],classification:{source:'gemini_decisions',model:'gemini-decision-1',status:'classified',kind:'place',category:'bar',confidence:.95}};
   let item=vm.runInNewContext(`${source}\npinmapAccountItem(record, 7)`,{record});
-  assert.equal(item.category,'주점');assert.equal(item.aiClassified,true);assert.equal(item.type,'맛집/카페');
+  assert.equal(item.category,'맛집');assert.equal(item.aiClassified,true);assert.equal(item.type,'맛집/카페');
   record.classification.confidence=.2;
   item=vm.runInNewContext(`${source}\npinmapAccountItem(record, 7)`,{record});
-  assert.equal(item.category,'장소');assert.equal(item.aiClassified,false);
+  assert.equal(item.category,'분류보류');assert.equal(item.aiClassified,false);
 });
