@@ -1,8 +1,34 @@
-/* Google is the only map background. Leaflet continues to own places and gestures. */
+/* Google owns the styled background. Leaflet continues to own places and gestures. */
 (() => {
   let scriptPromise;
   let authenticationFailed = false;
   const failureListeners = new Set();
+  const lightStyles = [
+    {elementType:'geometry',stylers:[{color:'#F4F4F5'}]},
+    {elementType:'labels.text.fill',stylers:[{color:'#6B6B70'}]},
+    {elementType:'labels.text.stroke',stylers:[{color:'#FFFFFF'}]},
+    {featureType:'road',elementType:'geometry',stylers:[{color:'#FFFFFF'}]},
+    {featureType:'road.highway',elementType:'geometry',stylers:[{color:'#E8E8EA'}]},
+    {featureType:'road',elementType:'labels.text.fill',stylers:[{color:'#333333'}]},
+    {featureType:'poi.park',elementType:'geometry',stylers:[{color:'#C6F5E1'}]},
+    {featureType:'water',elementType:'geometry',stylers:[{color:'#E8E8EA'}]},
+    {featureType:'poi.business',elementType:'labels',stylers:[{visibility:'off'}]},
+    {featureType:'road.local',elementType:'labels',stylers:[{visibility:'off'}]},
+    {featureType:'administrative.neighborhood',elementType:'labels',stylers:[{visibility:'off'}]}
+  ];
+  const darkStyles = [
+    {elementType:'geometry',stylers:[{color:'#111111'}]},
+    {elementType:'labels.text.fill',stylers:[{color:'#B4B4B8'}]},
+    {elementType:'labels.text.stroke',stylers:[{color:'#1B1B1D'}]},
+    {featureType:'road',elementType:'geometry',stylers:[{color:'#333333'}]},
+    {featureType:'road',elementType:'labels.text.fill',stylers:[{color:'#F4F4F5'}]},
+    {featureType:'poi.park',elementType:'geometry',stylers:[{color:'#333333'}]},
+    {featureType:'water',elementType:'geometry',stylers:[{color:'#1B1B1D'}]},
+    {featureType:'poi.business',elementType:'labels',stylers:[{visibility:'off'}]},
+    {featureType:'road.local',elementType:'labels',stylers:[{visibility:'off'}]},
+    {featureType:'administrative.neighborhood',elementType:'labels',stylers:[{visibility:'off'}]}
+  ];
+  const currentStyles = () => document.documentElement?.dataset?.theme === 'dark' ? darkStyles : lightStyles;
 
   function loadGoogle(key) {
     if (scriptPromise) return scriptPromise;
@@ -77,11 +103,14 @@
     }
 
     const onFailure = message => showError(message);
+    const onThemeChange = () => nativeMap?.setOptions({styles:currentStyles()});
     failureListeners.add(onFailure);
+    window.addEventListener?.('pinmap:theme-changed', onThemeChange);
     map.on('move zoom resize', sync);
     map.on('unload', () => {
       disposed = true;
       failureListeners.delete(onFailure);
+      window.removeEventListener?.('pinmap:theme-changed', onThemeChange);
       cancelAnimationFrame(frame);
       if (nativeMap) window.google?.maps?.event?.clearInstanceListeners?.(nativeMap);
       nativeHost.remove();
@@ -105,6 +134,7 @@
         nativeMap = new google.maps.Map(surface, {
           center: {lat: center.lat, lng: center.lng},
           zoom: map.getZoom(),
+          styles: currentStyles(),
           disableDefaultUI: true,
           gestureHandling: 'none',
           clickableIcons: false,
