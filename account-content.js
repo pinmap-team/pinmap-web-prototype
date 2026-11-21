@@ -398,7 +398,7 @@ if (PM_ENV.requiresAuth) (() => {
       toast(item.contentKind === 'unknown' && item.status !== 'extracted'
         ? '링크를 저장했어요. 분석은 완료하지 못했어요. 상세에서 이유를 확인해 주세요.'
         : item.contentKind === 'unknown'
-        ? '저장했어요 · AI 요약 · ' + item.category
+        ? '저장했어요 · AI 설명 · ' + item.category
         : `저장했어요 · 장소 ${item.extractedPlaceCount}곳 · 행사 ${item.events.length}건${warningCount ? ' · 확인할 안내가 있어요' : ''}`);
       if (wasLoading) void loadAccount();
     } catch (error) {

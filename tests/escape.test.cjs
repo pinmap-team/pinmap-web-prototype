@@ -23,7 +23,7 @@ const ALLOWED=new Map([
   ['library.js title 353d511dd3d1','toast writes textContent'],
   ['my.js title 22ee3f364199','notification text is escaped when rendered'],
   ['my.js period 767a15f12514','notification body is escaped when rendered'],
-  ['detail.js desc c49510988482','condition only; description is escaped when rendered'],
+  ['detail.js desc 11942046031d','condition only; description is escaped when rendered'],
 ]);
 
 const lineHash=line=>crypto.createHash('sha256').update(line.trim()).digest('hex').slice(0,12);

@@ -122,7 +122,7 @@ detail = function(){
     <section class="dtsheet" id="detail-info" aria-label="콘텐츠 상세 정보">
       <button type="button" class="dt-sheet-handle" data-action="dtsheettoggle" aria-label="상세 정보 펼치기" aria-controls="detail-info" aria-expanded="false"><span aria-hidden="true"></span></button>
       ${author ? `<div class="dt-author">${authorPhoto ? `<img src="${esc(authorPhoto)}" alt="">` : `<span class="dt-author-fallback" aria-hidden="true">@</span>`}<span>게시물 작성자 <b>@${esc(author)}</b></span></div>` : ''}
-      ${x.desc ? `<section class="dtsum"><h2${x.source === '직접 추가' || x.aiSummary === false ? '' : ' class="dtai"'}>${icon('spark')}${esc(x.source === '직접 추가' || x.aiSummary === false ? '장소 설명' : 'AI 요약')}</h2><p>${esc(x.desc)}</p></section>` : ''}
+      ${x.desc ? `<section class="dtsum"><h2${x.source === '직접 추가' || x.aiSummary === false ? '' : ' class="dtai"'}>${icon('spark')}${esc(x.source === '직접 추가' || x.aiSummary === false ? '장소 설명' : 'AI 설명')}</h2><p>${esc(x.desc)}</p></section>` : ''}
       ${extractionInfo}
       ${eventInfo}
       ${reviewInfo}
