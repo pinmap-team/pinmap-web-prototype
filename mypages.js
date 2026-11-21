@@ -85,8 +85,17 @@ document.addEventListener('click', e => {
 // 2026-11-10 지도 카드에서 하트를 누른 장소(찜) 모아보기. 누르면 상세로 가요.
 pages.favorites = () => {
   const list = items.filter(x => x.favorite);
+  const row = x => {
+    const description = x.desc || x.memo;
+    const place = x.address ? `${icon('pin')}<span>${esc(x.address)}</span>` : `<span>${esc(x.category || x.type || '')}</span>`;
+    return `<button type="button" class="calrow fav-row" data-detail="${x.id}" aria-label="${esc(x.title)} 상세 보기">
+    <span class="calthumb">${libThumb(x)}</span>
+    <span class="caltext fav-text"><b>${esc(x.title)}</b>${description ? `<small class="fav-desc">${esc(description)}</small>` : ''}
+      <small class="fav-meta">${place}<span class="fav-time">${esc(savedAgo(x))} 저장</span></small></span>
+  </button>`;
+  };
   return myPage('즐겨찾기', list.length
-    ? `<p class="fav-count">${list.length}개</p><div class="cf-items fav-items">${list.map(cfItem).join('')}</div>`
+    ? `<p class="fav-count">${list.length}개</p><div class="fav-items">${list.map(row).join('')}</div>`
     : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 콘텐츠가 없어요</h3><p class="muted">콘텐츠 상세에서 하트를 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="library">컬렉션으로 가기</button></div>`, 'favpage');
 };
 pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
