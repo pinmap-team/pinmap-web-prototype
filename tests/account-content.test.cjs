@@ -47,6 +47,17 @@ test('summary-only account content uses AI category without creating a place or 
   }
 });
 
+test('captured screenshot uses the same account item shape with a local preview source', () => {
+  const source=accountSource.split('\nif (PM_ENV.requiresAuth)')[0];
+  const record={...eventRecord,source_url:'pinmap://capture/550e8400-e29b-41d4-a716-446655440000',
+    ai_title:'캡처한 전시 안내',cover_data_url:'data:image/jpeg;base64,AAAA'};
+  const item=vm.runInNewContext(`${source}\npinmapAccountItem(record, 7)`,{record,PinmapCategories:require('../categories.js')});
+  assert.equal(item.source,'캡처');
+  assert.equal(item.title,'캡처한 전시 안내');
+  assert.equal(item.photo,record.cover_data_url);
+  assert.equal(item.url,record.source_url);
+});
+
 test('account edits and direct pins survive account reload and can be removed', async () => {
   let metadata={};
   const record={...eventRecord,id:'place-1',content_kind:'place',events:[],places:[{name:'카페'}],map_locations:[]};

@@ -96,7 +96,10 @@ detail = function(){
   const bottom = [];
   if (ready) bottom.push(`<a class="dtghost" href="${mapHref}" target="_blank" rel="noopener noreferrer">${icon('send')}길찾기</a>`);
   else if (showPlaceInfo) bottom.push(`<button class="dtghost" data-action="edit">${icon('pin')}장소 입력</button>`);
-  if (!x.deleted) bottom.push(`<button class="dtprimary" data-action="original">${icon('image')}원본 보기</button>`);
+  if (!x.deleted) {
+    const originalLabel = x.source === '캡처' ? '캡처 미리보기' : '원본 보기';
+    bottom.push(`<button class="dtprimary" data-action="original">${icon('image')}${originalLabel}</button>`);
+  }
   else if (!ready) bottom.push(`<button class="dtprimary" data-action="edit">${icon('pen')}정보 수정</button>`);
   if (bottom.length === 1) bottom[0] = bottom[0].replace('class="dtghost"', 'class="dtprimary"');
 
