@@ -4,26 +4,26 @@
   let authenticationFailed = false;
   const failureListeners = new Set();
   const lightStyles = [
-    {elementType:'geometry',stylers:[{color:'#F4F4F5'}]},
-    {elementType:'labels.text.fill',stylers:[{color:'#6B6B70'}]},
-    {elementType:'labels.text.stroke',stylers:[{color:'#FFFFFF'}]},
-    {featureType:'road',elementType:'geometry',stylers:[{color:'#FFFFFF'}]},
-    {featureType:'road.highway',elementType:'geometry',stylers:[{color:'#E8E8EA'}]},
-    {featureType:'road',elementType:'labels.text.fill',stylers:[{color:'#333333'}]},
-    {featureType:'poi.park',elementType:'geometry',stylers:[{color:'#C6F5E1'}]},
-    {featureType:'water',elementType:'geometry',stylers:[{color:'#E8E8EA'}]},
+    {elementType:'geometry',stylers:[{color:'#F7F2EA'}]},
+    {elementType:'labels.text.fill',stylers:[{color:'#665C52'}]},
+    {elementType:'labels.text.stroke',stylers:[{color:'#FFFDF9'}]},
+    {featureType:'road',elementType:'geometry',stylers:[{color:'#FFFDF9'}]},
+    {featureType:'road.highway',elementType:'geometry',stylers:[{color:'#EADCCB'}]},
+    {featureType:'road',elementType:'labels.text.fill',stylers:[{color:'#594F46'}]},
+    {featureType:'poi.park',elementType:'geometry',stylers:[{color:'#DCE8CF'}]},
+    {featureType:'water',elementType:'geometry',stylers:[{color:'#D9DED9'}]},
     {featureType:'poi.business',elementType:'labels',stylers:[{visibility:'off'}]},
     {featureType:'road.local',elementType:'labels',stylers:[{visibility:'off'}]},
     {featureType:'administrative.neighborhood',elementType:'labels',stylers:[{visibility:'off'}]}
   ];
   const darkStyles = [
-    {elementType:'geometry',stylers:[{color:'#111111'}]},
-    {elementType:'labels.text.fill',stylers:[{color:'#B4B4B8'}]},
-    {elementType:'labels.text.stroke',stylers:[{color:'#1B1B1D'}]},
-    {featureType:'road',elementType:'geometry',stylers:[{color:'#333333'}]},
-    {featureType:'road',elementType:'labels.text.fill',stylers:[{color:'#F4F4F5'}]},
-    {featureType:'poi.park',elementType:'geometry',stylers:[{color:'#333333'}]},
-    {featureType:'water',elementType:'geometry',stylers:[{color:'#1B1B1D'}]},
+    {elementType:'geometry',stylers:[{color:'#24201D'}]},
+    {elementType:'labels.text.fill',stylers:[{color:'#E5DDD3'}]},
+    {elementType:'labels.text.stroke',stylers:[{color:'#24201D'}]},
+    {featureType:'road',elementType:'geometry',stylers:[{color:'#423B36'}]},
+    {featureType:'road',elementType:'labels.text.fill',stylers:[{color:'#E5DDD3'}]},
+    {featureType:'poi.park',elementType:'geometry',stylers:[{color:'#3D4738'}]},
+    {featureType:'water',elementType:'geometry',stylers:[{color:'#333A37'}]},
     {featureType:'poi.business',elementType:'labels',stylers:[{visibility:'off'}]},
     {featureType:'road.local',elementType:'labels',stylers:[{visibility:'off'}]},
     {featureType:'administrative.neighborhood',elementType:'labels',stylers:[{visibility:'off'}]}
