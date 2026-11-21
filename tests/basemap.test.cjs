@@ -53,18 +53,10 @@ test('missing Google configuration shows an error instead of another map',async(
   assert.equal(app.elements.filter(node=>node.tag==='script').length,0);
 });
 
-test('map uses a restrained warm palette and follows the appearance setting',async()=>{
+test('map uses the unstyled Google default in every appearance mode',async()=>{
   const app=setup({available:{google:true},googleBrowserKey:'test-browser-key'});
   app.window.PinmapMapProviders.attach(app.map);
   await flush();
-  const light=app.getGoogleOptions().styles;
-  assert(light.some(style=>style.elementType==='geometry'&&style.stylers[0].color==='#FCFAF6'));
-  assert(light.some(style=>style.featureType==='poi.park'&&style.stylers[0].color==='#EDF3E4'));
-  assert(light.some(style=>style.featureType==='road'&&style.stylers[0].color==='#FFFFFF'));
-  for(const feature of ['poi.business','road.local','administrative.locality','administrative.neighborhood'])
-    assert(light.some(style=>style.featureType===feature&&style.elementType==='labels'&&style.stylers[0].visibility==='off'));
-  app.document.documentElement.dataset.theme='dark';
-  app.listeners['pinmap:theme-changed']();
-  const dark=app.getUpdatedOptions().styles;
-  assert(dark.some(style=>style.elementType==='geometry'&&style.stylers[0].color==='#24201D'));
+  assert.equal(app.getGoogleOptions().styles,undefined);
+  assert.equal(app.listeners['pinmap:theme-changed'],undefined);
 });
