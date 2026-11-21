@@ -263,7 +263,7 @@ pages.library = function(){
     ? `<button type="button" class="subback cf-back-btn" data-action="cfback" aria-label="컬렉션으로 돌아가기">${icon('back')}</button>`
     : ((typeof backHome !== "undefined" && backHome) ? `<button type="button" class="subback cf-back-btn" data-action="backhome" aria-label="홈으로 돌아가기">${icon('back')}</button>` : '');
   if(query)cfSearchOpen=true;
-  const ph = open ? `${open}에서 찾기` : '제목·요약·장소 검색';
+  const ph = open ? `${open}에서 찾기` : '제목·설명·장소 검색';
   const n = cfSel?.size || 0;
   const selbar = cfSel ? `<div class="cf-selbar" role="toolbar" aria-label="선택한 콘텐츠">
       <button type="button" class="cf-selall" data-action="cfselall">${cfOpenList().length && cfOpenList().every(x => cfSel.has(x.id)) ? '선택 해제' : '전체 선택'}</button>
