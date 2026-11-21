@@ -58,10 +58,10 @@ test('map uses a restrained warm palette and follows the appearance setting',asy
   app.window.PinmapMapProviders.attach(app.map);
   await flush();
   const light=app.getGoogleOptions().styles;
-  assert(light.some(style=>style.elementType==='geometry'&&style.stylers[0].color==='#F7F2EA'));
-  assert(light.some(style=>style.featureType==='poi.park'&&style.stylers[0].color==='#DCE8CF'));
-  assert(light.some(style=>style.featureType==='road'&&style.stylers[0].color==='#FFFDF9'));
-  for(const feature of ['poi.business','road.local','administrative.neighborhood'])
+  assert(light.some(style=>style.elementType==='geometry'&&style.stylers[0].color==='#FCFAF6'));
+  assert(light.some(style=>style.featureType==='poi.park'&&style.stylers[0].color==='#EDF3E4'));
+  assert(light.some(style=>style.featureType==='road'&&style.stylers[0].color==='#FFFFFF'));
+  for(const feature of ['poi.business','road.local','administrative.locality','administrative.neighborhood'])
     assert(light.some(style=>style.featureType===feature&&style.elementType==='labels'&&style.stylers[0].visibility==='off'));
   app.document.documentElement.dataset.theme='dark';
   app.listeners['pinmap:theme-changed']();
