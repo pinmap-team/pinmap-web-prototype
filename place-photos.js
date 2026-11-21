@@ -4,6 +4,7 @@
  const pending=new Map(),queue=[];let active=0,generation=0,sdk;
  const imageUrl=value=>{try{const u=new URL(value);return u.protocol==='https:'&&/(^|\.)googleusercontent\.com$/.test(u.hostname)?u.href:null;}catch{return null;}};
  const link=value=>{try{const u=new URL(value);return u.protocol==='https:'&&/(^|\.)google\.com$/.test(u.hostname)?u.href:null;}catch{return null;}};
+ const preferredImage=(location,postCover)=>location?.image_data_url||postCover||PM_ENV.placeholderImage;
  function markup(id,index,image,extra=''){
   const fallback=image||PM_ENV.placeholderImage;
   const needs=PM_ENV.requiresAuth&&uuid.test(id||'')&&Number.isInteger(index)&&index>=0&&index<40&&!/^data:image\/(?:jpeg|png|webp);base64,/.test(fallback);
@@ -43,5 +44,5 @@
  let frame=0;new MutationObserver(()=>{if(!frame)frame=requestAnimationFrame(()=>{frame=0;scan();});}).observe(document.documentElement,{childList:true,subtree:true});
  document.addEventListener('click',event=>{if(event.target.closest('.pm-photo-credit'))event.stopPropagation();},true);
  window.addEventListener('pinmap:account-cleared',()=>{generation++;for(const job of queue.splice(0))job.reject(Error('signed_out'));pending.clear();});
- window.PinmapPlacePhotos={markup,scan};scan();
+ window.PinmapPlacePhotos={markup,scan,preferredImage};scan();
 })();
