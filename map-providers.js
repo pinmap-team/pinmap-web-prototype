@@ -40,7 +40,7 @@
     nativeHost.setAttribute('aria-hidden', 'true');
     host.prepend(nativeHost);
     host.dataset.mapProvider = 'google';
-    let nativeMap = null, disposed = false, frame = 0;
+    let nativeMap = null, disposed = false;
 
     function showError(message) {
       if (disposed) return;
@@ -58,21 +58,18 @@
 
     function sync() {
       if (!nativeMap || disposed) return;
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        if (!nativeMap || disposed) return;
-        const canvas = host.getBoundingClientRect();
-        const header = host.closest('.live-map')?.querySelector('.lm-header')?.getBoundingClientRect();
-        const top = Math.max(0, Math.round((header?.bottom ?? canvas.top) - canvas.top));
-        nativeHost.style.top = top + 'px';
-        const center = map.containerPointToLatLng([canvas.width / 2, (top + canvas.height) / 2]);
-        try {
-          nativeMap.setCenter({lat: center.lat, lng: center.lng});
-          nativeMap.setZoom(map.getZoom());
-        } catch {
-          showError('구글 지도 연결을 확인해 주세요.');
-        }
-      });
+      const canvas = host.getBoundingClientRect();
+      const header = host.closest('.live-map')?.querySelector('.lm-header')?.getBoundingClientRect();
+      const top = Math.max(0, Math.round((header?.bottom ?? canvas.top) - canvas.top));
+      nativeHost.style.top = top + 'px';
+      const center = map.containerPointToLatLng([canvas.width / 2, (top + canvas.height) / 2]);
+      try {
+        // Leaflet moves badges in the current pointer event. Keep the Google
+        // camera on that same event instead of waiting for a later paint frame.
+        nativeMap.moveCamera({center: {lat: center.lat, lng: center.lng}, zoom: map.getZoom()});
+      } catch {
+        showError('구글 지도 연결을 확인해 주세요.');
+      }
     }
 
     const onFailure = message => showError(message);
@@ -81,7 +78,6 @@
     map.on('unload', () => {
       disposed = true;
       failureListeners.delete(onFailure);
-      cancelAnimationFrame(frame);
       if (nativeMap) window.google?.maps?.event?.clearInstanceListeners?.(nativeMap);
       nativeHost.remove();
     });
