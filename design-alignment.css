@@ -862,6 +862,20 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .auth-step-number svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 /* Auto block margins center short forms and yield to scrollable content when tall. */
 .auth-shell:not([data-screen="welcome"]) #auth-content{flex:none;width:100%;min-width:0;margin:auto}
+/* Authentication forms use the same top header and content grid as service pages. */
+.auth-shell:not([data-screen="welcome"]):not([data-screen="connecting"]) .auth-panel{background:var(--color-neutral)}
+.auth-shell:not([data-screen="welcome"]):not([data-screen="connecting"]) #auth-content{margin:0 auto}
+.auth-form-header{display:flex;align-items:center;gap:calc(var(--space-xs)/2);height:56px;margin:0 0 var(--space-xl)}
+.auth-form-header .auth-back{flex:none;min-width:44px;margin:0 0 0 calc(-1 * var(--space-md))}
+.pm-auth .auth-form-header h1{margin:0;font:var(--type-headline-md)}
+.auth-form-description{margin:0 0 var(--space-xl);font:var(--type-body-md);color:var(--color-secondary);word-break:keep-all}
+.auth-shell:is([data-screen="verify"],[data-screen="error"]) .auth-heading{text-align:left}
+.auth-shell:is([data-screen="verify"],[data-screen="error"]) .auth-heading h1{font:var(--type-headline-md)}
+.auth-shell[data-screen="verify"] .auth-mail-icon{margin-left:0;background:var(--color-surface)}
+.auth-shell[data-screen="error"] .auth-connection{align-items:stretch;text-align:left}
+.auth-gate{justify-content:flex-start}
+.auth-gate:has(>.pm-loading){justify-content:center}
+.auth-gate h1{font:var(--type-headline-md)}
 .auth-mail-icon{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;background:var(--color-neutral);color:var(--color-on-surface);margin:0 auto var(--space-xl)}
 .auth-mail-icon svg{width:28px;height:28px;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .auth-verification-email{overflow-wrap:anywhere;color:var(--color-on-surface)!important}
