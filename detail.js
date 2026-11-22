@@ -1,5 +1,5 @@
 // 콘텐츠 상세 화면 리디자인 (레퍼런스 시안 반영)
-// 기존 기능(돌아가기 · 원본 보기 · 분류·메모·장소 수정 · 장소 확인 필요 · 원본 삭제 · 모음 이동)은 그대로 쓰고 화면 모양만 바꿉니다.
+// 상세 정보와 게시물에서 찾은 장소를 표시합니다.
 // app.js의 detail()을 이 파일에서 다시 정의합니다. library.js 다음에 불러와야 해요(사진·아이콘을 같이 씁니다).
 
 // 저장한 곳 로고 (출처 이름이나 링크 주소로 판단, 모르는 곳은 첫 글자)
@@ -32,15 +32,10 @@ function dtEventInfo(events){
 detail = function(){
   requestAnimationFrame(dtSheetLayout);
   const x = items.find(i => i.id === detailId);
-  const selectedPlaceIndex=window.pmDetailPlace?.id===detailId ? window.pmDetailPlace.index : 0;
-  const selectedPlace=x?.mapLocations?.[selectedPlaceIndex||0];
   if (!x) { detailId = null; return pages[page](); }
   const failure=pinmapAnalysisFailure(x);
   const restricted=!!failure;
   const t = typeOf(x.type);
-  const showPlaceInfo = t.place && x.contentKind !== 'unknown' &&
-    (x.contentKind !== 'event' || (x.extractionPlaces || []).length > 0 || !!x.address);
-  const ready = showPlaceInfo && x.address && !x.pending;
   const src = x.source || 'SNS';
   const author = /^[A-Za-z0-9._]{1,30}$/.test(x.authorUsername || '') ? x.authorUsername : '';
   const authorPhoto = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(x.authorProfilePhoto || '') ? x.authorProfilePhoto : '';
@@ -49,7 +44,12 @@ detail = function(){
   const photoIndexes=PinmapPlaces.matchExtracted(extracted,locations);
   const extractedPlaces=PinmapPlaces.forExtracted(x);
   const mappedCount=photoIndexes.filter(index=>index>=0).length;
-  const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 확인 · 지도 표시 ${mappedCount}곳 · 위치 확인 필요 ${extracted.length - mappedCount}곳</p><ul>${extracted.map((place,i) => {const index=photoIndexes[i],favorite=extractedPlaces[i],located=index>=0&&!favorite.unlocated;return `<li class="dt-extraction-place">${located?PinmapPlacePhotos.markup(x.backendId,index,PinmapPlacePhotos.preferredImage(locations[index],x.photo),'dt-extraction-photo'):''}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong><span class="${located ? 'dt-extraction-ready' : 'dt-extraction-pending'}">${located ? '지도 표시' : '위치 확인 필요'}</span></div><p>${esc(located ? (locations[index]?.address || place.address || '지도 위치 확인됨') : (place.reason || '주소를 확인하지 못했어요.'))}</p></div><button type="button" class="dt-extraction-heart lm-heart-motion${favorite.favorite?' is-active':''}" data-fav-place-id="${esc(favorite.id)}" aria-pressed="${!!favorite.favorite}" aria-label="${esc(favorite.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button></li>`;}).join('')}</ul></section>` : '';
+  const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 확인 · 지도 표시 ${mappedCount}곳 · 위치 확인 필요 ${extracted.length - mappedCount}곳</p><ul>${extracted.map((place,i) => {
+    const index=photoIndexes[i],favorite=extractedPlaces[i],located=index>=0&&!favorite.unlocated;
+    const address=String((index>=0?locations[index]?.address:'')||place.address||'').trim();
+    const addressInfo=address ? `<div class="dt-extraction-address"><span>${esc(address)}</span><button type="button" class="dt-extraction-copy-button" data-dt-copy-place="${i}" aria-label="${esc(place.name || '장소')} 주소 복사" title="주소 복사">${icon('copy')}</button></div>${!located&&place.reason?`<p>${esc(place.reason)}</p>`:''}` : `<p>${esc(located?'지도 위치 확인됨':place.reason||'주소를 확인하지 못했어요.')}</p>`;
+    return `<li class="dt-extraction-place">${located?PinmapPlacePhotos.markup(x.backendId,index,PinmapPlacePhotos.preferredImage(locations[index],x.photo),'dt-extraction-photo'):''}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong><span class="${located ? 'dt-extraction-ready' : 'dt-extraction-pending'}">${located ? '지도 표시' : '위치 확인 필요'}</span></div>${addressInfo}</div><button type="button" class="dt-extraction-heart lm-heart-motion${favorite.favorite?' is-active':''}" data-fav-place-id="${esc(favorite.id)}" aria-pressed="${!!favorite.favorite}" aria-label="${esc(favorite.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button></li>`;
+  }).join('')}</ul></section>` : '';
   const eventInfo=dtEventInfo(x.events);
   const analysisNotes = Array.isArray(x.extractionNotes) ? x.extractionNotes.filter(note => typeof note === 'string').slice(0, 8) : [];
   const reviewInfo = failure ? analysisFailureNotice(failure,false) : analysisNotes.length || (x.contentKind === 'unknown' && x.status !== 'extracted') ? `<section class="dtsec dt-extraction dt-analysis-notes"><h2>분석 안내</h2><ul>${(analysisNotes.length ? analysisNotes : ['게시물에서 장소 또는 행사 정보를 확인하지 못했어요.']).map(note => `<li><p>${esc(note)}</p></li>`).join('')}</ul></section>` : '';
@@ -58,21 +58,14 @@ detail = function(){
   // 유형별 정보
   let info = '';
   if (x.period) info += `<section class="dtsec"><h2>운영 기간</h2><div class="dtrow">${icon('calendar')}<span>${esc(x.period)}</span>${x.deadline ? `<b class="dtdue">마감 ${esc(x.deadline)}</b>` : ''}</div></section>`;
-  const factRow = x.distance && ready ? `<div class="dtfacts"><span>${icon('walk')}${esc(x.distance)}</span></div>` : '';
-  const singlePlace=!extracted.length?PinmapPlaces.forItem(x).find(place=>place.locationIndex===(selectedPlaceIndex||0)):null;
-  const placeHeading=singlePlace?`<div class="dtsechead"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><button type="button" class="dt-extraction-heart lm-heart-motion${singlePlace.favorite?' is-active':''}" data-fav-place-id="${esc(singlePlace.id)}" aria-pressed="${!!singlePlace.favorite}" aria-label="${esc(singlePlace.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button></div>`:`<h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2>`;
-  if (showPlaceInfo) info += ready
-    ? `<section class="dtsec dtlocation">${placeHeading}${selectedPlace?PinmapPlacePhotos.markup(x.backendId,selectedPlaceIndex||0,PinmapPlacePhotos.preferredImage(selectedPlace,x.photo),'dt-place-photo'):''}<div class="dtplacecard"><div class="dtaddress">${icon('pin')}<span>${esc(selectedPlace?.address||x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div>${factRow}</div></section>`
-    : `<section class="dtsec dtlocation"><h2>장소 정보</h2><div class="dtplacecard"><div class="dtwarn"><b>장소 확인 필요</b><p>위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.</p><button class="dtsmall" data-action="edit">장소 직접 입력</button></div></div></section>`;
   // 2026-11-10 가격을 크게(headline-md), 안내는 body-md. '예시 가격' → '참고 가격'
   if (x.type === '쇼핑') { const amount = String(x.price || '').replace(/,\s*(예시|참고) 가격$/, '').trim();
     info += `<section class="dtsec dtbuy"><h2>구매 정보</h2>${amount ? `<p class="dtprice"><span class="sr">참고 가격 </span>${esc(amount)}</p>` : '<p class="dtprice none">가격 정보 없음</p>'}<p class="dtpricehint">${x.shop ? `${esc(x.shop)}에서 본 참고 가격이에요.` : '판매처 정보가 없어요.'}<br>가격과 재고는 원본에서 한 번 더 확인해 주세요.</p></section>`; }
   if (x.type === '레시피') info += `<section class="dtsec"><h2>간단 정보</h2><div class="dtrow dtrecipe">${icon('clock')}<span>${esc(x.recipe || '정보 없음')}</span></div><p class="dthint">자세한 조리법은 원본 콘텐츠에서 확인해요.</p></section>`;
   if (x.deleted) info += `<section class="dtsec"><h2>원본 콘텐츠</h2><div class="dtgone"><b>삭제된 게시물이에요.</b><p>원본을 열 수 없지만 ${t.place ? '장소 정보와 ' : ''}내 메모는 그대로 남아 있어요.</p></div></section>`;
 
-  // 아래 고정 버튼: 원본 보기 또는 장소 입력
+  // 아래 고정 버튼: 원본 보기 또는 분석 실패 시 안내 동작
   const bottom = [];
-  if (!ready && showPlaceInfo) bottom.push(`<button class="dtghost" data-action="edit">${icon('pin')}장소 입력</button>`);
   if(failure){
     bottom.push(`<button class="dtprimary" data-action="${failure.action}">${icon(failure.action==='original'?'image':failure.action==='billing'?'clock':'link')}${esc(failure.actionLabel)}</button>`);
   }
@@ -80,8 +73,6 @@ detail = function(){
     const originalLabel = failure?.action==='original' ? failure.actionLabel : x.source === '캡처' ? '캡처 미리보기' : '원본 보기';
     bottom.push(`<button class="dtprimary" data-action="original">${icon('image')}${originalLabel}</button>`);
   }
-  else if (!ready) bottom.push(`<button class="dtprimary" data-action="edit">${icon('pen')}정보 수정</button>`);
-  if (bottom.length === 1) bottom[0] = bottom[0].replace('class="dtghost"', 'class="dtprimary"');
 
   return `<article class="dt dt-photo${restricted?' dt-restricted':''}${bottom.length?'':' dt-no-actions'}">
     <div class="dtambient" aria-hidden="true">${libThumb(x)}</div>
@@ -392,9 +383,16 @@ async function dtCopy(text){
     const ok = document.execCommand('copy'); ta.remove(); return ok;
   } catch { return false; }
 }
-actions.dtcopyaddr = async () => {
-  const x = items.find(i => i.id === detailId); if (!x?.address) return;
-  const index=window.pmDetailPlace?.id===detailId?window.pmDetailPlace.index:0;
-  const address=x.mapLocations?.[index||0]?.address||x.address;
-  toast(await dtCopy(address) ? '주소를 복사했어요.' : `주소: ${address}`);
-};
+document.addEventListener('click', async event => {
+  const button=event.target.closest('[data-dt-copy-place]');
+  if(!button||detailId==null)return;
+  const x=items.find(item=>item.id===detailId);
+  const extracted=Array.isArray(x?.extractionPlaces)?x.extractionPlaces:[];
+  const index=Number(button.dataset.dtCopyPlace);
+  if(!Number.isInteger(index)||index<0||index>=extracted.length)return;
+  const locations=Array.isArray(x.mapLocations)?x.mapLocations:[];
+  const locationIndex=PinmapPlaces.matchExtracted(extracted,locations)[index];
+  const address=String((locationIndex>=0?locations[locationIndex]?.address:'')||extracted[index].address||'').trim();
+  if(!address)return;
+  toast(await dtCopy(address)?'주소를 복사했어요.':`주소: ${address}`);
+});
