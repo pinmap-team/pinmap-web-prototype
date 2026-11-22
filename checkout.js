@@ -2,10 +2,9 @@
 (async() => {
   const status=document.getElementById('checkout-status');
   try{
-  const prototype=new URLSearchParams(window.location.search).get('mode')==='prototype';
-  const response=prototype?null:await fetch('/api/billing/config',{cache:'no-store',signal:AbortSignal.timeout(10000)});
-  const config=prototype?window.PINMAP_PADDLE:await response.json();
-  if((response&&!response.ok)||!config||!['sandbox','live'].includes(config.environment)||!new RegExp('^'+(config.environment==='live'?'live':'test')+'_[A-Za-z0-9_]+$').test(config.clientToken||'')||!window.Paddle||prototype&&config.environment!=='sandbox'){
+  const response=await fetch('/api/billing/config',{cache:'no-store',signal:AbortSignal.timeout(10000)});
+  const config=await response.json();
+  if(!response.ok||!config||!['sandbox','live'].includes(config.environment)||!new RegExp('^'+(config.environment==='live'?'live':'test')+'_[A-Za-z0-9_]+$').test(config.clientToken||'')||!window.Paddle){
     status.textContent='결제창을 불러오지 못했어요. 핀맵으로 돌아가 다시 시도해 주세요.';return;
   }
   document.getElementById('checkout-mode').textContent=config.environment==='live'?'안전한 결제':'테스트 결제';

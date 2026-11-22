@@ -91,9 +91,9 @@ const session={access_token:token,refresh_token:'test-refresh-token',token_type:
  await page.setViewportSize({width:1440,height:960});await page.screenshot({path:out+'/welcome-desktop.png'});
  await page.emulateMedia({colorScheme:'dark'});await page.setViewportSize({width:402,height:874});await page.screenshot({path:out+'/welcome-dark.png'});
  await page.setViewportSize({width:320,height:568});assert.equal(await page.locator('body').evaluate(el=>el.scrollWidth<=innerWidth),true);await page.getByRole('button',{name:'회원가입',exact:true}).click();await page.locator('#auth-email').fill('test@example.com');await page.screenshot({path:out+'/signup-narrow.png'});
- // Existing prototype entry never invokes account auth nor changes seed storage.
- await page.goto(base+'/index.html?mode=prototype');await page.frameLocator('.phone-frame').locator('#onboarding').waitFor();assert.equal(await page.frameLocator('.phone-frame').locator('#auth-gate').count(),0);
+ // The retired prototype URL returns to the sign-in welcome screen.
+ await page.goto(base+'/index.html?mode=prototype');await page.waitForURL(base+'/auth.html?screen=welcome');await page.getByRole('button',{name:'이메일 로그인',exact:true}).waitFor();
  assert.deepEqual(errors,[]);fs.writeFileSync(out+'/result.json',JSON.stringify({passed:true,sdk:'2.119.0',requests:calls.map(x=>({path:x.path,query:x.query})),pageErrors:errors},null,2));
- console.log('PASS: signup, mismatch, duplicate submit, invalid password, PKCE recovery, recovery reload, password update, identity, logout, Kakao PKCE callback, session restore, missing config, desktop/mobile/dark/narrow, prototype preservation.');
+ console.log('PASS: signup, mismatch, duplicate submit, invalid password, PKCE recovery, recovery reload, password update, identity, logout, Kakao PKCE callback, session restore, missing config, desktop/mobile/dark/narrow, retired prototype URL.');
  await browser.close();
 })().catch(async error=>{console.error(error.message);console.log(await debugPage?.locator('body').innerText());console.log(JSON.stringify(debugCalls?.slice(-4)));await debugPage?.screenshot({path:out+'/failure.png'});process.exit(1)});

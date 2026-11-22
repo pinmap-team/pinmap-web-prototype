@@ -1,13 +1,22 @@
-// Authentication is explicit: only the app entered after the login test requires it.
-// Direct development and prototype previews remain available without signing in.
+// The account app is the only supported application entry.
 if (PM_ENV.requiresAuth) (() => {
-  let client, user, resolving = false;
+  let client, user, resolving = false, onboardingUserId = null;
   const app = document.getElementById('app');
   const login = () => PinmapAuth.login();
+  function maybeStartOnboarding() {
+    if (!user?.id || window.PinmapAccountState?.userId !== user.id || onboardDone ||
+        document.documentElement.classList.contains('auth-pending') || document.getElementById('onboarding') ||
+        onboardingUserId === user.id) return;
+    onboardingUserId = user.id;
+    openOnboarding(0);
+  }
+  window.addEventListener('pinmap:account-profile-loaded',maybeStartOnboarding);
   function gate(message = '로그인하고 나만의 핀맵을 시작해 보세요.',loading=false) {
+    onboardingUserId = null;
     document.documentElement.classList.add('auth-pending');
     app.inert = true;
     closeOnboarding();
+    if(document.getElementById('coach')){document.getElementById('coach').remove();lockScroll(false);}
     app.inert = true;
     if (document.getElementById('sheet').open) document.getElementById('sheet').close();
     let node = document.getElementById('auth-gate');
@@ -17,13 +26,13 @@ if (PM_ENV.requiresAuth) (() => {
       document.body.append(node);
     }
     if(loading){node.innerHTML='<div class="pm-loading" role="status" aria-label="로그인 상태 확인 중"><span class="pm-spinner" aria-hidden="true"></span></div>';return;}
-    node.innerHTML = `<img src="img/pinmap-symbol-splash.svg" alt="" width="48" height="48"><h1>나의 취향을 한곳에</h1><p>${esc(message)}</p><button class="filled auth-submit" id="auth-enter">로그인 · 회원가입</button><a class="auth-home" href="index.html" target="_top">시작 화면으로 돌아가기</a>`;
+    node.innerHTML = `<img src="img/pinmap-symbol-splash.svg" alt="" width="48" height="48"><h1>나의 취향을 한곳에</h1><p>${esc(message)}</p><button class="filled auth-submit" id="auth-enter">로그인 · 회원가입</button><a class="auth-home" href="auth.html?screen=welcome" target="_top">로그인 화면으로 이동</a>`;
     node.querySelector('button').onclick = login;
   }
   function unlock() {
     document.getElementById('auth-gate')?.remove();
     document.documentElement.classList.remove('auth-pending');
-    app.inert = false; render();
+    app.inert = false; render(); maybeStartOnboarding();
   }
   // Account identity is read by the common account page, never copied to demo settings.
   const logout = async () => {

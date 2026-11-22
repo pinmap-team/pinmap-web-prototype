@@ -94,7 +94,7 @@
     fillEmail();
     main.setAttribute('aria-busy','false');
   }
-  function enterApp() {try {sessionStorage.removeItem(pendingKey);} catch {} location.replace('index.html?mode=development&auth=required'); }
+  function enterApp() {try {sessionStorage.removeItem(pendingKey);} catch {} location.replace('index.html'); }
   function loading(value) {
     busy = value; main.setAttribute('aria-busy', String(value));
     main.querySelectorAll('button').forEach(button => {button.disabled = value;});

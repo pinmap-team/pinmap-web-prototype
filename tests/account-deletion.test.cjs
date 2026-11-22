@@ -23,7 +23,7 @@ async function app(response) {
   const actions = {};
   const location = {href: 'https://example.com/app.html'};
   const window = {top: {location: {replace: url => calls.push(['redirect', url])}},
-    PinmapAccountIdentity: null, PinmapZipImport: {pause: () => calls.push('pause')}};
+    addEventListener() {}, PinmapAccountIdentity: null, PinmapZipImport: {pause: () => calls.push('pause')}};
   const context = {PM_ENV: {requiresAuth: true}, document, window, location, actions,
     closeOnboarding() {}, render() {}, confirmPop() {}, toast: text => calls.push(['toast', text]),
     esc: value => value, setTimeout, URL, AbortSignal,

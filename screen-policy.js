@@ -1,4 +1,4 @@
-/* One supported screen registry for prototype and account modes. This is UI
+/* One supported screen registry for the authenticated account app. This is UI
    routing, not authorization: account and billing APIs still verify users. */
 (function(root){
   const screens=new Set(['home','map','library','my','calendar','topic','profile','courses','course',

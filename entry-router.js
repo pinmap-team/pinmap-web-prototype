@@ -7,20 +7,16 @@
     location.replace('auth.html' + location.search + location.hash);
     return;
   }
-  const reloading = performance.getEntriesByType('navigation')[0]?.type === 'reload';
-  const mode = reloading ? null : params.get('mode');
-  const requiresAuth = mode === 'development' && params.get('auth') === 'required';
-  const retiredPreview = params.has('place-test') || (mode === 'development' && !requiresAuth);
-  // A mode is a one-time entry choice, not a route to restore on refresh.
-  if(params.has('mode')) {
+  const legacyMode = params.has('place-test') || (params.has('mode') &&
+    (params.get('mode') !== 'development' || params.get('auth') !== 'required'));
+  if (legacyMode) { location.replace('auth.html?screen=welcome'); return; }
+  if (params.has('mode')) {
     params.delete('mode');
     params.delete('auth');
     params.delete('place-test');
     const query=params.toString();
     history.replaceState(null,'',location.pathname+(query?'?'+query:'')+location.hash);
   }
-  // Explicit assignment also prevents a browser restoring the previous iframe.
-  document.querySelector('.phone-frame').src = !retiredPreview && (mode === 'prototype' || requiresAuth)
-    ? 'app.html?mode=' + mode + (requiresAuth ? '&auth=required' : '')
-    : 'entry.html';
+  // The only application route is the authenticated account app.
+  document.querySelector('.phone-frame').src = 'app.html?mode=development&auth=required';
 })();

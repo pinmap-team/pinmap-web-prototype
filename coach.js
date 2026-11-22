@@ -4,11 +4,18 @@ const COACH_STEPS = [
   {sel:'.chiprows', title:'저장한 카테고리 보기', text:'저장한 콘텐츠가 있는 카테고리만 보여요.\n카테고리를 누르면 해당 저장 목록을 볼 수 있어요.'},
   {sel:'.bottomnav', title:'홈, 지도, 컬렉션, 마이', text:'저장한 장소는 지도에서 볼 수 있어요.\n모든 저장 콘텐츠는 컬렉션에서 볼 수 있어요.'}
 ];
+const EMPTY_COACH_STEPS = [
+  {sel:'.home-first-save', title:'첫 콘텐츠 저장하기', text:'마음에 드는 콘텐츠를 저장해 보세요.\n저장한 콘텐츠는 홈에서 다시 볼 수 있어요.'},
+  {sel:'.home-add-fab', title:'콘텐츠 추가하기', text:'추가 버튼을 눌러 링크, 캡처 화면 또는 ZIP 파일로 콘텐츠를 저장해요.'},
+  COACH_STEPS[2]
+];
+let activeCoachSteps = COACH_STEPS;
 let coachStep = 0;
 let coachFromGuide = false;
 function startCoach(fromGuide = false){
   if (page !== 'home' || detailId) return;
   coachFromGuide = fromGuide === true;
+  activeCoachSteps = document.querySelector('.home-first-save') ? EMPTY_COACH_STEPS : COACH_STEPS;
   coachStep = 0;
   window.scrollTo(0, 0);
   lockScroll(true);
@@ -26,13 +33,13 @@ function lockScroll(on){
   on ? window.addEventListener('scroll', placeCoach) : window.removeEventListener('scroll', placeCoach);
 }
 function drawCoach(){
-  const s = COACH_STEPS[coachStep], target = document.querySelector(s.sel);
-  if (!target) { if (coachStep < COACH_STEPS.length-1) { coachStep++; drawCoach(); } else endCoach(); return; }
+  const s = activeCoachSteps[coachStep], target = document.querySelector(s.sel);
+  if (!target) { if (coachStep < activeCoachSteps.length-1) { coachStep++; drawCoach(); } else endCoach(); return; }
   const fixed = getComputedStyle(target).position === 'fixed';
   if (!fixed) { const r = target.getBoundingClientRect(); window.scrollTo(0, Math.max(0, window.scrollY + r.top - window.innerHeight/2 + r.height/2 - 60)); }
-  const last = coachStep === COACH_STEPS.length-1;
+  const last = coachStep === activeCoachSteps.length-1;
   $('#coach').innerHTML = `${coachFromGuide ? '<button class="cm-close" data-coach="exit" aria-label="튜토리얼 종료하기">종료하기</button>' : '<button class="cm-close" data-coach="skip" aria-label="튜토리얼 건너뛰기">건너뛰기</button>'}<div class="cm-hole"></div><div class="cm-tip" aria-live="polite">
-      <span class="cm-step">${coachStep+1} / ${COACH_STEPS.length}</span><b>${s.title}</b><p>${s.text}</p>
+      <span class="cm-step">${coachStep+1} / ${activeCoachSteps.length}</span><b>${s.title}</b><p>${s.text}</p>
       <div class="cm-btns"><button class="cm-prev" data-coach="prev" ${coachStep===0?'disabled':''}>이전</button><button class="cm-next" data-coach="next">${last?(coachFromGuide?'튜토리얼 종료하기':'시작하기'):'다음'}</button></div>
     </div>`;
   requestAnimationFrame(placeCoach);
@@ -42,9 +49,9 @@ function drawCoach(){
 // 강조 영역과 말풍선 위치를 대상 요소에 맞춰요
 function placeCoach(){
   const c = $('#coach'); if (!c) return;
-  const target = document.querySelector(COACH_STEPS[coachStep].sel); if (!target) return;
+  const target = document.querySelector(activeCoachSteps[coachStep].sel); if (!target) return;
   // area가 있으면 그 요소들만 감싸서 강조해요 (예: 위치 이름만, 검색 · 알림 아이콘은 빼고)
-  const parts = COACH_STEPS[coachStep].area ? [...document.querySelectorAll(COACH_STEPS[coachStep].area)].map(el => el.getBoundingClientRect()) : [];
+  const parts = activeCoachSteps[coachStep].area ? [...document.querySelectorAll(activeCoachSteps[coachStep].area)].map(el => el.getBoundingClientRect()) : [];
   const r = parts.length ? (() => { const L = Math.min(...parts.map(x => x.left)), T = Math.min(...parts.map(x => x.top)), R = Math.max(...parts.map(x => x.right)), B = Math.max(...parts.map(x => x.bottom)); return {left:L, top:T, right:R, bottom:B, width:R-L, height:B-T}; })() : target.getBoundingClientRect(), pad = 6, hole = c.querySelector('.cm-hole'), tip = c.querySelector('.cm-tip');
   // 강조 영역은 화면 안쪽(좌우 space-sm)까지만: 넓은 캐러셀도 양끝 모서리가 잘리지 않게 보여요
   const edge = 8, hl = Math.max(edge, r.left - pad), hr = Math.min(window.innerWidth - edge, r.right + pad);
@@ -61,7 +68,7 @@ document.addEventListener('click', e => {
   if (!b) return;
   if (b.dataset.coach === 'skip' || b.dataset.coach === 'exit') { endCoach(); return; }
   if (b.dataset.coach === 'prev') { if (coachStep > 0) { coachStep--; drawCoach(); } return; }
-  if (coachStep < COACH_STEPS.length-1) { coachStep++; drawCoach(); } else { endCoach(); window.scrollTo(0,0); }
+  if (coachStep < activeCoachSteps.length-1) { coachStep++; drawCoach(); } else { endCoach(); window.scrollTo(0,0); }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#coach')) endCoach(); });
 // 튜토리얼 중에는 말풍선 버튼 말고 아무것도 누를 수 없어요 (하단 메뉴 포함)
