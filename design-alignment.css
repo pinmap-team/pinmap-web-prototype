@@ -1558,7 +1558,8 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .live-map .lm-header .lm-categories>button{flex:1 0 calc(100% / 6);min-width:0;width:calc(100% / 6)}
 .live-map .lm-header .lm-categories .pm-category-icon{width:26px;height:26px}
 .live-map .lm-header .lm-categories>button b{white-space:normal;word-break:keep-all;line-height:1.2;min-height:2.4em;text-align:center}
-.live-map .lm-header .lm-categories .lm-category-indicator{width:calc(100% / 6);bottom:0}
+.live-map .lm-header .lm-categories .lm-category-indicator{width:44px;bottom:0}
+.live-map .lm-header .lm-categories .lm-category-indicator::after{inset:0}
 
 /* Keep the sliding underline on the header/map boundary, including horizontal scroll. */
 .live-map .lm-header .lm-categories{padding-bottom:var(--space-sm);margin-bottom:calc(-1 * var(--space-sm))}

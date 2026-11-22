@@ -96,8 +96,8 @@
     const bounds=bar.getBoundingClientRect(),button=selected.getBoundingClientRect();
     const scale=bounds.width/bar.offsetWidth;
     if(!Number.isFinite(scale)||scale<=0)return;
-    indicator.style.width=`${button.width/scale}px`;
-    bar.style.setProperty('--lm-category-position',`${(button.left-bounds.left)/scale+bar.scrollLeft}px`);
+    const left=(button.left-bounds.left+button.width/2)/scale+bar.scrollLeft-indicator.offsetWidth/2;
+    bar.style.setProperty('--lm-category-position',`${left}px`);
   }
   function selectCategory(next) {
     category=next;
