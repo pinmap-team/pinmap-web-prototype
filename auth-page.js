@@ -69,7 +69,7 @@
     updateResend(); resendTimer = setInterval(updateResend, 1000);
   }
   function testEntry() {
-    return PinmapAuth.testLoginAvailable ? '<div class="auth-test-entry"><button class="filled auth-submit auth-submit-wide" type="button" data-auth="test-login">테스트 계정으로 시작하기</button><p class="auth-field-help">공용 테스트 계정 · 저장한 콘텐츠가 함께 보여요.</p></div>' : '';
+    return PinmapAuth.testLoginAvailable ? '<div class="auth-test-entry"><button class="filled auth-submit auth-submit-wide" type="button" data-auth="test-login">테스트 계정으로 시작하기</button></div>' : '';
   }
   function render(next = mode) {
     clearInterval(resendTimer);
