@@ -48,13 +48,19 @@
     if(event.target.closest('[data-lm-recent-clear]')){recentSearches=[];persistRecentSearches();refreshRecentSearches();$('#lm-search input')?.focus();}
   });
   const savedPlaces = () => {
-    const pinned = savedCoords.map(position => {
-      const item = items.find(x => x.id === position.id);
-      return item && !item.pending ? {...position, categoryId:PinmapCategories.of(item).id, image:libPhoto(item)||position.image, title:item.title, address:item.address || '주소 확인 필요', category:item.category || item.type, description:item.desc || '', searchSummary:item.searchSummary || '', savedLabel:savedAgo(item)+' 저장', source:'저장한 콘텐츠', saved:true, favorite:!!item.favorite} : null;
-    }).filter(Boolean);
-    const own = items.filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lng) && !x.pending && !savedCoords.some(y => y.id === x.id))
-      .map(x => ({id:x.id,backendId:x.backendId,categoryId:PinmapCategories.of(x).id,lat:x.lat,lng:x.lng,kind:x.mapKind||kindOf(x.category || ''),image:libPhoto(x)||localPhoto(x.mapKind||kindOf(x.category || '')),title:x.title,address:x.address || '',category:x.category || x.type,description:x.desc || '',searchSummary:x.searchSummary || '',savedLabel:savedAgo(x)+' 저장',source:'저장한 콘텐츠',saved:true,favorite:!!x.favorite}));
-    return [...pinned,...own.flatMap(place=>{const item=items.find(x=>x.id===place.id);return item?.mapLocations?.length?item.mapLocations.map((loc,index)=>({loc,index})).filter(({loc})=>Number.isFinite(loc.coordinates?.lat)&&Number.isFinite(loc.coordinates?.lng)).map(({loc,index})=>({...place,sourceTitle:place.title,title:loc.name||place.title,lat:loc.coordinates.lat,lng:loc.coordinates.lng,address:loc.address||'주소 확인 필요',areaHint:loc.area_hint||'',image:PinmapPlacePhotos.preferredImage(loc,item.photo),savedLabel:loc.review_required?'지도 검색 위치 · 확인 필요':place.savedLabel,locationIndex:index})): [place];})];
+    return PinmapPlaces.all(items).map(place=>{
+      const item=place.sourceItem,loc=item.mapLocations?.[place.locationIndex];
+      const sample=savedCoords.find(entry=>entry.id===item.id);
+      return {id:item.id,backendId:item.backendId,placeId:place.id,locationIndex:place.locationIndex,
+        categoryId:PinmapCategories.of(item).id,lat:place.lat,lng:place.lng,
+        kind:item.mapKind||sample?.kind||kindOf(item.category||''),
+        image:place.photo||libPhoto(item)||sample?.image||localPhoto(item.mapKind||''),
+        sourceTitle:item.title,title:place.title,address:place.address||'주소 확인 필요',
+        areaHint:loc?.area_hint||'',category:item.category||item.type,
+        description:item.desc||'',searchSummary:item.searchSummary||'',
+        savedLabel:loc?.review_required?'지도 검색 위치 · 확인 필요':savedAgo(item)+' 저장',
+        source:'저장한 콘텐츠',saved:true,favorite:place.favorite};
+    });
   };
   function content() {
     if(!mapCategories().some(([id])=>id===category))category='all';
@@ -99,7 +105,7 @@
     const list = searchResults || savedPlaces();
     return list.filter(x => category === 'all' || (x.categoryId || PinmapCategories.get(x.kind)?.id) === category);
   }
-  const placeKey=place=>`${place.saved?'saved':'search'}:${place.id}${place.locationIndex==null?'':':'+place.locationIndex}`;
+  const placeKey=place=>place.saved&&place.placeId?place.placeId:`search:${place.id}${place.locationIndex==null?'':':'+place.locationIndex}`;
   function markerIcon(place,expanded=false) {
     const photo=safe(place.image||localPhoto(place.kind));
     return L.divIcon({className:`lm-photo-marker${expanded?' is-selected':''}`,
@@ -172,7 +178,7 @@
       setSheetStage(stages[Math.max(0,Math.min(stages.length-1,stages.indexOf(sheetStage)+(event.key==='ArrowUp'?1:-1)))]);
     });
   }
-  const favoriteButton = place => place.saved ? `<button type="button" class="lm-carousel-heart lm-heart-motion${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" data-item-id="${place.id}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>` : '';
+  const favoriteButton = place => place.saved ? `<button type="button" class="lm-carousel-heart lm-heart-motion${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>` : '';
   function playHeartMotion(button, liked) {
     button.querySelector('.lm-heart-burst')?.remove();
     button.classList.remove('is-bursting');
@@ -459,13 +465,13 @@
       }
       case 'toggle-favorite':{
         const place=markerEntries.get(button.dataset.placeKey)?.place;
-        const item=place?.saved&&items.find(x=>x.id===place.id);
+        const item=place?.saved&&PinmapPlaces.all(items).find(x=>x.id===place.placeId);
         if(!item)break;
         const favorite=PinmapFavorites.toggle(item);if(favorite===null)break;
         place.favorite=favorite;
-        searchResults?.forEach(result=>{if(result.saved&&result.id===item.id)result.favorite=favorite;});
-        for(const entry of markerEntries.values())if(entry.place?.id===item.id)entry.place.favorite=favorite;
-        document.querySelectorAll('.lm-carousel-heart').forEach(node=>{if(node.dataset.itemId!==String(item.id))return;node.classList.toggle('is-active',favorite);node.setAttribute('aria-pressed',String(favorite));if(node.classList.contains('lm-heart-motion'))playHeartMotion(node,favorite);});
+        searchResults?.forEach(result=>{if(result.placeId===item.id)result.favorite=favorite;});
+        for(const entry of markerEntries.values())if(entry.place?.placeId===item.id)entry.place.favorite=favorite;
+        document.querySelectorAll('.lm-carousel-heart').forEach(node=>{if(node.dataset.placeKey!==item.id)return;node.classList.toggle('is-active',favorite);node.setAttribute('aria-pressed',String(favorite));if(node.classList.contains('lm-heart-motion'))playHeartMotion(node,favorite);});
         toast(favorite?'즐겨찾기에 추가했어요.':'즐겨찾기에서 뺐어요.');
         break;
       }

@@ -47,6 +47,7 @@ detail = function(){
   const x = items.find(i => i.id === detailId);
   const selectedPlaceIndex=window.pmDetailPlace?.id===detailId ? window.pmDetailPlace.index : 0;
   const selectedPlace=x?.mapLocations?.[selectedPlaceIndex||0];
+  const favoritePlace=PinmapPlaces.forItem(x).find(place=>place.locationIndex===(selectedPlaceIndex||0));
   if (!x) { detailId = null; return pages[page](); }
   const t = typeOf(x.type);
   const showPlaceInfo = t.place && x.contentKind !== 'unknown' &&
@@ -61,7 +62,7 @@ detail = function(){
   const mappedCount = extracted.filter(place => place.hasCoordinates).length;
   const locations=Array.isArray(x.mapLocations)?x.mapLocations:[];
   const photoIndexes=dtPlacePhotoIndexes(extracted,locations);
-  const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 확인 · 지도 표시 ${mappedCount}곳 · 위치 확인 필요 ${extracted.length - mappedCount}곳</p><ul>${extracted.map((place,i) => {const index=photoIndexes[i];return `<li class="dt-extraction-place">${PinmapPlacePhotos.markup(x.backendId,index,PinmapPlacePhotos.preferredImage(index>=0?locations[index]:null,x.photo),'dt-extraction-photo')}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong><span class="${place.hasCoordinates ? 'dt-extraction-ready' : 'dt-extraction-pending'}">${place.hasCoordinates ? '지도 표시' : '위치 확인 필요'}</span></div><p>${esc(place.hasCoordinates ? (place.address || '지도 위치 확인됨') : (place.reason || '주소를 확인하지 못했어요.'))}</p></div></li>`;}).join('')}</ul></section>` : '';
+  const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 확인 · 지도 표시 ${mappedCount}곳 · 위치 확인 필요 ${extracted.length - mappedCount}곳</p><ul>${extracted.map((place,i) => {const index=photoIndexes[i],favorite=index>=0?PinmapPlaces.forItem(x).find(entry=>entry.locationIndex===index):null;return `<li class="dt-extraction-place">${PinmapPlacePhotos.markup(x.backendId,index,PinmapPlacePhotos.preferredImage(index>=0?locations[index]:null,x.photo),'dt-extraction-photo')}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong><span class="${place.hasCoordinates ? 'dt-extraction-ready' : 'dt-extraction-pending'}">${place.hasCoordinates ? '지도 표시' : '위치 확인 필요'}</span></div><p>${esc(place.hasCoordinates ? (place.address || '지도 위치 확인됨') : (place.reason || '주소를 확인하지 못했어요.'))}</p></div>${favorite?`<button type="button" class="dt-extraction-heart lm-heart-motion${favorite.favorite?' is-active':''}" data-fav-place="${index}" aria-pressed="${!!favorite.favorite}" aria-label="${esc(favorite.title)} 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>`:''}</li>`;}).join('')}</ul></section>` : '';
   const events = Array.isArray(x.events) ? x.events : [];
   const eventDate = value => {
     if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
@@ -108,7 +109,7 @@ detail = function(){
     <div class="dthero">${libThumb(x)}<div class="dtshade" aria-hidden="true"></div>
       <div class="dttop"><button class="dtbtn" data-action="back" aria-label="돌아가기">${icon('chevleft')}</button>
         <div class="dttopr">
-          <button type="button" class="dtbtn dtfavorite lm-heart-motion${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 즐겨찾기" aria-pressed="${!!x.favorite}"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>
+          ${favoritePlace?`<button type="button" class="dtbtn dtfavorite lm-heart-motion${favoritePlace.favorite?' is-active':''}" data-action="fav" aria-label="${esc(favoritePlace.title)} 즐겨찾기" aria-pressed="${!!favoritePlace.favorite}"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>`:''}
           <button class="dtbtn dtmorebtn" data-action="dtmore" aria-label="더보기" aria-haspopup="menu" aria-expanded="false" aria-controls="dtmenu">${icon('more')}</button>
           <div class="dtmenu" id="dtmenu" role="menu" aria-label="콘텐츠 메뉴" hidden>
             <button type="button" role="menuitem" data-action="dtshare">${icon('share')}공유</button>
@@ -248,12 +249,28 @@ paths.walk = 'M13 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0 M9 21l2-6 2 2v4 M8 11l
 // 즐겨찾기 하트 · 프로토타입과 로그인 계정에서 같은 동작을 사용해요.
 actions.fav = () => {
   const x = items.find(i => i.id === detailId); if (!x) return;
-  const favorite = PinmapFavorites.toggle(x); if (favorite === null) return;
+  const index=window.pmDetailPlace?.id===detailId?window.pmDetailPlace.index||0:0;
+  const place=PinmapPlaces.forItem(x).find(entry=>entry.locationIndex===index);if(!place)return;
+  const favorite = PinmapFavorites.toggle(place); if (favorite === null) return;
   const y = scrollY; render(); scrollTo(0, y);
   const button = document.querySelector('.dt-photo .dtfavorite');
   if (button) window.PinmapHeartMotion?.(button, favorite);
   toast(favorite ? '즐겨찾기에 추가했어요.' : '즐겨찾기에서 뺐어요.');
 };
+document.addEventListener('click',event=>{
+  const button=event.target.closest('[data-fav-place]');if(!button||detailId==null)return;
+  const item=items.find(entry=>entry.id===detailId);
+  const place=PinmapPlaces.forItem(item).find(entry=>entry.locationIndex===Number(button.dataset.favPlace));
+  if(!place)return;
+  const favorite=PinmapFavorites.toggle(place);if(favorite===null)return;
+  button.classList.toggle('is-active',favorite);button.setAttribute('aria-pressed',String(favorite));
+  window.PinmapHeartMotion?.(button,favorite);
+  const top=document.querySelector('.dt-photo .dtfavorite');
+  if(top&&Number(button.dataset.favPlace)===(window.pmDetailPlace?.id===detailId?window.pmDetailPlace.index||0:0)){
+    top.classList.toggle('is-active',favorite);top.setAttribute('aria-pressed',String(favorite));
+  }
+  toast(favorite?'즐겨찾기에 추가했어요.':'즐겨찾기에서 뺐어요.');
+});
 
 /* ---------- 저장 정보 수정 (흰 시트) ---------- */
 // app.js의 수정 처리(#editform 제출)를 그대로 쓰도록 입력 이름(type · title · address · memo · collection)을 유지해요.
