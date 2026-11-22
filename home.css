@@ -173,9 +173,7 @@
 .mgroup .syncbtn{border-top:1px solid var(--t-line,var(--color-disabled))}
 .syncico{width:24px;display:grid;place-items:center}.syncico .icon{width:20px;height:20px}
 .syncbtn b{display:block;font:var(--type-body-md)}.syncbtn small{font:var(--type-body-sm);color:var(--t-sub,var(--color-secondary))}
-.syncbtn.on .syncico .icon{animation:spin .9s linear infinite}
 .subhead~.syncbtn{margin:0 0 var(--space-md);padding:var(--space-md) var(--space-lg);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:var(--t-shadow)}
-@keyframes spin{to{transform:rotate(360deg)}}
 
 /* ===== (5차) ===== */
 .rwtitle{margin:0 0 var(--space-md);font:var(--type-label-md)}
@@ -243,7 +241,6 @@ body.notipanel-open .bottomnav{display:none!important}
 /* SNS 계정 연동: 계정별 새로고침 버튼 */
 .accsync{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--t-soft,var(--color-neutral))}
 .accsync .icon{width:17px;height:17px}
-.accsync.on .icon{animation:spin .9s linear infinite}
 
 /* 홈 키워드 글자: 조금 더 진하게 (#505050 → #2E2E2E) */
 .chiprows .prefchip{color:var(--color-on-surface)!important}

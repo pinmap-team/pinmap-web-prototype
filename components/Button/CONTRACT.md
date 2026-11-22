@@ -15,3 +15,5 @@ await PinmapButton.run(searchButton, () => searchPlaces(query), '장소 검색 �
 반례: CSS로만 흐리게 하고 클릭을 허용하기; 로딩 스피너만 보이며 중복 요청하기; 존재하지 않는 React Button을 import하기.
 
 - 2026-11-19 로컬 정리: 초점은 추가 outline 테두리 대신 밝기 변화로 표시한다. 메뉴는 기존 배경 변화도 함께 사용한다. 원래 테두리·선택 표시는 유지하며 키보드 Tab·Enter로 같은 동작을 검증한다.
+
+- 로딩은 공통 pm-spin(0.8초 linear), 16px 원형을 버튼 정중앙에 표시한다. 대기 중 기존 내용은 시각적으로 숨기고 aria-label로 동작을 설명하며 기존 버튼 크기와 중복 실행 방지를 유지한다. 모션 축소에서는 회전을 멈춘다. 화면·진행 상태의 로딩은 .pm-loading 안에 .pm-spinner를 놓아 중앙 정렬하고 처리 완료/실패/중단 때 제거한다.

@@ -18,4 +18,5 @@
   }});
   status.textContent='결제창에서 결제 또는 결제 수단 변경을 진행해 주세요.';
   }catch{status.textContent='결제 연결을 확인하지 못했어요. 핀맵에서 다시 시도해 주세요.';}
+  finally{document.getElementById('checkout-loading').hidden=true;}
 })();

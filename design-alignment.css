@@ -152,11 +152,8 @@ button:disabled,button[aria-disabled="true"],input:disabled,textarea:disabled{cu
 button:disabled:hover{filter:none}
 button:not(:disabled):not([aria-busy="true"]):active{filter:brightness(.90)}
 .filled:not(:disabled):active,.cm-next:not(:disabled):active,.pm-done:not(:disabled):active,.ob-next:not(:disabled):active{background:var(--color-primary-pressed)!important}
-button[aria-busy="true"]{position:relative;cursor:wait;opacity:1}
-button[aria-busy="true"]>svg{visibility:hidden}
-button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto;width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:pm-busy .7s linear infinite}
-@keyframes pm-busy{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){button[aria-busy="true"]::after{animation:none}}
+button[aria-busy="true"]{position:relative;cursor:wait;opacity:1;text-indent:-9999px}
+button[aria-busy="true"]>*{visibility:hidden}
 
 .live-map .lm-header .lm-categories button{gap:var(--space-sm);padding:var(--space-sm) 0 var(--space-md)}
 /* Home controls: keep the 52px strip; reserve a separate, non-overlapping close column. */
@@ -428,8 +425,6 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 .myq-card .myq-ico .icon{width:24px;height:24px}
 .myq-card b{font:var(--type-label-md)}
 .myq-card small{font:var(--type-body-sm);color:var(--color-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.myq-card.on .myq-ico .icon{animation:spin .9s linear infinite}
-@media(prefers-reduced-motion:reduce){.myq-card.on .myq-ico .icon{animation:none}}
 
 /* 2026-11-03 온보딩 2·3번째 화면: 단계 표시(1/2 · 2/2)와 건너뛰기를 space-md만큼 위로. 아래 제목 위치는 그대로 */
 #onboarding .ob-screen:is(.step2,.step3)>.ob-top{margin-top:calc(-1 * var(--space-md));margin-bottom:var(--space-md)}
@@ -827,13 +822,10 @@ body.auth-body{display:grid;grid-template-columns:minmax(0,1fr);grid-template-ro
 .auth-submit:active{background:var(--color-primary-pressed)}
 .auth-shell:is([data-screen="connecting"],[data-screen="error"]) .auth-panel{text-align:center}
 .auth-connection{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-xl);width:100%;margin-inline:auto}
-.auth-connection-symbol{display:block;width:32px;height:38px;flex:none;background:var(--color-primary);mask:url("img/pinmap-symbol-splash.svg") center/contain no-repeat;-webkit-mask:url("img/pinmap-symbol-splash.svg") center/contain no-repeat;animation:auth-pin-spin 5.6s cubic-bezier(.45,0,.55,1) infinite}
 .auth-connection .auth-heading{margin:0;text-align:center}
 .auth-connection .auth-heading h1{word-break:keep-all}
 .auth-connection .auth-submit{width:100%;margin:0}
 .auth-connection .auth-home{margin:0}
-@keyframes auth-pin-spin{from{transform:perspective(240px) rotateY(0deg)}to{transform:perspective(240px) rotateY(360deg)}}
-@media(prefers-reduced-motion:reduce){.auth-connection-symbol{animation:none}}
 .auth-message{text-align:center;font:var(--type-body-sm);color:var(--color-secondary);margin:var(--space-lg) 0 0;overflow-wrap:anywhere}
 .auth-message:empty{display:none}
 .auth-message.is-error{color:var(--color-on-surface);border-left:3px solid var(--color-error);padding:var(--space-sm) var(--space-md)}
@@ -844,7 +836,6 @@ body.auth-body{display:grid;grid-template-columns:minmax(0,1fr);grid-template-ro
 .pm-auth :is(button,a):focus-visible{outline:2px solid var(--color-primary);outline-offset:4px}
 .auth-hero .auth-brand:focus-visible{outline-color:var(--color-neutral)}
 .pm-auth button:disabled{cursor:wait;opacity:.6}
-.pm-auth button[aria-busy="true"]::after{content:"…";margin-left:var(--space-xs)}
 @media(min-width:480px){.auth-body .auth-shell{box-shadow:var(--shadow-md)}}
 html.auth-pending #app{visibility:hidden;pointer-events:none}
 .auth-gate{position:fixed;inset:0;overflow:auto;background:var(--color-surface);z-index:100;display:flex;flex-direction:column;justify-content:center;align-items:stretch}
@@ -1358,16 +1349,20 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .mainpick .pick:not(.pick-placeholder) .pickimg::after{background:linear-gradient(180deg,rgba(0,0,0,.64) 0%,rgba(0,0,0,.64) 25%,transparent 45%,rgba(0,0,0,.64) 60%,rgba(0,0,0,.64) 100%)!important}
 .mainpick .pick:not(.pick-placeholder) .pickword{color:#fff;opacity:1}
 
-/* Loading and pull-to-refresh share one accessible progress indicator. */
+/* All application-owned loading indicators share geometry, speed and easing. */
 .pm-loading{display:flex;justify-content:center;align-items:center;min-height:120px;padding:var(--space-xl)}
-.pm-spinner{display:inline-block;box-sizing:border-box;width:28px;height:28px;border:3px solid var(--color-disabled);border-top-color:var(--color-primary);border-radius:50%;animation:pm-spin .8s linear infinite}
+.pm-spinner,button[aria-busy="true"]::after{display:inline-block;box-sizing:border-box;flex:none;width:28px;height:28px;border:3px solid color-mix(in srgb,currentColor 22%,transparent);border-top-color:currentColor;border-radius:50%;background:none;animation:pm-spin .8s linear infinite}
+.pm-spinner{color:var(--color-primary)}
+.pm-loading[hidden]{display:none}
+.pm-loading-compact{min-height:0;padding:var(--space-sm) 0}
+.auth-shell[data-screen="connecting"] .auth-connection{position:relative;min-height:28px}
+.auth-shell[data-screen="connecting"] .auth-connection .auth-heading{position:absolute;top:calc(100% + var(--space-xl));width:100%}
+.pm-spinner.pm-spinner-inline,button[aria-busy="true"]::after{width:16px;height:16px;border-width:2px}
+button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto;text-indent:0}
 @keyframes pm-spin{to{transform:rotate(360deg)}}
-.pm-refresh{position:fixed;z-index:900;top:0;left:50%;display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:var(--color-surface);box-shadow:var(--shadow-sm);transform:translate(-50%,-60px);opacity:0;pointer-events:none;transition:transform .2s ease,opacity .2s ease}
-.pm-refresh.is-pulling{transition:none}
-.pm-refresh.is-pulling .pm-spinner{animation:none;transform:rotate(var(--pull-turn,0deg))}
 /* Disable browser pull-to-refresh while keeping normal vertical scrolling. */
 html,body{overscroll-behavior-y:contain}
-@media(prefers-reduced-motion:reduce){.pm-spinner{animation-duration:1.6s}.pm-refresh{transition:none}}
+@media(prefers-reduced-motion:reduce){.pm-spinner,button[aria-busy="true"]::after{animation:none}}
 
 /* Current location: blue position and a compass cone only when heading is available. */
 .live-map .lm-current-position-dot{fill:#2789ef;stroke:#fff;filter:drop-shadow(0 2px 5px #163c7740)}
@@ -1509,7 +1504,6 @@ html.pm-refresh-enabled #app{position:relative;top:var(--pull-content,0px);trans
 html.pm-pulling #app{transition:none}
 html.pm-pulling,html.pm-pulling *{user-select:none!important;-webkit-user-select:none!important}
 .pm-refresh.is-ready{background:var(--color-primary);color:var(--color-neutral)}
-.pm-refresh.is-ready .pm-spinner{border-color:color-mix(in srgb,var(--color-neutral) 35%,transparent);border-top-color:var(--color-neutral)}
 @media(prefers-reduced-motion:reduce){html.pm-refresh-enabled #app{transition:none}}
 
 /* Saved-place photos retain original post imagery, with visible Google author credits. */

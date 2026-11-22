@@ -15,6 +15,8 @@
     const pause = form.querySelector('#zip-import-pause');
     const resume = form.querySelector('#zip-import-resume');
     status.hidden = !state;
+    const loader = form.querySelector('#zip-import-loading');
+    if (loader) loader.hidden = state?.phase !== 'running';
     start.disabled = state?.phase === 'running' || state?.phase === 'paused';
     pause.hidden = state?.phase !== 'running';
     resume.hidden = state?.phase !== 'paused';
@@ -71,7 +73,7 @@
       <p id="zip-file-name" class="zip-import-filename" role="status">선택한 파일 없음</p>
       <p class="zip-import-note">ZIP은 기기에서 읽고 게시물 링크만 전송해요. 중복은 건너뛰며, 월간 분석 한도나 계정 저장 100개 한도에 닿으면 남은 목록을 일시정지해요.</p>
       ${PM_ENV.requiresAuth ? '' : '<a class="textbtn" href="auth.html?screen=welcome" target="_top">로그인하고 가져오기</a>'}
-      <div id="zip-import-status" class="zip-import-status" role="status" hidden><p id="zip-import-progress-text"></p><progress id="zip-import-meter" aria-label="ZIP 가져오기 진행률" max="1" value="0"></progress><p id="zip-import-state"></p><button type="button" class="textbtn" id="zip-import-pause" hidden>일시정지</button><button type="button" class="textbtn" id="zip-import-resume" hidden>이어하기</button></div>
+      <div id="zip-import-status" class="zip-import-status" role="status" hidden><div class="pm-loading pm-loading-compact" id="zip-import-loading" aria-hidden="true" hidden><span class="pm-spinner"></span></div><p id="zip-import-progress-text"></p><progress id="zip-import-meter" aria-label="ZIP 가져오기 진행률" max="1" value="0"></progress><p id="zip-import-state"></p><button type="button" class="textbtn" id="zip-import-pause" hidden>일시정지</button><button type="button" class="textbtn" id="zip-import-resume" hidden>이어하기</button></div>
       <p id="zip-import-error" class="eserror" role="alert"></p>
       <div class="dialogactions"><button type="button" class="textbtn" data-action="zipback">뒤로</button><button type="button" class="filled" id="zip-import-start">분석하고 저장</button></div>
     </form>`);
