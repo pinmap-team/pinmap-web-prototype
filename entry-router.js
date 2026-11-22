@@ -7,6 +7,11 @@
     location.replace('auth.html' + location.search + location.hash);
     return;
   }
+  if (performance.getEntriesByType('navigation')[0]?.type === 'reload') {
+    try { localStorage.removeItem('pinmap.auth.v1'); } catch {}
+    location.replace('auth.html?screen=welcome');
+    return;
+  }
   const legacyMode = params.has('place-test') || (params.has('mode') &&
     (params.get('mode') !== 'development' || params.get('auth') !== 'required'));
   if (legacyMode) { location.replace('auth.html?screen=welcome'); return; }

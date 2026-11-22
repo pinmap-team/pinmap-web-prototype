@@ -68,7 +68,7 @@ node scripts/dev-auth-server.cjs
 
 ## 공개 화면 접근
 
-공개 앱은 로그인 후 계정 화면만 제공합니다. 이전 `mode=prototype`, 로그인 없는 `mode=development` 및 `place-test` 주소는 로그인 화면으로 이동합니다. `mode=development&auth=required` 경로는 로그인 상태를 확인합니다.
+공개 앱은 로그인 후 계정 화면만 제공합니다. 브라우저를 새로고침하면 이 브라우저의 로그인 세션을 지우고 로그인 화면으로 이동합니다. 다시 로그인해도 저장 콘텐츠와 완료한 온보딩 기록은 유지됩니다. 이전 `mode=prototype`, 로그인 없는 `mode=development` 및 `place-test` 주소는 로그인 화면으로 이동합니다. `mode=development&auth=required` 경로는 로그인 상태를 확인합니다.
 
 `screen-policy.js`에 현재 사용하는 화면만 등록한다. 옛 `placeset`·`accountaccess`는 현재 위치 편집·계정 관리로 연결하며 알 수 없는 화면은 홈으로 보낸다. 사용 종료한 SNS 공유 체험·모의 권한/푸시·익명 분석 미리보기·당겨서 새로고침 코드는 삭제했다. 기록은 Git 이력에서 확인한다. 회원 탈퇴의 미구현 확인·실행 버튼은 노출하지 않고 계정 삭제 문의를 제공한다.
 

@@ -57,14 +57,14 @@ test('sample pools, map coordinates, photos and neighborhoods are absent in deve
   assert(read('course.js').includes('else if(!PM_ENV.development)'));
 });
 function route(search, navigationType='navigate') {
-  const frame={src:'app.html?mode=development&auth=required'},replacements=[],redirects=[];
+  const frame={src:'about:blank'},replacements=[],redirects=[],removed=[];
   vm.runInNewContext(read('entry-router.js'),{
     location:{search,pathname:'/index.html',hash:'',replace:url=>redirects.push(url)},
     performance:{getEntriesByType:()=>[{type:navigationType}]},
     history:{replaceState:(state,title,url)=>replacements.push(url)},
-    URLSearchParams,document:{querySelector:()=>frame}
+    URLSearchParams,localStorage:{removeItem:key=>removed.push(key)},document:{querySelector:()=>frame}
   });
-  return {src:frame.src,replacements,redirects};
+  return {src:frame.src,replacements,redirects,removed};
 }
 test('root and signed-in links open only the account app',()=>{
   assert.equal(route('').src,'app.html?mode=development&auth=required');
@@ -72,8 +72,11 @@ test('root and signed-in links open only the account app',()=>{
   assert.equal(result.src,'app.html?mode=development&auth=required');
   assert.deepEqual(result.replacements,['/index.html']);
 });
-test('refresh stays on the account app and legacy links return to login',()=>{
-  assert.equal(route('','reload').src,'app.html?mode=development&auth=required');
+test('refresh clears the local session and opens login; legacy links return to login',()=>{
+  const refreshed=route('','reload');
+  assert.equal(refreshed.src,'about:blank');
+  assert.deepEqual(refreshed.removed,['pinmap.auth.v1']);
+  assert.deepEqual(refreshed.redirects,['auth.html?screen=welcome']);
   assert.deepEqual(route('?mode=prototype').redirects,['auth.html?screen=welcome']);
   assert.deepEqual(route('?mode=development').redirects,['auth.html?screen=welcome']);
   assert.deepEqual(route('?mode=invalid').redirects,['auth.html?screen=welcome']);
@@ -83,7 +86,7 @@ test('old account link is normalized without discarding other query parameters',
   const result=route('?mode=development&auth=required');
   assert.equal(result.src,'app.html?mode=development&auth=required');
   assert.deepEqual(result.replacements,['/index.html']);
-  assert.deepEqual(route('?mode=development&auth=required&v=review','reload').replacements,['/index.html?v=review']);
+  assert.deepEqual(route('?mode=development&auth=required&v=review','reload').redirects,['auth.html?screen=welcome']);
 });
 
 test('old place-test mode cannot enable anonymous place results',()=>{
