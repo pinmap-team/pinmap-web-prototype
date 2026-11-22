@@ -338,6 +338,8 @@ if (PM_ENV.requiresAuth) (() => {
       window.PinmapAccountLoaded = true;
       window.PinmapAccountLoadError = false;
       refreshVisibleContent();
+      if (typeof CustomEvent === 'function' && typeof window.dispatchEvent === 'function')
+        window.dispatchEvent(new CustomEvent('pinmap:account-loaded', {detail:{userId}}));
     } catch (error) {
       if (version === loadVersion && currentUserId === userId) {
         window.PinmapAccountLoaded = true;
@@ -349,7 +351,8 @@ if (PM_ENV.requiresAuth) (() => {
   }
   const originalSave = actions.save;
   window.PinmapCaptureSave = async (image, id) => {
-    if (PinmapSaveProgress.isRunning() || contentSaving) throw Error('다른 저장 작업이 진행 중이에요.');
+    if (PinmapSaveProgress.isRunning() || contentSaving || window.PinmapZipImport?.isRunning())
+      throw Error('다른 저장 작업이 진행 중이에요.');
     contentSaving = true;
     const userId = currentUserId;
     try {
@@ -377,6 +380,21 @@ if (PM_ENV.requiresAuth) (() => {
       return item;
     } finally { contentSaving = false; }
   };
+  async function importZipLink(url, expectedUserId) {
+    if (!expectedUserId || expectedUserId !== currentUserId) throw Error('로그인 계정이 변경됐어요.');
+    if (PinmapSaveProgress.isRunning() || contentSaving) throw Error('다른 저장 작업이 진행 중이에요.');
+    contentSaving = true;
+    try {
+      const result = await accountRequest('POST', {url,content_types:['place','event']}, '', expectedUserId);
+      if (!result.item || typeof result.item !== 'object') throw Error('게시물 저장 결과를 확인하지 못했어요.');
+      if (currentUserId !== expectedUserId) throw Error('로그인 계정이 변경됐어요.');
+      loadVersion++;
+      const item = accountItem(result.item);
+      items = [item, ...items.filter(entry => entry.url !== item.url)];
+      refreshVisibleContent();
+      return item;
+    } finally { contentSaving = false; }
+  }
   actions.accountretry = () => loadAccount();
   actions.save = () => {
     originalSave();
@@ -400,7 +418,7 @@ if (PM_ENV.requiresAuth) (() => {
     if (event.target.id !== 'saveform') return;
     event.preventDefault(); event.stopImmediatePropagation();
     const form = event.target;
-    if (PinmapSaveProgress.isRunning() || contentSaving) {
+    if (PinmapSaveProgress.isRunning() || contentSaving || window.PinmapZipImport?.isRunning()) {
       const errorNode = form.querySelector('#saveerror');
       if (errorNode) errorNode.textContent = '다른 링크를 저장 중이에요. 완료될 때까지 기다려 주세요.';
       return;
@@ -539,7 +557,11 @@ if (PM_ENV.requiresAuth) (() => {
       }finally{contentSaving=false;}
     }
   };
-  window.PinmapAccountContent = {remove:async item => {
+  window.PinmapAccountContent = {
+    userId:() => currentUserId,
+    knownUrls:() => items.map(item => item.url).filter(url => typeof url === 'string'),
+    importZipLink,
+    remove:async item => {
     if (!item?.url&&!item?.manualId) throw Error('삭제할 콘텐츠를 확인하지 못했어요.');
     const userId = currentUserId;
     const wasLoading = !window.PinmapAccountLoaded;
