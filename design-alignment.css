@@ -1251,6 +1251,7 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 
 .dt.dt-photo .dtsheet,[data-theme="dark"] .dt.dt-photo .dtsheet{position:relative;z-index:1;display:flex;flex-direction:column;gap:var(--space-xl);margin-top:calc(-1 * var(--space-xl));padding:var(--space-xl) var(--space-xl) calc(176px + env(safe-area-inset-bottom));height:calc(100svh - var(--dt-sheet-top,240px));min-height:0;max-height:calc(100svh - var(--dt-sheet-top,240px));overflow-y:hidden;overflow-x:hidden;overscroll-behavior:auto;scrollbar-width:none;flex:none;border:0;border-top:1px solid color-mix(in srgb,var(--color-surface) 72%,transparent);border-radius:var(--rounded-lg) var(--rounded-lg) 0 0;background:color-mix(in srgb,var(--color-surface) 68%,transparent);-webkit-backdrop-filter:blur(28px) saturate(1.15);backdrop-filter:blur(28px) saturate(1.15);box-shadow:var(--shadow-sm)}
 .dt.dt-photo .dtsheet{padding-top:0}
+.dt.dt-photo.dt-no-actions .dtsheet{padding-bottom:calc(80px + var(--space-xl) + env(safe-area-inset-bottom))}
 .dt.dt-photo .dtsheet.is-expanded{overflow-y:auto;overscroll-behavior:contain}
 .dt-photo .dtsheet::-webkit-scrollbar{display:none}
 .dt-photo .dtsheet>.dtsec,.dt-photo .dtsheet>.dtsum{flex:none}

@@ -74,7 +74,6 @@ let page='home', filter='전체', query='', detailId=null, selectedPin=1, collec
 // 마이 > 프로필 · 설정 (pinmap.js가 브라우저에 저장합니다)
 let settings = PM_ENV.development ? {nickname:'',area:'',notiDeadline:false,notiNearby:false,notiReminder:false,aiDefault:false,readNoti:[],push:false,locPerm:'none',places:[],recentPlaces:[],accounts:[],calSeeded:true} : {nickname:'서연', area:'성수동', notiDeadline:true, notiNearby:true, notiReminder:false, aiDefault:true, readNoti:[], push:false, locPerm:'none', places:['성수동','청파동'], recentPlaces:['한남동','연남동','잠실3동']};
 const LOC_PERM = {always:'항상 허용', using:'앱을 사용하는 동안', none:'허용 안 함'};
-const GOOGLE_MAP = {name:'구글 지도', url:q=>`https://www.google.com/maps/search/?api=1&query=${q}`};
 let dueDismissed = false; // 마감 임박 배너를 닫으면 이번 방문 동안 숨김
 let unreadCount = () => 0; // my.js가 알림 개수 계산을 연결합니다
 const pages = {};          // 화면 렌더 함수 (pinmap.js가 home을 개인화 버전으로 바꿉니다)
