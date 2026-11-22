@@ -12,6 +12,23 @@ function dtLogo(src){
   return '';
 }
 
+function dtEventDate(value){
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
+  const [year,month,day] = value.split('-').map(Number), date = new Date(year,month-1,day);
+  return date.getFullYear() === year && date.getMonth() === month-1 && date.getDate() === day ? value.replaceAll('-', '.') : '';
+}
+function dtEventInfo(events){
+  if(!Array.isArray(events)||!events.length)return '';
+  return `<section class="dtsec dt-extraction dt-events"><h2>게시물에서 찾은 행사 일정</h2><p class="dt-extraction-count">${events.length}건 · 게시물에서 추출한 일정</p><ul>${events.map(event => {
+    const start = dtEventDate(event.start_date), end = dtEventDate(event.end_date);
+    const hasDate=!!(start||end);
+    const date = start ? `${start}${end && end !== start ? ' – ' + end : ''}` : end || event.date_text || '날짜 확인 필요';
+    const kind = {exhibition:'전시',pop_up:'팝업',other:'행사'}[event.event_type] || '행사';
+    const notes = Array.isArray(event.notes) ? event.notes.filter(note => typeof note === 'string').slice(0, 3) : [];
+    return `<li><div><strong>${esc(event.title || '행사 이름 확인 필요')}</strong><span class="${hasDate?'dt-extraction-ready':'dt-extraction-pending'}">${kind} · ${hasDate?'날짜 추출':'날짜 확인 필요'}</span></div><p>${icon('calendar')}${esc(date)}${hasDate ? '' : ' · 확정 날짜 아님'}</p>${event.time_text ? `<p>${icon('clock')}${esc(event.time_text)}</p>` : ''}${event.venue_name || event.address ? `<p>${icon('pin')}${esc([event.venue_name,event.address].filter(Boolean).join(' · '))}</p>` : ''}${notes.map(note => `<p>${esc(note)}</p>`).join('')}</li>`;
+  }).join('')}</ul></section>`;
+}
+
 detail = function(){
   requestAnimationFrame(dtSheetLayout);
   const x = items.find(i => i.id === detailId);
@@ -33,19 +50,7 @@ detail = function(){
   const extractedPlaces=PinmapPlaces.forExtracted(x);
   const mappedCount=photoIndexes.filter(index=>index>=0).length;
   const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 확인 · 지도 표시 ${mappedCount}곳 · 위치 확인 필요 ${extracted.length - mappedCount}곳</p><ul>${extracted.map((place,i) => {const index=photoIndexes[i],favorite=extractedPlaces[i],located=index>=0&&!favorite.unlocated;return `<li class="dt-extraction-place">${located?PinmapPlacePhotos.markup(x.backendId,index,PinmapPlacePhotos.preferredImage(locations[index],x.photo),'dt-extraction-photo'):''}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong><span class="${located ? 'dt-extraction-ready' : 'dt-extraction-pending'}">${located ? '지도 표시' : '위치 확인 필요'}</span></div><p>${esc(located ? (locations[index]?.address || place.address || '지도 위치 확인됨') : (place.reason || '주소를 확인하지 못했어요.'))}</p></div><button type="button" class="dt-extraction-heart lm-heart-motion${favorite.favorite?' is-active':''}" data-fav-place-id="${esc(favorite.id)}" aria-pressed="${!!favorite.favorite}" aria-label="${esc(favorite.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button></li>`;}).join('')}</ul></section>` : '';
-  const events = Array.isArray(x.events) ? x.events : [];
-  const eventDate = value => {
-    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
-    const [year,month,day] = value.split('-').map(Number), date = new Date(year,month-1,day);
-    return date.getFullYear() === year && date.getMonth() === month-1 && date.getDate() === day ? value.replaceAll('-', '.') : '';
-  };
-  const eventInfo = events.length ? `<section class="dtsec dt-extraction dt-events"><h2>게시물에서 찾은 행사 일정</h2><p class="dt-extraction-count">${events.length}건 · 날짜와 장소는 원본에서 확인해 주세요.</p><ul>${events.map(event => {
-    const start = eventDate(event.start_date), end = eventDate(event.end_date);
-    const date = start ? `${start}${end && end !== start ? ' – ' + end : ''}` : event.date_text || '날짜 확인 필요';
-    const kind = {exhibition:'전시',pop_up:'팝업',other:'행사'}[event.event_type] || '행사';
-    const notes = Array.isArray(event.notes) ? event.notes.filter(note => typeof note === 'string').slice(0, 3) : [];
-    return `<li><div><strong>${esc(event.title || '행사 이름 확인 필요')}</strong><span class="dt-extraction-pending">${kind} · 확인 필요</span></div><p>${icon('calendar')}${esc(date)}${start ? '' : ' · 확정 날짜 아님'}</p>${event.time_text ? `<p>${icon('clock')}${esc(event.time_text)}</p>` : ''}${event.venue_name || event.address ? `<p>${icon('pin')}${esc([event.venue_name,event.address].filter(Boolean).join(' · '))}</p>` : ''}${notes.map(note => `<p>${esc(note)}</p>`).join('')}</li>`;
-  }).join('')}</ul></section>` : '';
+  const eventInfo=dtEventInfo(x.events);
   const analysisNotes = Array.isArray(x.extractionNotes) ? x.extractionNotes.filter(note => typeof note === 'string').slice(0, 8) : [];
   const reviewInfo = analysisNotes.length || (x.contentKind === 'unknown' && x.status !== 'extracted') ? `<section class="dtsec dt-extraction dt-analysis-notes"><h2>분석 안내</h2><ul>${(analysisNotes.length ? analysisNotes : ['게시물에서 장소 또는 행사 정보를 확인하지 못했어요.']).map(note => `<li><p>${esc(note)}</p></li>`).join('')}</ul></section>` : '';
   const memoInfo = `<section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>`;

@@ -52,9 +52,8 @@ function calEventEntries(item){
     const start = calAbsoluteDate(event.start_date), end = calAbsoluteDate(event.end_date);
     if (!start && !end) return []; // 연도가 빠진 날짜는 캘린더의 확정 날짜로 만들지 않아요.
     const title = typeof event.title === 'string' && event.title.trim() ? event.title.trim() : item.title;
-    const candidate = event.needs_review !== false;
     const base = {id:item.id,title,art:item.art,photo:item.photo,desc:item.desc,
-      contentKind:item.contentKind,eventCandidate:candidate,period:event.date_text || ''};
+      contentKind:item.contentKind,eventCandidate:false,period:event.date_text || ''};
     if (start && end && start.getTime() === end.getTime())
       return [{...base,eventDate:event.start_date,dueLabel:'행사 일정'}];
     return [

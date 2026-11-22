@@ -349,7 +349,7 @@ test('only fully dated extracted events appear on the calendar', () => {
   const entries = vm.runInNewContext('calDueList().map(x=>({title:x.title,eventDate:x.eventDate,eventCandidate:x.eventCandidate}))',context);
   assert.equal(entries.length,2);
   assert.deepEqual(Array.from(entries,x=>x.eventDate),['2026-12-11','2027-04-11']);
-  assert(entries.every(x=>x.eventCandidate));
+  assert(entries.every(x=>x.eventCandidate===false));
 });
 
 test('account category uses trusted Decisions result and keeps old records compatible', () => {
