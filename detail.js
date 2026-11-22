@@ -341,9 +341,9 @@ document.addEventListener('click', e => {
 // app.js의 저장 처리(#saveform 제출)를 그대로 쓰도록 입력 이름(url · title · type · collection · memo)과 #saveerror를 유지해요.
 function saveSheet(){
   const label = (ic, text, extra='') => `<div class="eslabel">${icon(ic)}<span>${text}</span>${extra}</div>`;
-    modal('', `<form id="saveform" class="esform" novalidate>
-      <div class="eshead"><span class="esicon" aria-hidden="true">${icon('link')}</span><div><h2>게시물 링크로 저장</h2><p>콘텐츠 링크를 저장해요.</p></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
+    modal('게시물 링크로 저장', `<form id="saveform" class="esform" novalidate>
       <div class="esbody">
+        <p class="add-import-intro">콘텐츠 링크를 저장해요.</p>
         <label class="esfield">${label('link','게시물 주소 (URL)')}
           <span class="esinput withicon">${icon('link')}<input type="url" name="url" id="es-url" placeholder="https://www.instagram.com/p/…/" required inputmode="url"></span>
         </label>
@@ -356,7 +356,7 @@ function saveSheet(){
       </div>
       <div class="esfoot"><button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
     </form>`);
-    $('#sheet').classList.add('editsheet');
+    $('#sheet').classList.add('editsheet', 'add-import-sheet');
 
 }
 actions.save = saveSheet;

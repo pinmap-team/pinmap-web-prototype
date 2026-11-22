@@ -1595,3 +1595,22 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .legal-draft{padding:var(--space-md);border-radius:var(--rounded-sm);background:var(--color-accent);font:var(--type-label-md)}
 
 .policy-list a{text-decoration:none;color:var(--color-on-surface);min-height:56px}
+
+/* The three routes from + Add share one mobile sheet grid and button row. */
+#sheet.add-import-sheet{inset:auto 0 0;margin:auto auto 0;width:min(480px,100%);max-width:480px;max-height:min(92dvh,760px);padding:var(--space-xl) var(--space-xl) max(var(--space-xl),env(safe-area-inset-bottom));border-radius:var(--rounded-lg) var(--rounded-lg) 0 0;overflow:auto;background:var(--color-surface)!important;color:var(--color-on-surface)}
+#sheet.add-import-sheet .handle{width:32px;height:4px;margin:calc(-1 * var(--space-sm)) auto var(--space-xl);background:var(--color-disabled)}
+#sheet.add-import-sheet .dialoghead,#sheet.editsheet.add-import-sheet .dialoghead{display:flex;align-items:center;gap:var(--space-md);min-height:44px;margin:0 0 var(--space-xl)}
+#sheet.add-import-sheet .dialoghead h2{flex:1;min-width:0;font:var(--type-headline-md);overflow-wrap:anywhere}
+#sheet.add-import-sheet .dialoghead .iconbtn{margin-left:auto}
+#sheet.add-import-sheet :is(.zip-import-form,#saveform){display:flex;flex-direction:column;gap:var(--space-lg);max-height:none;margin:0;font:var(--type-body-md)}
+#sheet.add-import-sheet .add-import-intro{margin:0;font:var(--type-body-md);color:var(--color-on-surface)}
+#sheet.add-import-sheet #saveform .esbody{display:flex;flex-direction:column;gap:var(--space-lg);padding:0;overflow:visible}
+#sheet.add-import-sheet #saveform .esfield{margin:0}
+#sheet.add-import-sheet #saveform .eslabel{margin-bottom:var(--space-sm)}
+#sheet.add-import-sheet #saveform .eshint{margin:0}
+#sheet.add-import-sheet .zip-import-picker{width:100%;min-width:0;margin:0}
+#sheet.add-import-sheet .zip-import-filename,#sheet.add-import-sheet .zip-import-note{margin:0}
+#sheet.add-import-sheet :is(.dialogactions,.esfoot){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-md);margin:var(--space-xl) 0 0;padding:0;border:0;background:transparent}
+#sheet.add-import-sheet :is(.dialogactions,.esfoot)>button{width:100%;min-width:0;min-height:48px;padding:var(--space-md);border-radius:var(--rounded-md);font:var(--type-label-md)}
+#sheet.add-import-sheet :is(.eserror,#saveerror,#zip-import-error,#screenshot-import-error):empty{display:none}
+@media(max-width:650px){#sheet.add-import-sheet{width:100%;max-height:calc(100dvh - var(--space-xl));border-radius:var(--rounded-lg) var(--rounded-lg) 0 0}}

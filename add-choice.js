@@ -63,12 +63,13 @@
     setAddMenuOpen(false);
     sheet.className = '';
     actions.save();
+    sheet.classList.add('add-import-sheet');
   };
   actions.zipimport = () => {
     setAddMenuOpen(false);
-    sheet.className = 'zip-import-sheet';
+    sheet.className = 'zip-import-sheet add-import-sheet';
     modal('Instagram ZIP 가져오기', `<form id="zipimportform" class="zip-import-form">
-      <p>Instagram에서 내보낸 저장 게시물 ZIP 파일을 선택해 주세요.</p>
+      <p class="add-import-intro">Instagram에서 내보낸 저장 게시물 ZIP 파일을 선택해 주세요.</p>
       <label class="zip-import-picker"><span>ZIP 파일 선택</span><input type="file" name="archive" accept=".zip,application/zip" aria-label="Instagram 내보내기 ZIP 파일" required></label>
       <p id="zip-file-name" class="zip-import-filename" role="status">선택한 파일 없음</p>
       <p class="zip-import-note">ZIP은 기기에서 읽고 게시물 링크만 전송해요. 중복은 건너뛰며, 월간 분석 한도나 계정 저장 100개 한도에 닿으면 남은 목록을 일시정지해요.</p>
@@ -92,9 +93,9 @@
     setAddMenuOpen(false);
     clearScreenshotPreview();
     captureId = crypto.randomUUID();
-    sheet.className = 'zip-import-sheet screenshot-import-sheet';
+    sheet.className = 'zip-import-sheet screenshot-import-sheet add-import-sheet';
     modal('캡처 화면으로 추가', `<form class="zip-import-form" id="screenshotimportform">
-      <p>저장할 콘텐츠의 캡처 이미지를 선택해 주세요.</p>
+      <p class="add-import-intro">저장할 콘텐츠의 캡처 이미지를 선택해 주세요.</p>
       <label class="zip-import-picker"><span>캡처 이미지 선택</span><input type="file" name="screenshot" accept="image/png,image/jpeg,image/webp" aria-label="캡처 이미지 파일" required></label>
       <p id="screenshot-file-name" class="zip-import-filename" role="status">선택한 파일 없음</p>
       <img id="screenshot-preview" class="screenshot-import-preview" alt="선택한 캡처 이미지 미리보기" hidden>
@@ -115,7 +116,7 @@
   };
   sheet.addEventListener('close', () => {
     clearScreenshotPreview();
-    sheet.classList.remove('zip-import-sheet', 'screenshot-import-sheet');
+    sheet.classList.remove('zip-import-sheet', 'screenshot-import-sheet', 'add-import-sheet');
   });
   document.addEventListener('pointerdown', event => {
     const stage = document.getElementById('home-add-menu');
