@@ -24,3 +24,11 @@ test('edited place keeps its cover by original located order',()=>{
     [{name:'노즈커피',address:'서울 강남구'},
       {name:'기존 장소',address:'기존 주소'}]),[1,0]);
 });
+
+test('older extracted places still connect to their located map entries',()=>{
+  const places=[{name:'첫 카페',address:'서울 성동구 첫길 1',hasCoordinates:false},
+    {name:'둘째 카페',address:'서울 성동구 둘길 2',hasCoordinates:false}];
+  const locations=[{name:'둘째 카페',address:'서울 성동구 둘길 2'},
+    {name:'첫 카페',address:'서울 성동구 첫길 1'}];
+  assert.deepEqual(match(places,locations),[1,0]);
+});

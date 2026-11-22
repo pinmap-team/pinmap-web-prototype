@@ -102,7 +102,7 @@ if (PM_ENV.requiresAuth) (() => {
   window.PinmapAccountLoadError = false;
   const localIds = new Map();
   let folderState=PinmapFolders.normalize(null),folderSaving=false;
-  let favoriteState=PinmapFavorites.normalize(null),favoriteSaving=false;
+  let favoriteState=PinmapFavorites.normalize(null),favoriteWrite=Promise.resolve();
   let manualPins=[],editState=PinmapAccountMapData.normalizeEdits(null),contentSaving=false;
   let memoState=Object.create(null),memoSaving=false;
   function normalizeMemos(value){
@@ -165,14 +165,20 @@ if (PM_ENV.requiresAuth) (() => {
   function applyFavorites(value){
     favoriteState=PinmapFavorites.normalize(value);
     const selected=new Set(favoriteState);
-    for(const item of items){item.favorite=selected.has(String(item.backendId));item.placeFavorites=favoriteState.filter(id=>id.startsWith(`place:${item.backendId}:`));}
+    for(const [id,favorite] of PinmapFavorites.pendingChanges()){
+      if(favorite)selected.add(id);else selected.delete(id);
+    }
+    for(const item of items){item.favorite=selected.has(String(item.backendId));item.placeFavorites=[...selected].filter(id=>id.startsWith(`place:${item.backendId}:`));}
   }
-  PinmapFavorites.connect(async(item,favorite)=>{
-    if(!window.PinmapAccountLoaded||window.PinmapAccountLoadError)throw Error('저장 목록을 불러온 뒤 즐겨찾기해 주세요.');
-    if(favoriteSaving)throw Error('즐겨찾기를 저장 중이에요. 잠시 기다려 주세요.');
-    favoriteSaving=true;
+  const queueFavorite=operation=>{
+    const next=favoriteWrite.catch(()=>{}).then(operation);
+    favoriteWrite=next;
+    return next;
+  };
+  PinmapFavorites.connect((item,favorite)=>{
     const expected=currentUserId;
-    try{
+    return queueFavorite(async()=>{
+      if(!window.PinmapAccountLoaded||window.PinmapAccountLoadError)throw Error('저장 목록을 불러온 뒤 즐겨찾기해 주세요.');
       const {data,error}=await client.auth.getUser();
       if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)throw Error('로그인 계정을 다시 확인해 주세요.');
       const current=PinmapFavorites.normalize(data.user.user_metadata?.pinmap_favorites);
@@ -182,14 +188,12 @@ if (PM_ENV.requiresAuth) (() => {
       if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
       loadVersion++;
       applyFavorites(value);
-    }finally{favoriteSaving=false;}
+    });
   });
-  PinmapFavorites.connectMany(async chosen=>{
-    if(!window.PinmapAccountLoaded||window.PinmapAccountLoadError)throw Error('저장 목록을 불러온 뒤 즐겨찾기를 변경해 주세요.');
-    if(favoriteSaving)throw Error('즐겨찾기를 저장 중이에요. 잠시 기다려 주세요.');
-    favoriteSaving=true;
+  PinmapFavorites.connectMany(chosen=>{
     const expected=currentUserId;
-    try{
+    return queueFavorite(async()=>{
+      if(!window.PinmapAccountLoaded||window.PinmapAccountLoadError)throw Error('저장 목록을 불러온 뒤 즐겨찾기를 변경해 주세요.');
       const {data,error}=await client.auth.getUser();
       if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)throw Error('로그인 계정을 다시 확인해 주세요.');
       const removed=new Set(chosen.map(item=>String(item.placeId||item.backendId)));
@@ -199,7 +203,7 @@ if (PM_ENV.requiresAuth) (() => {
       if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
       loadVersion++;
       applyFavorites(value);
-    }finally{favoriteSaving=false;}
+    });
   });
   function applyFolders(value){
     for(const name of cfCustom()){

@@ -50,3 +50,24 @@ test('failed batch save restores every selected favorite',async()=>{
   assert.deepEqual(items.map(item=>item.favorite),[true,true]);
   assert.equal(requests,1);
 });
+
+test('rapid place like and unlike saves the last choice without dropping a tap',async()=>{
+  const context={window:{},render:()=>{}};
+  vm.runInNewContext(source,context);
+  const favorites=context.window.PinmapFavorites;
+  const item={backendId:'place:post:0',favorite:false};
+  const writes=[];
+  let release;
+  favorites.connect(async(_item,value)=>{
+    writes.push(value);
+    if(writes.length===1)await new Promise(resolve=>{release=resolve;});
+  });
+  assert.equal(favorites.toggle(item),true);
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(favorites.toggle(item),false);
+  assert.equal(item.favorite,false);
+  release();
+  for(let attempt=0;attempt<20&&writes.length<2;attempt++)await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(writes,[true,false]);
+  assert.equal(item.favorite,false);
+});
