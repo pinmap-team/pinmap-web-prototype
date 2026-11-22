@@ -54,7 +54,6 @@ test('sample pools, map coordinates, photos and neighborhoods are absent in deve
     ['map-live.js',/const savedCoords = ([\s\S]*?\n  \]);/],
     ['library.js',/const LIB_PHOTOS_BY_ID = ([\s\S]*?\n\});/],
     ['place.js',/const DONGS = ([\s\S]*?);\nconst dongOf/],
-    ['share.js',/const demoPost = ([\s\S]*?\n\});/]
   ]) {
     const match=read(file).match(expression);assert(match,file);
     const data=vm.runInContext('('+match[1]+')',context);
@@ -78,7 +77,7 @@ test('explicit choices enter the selected app once and remove the mode from the 
   const result=route('?mode=prototype');
   assert.equal(result.src,'app.html?mode=prototype');
   assert.deepEqual(result.replacements,['/index.html']);
-  assert.equal(route('?mode=development').src,'app.html?mode=development');
+  assert.equal(route('?mode=development').src,'entry.html');
   assert.equal(route('').src,'entry.html');
   assert.equal(route('?mode=invalid').src,'entry.html');
 });
@@ -87,7 +86,7 @@ test('refresh always returns to version selection, including old links with a mo
     assert.equal(route(query,'reload').src,'entry.html');
   }
   const first=route('?mode=development&v=review');
-  assert.equal(first.src,'app.html?mode=development');
+  assert.equal(first.src,'entry.html');
   assert.deepEqual(first.replacements,['/index.html?v=review']);
   assert.equal(route('?v=review','reload').src,'entry.html');
 });
@@ -100,8 +99,8 @@ test('post-login auth flag reaches only the development frame and is removed fro
 });
 
 test('login-free development can display backend place results, while signed-in mode remains separate',()=>{
-  assert.equal(route('?mode=development&place-test=1').src,'app.html?mode=development&place-test=1');
-  assert.equal(boot('development').value('PM_ENV.cloudPlaceTest'),true);
+  assert.equal(route('?mode=development&place-test=1').src,'entry.html');
+  assert.equal(boot('development').value('PM_ENV.cloudPlaceTest'),false);
   assert.equal(boot('development&auth=required').value('PM_ENV.cloudPlaceTest'),false);
   assert.equal(boot('prototype').value('PM_ENV.cloudPlaceTest'),false);
 });

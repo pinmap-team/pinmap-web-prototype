@@ -24,7 +24,7 @@ const server=http.createServer(async(req,res)=>{
   if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);res.end();return;}
   try{
     let pathname=decodeURIComponent(url.pathname);
-    if(pathname.split('/').some(segment=>segment.startsWith('.'))||pathname.startsWith('/api/'))throw new Error();
+    if(pathname.split('/').some(segment=>segment.startsWith('.'))||(pathname.startsWith('/api/')||pathname.startsWith('/archive/')))throw new Error();
     const file=await fs.realpath(path.join(root,pathname==='/'?'index.html':pathname));
     if(!file.startsWith(root+path.sep))throw new Error();
     const body=await fs.readFile(file);

@@ -2,7 +2,7 @@
 // 마이에서 누르는 기능은 아래에서 올라오는 시트 대신 새 페이지로 열리고, 왼쪽 위 ← 로 마이로 돌아가요.
 // 현재 위치 · 관심 키워드 · 알림 · 저장 · 위치/지도 · 저장하는 방법 · 앱 정보 · 핀맵 계정 설정
 
-const MY_PAGES = {calexport:'캘린더로 내보내기', favorites:'즐겨찾기', placeset:'위치 설정', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리', accountaccess:'로그아웃, 탈퇴'};
+const MY_PAGES = {calexport:'캘린더로 내보내기', favorites:'즐겨찾기', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리'};
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
 const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
@@ -14,27 +14,6 @@ function myQuickCards(){
     <button type="button" class="myq-card" data-action="accounts"><span class="myq-ico" aria-hidden="true">${icon('user')}</span><b>콘텐츠 출처</b></button>
   </div>`;
 }
-
-/* ---------- 현재 위치 ---------- */
-const placeSheetBase = placeSheet;
-function placeBody(){
-  const p = myPlaces();
-  const rows = p.map((name, i) => `<div class="prow">
-      <button class="pradio ${i===0?'on':''}" data-place-pick="${i}" role="radio" aria-checked="${i===0}" aria-label="${esc(name)} 선택"></button>
-      <button class="pname" data-place-pick="${i}"><b>${esc(name)}</b><small>${esc(dongOf(name).full)}${i===0?', 현재 위치':''}</small></button>
-      <button class="picon" data-place-edit="${i}" aria-label="${esc(name)} 수정">${icon('edit')}</button>
-      <button class="picon" data-place-del="${i}" aria-label="${esc(name)} 삭제" ${p.length===1?'disabled':''}>${icon('close')}</button>
-    </div>`).join('');
-  return `
-    <div class="mycard plist" role="radiogroup" aria-label="현재 위치">${rows}</div>
-    ${p.length < MAX_PLACES ? `<button class="padd" data-action="placeadd">${icon('plus')} 위치 추가</button>` : `<p class="hint pfull">위치를 바꾸려면 ✎ 수정을 누르거나, 하나를 지운 뒤 새로 추가해 주세요.</p>`}
-    ${p.length===1 ? '<p class="hint pfull">위치는 최소 1개가 필요해서 삭제할 수 없어요.</p>' : ''}`;
-}
-pages.placeset = () => myPage('위치 설정', placeBody(), 'placepage');
-// 이 페이지에 있을 때는 시트 대신 페이지를 다시 그려요 (홈 상단에서 열 때는 지금처럼 시트)
-placeSheet = function(){ if (page === 'placeset' && !detailId) { if ($('#sheet').open) $('#sheet').close(); render(); } else placeSheetBase(); };
-const placeSheetAction = actions.placesheet;
-actions.placesheet = () => { if (page === 'placeset') placeSheet(); else placeSheetAction(); };
 
 /* ---------- 관심 키워드 설정 (온보딩으로 가지 않고 이 페이지에서 바로 바꿔요) ---------- */
 pages.interestset = function(){
@@ -67,7 +46,6 @@ pages.saveset = () => myPage('저장 설정', pageFromModal(saveSettings), 'sett
 pages.themeset = () => { PinmapTheme.beginPreview(); return myPage('화면 모드', pageFromModal(() => PinmapTheme.show()), 'settingpage themepage'); };
 actions.appearance = () => go('themeset');
 Object.assign(actions, {
-  placesheetmy: () => go('placeset'),
   notisheet: () => go('notiset'),
   notisettings: () => go('notiset'),
   savesheet: () => go('saveset'),
@@ -79,7 +57,7 @@ Object.assign(actions, {
 // 마이의 '현재 위치' 줄은 페이지로 (홈 상단의 위치 버튼은 지금처럼 시트)
 document.addEventListener('click', e => {
   const b = e.target.closest('.mgroup [data-action="placesheet"]');
-  if (b && page === 'my') { e.stopImmediatePropagation(); go('placeset'); }
+  if (b && page === 'my') { e.stopImmediatePropagation(); go('myaddresses'); }
 }, true);
 
 /* ---------- 즐겨찾기 ---------- */
@@ -157,11 +135,11 @@ pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
 /* ---------- 자주 묻는 질문 · 공지사항 · 약관 및 정책 (2026-11-03, 마이 하단 도움말) ---------- */
 const infoRows = rows => `<div class="mycard settings">${rows.map(([t, d]) => `<div class="setrow"><div><b>${t}</b><small>${d}</small></div></div>`).join('')}</div>`;
 pages.faq = () => myPage('자주 묻는 질문', infoRows([
-  ['SNS 콘텐츠는 어떻게 저장하나요?', '인스타그램/유튜브 게시물에서 공유하기를 누르고 핀맵을 고르면<br>바로 저장돼요.'],
+  ['SNS 콘텐츠는 어떻게 저장하나요?', '홈 추가 메뉴에서 Instagram 링크·저장 ZIP·캡처 이미지를 선택해 주세요.'],
   ['저장한 콘텐츠는 어디에서 다시 보나요?', '홈에서 주변 저장 장소와 최근 저장을, 컬렉션에서 전체 목록을 볼 수 있어요.'],
   ['AI 자동 분류가 틀렸어요.', '콘텐츠 상세에서 카테고리를 직접 바꿀 수 있어요.<br>저장 설정에서 자동 분류를 끌 수도 있어요.'],
   ['원본 게시물이 삭제되면 어떻게 되나요?', '장소 정보는 그대로 남고, 원본 보기에는 ‘삭제된 게시물이에요’라고 보여요.'],
-  ['위치 권한은 어디에서 바꾸나요?', '휴대폰의 설정 앱 › 핀맵 › 위치에서 바꿀 수 있어요.']
+  ['위치 권한은 어디에서 바꾸나요?', '브라우저의 사이트 설정에서 위치 권한을 바꿀 수 있어요.']
 ]), 'settingpage');
 pages.notice = () => myPage('공지사항', infoRows([
   ['핀맵 프로토타입 03 공개', '연동 계정 관리, 위치 편집, 마이 바로가기가 새로 생겼어요.'],
@@ -194,7 +172,7 @@ pages.howtopage = function(){
     .replace(/<h1 class="ob-title"[^>]*>[\s\S]*?<\/h1>/, '<p class="ob-desc howtosub">마음에 드는 콘텐츠를 발견했다면?</p>');
   onboardStep = keep;
   return myPage('저장하는 방법 다시 보기', `<div class="ob-screen step2 howtobody">${html}
-    <div class="ob-actions"><button class="filled ob-next" data-action="snsdemo">SNS 저장 체험 해보기</button></div></div>`, 'howtopage', 'guide');
+    <div class="ob-actions"><button class="filled ob-next" data-action="linkimport">게시물 링크로 저장하기</button></div></div>`, 'howtopage', 'guide');
 };
 
 /* ---------- 프로필: 사진/이름 직접 편집 (2026-11-04: SNS 연동 계정은 마이 바로가기 '연동 계정 관리' 페이지로 분리) ---------- */
@@ -210,16 +188,9 @@ pages.account = () => myPage('계정 관리', `<h2 class="account-sub">프로필
     <div><dt>생년월일</dt><dd>${esc(PM_ENV.requiresAuth ? (settings.birth || '등록된 정보 없음') : (settings.birth || ACCOUNT_EXAMPLE.birth))}</dd></div>
   </dl>
   ${PM_ENV.requiresAuth ? '' : '<p class="account-note">프로토타입 예시 정보예요.</p>'}
-  <nav class="account-exit" aria-label="로그아웃 및 회원 탈퇴">
-    <button type="button" data-action="logoutask">로그아웃</button><span aria-hidden="true">|</span><button type="button" data-action="leaveask">회원 탈퇴</button>
+  <nav class="account-exit" aria-label="계정 이용">
+    <button type="button" data-action="logoutask">로그아웃</button><span aria-hidden="true">|</span><a href="mailto:stophyun02@gmail.com?subject=Pinmap%20account%20deletion">계정 삭제 문의</a>
   </nav>`, 'accountpage');
-pages.accountaccess = () => myPage('로그아웃, 탈퇴', `<p class="mpdesc">계정 이용을 잠시 쉬거나 종료할 수 있어요.</p>
-  <section class="account-section access-options" aria-label="계정 이용 관리">
-    <button type="button" class="setrow" data-action="logoutask"><div><b>로그아웃</b><small>이 기기에서 계정 이용을 종료해요.</small></div>${icon('chevright')}</button>
-    <button type="button" class="setrow account-leave" data-action="leaveask"><div><b>탈퇴하기</b><small>저장한 콘텐츠와 설정이 모두 삭제돼요.</small></div>${icon('chevright')}</button>
-  </section>`, 'accountaccesspage', 'account');
-actions.accountaccess = () => go('accountaccess');
-
 /* ---------- 항목별 초기화: 저장 콘텐츠와 코스는 보존 ---------- */
 const RESET_OPTIONS = {
   keywords: {label:'키워드 초기화', description:'선택한 관심 키워드만 해제해요. 저장한 카테고리와 콘텐츠는 유지돼요.'},
@@ -273,9 +244,7 @@ function confirmPop(title, desc, okAction, okLabel = '확인', cancelLabel = '�
 $('#sheet').addEventListener('close', () => { if($('#sheet').open)return; $('#sheet').classList.remove('confirmpop'); $('#sheet').removeAttribute('aria-labelledby'); $('#sheet').removeAttribute('aria-describedby'); });
 Object.assign(actions, {
   logoutask: () => confirmPop('로그아웃할까요?', '다시 로그인하면 저장한 콘텐츠를 그대로 볼 수 있어요.', 'logoutyes', '로그아웃', '취소'),
-  leaveask: () => confirmPop('탈퇴할까요?', '탈퇴하면 저장한 콘텐츠와 설정이 모두 지워져요.<br>지운 내용은 되돌릴 수 없어요.', 'leaveyes', '탈퇴하기', '유지하기'),
   logoutyes: () => { $('#sheet').close(); go('home'); toast('로그아웃했어요. (체험)'); openOnboarding(0); },
-  leaveyes: () => { try { [STORAGE, ...LEGACY_KEYS].forEach(k => localStorage.removeItem(k)); } catch {} location.reload(); },
   resetask: () => go('account')
 });
 
