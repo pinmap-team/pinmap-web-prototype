@@ -4,6 +4,29 @@
   let openTimer;
   let screenshotPreviewUrl;
   let captureId;
+  function renderZipStatus() {
+    const form = document.getElementById('zipimportform');
+    if (!form) return;
+    const state = window.PinmapZipImport?.state();
+    const status = form.querySelector('#zip-import-status');
+    const text = form.querySelector('#zip-import-progress-text');
+    const meter = form.querySelector('#zip-import-meter');
+    const start = form.querySelector('#zip-import-start');
+    const pause = form.querySelector('#zip-import-pause');
+    const resume = form.querySelector('#zip-import-resume');
+    status.hidden = !state;
+    start.disabled = state?.phase === 'running' || state?.phase === 'paused';
+    pause.hidden = state?.phase !== 'running';
+    resume.hidden = state?.phase !== 'paused';
+    if (!state) return;
+    meter.max = Math.max(1, state.total);
+    meter.value = state.processed;
+    text.textContent = `${state.name} · ${state.processed}/${state.total}건 확인 · 새로 저장 ${state.saved}건 · 중복 ${state.skipped}건${state.review ? ` · 검토 필요 ${state.review}건` : ''}`;
+    form.querySelector('#zip-import-state').textContent = state.phase === 'done'
+      ? '가져오기가 끝났어요. 지도·컬렉션에서 결과를 확인해 주세요.'
+      : state.phase === 'paused' ? `일시정지됨 · ${state.error || '이어하기를 누르면 계속해요.'}`
+      : '게시물을 차례로 분석하고 계정에 저장 중이에요. 이 탭을 닫아도 다음 방문에 이어서 진행해요.';
+  }
   function clearScreenshotPreview() {
     if (screenshotPreviewUrl) URL.revokeObjectURL(screenshotPreviewUrl);
     screenshotPreviewUrl = null;
@@ -46,11 +69,23 @@
       <p>Instagram에서 내보낸 저장 게시물 ZIP 파일을 선택해 주세요.</p>
       <label class="zip-import-picker"><span>ZIP 파일 선택</span><input type="file" name="archive" accept=".zip,application/zip" aria-label="Instagram 내보내기 ZIP 파일" required></label>
       <p id="zip-file-name" class="zip-import-filename" role="status">선택한 파일 없음</p>
-      <p class="zip-import-note">파일은 아직 전송되지 않아요. ZIP 자동 분석은 다음 단계에서 연결됩니다.</p>
+      <p class="zip-import-note">ZIP은 기기에서 읽고 게시물 링크만 전송해요. 중복은 건너뛰며, 월간 분석 한도나 계정 저장 100개 한도에 닿으면 남은 목록을 일시정지해요.</p>
+      ${PM_ENV.requiresAuth ? '' : '<a class="textbtn" href="auth.html?screen=welcome" target="_top">로그인하고 가져오기</a>'}
+      <div id="zip-import-status" class="zip-import-status" role="status" hidden><p id="zip-import-progress-text"></p><progress id="zip-import-meter" aria-label="ZIP 가져오기 진행률" max="1" value="0"></progress><p id="zip-import-state"></p><button type="button" class="textbtn" id="zip-import-pause" hidden>일시정지</button><button type="button" class="textbtn" id="zip-import-resume" hidden>이어하기</button></div>
       <p id="zip-import-error" class="eserror" role="alert"></p>
-      <div class="dialogactions"><button type="button" class="textbtn" data-action="zipback">뒤로</button><button type="submit" class="filled">파일 확인</button></div>
+      <div class="dialogactions"><button type="button" class="textbtn" data-action="zipback">뒤로</button><button type="button" class="filled" id="zip-import-start">분석하고 저장</button></div>
     </form>`);
+    document.getElementById('zip-import-start').addEventListener('click', () => actions.zipstart());
+    document.getElementById('zip-import-pause').addEventListener('click', () => window.PinmapZipImport?.pause());
+    document.getElementById('zip-import-resume').addEventListener('click', () => {
+      window.PinmapZipImport?.resume().catch(error => {
+        const node = document.getElementById('zip-import-error');
+        if (node) node.textContent = error.message;
+      });
+    });
+    renderZipStatus();
   };
+  window.addEventListener('pinmap:zip-progress', renderZipStatus);
   actions.screenshotimport = () => {
     setAddMenuOpen(false);
     clearScreenshotPreview();
@@ -168,17 +203,35 @@
       }
     }
   };
-  document.addEventListener('submit', async event => {
-    if (event.target.id !== 'zipimportform') return;
-    event.preventDefault();
-    const form = event.target, file = form.elements.namedItem('archive').files?.[0];
+  actions.zipstart = async () => {
+    const form = document.getElementById('zipimportform');
+    if (!form) return;
+    const file = form.elements.namedItem('archive').files?.[0];
     const error = form.querySelector('#zip-import-error');
     if (!file) { error.textContent = 'ZIP 파일을 선택해 주세요.'; return; }
-    const bytes = new Uint8Array(await file.slice(0, 4).arrayBuffer());
-    if (!/\.zip$/i.test(file.name) || bytes[0] !== 0x50 || bytes[1] !== 0x4b || bytes[2] !== 0x03 || bytes[3] !== 0x04) {
-      error.textContent = 'Instagram 내보내기 ZIP 파일인지 확인해 주세요.'; return;
+    if (!window.PinmapZipImport) {
+      error.textContent = 'ZIP 분석·저장은 로그인 후 사용할 수 있어요.';
+      return;
     }
     error.textContent = '';
-    form.querySelector('#zip-file-name').textContent = `${file.name} · 파일 선택 완료`;
-  }, true);
+    const button = form.querySelector('#zip-import-start');
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.textContent = 'ZIP 읽는 중…';
+    try {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      const parsed = await window.PinmapZipParser.parseFile(file);
+      form.querySelector('#zip-file-name').textContent = `${file.name} · 게시물 ${parsed.urls.length}건 확인`;
+      void window.PinmapZipImport.start(parsed.urls, file.name).catch(reason => {
+        if (form.isConnected) error.textContent = reason.message || 'ZIP 가져오기를 시작하지 못했어요.';
+      });
+    } catch (reason) { error.textContent = reason.message || 'ZIP 파일을 읽지 못했어요.'; }
+    finally {
+      if (form.isConnected) {
+        button.removeAttribute('aria-busy');
+        button.textContent = '분석하고 저장';
+        renderZipStatus();
+      }
+    }
+  };
 })();

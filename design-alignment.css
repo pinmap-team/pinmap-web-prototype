@@ -1457,7 +1457,7 @@ html,body{overscroll-behavior-y:contain}
 @media(prefers-reduced-motion:reduce){.home-add-body,.home-add-fab,.home-add-options button{transition-duration:0s!important}.home-add-menu[data-sink="true"] :is(.home-add-body,.home-add-fab){scale:1}}
 
 /* The two input screens keep their existing save and ZIP handling. */
-#sheet.zip-import-sheet{width:min(400px,calc(100% - var(--space-xl) * 2));padding:var(--space-xl);background:var(--color-surface);color:var(--color-on-surface)}
+#sheet.zip-import-sheet{width:min(400px,calc(100% - var(--space-xl) * 2));max-height:84dvh;overflow:auto;padding:var(--space-xl);background:var(--color-surface);color:var(--color-on-surface)}
 .zip-import-form{display:grid;gap:var(--space-lg);font:var(--type-body-md)}
 .zip-import-form>p{margin:0}
 .zip-import-picker{display:grid;gap:var(--space-sm);padding:var(--space-lg);border:1px dashed var(--color-border);border-radius:var(--rounded-md);font:var(--type-label-md);cursor:pointer}
@@ -1466,6 +1466,11 @@ html,body{overscroll-behavior-y:contain}
 .zip-import-picker input::file-selector-button{min-height:44px;padding:0 var(--space-lg);border:1px solid var(--color-border);border-radius:var(--rounded-md);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md);cursor:pointer}
 .zip-import-filename{overflow-wrap:anywhere;font:var(--type-body-sm);color:var(--color-secondary)}
 .zip-import-note{font:var(--type-body-sm);color:var(--color-secondary)}
+.zip-import-status{display:grid;gap:var(--space-sm);padding:var(--space-md);border-radius:var(--rounded-md);background:var(--color-neutral);font:var(--type-body-sm)}
+.zip-import-status[hidden],.zip-import-status button[hidden]{display:none}
+.zip-import-status p{margin:0;overflow-wrap:anywhere}
+.zip-import-status progress{width:100%;height:var(--space-sm);accent-color:var(--color-primary)}
+.zip-import-status button{min-height:44px;justify-self:start}
 .zip-import-form .dialogactions{margin:0}
 .screenshot-import-preview{display:block;width:100%;max-height:280px;object-fit:contain;border-radius:var(--rounded-md);background:var(--color-neutral)}
 .screenshot-import-preview[hidden]{display:none}
