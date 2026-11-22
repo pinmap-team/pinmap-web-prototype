@@ -317,6 +317,7 @@ if (PM_ENV.requiresAuth) (() => {
       if(error)throw error;
       if(!data?.user?.id){clearAccount();return;}
       userId=data.user.id;
+      const sameAccount = currentUserId === userId;
       if(currentUserId&&currentUserId!==userId){window.dispatchEvent(new Event('pinmap:account-cleared'));items=[];applyFolders(null);applyFavorites(null);applyMemos(null);applyMapData(null);applyProfile(null);detailId=null;}
       currentUserId=userId;
       window.PinmapAccountState?.hydrate(data.user,client,stateRevision);
@@ -325,8 +326,11 @@ if (PM_ENV.requiresAuth) (() => {
       applyMemos(data.user.user_metadata?.pinmap_memos);
       applyMapData(data.user.user_metadata);
       applyProfile(data.user.user_metadata?.pinmap_profile);
-      items=manualItems();
-      refreshVisibleContent();
+      const showCachedItems = sameAccount && window.PinmapAccountLoaded && !window.PinmapAccountLoadError;
+      if (!showCachedItems) {
+        items=manualItems();
+        refreshVisibleContent();
+      }
       const {data:sessionData, error:sessionError} = await client.auth.getSession();
       if (sessionError || !sessionData?.session?.access_token)
         throw Error('로그인 상태가 만료됐어요. 다시 로그인해 주세요.');
@@ -337,8 +341,10 @@ if (PM_ENV.requiresAuth) (() => {
         if (version !== loadVersion || currentUserId !== userId) throw Error('stale_load');
         const item = accountItem(record);
         staged.push(item);
-        items = [...staged, ...manualItems()];
-        refreshVisibleContent();
+        if (!showCachedItems) {
+          items = [...staged, ...manualItems()];
+          refreshVisibleContent();
+        }
         // Give the browser a paint opportunity before adding the next post.
         if (typeof requestAnimationFrame === 'function') await new Promise(requestAnimationFrame);
       });
@@ -647,9 +653,11 @@ if (PM_ENV.requiresAuth) (() => {
   };
   PinmapAuth.ready().then(sdk => {
     client = sdk;
-    sdk.auth.onAuthStateChange(event => {
+    sdk.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {clearAccount(); return;}
-      if (['SIGNED_IN','TOKEN_REFRESHED','USER_UPDATED'].includes(event)) setTimeout(loadAccount, 0);
+      // A token refresh or a same-account SIGNED_IN event does not change saved posts.
+      if (event === 'SIGNED_IN' && currentUserId !== session?.user?.id) setTimeout(loadAccount, 0);
+      if (event === 'USER_UPDATED') setTimeout(loadAccount, 0);
     });
     loadAccount();
   }).catch(() => toast('로그인 연결을 확인하지 못했어요.'));
