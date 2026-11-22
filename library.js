@@ -57,8 +57,15 @@ const LIB_PHOTOS_BY_ID = PM_ENV.development ? {} : {
   5:'img/notebook.jpg',     // 취향을 기록하는 방법
   13:'img/popup-store.jpg'  // 성수 오브젝트 팝업 스토어
 };
-const libPhoto = x => x.photo || (PM_ENV.development ? '' : LIB_PHOTOS_BY_ID[x.id] || LIB_PHOTOS[x.art]);
-const libThumb = x => libPhoto(x)
+// A restriction is shown only when the source explicitly reports an age gate.
+function pinmapAgeRestricted(x){
+  if(['age_restricted','age_restriction'].includes(x?.accessStatus))return true;
+  return (Array.isArray(x?.extractionNotes)?x.extractionNotes:[]).some(note=>
+    typeof note==='string'&&/연령\s*제한|나이\s*제한|age[-_ ]restrict(?:ed|ion)|age[-_ ]gat(?:e|ed)/i.test(note));
+}
+function restrictedCover(){return `<span class="pm-restricted-cover"><span class="pm-restricted-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg></span><b>연령 제한</b><span class="pm-restricted-hint">Instagram에서 확인해 주세요</span></span>`;}
+const libPhoto = x => pinmapAgeRestricted(x) ? '' : x.photo || (PM_ENV.development ? '' : LIB_PHOTOS_BY_ID[x.id] || LIB_PHOTOS[x.art]);
+const libThumb = x => pinmapAgeRestricted(x) ? restrictedCover() : libPhoto(x)
   ? `<img src="${esc(libPhoto(x))}" alt="" loading="lazy">` : art(x.art);
 function libCard(x, gallery){
   const ratio = gallery ? [1.2,1.5,1.3,1.6][x.id % 4] : 2.1;
