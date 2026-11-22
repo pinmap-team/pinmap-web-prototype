@@ -83,7 +83,7 @@
     try {sessionStorage.removeItem(pendingKey);} catch {}
     resumeVerification = false;
     if (mode === 'welcome') {
-      content.innerHTML = `<div class="auth-social"><p>간편하게 시작하기</p><div class="auth-social-buttons">${kakao}${google}</div></div><nav class="auth-entry-links" aria-label="이메일 계정"><button type="button" data-auth="signin">이메일 로그인</button><span class="auth-entry-divider" aria-hidden="true"></span><button type="button" data-auth="signup">회원가입</button></nav>${testEntry()}<p class="auth-message" id="auth-message" role="status" aria-live="polite" aria-atomic="true"></p>`;
+      content.innerHTML = `<header class="auth-heading"><h1>핀맵에 로그인</h1><p>저장한 취향을 다시 만나요.</p></header><div class="auth-social"><p>간편하게 시작하기</p><div class="auth-social-buttons">${kakao}${google}</div></div><nav class="auth-entry-links" aria-label="이메일 계정"><button type="button" data-auth="signin">이메일 로그인</button><span class="auth-entry-divider" aria-hidden="true"></span><button type="button" data-auth="signup">회원가입</button></nav>${testEntry()}<p class="auth-message" id="auth-message" role="status" aria-live="polite" aria-atomic="true"></p>`;
       main.setAttribute('aria-busy','false'); return;
     }
     const title = {signin:'이메일 로그인',signup:'회원가입',reset:'비밀번호 재설정',password:'새 비밀번호 설정'}[mode];
@@ -111,7 +111,10 @@
     content.innerHTML=`${retry?'<header class="auth-form-header"><a class="auth-back" href="index.html" aria-label="시작 화면으로 돌아가기"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></a><h1>연결 확인</h1></header>':''}<div class="auth-connection">${retry?'':'<span class="pm-spinner" aria-hidden="true"></span>'}<header class="auth-heading" role="status" aria-live="polite"><h1>${retry?'연결을 확인해 주세요':'잠시 연결을<br>기다려 주세요'}</h1></header>${retry?'<button class="filled auth-submit auth-submit-wide" data-auth="retry">다시 연결하기</button><a class="auth-home" href="index.html">시작 화면으로 돌아가기</a>':''}</div>`;
   }
   async function boot() {
-    connectionScreen();
+    const introEntry = !accountDeleted && !callbackError && !recovering && !resumeVerification && !params.has('code') && !fragment.has('access_token');
+    const introStartedAt = Date.now();
+    if (introEntry) { main.dataset.screen = 'intro'; main.setAttribute('aria-busy','true'); }
+    else connectionScreen();
     try {
       client = await PinmapAuth.ready();
       unsubscribe?.();
@@ -145,7 +148,9 @@
         if (userData.user && !showLoginChoice) {enterApp(); return;}
       }
       if (params.has('code') || fragment.has('access_token')) {render('signin'); notice('인증 링크를 확인하지 못했어요. 이메일에서 인증을 마쳤다면 가입한 이메일과 비밀번호로 로그인해 주세요.',true);} else {
-        render(accountDeleted ? 'welcome' : resumeVerification ? 'verify' : mode);
+        const next = accountDeleted ? 'welcome' : resumeVerification ? 'verify' : mode;
+        if (next === 'welcome' && introEntry) await new Promise(resolve => setTimeout(resolve, Math.max(0, 1400 - (Date.now() - introStartedAt))));
+        render(next);
         if (accountDeleted) notice('회원 탈퇴가 완료됐어요.');
       }
     } catch (error) {

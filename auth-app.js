@@ -8,7 +8,7 @@ if (PM_ENV.requiresAuth) (() => {
         document.documentElement.classList.contains('auth-pending') || document.getElementById('onboarding') ||
         onboardingUserId === user.id) return;
     onboardingUserId = user.id;
-    openOnboarding(0);
+    openOnboarding(1);
   }
   window.addEventListener('pinmap:account-profile-loaded',maybeStartOnboarding);
   function gate(loading=false) {

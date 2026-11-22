@@ -28,7 +28,6 @@ body.onboarding-open{overflow:hidden}
 .ob-tile.photo{width:100px;height:80px;border:4px solid #fff;border-radius:16px}
 .ob-tile.photo svg{width:100%;height:100%;display:block;border-radius:11px}
 .ob-tile.emoji{width:60px;height:60px;font-size:28px;transform:translate(-50%,-50%)}
-.step1 .ob-tile.emoji{transform:none}
 .t1{left:2%;top:22%;rotate:-8deg}.t2{right:2%;top:6%;rotate:10deg;animation-delay:.6s!important}.t3{left:6%;bottom:6%;rotate:6deg;animation-delay:1.1s!important}.t4{right:4%;bottom:2%;rotate:-6deg;animation-delay:.3s!important}
 .t5{left:22%;top:0;animation-delay:.9s!important}.t6{right:6%;top:46%;animation-delay:1.4s!important}.t7{left:30%;bottom:-2%;animation-delay:.4s!important}
 .ob-spark{position:absolute;color:var(--ob-key);font:var(--type-headline-md)}
@@ -104,13 +103,6 @@ body.onboarding-open{overflow:hidden}
 .empty.small{padding:var(--space-xl) var(--space-lg)}.empty.small p{margin:0 0 var(--space-md)}
 
 /* ===== 온보딩 (4차) ===== */
-/* 첫 · 마지막 화면은 위쪽 단계 표시 없이 */
-.ob-screen.bare .ob-top{display:none}
-/* 첫 화면: 로고만 (어두운 배경) */
-#onboarding:has(.step1),#onboarding:has(.step4),.ob-screen.step1,.ob-screen.step4{background:var(--color-primary)!important}
-.ob-splash{flex:1;display:grid;place-items:center;width:100%;padding:0;background:none}
-.ob-splash img{width:min(56%,240px);height:auto;animation:obFadeUp .4s ease both}
-@keyframes obFadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 /* 저장 방법 안내: 카드 그림자 · 블러 없이 얇은 선만 */
 .step2 .ob-flowcard{box-shadow:none!important;border:1px solid var(--color-disabled)!important;background:var(--color-surface)!important}
 .step2 .ob-mock{box-shadow:none!important;border:1px solid #EDEDF0}
@@ -154,7 +146,6 @@ body.onboarding-open{overflow:hidden}
 .step3 .ob-option.on{background:rgba(17,17,17,.72)!important;border-color:rgba(255,255,255,.18)!important;color:#fff!important;box-shadow:0 0 0 1.5px var(--color-primary),var(--shadow-sm)!important}
 .step3 .ob-option.on .ob-check{background:var(--color-surface)!important;border-color:var(--color-surface)!important;color:var(--color-on-surface)!important}
 /* 첫 화면 · 전송 화면: 화면 둘레 선 없이 */
-.ob-screen.step1,.ob-screen.step4{box-shadow:none!important;border:0!important}
 .step3 .ob-option.on .ob-label,.step3 .ob-option.on .ob-emoji{color:#fff!important}
 /* 관심사 선택: 누르면 반투명한 회색 칠 (글자는 그대로 검정) */
 .step3 .ob-option.on{background:rgba(17,17,17,.14)!important;border-color:color-mix(in srgb,var(--color-surface) 60%,transparent)!important;color:var(--t-ink,var(--color-on-surface))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)!important}
@@ -164,12 +155,6 @@ body.onboarding-open{overflow:hidden}
 /* ===== 온보딩 (10/18) ===== */
 /* 전체가 아래로 내려가 보이던 문제: 위쪽 상태바 여백(약 54px)을 줄여요 */
 #onboarding .ob-screen{padding-top:var(--space-xl)!important}
-/* 첫 화면: 새 시작 이미지를 화면 가득 */
-#onboarding .ob-screen.step1{padding:0!important;background:var(--color-neutral)!important}
-#onboarding:has(.step1){background:var(--color-neutral)!important}
-.ob-splash{flex:1;display:block;width:100%;height:100%;padding:0;background:none}
-.ob-splash img{width:100%!important;height:100%!important;object-fit:cover;display:block;animation:obFade .4s ease both}
-@keyframes obFade{from{opacity:0}to{opacity:1}}
 /* 저장 방법 화면: 제목 · 설명을 뺀 만큼 카드를 위로 */
 .step2 .ob-flow{margin-top:var(--space-lg)}
 .ob-sendico{width:16px;height:16px;object-fit:contain;display:block}
@@ -204,8 +189,6 @@ body.onboarding-open{overflow:hidden}
 .step3 .ob-option.on{background:var(--color-disabled)!important;border-color:var(--color-disabled)!important}
 .step3 .ob-option .ob-label{letter-spacing:-.4px}
 .step3 .ob-option{padding-left:var(--space-lg)!important;padding-right:var(--space-md)!important}
-/* 첫 화면: 검정 배경 시작 이미지 */
-#onboarding .ob-screen.step1,#onboarding:has(.step1){background:var(--color-primary)!important}
 
 /* 저장 안내: 세로 비율의 휴대폰 화면과 그 아래 설명 */
 .step2 .ob-flowcard{flex-direction:column;align-items:stretch;gap:var(--space-lg);padding:var(--space-lg);min-height:0}
