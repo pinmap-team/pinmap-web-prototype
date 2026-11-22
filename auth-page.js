@@ -103,7 +103,7 @@
   function connectionScreen(retry=false) {
     main.dataset.screen=retry?'error':'connecting';
     main.setAttribute('aria-busy',String(!retry));
-    content.innerHTML=`<div class="auth-connection"><span class="auth-connection-symbol" aria-hidden="true"></span><header class="auth-heading" role="status" aria-live="polite"><h1>잠시 연결을<br>기다려 주세요</h1></header>${retry?'<button class="filled auth-submit auth-submit-wide" data-auth="retry">다시 연결하기</button><a class="auth-home" href="index.html">시작 화면으로 돌아가기</a>':''}</div>`;
+    content.innerHTML=`<div class="auth-connection">${retry?'':'<span class="pm-spinner" aria-hidden="true"></span>'}<header class="auth-heading" role="status" aria-live="polite"><h1>잠시 연결을<br>기다려 주세요</h1></header>${retry?'<button class="filled auth-submit auth-submit-wide" data-auth="retry">다시 연결하기</button><a class="auth-home" href="index.html">시작 화면으로 돌아가기</a>':''}</div>`;
   }
   async function boot() {
     connectionScreen();

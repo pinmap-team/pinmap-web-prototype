@@ -92,7 +92,6 @@ dialog::backdrop{background:rgba(17,17,17,.28);-webkit-backdrop-filter:blur(4px)
 .ob-check{border-color:var(--color-disabled)}
 .ob-option.on .ob-check{background:var(--t-ink)!important;border-color:var(--t-ink)!important;color:var(--color-neutral)!important}
 .ob-loader{background:var(--t-glass);-webkit-backdrop-filter:var(--t-blur);backdrop-filter:var(--t-blur)}
-.ob-bar i{background:var(--t-ink)}
 .ob-ring{border-color:var(--color-disabled)}.ob-ring.r2{border-color:var(--color-disabled)}
 .ob-center svg.icon{fill:var(--t-ink);stroke:var(--t-ink)}
 .ob-actions{background:linear-gradient(180deg,rgba(244,244,245,0) 0,var(--t-bg) 30%)!important}

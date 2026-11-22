@@ -36,8 +36,6 @@ body.onboarding-open{overflow:hidden}
 
 /* 로딩 */
 .ob-loader{margin-top:auto;background:#fff;border-radius:24px;padding:24px 22px;text-align:center;box-shadow:0 8px 28px #11111114}
-.ob-bar{height:8px;border-radius:8px;background:#E5EEE8;overflow:hidden}
-.ob-bar i{display:block;height:100%;width:0;border-radius:inherit;background:var(--ob-key);animation:obLoad 2.7s cubic-bezier(.4,.1,.3,1) forwards}
 .ob-loader p{margin:14px 0 0;font-size:14px;color:var(--ob-sub)}
 
 /* 2단계: 3-step 안내 */
@@ -85,7 +83,6 @@ body.onboarding-open{overflow:hidden}
 .step2 .ob-actions,.step3 .ob-actions{margin-top:var(--space-xl)}
 
 @keyframes obIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@keyframes obLoad{to{width:100%}}
 @keyframes obFloat{to{translate:0 -8px}}
 @media(max-width:370px){.ob-title{font:var(--type-headline-md)}.ob-mock{width:44%}.ob-art{min-height:260px}}
 @media(max-height:700px){.ob-art{min-height:230px}.ob-title{margin-top:var(--space-md)}}

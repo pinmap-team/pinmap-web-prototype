@@ -20,7 +20,7 @@
     const detail = job.phase === 'running'
       ? `예상 진행률 ${percent}% · 게시물을 분석하고 저장 중이에요.`
       : job.phase === 'done' ? '저장 결과를 확인했어요.' : escapeHtml(job.error);
-    return `<div class="pm-save-status-row"><strong>${title}</strong><span>${percent}%</span></div>
+    return `${job.phase === 'running' ? '<div class="pm-loading pm-loading-compact"><span class="pm-spinner" aria-hidden="true"></span></div>' : ''}<div class="pm-save-status-row"><strong>${title}</strong><span>${percent}%</span></div>
       <div class="pm-save-meter" role="progressbar" aria-label="${title} 예상 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}"><span style="width:${percent}%"></span></div>
       <p>${detail}</p>`;
   }

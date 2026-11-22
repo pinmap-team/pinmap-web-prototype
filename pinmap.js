@@ -139,7 +139,7 @@ document.addEventListener('click', e => {
 });
 /* ---------- 전체 화면 온보딩 (4단계) ---------- */
 const photo = (kind, cls='') => `<div class="ob-tile photo ${cls}">${art(kind)}</div>`;
-const loader = text => `<div class="ob-loader" role="status"><div class="ob-bar"><i></i></div><p>${text}</p></div>`;
+const loader = text => `<div class="ob-loader" role="status"><span class="pm-spinner" aria-hidden="true"></span><p>${text}</p></div>`;
 // 같은 휴대폰 화면에서 콘텐츠 → 공유 메뉴 → 핀맵 선택을 차례로 보여줘요.
 function onboardPhone(stage){
   const feed = `<div class="ob-phone-app"><img src="img/logo-instagram.png" alt=""><b>Instagram</b>${icon('more')}</div>
