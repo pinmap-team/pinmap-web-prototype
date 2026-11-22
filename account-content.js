@@ -4,7 +4,8 @@ function pinmapAccountItem(record, id) {
   if (!record || typeof record !== 'object') throw Error('저장된 콘텐츠 형식이 올바르지 않습니다.');
   const text = (value, limit = 300) => typeof value === 'string' ? value.trim().slice(0, limit) : '';
   const url = text(record.source_url, 2048);
-  if (!/^https:\/\/(?:www\.)?instagram\.com\/(?:p|reel|tv)\/[A-Za-z0-9_-]+\/?(?:\?.*)?$/.test(url)) {
+  const capture = /^pinmap:\/\/capture\/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(url);
+  if (!capture && !/^https:\/\/(?:www\.)?instagram\.com\/(?:p|reel|tv)\/[A-Za-z0-9_-]+\/?(?:\?.*)?$/.test(url)) {
     throw Error('저장된 게시물 주소가 올바르지 않습니다.');
   }
   const places = Array.isArray(record.places) ? record.places.filter(x => x && typeof x === 'object') : [];
@@ -43,7 +44,7 @@ function pinmapAccountItem(record, id) {
   const type = hasEvents ? '전시/팝업' : fixedClassified ? PinmapCategories.presentation(aiCategory) : places.length ? '맛집/카페' : '기타';
   const first = mapLocations[0];
   const eventName = text(events[0]?.title, 120);
-  const title = text(record.ai_title, 120) || eventName || text(places[0]?.name, 120) || 'Instagram 게시물';
+  const title = text(record.ai_title, 120) || eventName || text(places[0]?.name, 120) || (capture ? '저장한 캡처' : 'Instagram 게시물');
   const rawCover = text(record.cover_data_url, 700000);
   const cover = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(rawCover) ? rawCover : '';
   const savedAt = typeof record.created_at === 'string' && Number.isFinite(Date.parse(record.created_at))
@@ -56,7 +57,7 @@ function pinmapAccountItem(record, id) {
     category:fixedClassified ? categoryLabels[aiCategory] : (PinmapCategories.get(keywords[0]) || PinmapCategories.get(hasEvents?'exhibition':'other')).label,
     keywords,
     contentKind:kind, status:text(record.status, 80),
-    source:'Instagram', savedAt, desc:text(record.ai_summary, 500),
+    source:capture ? '캡처' : 'Instagram', savedAt, desc:text(record.ai_summary, 500),
     searchSummary:text(record.ai_summary, 800), aiSummary:!!text(record.ai_summary),
     art:hasEvents ? 'exhibit' : places.length ? 'cafe' : ({travel:'sea',shopping:'bag',recipe:'food'}[aiCategory] || 'book'), photo:cover,
     url, memo:'', collection:'', aiClassified:classified,
@@ -248,6 +249,8 @@ if (PM_ENV.requiresAuth) (() => {
     if (pendingView) setTimeout(refreshVisibleContent, 0);
   }, true);
   const message = (status, response) => {
+    if (response?.error === 'capture_analysis_failed') return '캡처 분석을 완료하지 못했어요. 잠시 후 다시 시도해 주세요.';
+    if (status === 413) return '이미지가 너무 커요. 더 작은 캡처를 선택해 주세요.';
     if (status === 402 && response?.error === 'monthly_analysis_limit') return '이번 결제 주기의 분석 300개를 모두 사용했어요. 다음 갱신일에 다시 이용할 수 있어요.';
     if (status === 402 && response?.error === 'free_monthly_analysis_limit') return '이번 달 무료 분석 50회를 모두 사용했어요. 다음 달에 다시 이용할 수 있어요.';
     if (status === 402) return '이용권이 활성 상태가 아니에요. 마이의 요금제 및 결제에서 확인해 주세요.';
@@ -345,6 +348,35 @@ if (PM_ENV.requiresAuth) (() => {
     }
   }
   const originalSave = actions.save;
+  window.PinmapCaptureSave = async (image, id) => {
+    if (PinmapSaveProgress.isRunning() || contentSaving) throw Error('다른 저장 작업이 진행 중이에요.');
+    contentSaving = true;
+    const userId = currentUserId;
+    try {
+      let result;
+      try { result = await accountRequest('POST', {capture_image:image,capture_id:id}, '', userId); }
+      catch (error) {
+        if (error.message === 'Instagram 게시물 또는 릴스 링크를 확인해 주세요.')
+          throw Error('캡처 이미지 형식을 확인해 주세요.');
+        throw error;
+      }
+      if (!result.item || typeof result.item !== 'object') throw Error('캡처 분석 결과를 확인하지 못했어요.');
+      if (currentUserId !== userId) throw Error('계정이 변경됐어요. 다시 로그인해 주세요.');
+      const wasLoading = !window.PinmapAccountLoaded;
+      loadVersion++;
+      const item = accountItem(result.item);
+      items = [item, ...items.filter(x => x.url !== item.url)];
+      document.getElementById('sheet')?.close();
+      closeOnboarding();
+      if (item.mapLocations.length && !item.events.length) { window.pmMapFocus = item.id; go('map'); }
+      else { go('library'); openDetail(item.id); }
+      toast(item.status === 'extracted' || item.status === 'needs_review'
+        ? `캡처를 저장했어요 · 장소 ${item.extractedPlaceCount}곳 · 일정 ${item.events.length}건`
+        : '캡처를 저장했지만 분석을 마치지 못했어요. 상세에서 확인해 주세요.');
+      if (wasLoading) void loadAccount();
+      return item;
+    } finally { contentSaving = false; }
+  };
   actions.accountretry = () => loadAccount();
   actions.save = () => {
     originalSave();
@@ -368,7 +400,7 @@ if (PM_ENV.requiresAuth) (() => {
     if (event.target.id !== 'saveform') return;
     event.preventDefault(); event.stopImmediatePropagation();
     const form = event.target;
-    if (PinmapSaveProgress.isRunning()) {
+    if (PinmapSaveProgress.isRunning() || contentSaving) {
       const errorNode = form.querySelector('#saveerror');
       if (errorNode) errorNode.textContent = '다른 링크를 저장 중이에요. 완료될 때까지 기다려 주세요.';
       return;

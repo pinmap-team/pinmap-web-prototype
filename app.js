@@ -222,8 +222,8 @@ const actions = {
   edit: editDialog,
   duedismiss: () => { dueDismissed = true; render(); },
   sample: () => { const f=$('#saveform'); f.url.value='https://www.youtube.com/watch?v=sample-prototype'; f.elements.namedItem('title').value='주말에 만들어볼 토마토 파스타 레시피'; f.type.value='ai'; f.collection.value='일상에 영감'; f.memo.value='토요일 점심에 만들어보기'; },
-  original: () => { const x=items.find(x=>x.id===detailId); const url=x.url&&!x.sample?x.url:null;
-    modal('원본 콘텐츠 보기',url?`<p>저장한 링크를 새 탭에서 엽니다.</p><div class="dialogactions"><a class="filled" target="_blank" rel="noopener noreferrer" href="${esc(url)}">원본 열기 ${icon('external')}</a></div>`:`<p>‘${esc(x.title)}’은 체험용 콘텐츠예요.</p><p class="muted">실제 서비스에서는 이 단계에서 저장한 ${esc(x.source)} 게시물로 이동해요.</p><div class="dialogactions"><button class="filled" data-action="close">확인</button></div>`); }
+  original: () => { const x=items.find(x=>x.id===detailId); const url=x.url&&!x.sample&&x.source!=='캡처'?x.url:null;
+    modal(x.source==='캡처'?'캡처 미리보기':'원본 콘텐츠 보기',x.source==='캡처'?`${x.photo?`<img class="screenshot-import-preview" src="${esc(x.photo)}" alt="저장한 캡처 화면 미리보기">`:'<p>캡처 미리보기를 저장하지 못했어요.</p>'}<div class="dialogactions"><button class="filled" data-action="close">닫기</button></div>`:url?`<p>저장한 링크를 새 탭에서 엽니다.</p><div class="dialogactions"><a class="filled" target="_blank" rel="noopener noreferrer" href="${esc(url)}">원본 열기 ${icon('external')}</a></div>`:`<p>‘${esc(x.title)}’은 체험용 콘텐츠예요.</p><p class="muted">실제 서비스에서는 이 단계에서 저장한 ${esc(x.source)} 게시물로 이동해요.</p><div class="dialogactions"><button class="filled" data-action="close">확인</button></div>`); }
 };
 function action(a){ (actions[a]||(()=>{}))(); }
 
