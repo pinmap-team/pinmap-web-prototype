@@ -140,8 +140,8 @@ document.addEventListener('click',event=>{
 },true);
 pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
     <div class="setrow"><div><b>핀맵</b><small>저장을 다시, 일상으로</small></div></div>
-    <div class="setrow"><div><b>버전</b><small>Prototype 03</small></div></div>
-    <div class="setrow"><div><b>데이터 보관</b><small>예시 데이터로 체험하는 프로토타입이에요. 데이터는 이 브라우저에만 저장돼요.</small></div></div>
+    <div class="setrow"><div><b>이용 환경</b><small>${PM_ENV.requiresAuth ? '로그인 서비스' : '프로토타입 체험'}</small></div></div>
+    <div class="setrow"><div><b>데이터 보관</b><small>${PM_ENV.requiresAuth ? '저장한 콘텐츠와 설정은 로그인한 계정에서 다시 볼 수 있어요.' : '예시 데이터와 변경한 내용은 이 브라우저에 저장돼요.'}</small></div></div>
   </div>`);
 
 /* ---------- 자주 묻는 질문 · 공지사항 · 약관 및 정책 (2026-11-03, 마이 하단 도움말) ---------- */
@@ -150,12 +150,15 @@ pages.faq = () => myPage('자주 묻는 질문', infoRows([
   ['SNS 콘텐츠는 어떻게 저장하나요?', '홈 추가 메뉴에서 Instagram 링크·저장 ZIP·캡처 이미지를 선택해 주세요.'],
   ['저장한 콘텐츠는 어디에서 다시 보나요?', '홈에서 주변 저장 장소와 최근 저장을, 컬렉션에서 전체 목록을 볼 수 있어요.'],
   ['AI 자동 분류가 틀렸어요.', '콘텐츠 상세에서 카테고리를 직접 바꿀 수 있어요.<br>저장 설정에서 자동 분류를 끌 수도 있어요.'],
-  ['원본 게시물이 삭제되면 어떻게 되나요?', '장소 정보는 그대로 남고, 원본 보기에는 ‘삭제된 게시물이에요’라고 보여요.'],
+  ['원본 게시물이 삭제되면 어떻게 되나요?', '원본 링크가 열리지 않을 수 있어요. 핀맵에 저장된 장소 정보와 내 메모는 남지만, 원본 삭제 여부를 자동으로 확인하지는 않아요.'],
   ['위치 권한은 어디에서 바꾸나요?', '브라우저의 사이트 설정에서 위치 권한을 바꿀 수 있어요.']
 ]), 'settingpage');
-pages.notice = () => myPage('공지사항', infoRows([
-  ['핀맵 프로토타입 03 공개', '위치 편집과 마이 바로가기가 새로 생겼어요.'],
-  ['예시 데이터 안내', '지금은 예시 데이터로 체험하는 프로토타입이에요.\n데이터는 이 브라우저에만 저장돼요.']
+pages.notice = () => myPage('공지사항', infoRows(PM_ENV.requiresAuth ? [
+  ['콘텐츠 추가 안내', 'Instagram 게시물·릴스 링크, 저장 게시물 ZIP 또는 캡처 이미지를 추가할 수 있어요.'],
+  ['웹 공유받기 안내', '현재 웹에서는 다른 앱의 공유 메뉴에서 핀맵으로 바로 저장할 수 없어요. Instagram 링크를 복사해 추가창에 붙여넣거나 캡처 화면으로 추가해 주세요.']
+] : [
+  ['프로토타입 체험 안내', '예시 콘텐츠와 화면을 체험할 수 있어요. 변경한 내용은 이 브라우저에 저장돼요.'],
+  ['분석 기능 안내', 'Instagram ZIP과 캡처 이미지 분석·저장은 로그인한 계정에서 사용할 수 있어요.']
 ]), 'settingpage');
 pages.terms = () => myPage('약관 및 정책', `<div class="mycard settings policy-list">
   <a class="setrow" href="terms.html" target="_top"><div><b>서비스 이용약관</b><small>계정·콘텐츠 분석·월간 이용권의 이용 조건이에요.</small></div></a>
@@ -184,7 +187,7 @@ pages.howtopage = function(){
     .replace(/<h1 class="ob-title"[^>]*>[\s\S]*?<\/h1>/, '<p class="ob-desc howtosub">마음에 드는 콘텐츠를 발견했다면?</p>');
   onboardStep = keep;
   return myPage('저장하는 방법 다시 보기', `<div class="ob-screen step2 howtobody">${html}
-    <div class="ob-actions"><button class="filled ob-next" data-action="linkimport">게시물 링크로 저장하기</button></div></div>`, 'howtopage', 'guide');
+    <div class="ob-actions"><button class="filled ob-next" data-action="linkimport">Instagram 링크로 저장하기</button></div></div>`, 'howtopage', 'guide');
 };
 
 /* ---------- 프로필: 사진/이름 직접 편집 ---------- */
