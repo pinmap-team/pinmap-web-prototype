@@ -40,16 +40,21 @@
         trigger.innerHTML=iconFor(selected)+'<span></span>'+icon('chevron');
         trigger.querySelector('span').textContent=selected.textContent;
         trigger.setAttribute('aria-label',(isSort?'정렬: ':fieldName+': ')+selected.textContent);
-        panel.querySelectorAll('button').forEach((button,i)=>button.setAttribute('aria-pressed',String(select.options[i].selected)));
+        const buttons=[...panel.querySelectorAll('button')];
+        buttons.forEach(button=>button.setAttribute('aria-pressed',String(select.options[Number(button.dataset.optionIndex)].selected)));
+        if(host.classList.contains('pm-choice-folder-sort')){
+          buttons.sort((a,b)=>Number(b.getAttribute('aria-pressed')==='true')-Number(a.getAttribute('aria-pressed')==='true') || Number(a.dataset.optionIndex)-Number(b.dataset.optionIndex));
+          panel.replaceChildren(...buttons);
+        }
       };
       let previousGroup=null;
-      [...select.options].forEach(option=>{
+      [...select.options].forEach((option,index)=>{
         const group=option.parentElement.tagName==='OPTGROUP'?option.parentElement:null;
         if(group && group!==previousGroup){
           const heading=document.createElement('div');heading.className='pm-choice-group';heading.textContent=group.label;panel.append(heading);
         }
         previousGroup=group;
-        const button=document.createElement('button');button.type='button';
+        const button=document.createElement('button');button.type='button';button.dataset.optionIndex=String(index);
         button.innerHTML=iconFor(option)+'<span></span>'+icon('check');
         button.querySelector('span').textContent=option.textContent;
         button.disabled=option.disabled || option.parentElement.disabled===true;
@@ -68,13 +73,13 @@
         panel.style.maxHeight=Math.max(96,Math.min(320,(upwards?above:below)-16))+'px';
         if(host.classList.contains('pm-choice-folder-sort')){
           host.style.setProperty('--sort-menu-width',Math.max(trigger.offsetWidth,panel.offsetWidth)+'px');
-          host.style.setProperty('--sort-menu-height',trigger.offsetHeight+8+panel.offsetHeight+'px');
+          host.style.setProperty('--sort-menu-height',panel.offsetHeight+'px');
         }
       };
       trigger.addEventListener('click',event=>{
         event.preventDefault();const open=!host.classList.contains('is-open');closeMenus(host);
         host.classList.toggle('is-open',open);panel.hidden=!open;trigger.setAttribute('aria-expanded',String(open));
-        if(open)positionPanel();
+        if(open){positionPanel();if(host.classList.contains('pm-choice-folder-sort'))panel.querySelector('[aria-pressed="true"]')?.focus();}
       });
       host.addEventListener('keydown',event=>{
         const buttons=[...panel.querySelectorAll('button:not(:disabled)')];
