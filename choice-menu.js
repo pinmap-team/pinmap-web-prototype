@@ -34,6 +34,7 @@
       // 2026-11-10 정렬 선택은 앞 픽토그램 없이 글자만(카테고리 선택은 그대로)
       const iconFor=option=>isSort?'':PinmapCategories.get(option.value.replace(/^category:/,''))?PinmapCategories.icon(option.value.replace(/^category:/,''),option.selected):icon(option.dataset.icon || categoryIcons[option.value] || 'grid');
       if(isSort)host.classList.add('pm-choice-sort');
+      if(select.hasAttribute('data-folder-sort'))host.classList.add('pm-choice-folder-sort');
       const update=()=>{
         const selected=select.selectedOptions[0];if(!selected)return;
         trigger.innerHTML=iconFor(selected)+'<span></span>'+icon('chevron');
@@ -65,6 +66,10 @@
         const upwards=below<Math.min(panel.scrollHeight,320)+16 && above>below;
         host.classList.toggle('opens-up',upwards);
         panel.style.maxHeight=Math.max(96,Math.min(320,(upwards?above:below)-16))+'px';
+        if(host.classList.contains('pm-choice-folder-sort')){
+          host.style.setProperty('--sort-menu-width',Math.max(trigger.offsetWidth,panel.offsetWidth)+'px');
+          host.style.setProperty('--sort-menu-height',trigger.offsetHeight+8+panel.offsetHeight+'px');
+        }
       };
       trigger.addEventListener('click',event=>{
         event.preventDefault();const open=!host.classList.contains('is-open');closeMenus(host);

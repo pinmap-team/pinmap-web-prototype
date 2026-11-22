@@ -1652,3 +1652,20 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .dt-failure-notice .dt-failure-action{width:100%;min-height:48px;margin-top:var(--space-lg);border-radius:var(--rounded-sm)}
 
 .dt-failure-label .icon{width:16px;height:16px;flex:none}
+/* Collection sort grows from its own trigger as one liquid menu surface. */
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort{isolation:isolate}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort.is-open{z-index:20}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort::before{content:"";position:absolute;z-index:0;top:0;left:0;width:100%;height:44px;pointer-events:none;border:1px solid rgba(255,255,255,.26);border-radius:22px;background:linear-gradient(155deg,rgba(255,255,255,.18),rgba(255,255,255,.03) 48%,rgba(0,0,0,.12)),rgba(17,17,17,.78);-webkit-backdrop-filter:blur(22px) saturate(1.45);backdrop-filter:blur(22px) saturate(1.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 12px 30px rgba(0,0,0,.22);transition:width .42s cubic-bezier(.22,1,.36,1),height .42s cubic-bezier(.22,1,.36,1),border-radius .42s cubic-bezier(.22,1,.36,1)}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort.is-open::before{width:var(--sort-menu-width,224px);height:var(--sort-menu-height,320px);border-radius:20px}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort.opens-up::before{top:auto;bottom:0}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-trigger{position:relative;z-index:1;min-height:44px;padding:0 var(--space-xl)!important;border:0;background:transparent!important;color:#fff!important}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-trigger>.icon:last-child{color:#fff}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-trigger:active{scale:.96}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-trigger:focus-visible{outline:2px solid #fff;outline-offset:-4px}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-options{border:0!important;background:transparent!important;box-shadow:none!important;animation:none!important;overflow-y:auto}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort.is-open .pm-choice-options{animation:cf-sort-items .2s .16s both!important}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-options>button{color:#fff!important}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-options>button:is(:hover,:focus-visible,[aria-pressed="true"]){background:rgba(255,255,255,.14)!important;color:#fff!important}
+.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-options>button>.icon:last-child{color:#fff}
+@keyframes cf-sort-items{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.cfpage .cf-folder-toolbar .pm-choice-folder-sort::before{transition:none}.cfpage .cf-folder-toolbar .pm-choice-folder-sort.is-open .pm-choice-options{animation:none!important}}
