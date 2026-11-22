@@ -1,4 +1,4 @@
-// 마이 하위 페이지: 프로필 편집 · SNS 계정 연동 (home.js 다음, navlabels.js 앞에 불러와요)
+// 마이 하위 페이지: 프로필 편집 · 저장 콘텐츠 출처 (home.js 다음, navlabels.js 앞에 불러와요)
 // 하단 시트가 아니라 페이지로 넘어가고, 왼쪽 위 ← 버튼으로 마이로 돌아가요.
 
 /* ---------- 프로필 사진 ---------- */
@@ -48,7 +48,6 @@ document.addEventListener('submit', async e => {
 });
 
 /* ---------- 저장 콘텐츠 출처: both modes use their stored records ---------- */
-const SNS={instagram:{name:'Instagram',logo:'img/logo-instagram.png'},youtube:{name:'YouTube',logo:'img/logo-youtube.png'},tiktok:{name:'TikTok',logo:'img/logo-tiktok.png'},x:{name:'X',logo:'img/logo-x.png'}};
 const myAccounts=()=>{
   const groups=new Map();
   for(const item of items){const source=String(item.source||'').split(',')[0],key=source+':'+(item.authorUsername||'');const group=groups.get(key)||{id:key,source,handle:item.authorUsername?('@'+item.authorUsername):source,count:0};group.count++;groups.set(key,group);}

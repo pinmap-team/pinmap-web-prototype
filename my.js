@@ -6,7 +6,7 @@
 const dueNum = x => Number(String(x.deadline || '').replace(/\D/g, '')); // 'D-3' → 3 (calendar.js보다 먼저 쓰일 수 있어 따로 둬요)
 function notifications(){
   const list = [];
-  // 홈 띠배너의 마감 임박 콘텐츠는 알림 목록에도 항상 보여줘요 (설정은 휴대폰 푸시 알림에만 적용)
+  // 홈 띠배너의 마감 임박 콘텐츠는 앱 안 알림 목록에도 보여줘요.
   const dates=typeof calDueList==='function'?calDueList().filter(x=>!x.eventCandidate&&calDue(x)>=calToday):items.filter(x=>x.deadline);
   dates.forEach(x=>{
     const source=items.find(item=>item.id===x.id)||x,days=typeof calDays==='function'?calDays(x):dueNum(x);
@@ -18,7 +18,7 @@ function notifications(){
   });
   if (settings.notiNearby) {
     const near = readyPlaces().filter(x => distanceOf(x) < 999).sort((a,b) => distanceOf(a)-distanceOf(b));
-    if (near.length) list.push({id:'near', emoji:'📍', title:`${settings.placeLabels?.[mainPlace()]||mainPlace()||'현재 위치'} 근처에 저장한 장소 ${near.length}곳`, body:`${near[0].title} 외, 지금 가까이에 있어요.`, time:'저장한 장소 기준', page:'map'});
+    if (near.length) list.push({id:'near', emoji:'📍', title:`${settings.placeLabels?.[mainPlace()]||mainPlace()||'선택한 지역'} 주변 저장 장소 ${near.length}곳`, body:`${near[0].title} 외, 선택한 지역에 저장한 장소예요.`, time:'저장한 지역 기준', page:'map'});
   }
   const pending = items.filter(x => isPlace(x) && (x.pending || !x.address));
   if (pending.length) list.push({id:'pending', emoji:'🔎', title:`장소 확인이 필요한 콘텐츠 ${pending.length}개`, body:'AI가 위치를 확정하지 못했어요. 주소를 확인해 주세요.', time:'위치 확인 필요', detail:pending[0].id});
@@ -94,7 +94,7 @@ let mySheet = null; // 지금 열린 설정 시트 (설정을 바꾸면 다시 �
 function openMySheet(fn){ mySheet = fn; fn(); $('#sheet').classList.add('bottomsheet'); }
 function notiSettings(){
   modal('알림 설정', `<div class="mycard settings">
-    ${sw('notiNearby','현재 위치 기반 추천 알림','저장한 위치 기준으로 가까운 콘텐츠를 앱 안에서 알려드려요')}
+    ${sw('notiNearby','저장 지역 주변 목록','선택한 지역의 저장 장소를 앱 안 알림 목록에 표시해요')}
     ${sw('notiDeadline','마감 임박 알림','전시/팝업이 끝나기 3일 전에 알려드려요')}
     ${sw('notiReminder','다시 보기 리마인드','잊고 있던 저장 콘텐츠를 가끔 꺼내드려요')}
   </div>`);
