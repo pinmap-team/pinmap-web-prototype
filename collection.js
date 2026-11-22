@@ -84,13 +84,13 @@ function cfSyncCollections(){
 document.addEventListener('DOMContentLoaded', cfSyncCollections);
 
 /* Folder ordering does not change saved content or content-level sorting. */
-// 2026-11-10 정렬은 세 가지로만: 최근 담은 순(기본) · 이름 오름차순 · 이름 내림차순
-const CF_FOLDER_SORTS=[['saved','최근 담은 순'],['name','이름 오름차순'],['name-desc','이름 내림차순']];
+const CF_FOLDER_SORTS=[['saved','최근 담은 순'],['name','이름 오름차순'],['name-desc','이름 내림차순'],['count-desc','저장 많은 순'],['count-asc','저장 적은 순']];
 function cfOrderFolders(folders){
   const mode=CF_FOLDER_SORTS.some(([k])=>k===settings.folderSort)?settings.folderSort:'saved',custom=cfCustom();
   const latest=f=>items.filter(x=>f.attr ? x.collection===f.id : folderOf(x)===f.id).reduce((max,x)=>Math.max(max,savedTimestamp(x)||0),0);
   return [...folders].sort((a,b)=>{
     if(mode==='name'||mode==='name-desc')return a.title.localeCompare(b.title,'ko',{numeric:true})*(mode==='name-desc'?-1:1);
+    if(mode==='count-desc'||mode==='count-asc')return (a.count-b.count)*(mode==='count-desc'?-1:1)||latest(b)-latest(a)||a.title.localeCompare(b.title,'ko');
     if(mode==='saved')return latest(b)-latest(a)||a.title.localeCompare(b.title,'ko');
     const ai=custom.indexOf(a.id),bi=custom.indexOf(b.id);
     if(ai>=0 && bi>=0)return mode==='old'?ai-bi:bi-ai;

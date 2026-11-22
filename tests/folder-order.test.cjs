@@ -21,6 +21,16 @@ test('folder names sort in both directions without changing source data',()=>{
 test('recently saved ordering derives from content timestamps',()=>{
  assert.deepEqual(Array.from(setup('saved').cfOrderFolders(folders),x=>x.id),['나','다','가']);
 });
+test('folder content counts sort in both directions, breaking ties by latest save',()=>{
+ const counted=[{...folders[0],count:2},{...folders[1],count:1},{...folders[2],count:2}];
+ const before=JSON.stringify(counted);
+ const records=[{collection:'나',folder:'가',stamp:9},{collection:'나',folder:'가',stamp:5},{collection:'가',folder:'가',stamp:3},{collection:'',folder:'다',stamp:10},{collection:'',folder:'다',stamp:4}];
+ const descending=setup('count-desc');descending.items=records;
+ const ascending=setup('count-asc');ascending.items=records;
+ assert.deepEqual(Array.from(descending.cfOrderFolders(counted),x=>x.id),['다','나','가']);
+ assert.deepEqual(Array.from(ascending.cfOrderFolders(counted),x=>x.id),['가','다','나']);
+ assert.equal(JSON.stringify(counted),before);
+});
 test('custom folder deletion retains content, memo and saved time',()=>{
  const items=[{id:1,collection:'나',memo:'메모',savedAt:'2026-11-01'},{id:2,collection:'가',memo:'유지'}];
  const ctx={actions:{},cfFolderToDelete:'나',settings:{customFolders:['나','가']},items,COLLECTIONS:[['나'],['가']],cfCustom:()=>ctx.settings.customFolders,afterChange(){},$:()=>({close(){}}),render(){},window:{scrollTo(){}},toast(){}};
