@@ -35,7 +35,8 @@ detail = function(){
   const selectedPlaceIndex=window.pmDetailPlace?.id===detailId ? window.pmDetailPlace.index : 0;
   const selectedPlace=x?.mapLocations?.[selectedPlaceIndex||0];
   if (!x) { detailId = null; return pages[page](); }
-  const restricted=pinmapAgeRestricted(x);
+  const failure=pinmapAnalysisFailure(x);
+  const restricted=!!failure;
   const t = typeOf(x.type);
   const showPlaceInfo = t.place && x.contentKind !== 'unknown' &&
     (x.contentKind !== 'event' || (x.extractionPlaces || []).length > 0 || !!x.address);
@@ -53,7 +54,7 @@ detail = function(){
   const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 확인 · 지도 표시 ${mappedCount}곳 · 위치 확인 필요 ${extracted.length - mappedCount}곳</p><ul>${extracted.map((place,i) => {const index=photoIndexes[i],favorite=extractedPlaces[i],located=index>=0&&!favorite.unlocated;return `<li class="dt-extraction-place">${located?PinmapPlacePhotos.markup(x.backendId,index,PinmapPlacePhotos.preferredImage(locations[index],x.photo),'dt-extraction-photo'):''}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong><span class="${located ? 'dt-extraction-ready' : 'dt-extraction-pending'}">${located ? '지도 표시' : '위치 확인 필요'}</span></div><p>${esc(located ? (locations[index]?.address || place.address || '지도 위치 확인됨') : (place.reason || '주소를 확인하지 못했어요.'))}</p></div><button type="button" class="dt-extraction-heart lm-heart-motion${favorite.favorite?' is-active':''}" data-fav-place-id="${esc(favorite.id)}" aria-pressed="${!!favorite.favorite}" aria-label="${esc(favorite.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button></li>`;}).join('')}</ul></section>` : '';
   const eventInfo=dtEventInfo(x.events);
   const analysisNotes = Array.isArray(x.extractionNotes) ? x.extractionNotes.filter(note => typeof note === 'string').slice(0, 8) : [];
-  const reviewInfo = restricted ? `<section class="dtsec dt-restricted-notice"><h2>원본 확인이 필요해요</h2><p>Instagram의 연령 제한으로 게시물의 사진과 내용을 확인하지 못했어요. Instagram에 로그인한 뒤 원본에서 확인해 주세요.</p></section>` : analysisNotes.length || (x.contentKind === 'unknown' && x.status !== 'extracted') ? `<section class="dtsec dt-extraction dt-analysis-notes"><h2>분석 안내</h2><ul>${(analysisNotes.length ? analysisNotes : ['게시물에서 장소 또는 행사 정보를 확인하지 못했어요.']).map(note => `<li><p>${esc(note)}</p></li>`).join('')}</ul></section>` : '';
+  const reviewInfo = failure ? analysisFailureNotice(failure,false) : analysisNotes.length || (x.contentKind === 'unknown' && x.status !== 'extracted') ? `<section class="dtsec dt-extraction dt-analysis-notes"><h2>분석 안내</h2><ul>${(analysisNotes.length ? analysisNotes : ['게시물에서 장소 또는 행사 정보를 확인하지 못했어요.']).map(note => `<li><p>${esc(note)}</p></li>`).join('')}</ul></section>` : '';
   const memoInfo = `<section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>`;
 
   // 유형별 정보
@@ -75,8 +76,11 @@ detail = function(){
   const bottom = [];
   if (ready) bottom.push(`<a class="dtghost" href="${mapHref}" target="_blank" rel="noopener noreferrer">${icon('send')}길찾기</a>`);
   else if (showPlaceInfo) bottom.push(`<button class="dtghost" data-action="edit">${icon('pin')}장소 입력</button>`);
-  if (!x.deleted) {
-    const originalLabel = restricted ? 'Instagram에서 확인' : x.source === '캡처' ? '캡처 미리보기' : '원본 보기';
+  if(failure){
+    bottom.push(`<button class="dtprimary" data-action="${failure.action}">${icon(failure.action==='original'?'image':failure.action==='billing'?'clock':'link')}${esc(failure.actionLabel)}</button>`);
+  }
+  else if (!x.deleted) {
+    const originalLabel = failure?.action==='original' ? failure.actionLabel : x.source === '캡처' ? '캡처 미리보기' : '원본 보기';
     bottom.push(`<button class="dtprimary" data-action="original">${icon('image')}${originalLabel}</button>`);
   }
   else if (!ready) bottom.push(`<button class="dtprimary" data-action="edit">${icon('pen')}정보 수정</button>`);
@@ -96,8 +100,8 @@ detail = function(){
           </div>
         </div></div>
       <div class="dtsrc dthtitle">
-        <span class="dthpill">${esc(restricted?'연령 제한':x.category || shortType(x.type))}</span>
-        <h1>${esc(restricted&&x.title==='Instagram 게시물'?'미리보기를 볼 수 없는 게시물':x.title)}</h1>
+        <span class="dthpill">${esc(failure?failure.label:x.category || shortType(x.type))}</span>
+        <h1>${esc(failure&&x.title==='Instagram 게시물'?'분석 결과가 없는 게시물':x.title)}</h1>
         <small>${esc(src)}, ${esc(savedAgo(x))} 저장</small>
       </div>
     </div>
