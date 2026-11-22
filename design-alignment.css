@@ -136,7 +136,7 @@ button,input,select,textarea,svg text,.libpage,.live-map,#login-screen,.ob-phone
 .live-map .lm-carousel-copy button.lm-carousel-detail svg{width:16px;height:16px}
 .live-map .lm-carousel-copy{justify-content:space-between}
 .live-map .lm-carousel-bottom{margin-top:var(--space-xs)}
-.live-map .lm-result-row,.live-map .lm-results-head button,.dtcopy,.dtmemoedit,.dtmap-open,.esclose,.ntclose,.cf-delfolder,.cf-textbtn,.cf-pickbtn,.accsync,.libchip{min-width:44px;min-height:44px}
+.live-map .lm-result-row,.live-map .lm-results-head button,.dtcopy,.dtmemoedit,.esclose,.ntclose,.cf-delfolder,.cf-textbtn,.cf-pickbtn,.accsync,.libchip{min-width:44px;min-height:44px}
 .live-map .lm-header .lm-categories button{min-height:75px}
 
 /* Semantic red: icon/badge use only. Text stays dark for readable contrast. */
@@ -270,7 +270,7 @@ button[aria-busy="true"]>*{visibility:hidden}
 [data-theme="dark"] .lm-location-demo{background:var(--color-surface);color:var(--color-secondary)}
 [data-theme="dark"] :is(.dt,.dtsheet,.esfoot,.esshare,.ntcard,.ntghost){background:var(--color-surface);color:var(--color-on-surface)}
 [data-theme="dark"] .dtbar::before{background:linear-gradient(180deg,#1b1b1d00,var(--color-surface) 50px)}
-[data-theme="dark"] :is(.dtbtn,.dtfav,.dtmap-open){background:var(--t-glass);color:var(--color-on-surface)}
+[data-theme="dark"] :is(.dtbtn,.dtfav){background:var(--t-glass);color:var(--color-on-surface)}
 [data-theme="dark"] :is(.dtprimary,.essubmit,.ntprimary){background:var(--color-primary);color:var(--color-neutral)}
 [data-theme="dark"] :is(.dtwarn,.dtgone,.eschip,.ntclose,.dtcopy:hover){background:var(--color-disabled);color:var(--color-on-surface)}
 [data-theme="dark"] .eschip.on{background:var(--color-primary);color:var(--color-neutral)}
@@ -1273,13 +1273,9 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .dt-photo .dtmemobox .icon{width:16px;height:16px;stroke-width:1.6}
 .dt-photo .dtsec:not(.dtmemo){padding:0;background:transparent}
 .dt-photo .dtplacecard{padding:var(--space-lg);border-radius:var(--rounded-md);background:var(--color-surface)}
-.dt-photo .dtaddress{display:flex;align-items:center;gap:var(--space-sm);margin:0 0 var(--space-md);font:var(--type-label-md);font-weight:var(--weight-regular);color:var(--color-secondary)}
+.dt-photo .dtaddress{display:flex;align-items:center;gap:var(--space-sm);margin:0;font:var(--type-label-md);font-weight:var(--weight-regular);color:var(--color-secondary)}
 .dt-photo .dtaddress>.icon{width:20px;height:20px}
 .dt-photo .dtaddress .dtcopy{flex:none;width:44px;height:44px;border-radius:var(--rounded-sm)}
-.dt-photo .dtmap-preview{height:160px;margin:0;border-radius:var(--rounded-md)}
-.dt-photo .dtmaplink{position:absolute;inset:0;z-index:460;width:100%;height:100%;padding:0;border:0;border-radius:inherit;background:transparent;cursor:pointer}
-.dt-photo .dtmaplink:focus-visible{outline:2px solid var(--color-primary);outline-offset:-2px}
-.dt-photo .dtmap-fallback{pointer-events:none}
 .dt-photo .dtfacts{margin:var(--space-lg) 0 0;padding:0;font:var(--type-label-md);font-weight:var(--weight-regular);color:var(--color-secondary)}
 .dt-photo .dtfacts span{gap:var(--space-sm);margin:0;padding:0;border:0}
 .dt-photo .dtfacts .icon{width:20px;height:20px;stroke-width:1.6}

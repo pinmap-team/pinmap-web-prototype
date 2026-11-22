@@ -62,7 +62,7 @@ detail = function(){
   const singlePlace=!extracted.length?PinmapPlaces.forItem(x).find(place=>place.locationIndex===(selectedPlaceIndex||0)):null;
   const placeHeading=singlePlace?`<div class="dtsechead"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><button type="button" class="dt-extraction-heart lm-heart-motion${singlePlace.favorite?' is-active':''}" data-fav-place-id="${esc(singlePlace.id)}" aria-pressed="${!!singlePlace.favorite}" aria-label="${esc(singlePlace.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button></div>`:`<h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2>`;
   if (showPlaceInfo) info += ready
-    ? `<section class="dtsec dtlocation">${placeHeading}${selectedPlace?PinmapPlacePhotos.markup(x.backendId,selectedPlaceIndex||0,PinmapPlacePhotos.preferredImage(selectedPlace,x.photo),'dt-place-photo'):''}<div class="dtplacecard"><div class="dtaddress">${icon('pin')}<span>${esc(selectedPlace?.address||x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div><div class="dtmap-preview"><div id="detail-map-canvas" role="img" aria-label="${esc(x.title)} 저장 위치 지도"></div><button type="button" class="dtmaplink" data-action="dtgomap" aria-label="${esc(x.title)} 지도 탭에서 보기"></button><p class="dtmap-fallback" id="detail-map-fallback" hidden>지도를 불러오지 못했어요. 지도에서 위치를 확인해 주세요.</p></div>${factRow}</div></section>`
+    ? `<section class="dtsec dtlocation">${placeHeading}${selectedPlace?PinmapPlacePhotos.markup(x.backendId,selectedPlaceIndex||0,PinmapPlacePhotos.preferredImage(selectedPlace,x.photo),'dt-place-photo'):''}<div class="dtplacecard"><div class="dtaddress">${icon('pin')}<span>${esc(selectedPlace?.address||x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div>${factRow}</div></section>`
     : `<section class="dtsec dtlocation"><h2>장소 정보</h2><div class="dtplacecard"><div class="dtwarn"><b>장소 확인 필요</b><p>위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.</p><button class="dtsmall" data-action="edit">장소 직접 입력</button></div></div></section>`;
   // 2026-11-10 가격을 크게(headline-md), 안내는 body-md. '예시 가격' → '참고 가격'
   if (x.type === '쇼핑') { const amount = String(x.price || '').replace(/,\s*(예시|참고) 가격$/, '').trim();
@@ -397,9 +397,4 @@ actions.dtcopyaddr = async () => {
   const index=window.pmDetailPlace?.id===detailId?window.pmDetailPlace.index:0;
   const address=x.mapLocations?.[index||0]?.address||x.address;
   toast(await dtCopy(address) ? '주소를 복사했어요.' : `주소: ${address}`);
-};
-// 지도 누르면 핀맵 지도 탭으로 이동해 이 장소를 선택해요
-actions.dtgomap = () => {
-  const x = items.find(i => i.id === detailId); if (!x) return;
-  selectedPin = x.id; window.pmMapFocus = x.id; go('map');
 };
