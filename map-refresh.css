@@ -48,8 +48,7 @@
 .live-map .lm-badge-category .lm-category-svg{display:block;width:16px;height:16px}
 .lm-photo-marker .lm-badge-category{color:var(--color-secondary)}
 .lm-photo-marker.is-selected .lm-badge-category{color:var(--color-primary)}
-.live-map .lm-badge-category .lm-category-svg,
-#detail-map-canvas .lm-badge-category .lm-category-svg{stroke-width:1.5}
+.live-map .lm-badge-category .lm-category-svg{stroke-width:1.5}
 .lm-photo-marker:not(.is-selected):hover .lm-place-badge{transform:translateY(-2px)}
 .lm-photo-marker:focus-visible{outline:2px solid var(--lm-text)}
 

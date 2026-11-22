@@ -1,7 +1,7 @@
 /* Photo place markers, real user-submitted place search, and shared navigation. */
 (() => {
   const originalRender = render;
-  let detailMap, categoryObserver;
+  let categoryObserver;
   let liveMap, pinLayer, locationMarker, locationHeadingMarker, placeController, mapProviderController;
   let expandedKey=null, sheetStage='peek', sheetDrag=null, suppressSheetClickUntil=0;
   let mapLocationName=null, searchOpen=false;
@@ -318,33 +318,9 @@
     liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); if(searchOpen&&searchQuery&&!expandedKey)searchPlaces(searchQuery); });
     requestAnimationFrame(() => liveMap?.invalidateSize());
   }
-  // The detail preview uses the exact same saved-place resolver, marker and basemap.
-  function mountDetailMap(){
-    const host=document.getElementById('detail-map-canvas');
-    if(!host)return;
-    const fallback=document.getElementById('detail-map-fallback');
-    const candidates=savedPlaces().filter(p=>p.id===detailId);
-    const index=window.pmDetailPlace?.id===detailId?window.pmDetailPlace.index:0;
-    const place=candidates.find(p=>p.locationIndex===(index||0))||candidates[0];
-    if(!window.L || !place){
-      fallback.hidden=false;
-      if(!place)fallback.textContent='저장된 좌표가 없어요. 장소 위치를 먼저 확인해 주세요.';
-      return;
-    }
-    try {
-      detailMap=L.map(host,{zoomControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false,zoomAnimation:false}).setView([place.lat,place.lng],15);
-      window.attachPinmapBasemap(detailMap);
-      detailMap.attributionControl?.remove();
-      L.marker([place.lat,place.lng],{title:place.title,icon:markerIcon(place),interactive:false}).addTo(detailMap);
-      requestAnimationFrame(()=>detailMap?.invalidateSize());
-    } catch(error){
-      detailMap?.remove(); detailMap=null; fallback.hidden=false;
-    }
-  }
   pages.map=content; // Register the active map renderer with the shared route policy.
   render = function() {
     categoryObserver?.disconnect();
-    if(detailMap){detailMap.remove();detailMap=null;}
     sheetDrag=null;expandedKey=null;sheetStage='peek';markerEntries.clear();
     window.unmountCourseMap?.();
     window.unmountCourseThumbnails?.();
@@ -352,7 +328,7 @@
     if (liveMap) { liveMap.remove(); liveMap=null; mapProviderController=null; locationMarker=null; locationHeadingMarker=null; }
     const isMap = page === 'map' && !detailId;
     document.body.classList.toggle('live-map-page',isMap);
-    // 상세 페이지 '지도에서 보기' → 그 장소로 이동해 핀을 펼쳐요
+    // 저장 직후 지도 탭으로 이동할 때 해당 장소를 펼쳐요.
     const focusId = isMap ? window.pmMapFocus : null;
     if (focusId != null) { window.pmMapFocus = null; searchResults = null; searchQuery = ''; category = 'all';
       const f = savedPlaces().find(p => p.id === focusId); if (f) { center = [f.lat, f.lng]; zoom = 15; } }
@@ -364,7 +340,7 @@
       mount(focusId==null); if(searchOpen&&searchQuery)searchPlaces(searchQuery); else if(searchResults)showResults();
       if (focusId != null) { const focused=savedPlaces().filter(p=>p.id===focusId); if (focused.length>1 && liveMap) liveMap.fitBounds(focused.map(p=>[p.lat,p.lng]),{maxZoom:15,padding:[48,48]});
         const f=focused[0]; if (f && liveMap) expandPlace(f,false); } }
-    else { originalRender(); if(detailId)mountDetailMap(); if(page==='course' && !detailId) window.mountCourseMap?.(); if(page==='courses' && !detailId) window.mountCourseThumbnails?.(); }
+    else { originalRender(); if(page==='course' && !detailId) window.mountCourseMap?.(); if(page==='courses' && !detailId) window.mountCourseThumbnails?.(); }
   };
   function drawLocation() {
     if(!liveMap)return;
