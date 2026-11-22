@@ -377,15 +377,6 @@ function saveSheet(){
 
 }
 actions.save = saveSheet;
-// 예시 링크로 채우기: 기존 동작 후 화면(글자 수 · 카테고리 · 모음 칩)도 맞춰요
-const fillSample = actions.sample;
-actions.sample = () => {
-  fillSample();
-  esCounts(); $('#saveerror').textContent = '';
-  $('#es-type')?.dispatchEvent(new Event('change',{bubbles:true}));
-  const v = $('#es-col')?.value;
-  document.querySelectorAll('[data-escol]').forEach(b => { const on = b.dataset.escol === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
-};
 // 링크를 비워둔 채 저장하면 안내 (제목은 선택 사항이에요).
 document.addEventListener('submit', e => {
   if (e.target.id !== 'saveform') return;

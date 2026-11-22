@@ -166,10 +166,11 @@ const distanceOf = x => /도보/.test(x.distance||'') ? Number(String(x.distance
 let detail = unavailableScreen;
 
 function render(){
+  page=PinmapScreenPolicy.resolve(page,pages);
   const content=detailId?detail():(pages[page] || unavailableScreen)();
   $('#app').innerHTML=`<div class="layout"><aside class="rail"><a href="#" class="brand" data-page="home"><b class="brandmark">${icon('bookmark')}</b><span>핀맵</span></a><button class="filled" data-action="save">${icon('plus')}<span>새로 저장</span></button><nav aria-label="주 메뉴">${nav()}</nav><div class="railfoot">저장을 다시, 일상으로.<button data-action="intro">사용 방법 알아보기</button><span>Prototype 03</span></div></aside><main class="main"><header class="topbar"><span class="breadcrumb">핀맵 / ${detailId?'콘텐츠 상세':pageName[page]}</span>${page==='my'&&!detailId?'<h1 class="toptitle">마이</h1>':`<a href="#" class="brand mobilebrand" data-page="home"><b class="brandmark">${icon('bookmark')}</b>핀맵</a>`}<div class="topactions">${(page === 'home' || page === 'my') && !detailId ? (n=>`<button class="bellbtn" data-action="noti" aria-label="알림${n?` ${n} 개 안 읽음`:''}">${icon('bell')}${n?`<span class="belldot" aria-hidden="true">${n}</span>`:''}</button>`)(unreadCount()) : ''}</div></header>${content}<footer class="footer"><span>핀맵, 저장을 다시, 일상으로.</span><span>예시 데이터로 체험하는 프로토타입</span></footer></main><nav class="bottomnav" aria-label="하단 메뉴">${nav()}</nav></div>`;
 }
-function go(p){page=p;detailId=null;collection=null;filter='전체';query='';render();window.scrollTo(0,0)}
+function go(p){p=PinmapScreenPolicy.resolve(p,pages);page=p;detailId=null;collection=null;filter='전체';query='';render();window.scrollTo(0,0)}
 let detailReturnTarget=null;
 function openDetail(id,trigger=document.activeElement){
   detailReturnTarget=trigger?.matches?.('[data-detail],[data-lm="open-place"]') ? {
@@ -196,15 +197,14 @@ function guessType(text){
 }
 
 /* ---------- 대화상자 ---------- */
-function saveDialog(){modal('새로 저장',`<button class="sharecta" data-action="snsdemo"><span class="bigemoji" aria-hidden="true">📲</span><div><b>SNS에서 공유로 저장하기</b><small>SNS 게시물에서 공유 → 핀맵을 누르는 저장 과정을 체험해요</small></div>${icon('arrow')}</button><div class="divider"><span>또는 링크 붙여넣기</span></div><form id="saveform"><label class="field"><span>콘텐츠 링크</span><input type="url" name="url" placeholder="https://" required></label><button type="button" class="textbtn" data-action="sample">예시 링크로 채우기 ${icon('arrow')}</button><label class="field"><span>제목</span><input name="title" placeholder="다시 찾기 쉬운 이름" required maxlength="80"></label><label class="field"><span>카테고리</span><select name="type"><option value="ai" ${settings.aiDefault?'selected':''}>✨ AI 자동 분류</option>${TYPES.map(t=>`<option value="${t.id}" ${!settings.aiDefault&&t.id==='기타'?'selected':''}>${t.emoji} ${t.id}</option>`).join('')}</select></label><label class="field"><span>모음, 선택</span><select name="collection"><option value="">나중에 정리</option>${collectionNames().map(c=>`<option>${esc(c)}</option>`).join('')}</select></label><label class="field"><span>저장한 이유, 선택</span><textarea name="memo" rows="2" maxlength="300" placeholder="어떤 순간에 다시 보고 싶나요?"></textarea></label><p class="hint">이 브라우저에 저장돼요. AI 분류는 프로토타입용 간단한 규칙이에요.</p><p class="error" id="saveerror"></p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">${icon('bookmark')} 저장하기</button></div></form>`)}
-function editDialog(){const x=items.find(x=>x.id===detailId);modal('저장 정보 수정',`<form id="editform"><label class="field"><span>카테고리</span><select name="type">${TYPES.map(t=>`<option value="${t.id}" ${t.id===x.type?'selected':''}>${t.emoji} ${t.id}</option>`).join('')}</select></label><label class="field"><span>제목 / 장소명</span><input name="title" value="${esc(x.title)}" required maxlength="80"></label><label class="field"><span>주소, 맛집/카페, 전시/팝업, 여행에만 사용</span><input name="address" value="${esc(x.address||'')}" maxlength="200" placeholder="원본에서 확인한 주소"></label><label class="field"><span>내 메모</span><textarea name="memo" maxlength="300">${esc(x.memo||'')}</textarea></label><label class="field"><span>모음</span><input name="collection" list="collectionlist" value="${esc(x.collection||'')}" maxlength="80" placeholder="나중에 정리"><datalist id="collectionlist">${collectionNames().map(c=>`<option value="${esc(c)}">`).join('')}</datalist></label><p class="hint">직접 바꾼 카테고리는 ‘직접 분류’로 표시돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">수정 내용 저장</button></div></form>`)}
-function intro(){modal('핀맵',`<p class="muted">저장한 콘텐츠를 필요한 순간 다시 꺼내 보세요.</p><div class="dialogactions"><button class="filled" data-action="close">확인</button></div>`)}
-// 위치 권한 (프로토타입: 실제 위치는 요청하지 않고 성수동 예시 위치를 사용)
-function locationDialog(){modal('위치 권한',`<p>현재 위치 주변에 저장한 장소를 찾을 때<br>사용해요.</p><div class="permopts" role="radiogroup" aria-label="위치 권한">${Object.entries(LOC_PERM).map(([k,v])=>`<button role="radio" aria-checked="${settings.locPerm===k}" class="permopt ${settings.locPerm===k?'on':''}" data-locperm="${k}"><b>${v}</b><small>${{none:'예시 위치(성수동)로만 체험해요',using:'앱을 켜 두었을 때 주변 장소를 보여줘요',always:'앱을 켜지 않아도 근처 저장 콘텐츠를 알려드려요'}[k]}</small></button>`).join('')}</div>`)}
+// Active screen modules register the save/edit/onboarding UI. A failed module
+// must never resurrect the retired fallback forms or simulated permission UI.
+const unavailableAction=()=>toast('화면을 불러오지 못했어요. 새로고침해 주세요.');
+let intro=unavailableAction;
 
 /* ---------- 동작 ---------- */
 const actions = {
-  save: saveDialog, intro: () => intro(), close: () => $('#sheet').close(),
+  save: unavailableAction, intro: () => intro(), close: () => $('#sheet').close(),
   back: () => {
     const target=detailReturnTarget;
     detailId=null;render();detailReturnTarget=null;
@@ -216,16 +216,12 @@ const actions = {
   },
   clear: () => { query=''; render(); $('#search')?.focus(); },
   resetfilter: () => { query=''; filter='전체'; render(); },
-  location: locationDialog,
-  allow: () => { if(settings.locPerm==='none')settings.locPerm='using'; afterChange(); $('#sheet').close(); render(); toast('예시 위치(성수동)로 주변 장소를 표시했어요'); },
-  later: () => { $('#sheet').close(); toast('위치 권한 없이 성수동 예시 지도를 보여드려요.'); },
-  edit: editDialog,
+  edit: unavailableAction,
   duedismiss: () => { dueDismissed = true; render(); },
-  sample: () => { const f=$('#saveform'); f.url.value='https://www.youtube.com/watch?v=sample-prototype'; f.elements.namedItem('title').value='주말에 만들어볼 토마토 파스타 레시피'; f.type.value='ai'; f.collection.value='일상에 영감'; f.memo.value='토요일 점심에 만들어보기'; },
   original: () => { const x=items.find(x=>x.id===detailId); const url=x.url&&!x.sample&&x.source!=='캡처'?x.url:null;
     modal(x.source==='캡처'?'캡처 미리보기':'원본 콘텐츠 보기',x.source==='캡처'?`${x.photo?`<img class="screenshot-import-preview" src="${esc(x.photo)}" alt="저장한 캡처 화면 미리보기">`:'<p>캡처 미리보기를 저장하지 못했어요.</p>'}<div class="dialogactions"><button class="filled" data-action="close">닫기</button></div>`:url?`<p>저장한 링크를 새 탭에서 엽니다.</p><div class="dialogactions"><a class="filled" target="_blank" rel="noopener noreferrer" href="${esc(url)}">원본 열기 ${icon('external')}</a></div>`:`<p>‘${esc(x.title)}’은 체험용 콘텐츠예요.</p><p class="muted">실제 서비스에서는 이 단계에서 저장한 ${esc(x.source)} 게시물로 이동해요.</p><div class="dialogactions"><button class="filled" data-action="close">확인</button></div>`); }
 };
-function action(a){ (actions[a]||(()=>{}))(); }
+function action(a){ if(!PinmapScreenPolicy.allowsAction(a))return; (Object.hasOwn(actions,a)&&typeof actions[a]==='function'?actions[a]:(()=>{}))(); }
 
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-page],[data-detail],[data-filter],[data-action],[data-collection],[data-pin],[data-libfilter],[data-libquery]');

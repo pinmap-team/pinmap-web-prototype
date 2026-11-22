@@ -40,9 +40,6 @@ if (PM_ENV.requiresAuth) (() => {
   actions.logout = logout;
   actions.logoutask = () => confirmPop('로그아웃할까요?', '다시 로그인하면 저장한 콘텐츠를 그대로 볼 수 있어요.', 'logoutyes','로그아웃','취소');
   actions.logoutyes = logout;
-  // Never run the old prototype's destructive local reset as account deletion.
-  actions.leaveask = () => confirmPop('탈퇴할까요?', '탈퇴하면 저장한 콘텐츠와 설정이 모두 지워져요.<br>지운 내용은 되돌릴 수 없어요.', 'leaveyes', '탈퇴하기', '유지하기');
-  actions.leaveyes = () => { $('#sheet').close(); toast('회원 탈퇴는 아직 연결되지 않았어요.'); };
   async function verify() {
     if (resolving) return; resolving = true;
     try {

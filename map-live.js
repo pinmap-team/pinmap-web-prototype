@@ -6,7 +6,7 @@
   let expandedKey=null, sheetStage='peek', sheetDrag=null, suppressSheetClickUntil=0;
   let mapLocationName=null, searchOpen=false;
   if(!paths.list)paths.list='M9 6h11 M9 12h11 M9 18h11 M4.5 6h.01 M4.5 12h.01 M4.5 18h.01';
-  let listOpen=false, pinning=false, listGesture=null; // 2026-11-10 목록 시트 · 직접 핀 찍기
+  let listOpen=false, listGesture=null; // 2026-11-10 목록 시트 · 직접 핀 찍기
   let followNextFix=false;
   const markerEntries=new Map();
   let userPosition = null;
@@ -70,8 +70,6 @@
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" role="status" aria-live="polite" hidden></div>
       <div class="lm-locate-top">${round('현재 위치로 이동','target')}</div>
-      <div class="lm-pin-target" aria-hidden="true">${icon('pin')}</div>
-      <div class="lm-pin-bar" role="group" aria-label="직접 핀 찍기"><p>지도를 움직여 핀을 원하는 곳에 맞춰 주세요.</p><div><button type="button" class="lm-pin-cancel" data-lm="pin-cancel">취소</button><button type="button" class="lm-pin-confirm" data-lm="pin-confirm">이 위치 저장</button></div></div>
       <div class="lm-list-scrim" data-lm="close-list" hidden></div><section class="lm-list-sheet" id="lm-list-sheet" role="dialog" aria-label="저장한 장소 목록" hidden></section>
       <section class="lm-selected-host" id="lm-selected-place" aria-label="이 근방 저장된 장소"></section>
       <nav class="bottomnav lm-shared-nav" aria-label="하단 메뉴">${nav()}</nav></section>`;
@@ -254,11 +252,6 @@
     $('#lm-selected-place .lm-list-tab')?.setAttribute('aria-expanded',String(open));
     if(focus)requestAnimationFrame(()=>(open?sheet.querySelector('.lm-list-close'):$('#lm-selected-place .lm-list-tab'))?.focus());
   }
-  function setPinning(on){
-    pinning=on;const map=$('#app .live-map');if(!map)return;
-    map.classList.toggle('is-pinning',on);if(on){setList(false,false);requestAnimationFrame(()=>$('#app .lm-pin-confirm')?.focus());}
-    else $('#app .lm-locate-top .lm-round')?.focus();
-  }
   // 아래 카드 · 목록 손잡이를 위/아래로 밀면 목록 시트를 열고 닫아요(가로로 넘기는 동작과 구분)
   document.addEventListener('pointerdown',event=>{
     if(page!=='map')return;
@@ -276,38 +269,7 @@
   document.addEventListener('pointercancel',()=>{listGesture=null;});
   document.addEventListener('keydown',event=>{
     if(page!=='map'||event.key!=='Escape')return;
-    if(listOpen){setList(false);}else if(pinning){setPinning(false);}
-  });
-  async function dropPin(){
-    const point=liveMap.getCenter(),lat=Number(point.lat.toFixed(6)),lng=Number(point.lng.toFixed(6));
-    const types=TYPES.filter(t=>t.place);
-    modal('핀 저장하기',`<form id="lm-pin-form" class="lm-pin-form"><input type="hidden" name="lat" value="${lat}"><input type="hidden" name="lng" value="${lng}"><label class="field"><span>장소 이름</span><input name="title" maxlength="80" required placeholder="예: 다시 가고 싶은 카페"></label><label class="field"><span>주소 또는 위치 설명</span><input name="address" maxlength="200" required placeholder="주소를 찾고 있어요"></label><label class="field"><span>유형</span><select name="type">${types.map(t=>`<option value="${esc(t.id)}">${esc(t.id)}</option>`).join('')}</select></label><label class="field"><span>내 메모, 선택</span><textarea name="memo" maxlength="300" rows="2" placeholder="이 장소에 가고 싶은 이유"></textarea></label><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장하기</button></div></form>`);
-    requestAnimationFrame(()=>$('#lm-pin-form [name="title"]')?.focus());
-    const address=$('#lm-pin-form [name="address"]');
-    try{
-      const response=await fetch('https://photon.komoot.io/reverse?lat='+lat+'&lon='+lng+'&limit=1');
-      const f=(await response.json()).features?.[0]?.properties||{};
-      const text=[f.city||f.county,f.district,f.locality||f.suburb,f.street,f.housenumber].filter(Boolean).join(' ')||f.name||'';
-      if(address&&!address.value&&text)address.value=text;
-    }catch{}
-    if(address){address.placeholder='예: 서울 성동구 성수동';}
-  }
-  document.addEventListener('submit',async event=>{
-    if(event.target.id!=='lm-pin-form')return;
-    event.preventDefault();
-    const data=new FormData(event.target);
-    const title=String(data.get('title')||'').trim(),address=String(data.get('address')||'').trim(),type=String(data.get('type')||'');
-    const lat=Number(data.get('lat')),lng=Number(data.get('lng'));
-    if(!title||!address||!typeOf(type).place||!Number.isFinite(lat)||!Number.isFinite(lng))return;
-    const mapKind=type==='전시/팝업'?'event':type==='여행'?'walk':'cafe';
-    const item={id:Date.now(),title,address,type,category:shortType(type),source:'직접 추가',ago:'방금',savedAt:new Date().toISOString(),desc:'',memo:String(data.get('memo')||'').trim(),art:typeOf(type).art,lat,lng,mapKind,aiClassified:false};
-    const button=event.target.querySelector('[type="submit"]');
-    try{
-      await PinmapButton.run(button,()=>window.PinmapContentPersistence.savePin(item),'핀 저장 중');
-      $('#sheet').close();setPinning(false);markers();
-      const entry=markerEntries.get(placeKey({saved:true,id:item.id}));if(entry)expandPlace(entry.place);
-      toast(`${josa(title,'을/를')} 지도에 저장했어요.`);
-    }catch(error){toast(error.message||'핀을 저장하지 못했어요. 다시 시도해 주세요.');}
+    if(listOpen)setList(false);
   });
   function expandPlace(place,moveMap=true,scrollCard=true) {
     const key=placeKey(place),entry=markerEntries.get(key);if(!entry)return;
@@ -363,6 +325,7 @@
       detailMap?.remove(); detailMap=null; fallback.hidden=false;
     }
   }
+  pages.map=content; // Register the active map renderer with the shared route policy.
   render = function() {
     if(detailMap){detailMap.remove();detailMap=null;}
     sheetDrag=null;expandedKey=null;sheetStage='peek';markerEntries.clear();

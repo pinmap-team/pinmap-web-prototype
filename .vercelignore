@@ -9,3 +9,6 @@ vendor/*LICENSE*
 .env.local
 .env.*
 .vercel/
+
+# Retired screen implementations are reference material, never public assets.
+archive/

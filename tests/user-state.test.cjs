@@ -50,10 +50,9 @@ test('account adapter saves settings, rolls back errors, reloads them, and clear
  db.fail();context.settings.notiNearby=false;assert.equal(await api.persist(),false);assert.equal(context.settings.notiNearby,true);assert(messages.includes('offline'));
  events['pinmap:account-cleared']();assert.equal(context.settings.places.length,0);assert.equal(context.preferences.length,0);assert.equal(api.userId,null);
 });
-test('development preview restrictions never run in the signed-in app',()=>{
- const ctx=vm.createContext({PM_ENV:{development:true,requiresAuth:true,cloudPlaceTest:false}});
- vm.runInContext(fs.readFileSync('development.js','utf8'),ctx);
- assert(!Object.hasOwn(ctx,'notifications'));
+test('retired development restrictions are not shipped in the shared app',()=>{
+ assert(!fs.readFileSync('app.html','utf8').includes('src="development.js'));
+ assert(!fs.existsSync('development.js'));
 });
 test('a metadata read started before a settings change cannot roll the UI back',async()=>{
  const {db,context,api}=ui();api.hydrate(db.users.a,db.client);

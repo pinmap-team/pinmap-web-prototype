@@ -77,7 +77,7 @@ pages.my = function(){
     ${myRow('billing',icon('bookmark'),'요금제 및 결제','월 5,000원')}
     ${myRow('savesheet','✨','저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
     ${myRow('appearance','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>','화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
-    ${myRow('notisheet','🔔','알림 설정', settings.push ? `미리보기 켜짐, ${notiOn}개` : '미리보기 꺼짐')}
+    ${myRow('notisheet','🔔','알림 설정', notiOn ? `${notiOn}개 켜짐` : '꺼짐')}
     ${myRow('calexport',icon('calendar'),'캘린더로 내보내기', typeof calExportList === 'function' ? `마감 ${calExportList().length}개` : '')}
   </section>
   <section class="mgroup my-section" aria-label="도움말">
@@ -94,9 +94,7 @@ let mySheet = null; // 지금 열린 설정 시트 (설정을 바꾸면 다시 �
 function openMySheet(fn){ mySheet = fn; fn(); $('#sheet').classList.add('bottomsheet'); }
 function notiSettings(){
   modal('알림 설정', `<div class="mycard settings">
-    ${sw('push','알림 미리보기','잠금화면 모양의 알림을 앱 안에서 미리 볼 수 있어요')}
     ${sw('notiNearby','현재 위치 기반 추천 알림','저장한 위치 기준으로 가까운 콘텐츠를 앱 안에서 알려드려요')}
-    ${settings.push ? `<button class="setwarn" data-action="pushdemo"><span>알림 미리보기 열기</span>${icon('chevright')}</button>` : ''}
     ${sw('notiDeadline','마감 임박 알림','전시/팝업이 끝나기 3일 전에 알려드려요')}
     ${sw('notiReminder','다시 보기 리마인드','잊고 있던 저장 콘텐츠를 가끔 꺼내드려요')}
   </div>`);
@@ -108,16 +106,16 @@ $('#sheet').addEventListener('close', () => { mySheet = null; });
 
 /* ---------- 동작 ---------- */
 Object.assign(actions, {
-  appearance: () => PinmapTheme.show(),
+  appearance: () => go('themeset'),
   noti: notiSheet,
   readall: () => { markRead(notifications().map(n => n.id)); notiSheet(); render(); },
-  notisettings: () => { if (page !== 'my') go('my'); openMySheet(notiSettings); },
-  notisheet: () => openMySheet(notiSettings),
-  savesheet: () => openMySheet(saveSettings),
+  notisettings: () => go('notiset'),
+  notisheet: () => go('notiset'),
+  savesheet: () => go('saveset'),
   coachagain: () => { go('home'); setTimeout(() => {if(page==='home')startCoach(true);}, 300); },
-  appinfo: () => { modal('앱 정보', `<p>핀맵 Prototype 03</p><p class="hint">예시 데이터로 체험하는 프로토타입이에요. 데이터는 이 브라우저에만 저장돼요.</p>`); $('#sheet').classList.add('bottomsheet'); },
+  appinfo: () => go('appinfo'),
   howto: () => openOnboarding(1),
-  profile: () => { modal('프로필 편집', `<form id="profileform"><label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label><p class="hint">위치는 ‘위치 편집’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장</button></div></form>`); $('#sheet').classList.add('bottomsheet'); },
+  profile: () => go('profile'),
   resetask: () => go('account'),
   resetdata: () => go('account'),
   logout: () => actions.logoutask?.()
@@ -137,17 +135,8 @@ document.addEventListener('click', e => {
 document.addEventListener('change', e => {
   const key = e.target.dataset?.setting;
   if (!key) return;
-  if (key === 'push' && e.target.checked) { e.target.checked = false; askPushPermission(); return; }
+  if (!['notiDeadline','notiNearby','notiReminder','aiDefault'].includes(key)) return;
   settings[key] = e.target.checked; afterChange();
   const y = window.scrollY; render(); window.scrollTo(0, y);
   mySheet?.(); // 열려 있는 설정 시트도 바로 갱신
-});
-document.addEventListener('submit', e => {
-  if (e.target.id !== 'profileform') return;
-  e.preventDefault();
-  const f = e.target, nick = f.nickname.value.trim();
-  if (!nick) return;
-  if(PM_ENV.requiresAuth){
-    window.PinmapAccountProfile?.save({nickname:nick}).then(()=>{$('#sheet').close();toast('프로필을 저장했어요.');}).catch(error=>toast(error.message||'프로필을 저장하지 못했어요.'));
-  }else{settings.nickname=nick;afterChange();$('#sheet').close();render();toast('프로필을 저장했어요.');}
 });
