@@ -61,7 +61,7 @@ function pinmapAccountItem(record, id) {
     analysisFailureCode:text(record.failure_code || record.error_code,80),
     source:capture ? '캡처' : 'Instagram', savedAt, desc:text(record.ai_summary, 500),
     searchSummary:text(record.ai_summary, 800), aiSummary:!!text(record.ai_summary),
-    art:hasEvents ? 'exhibit' : places.length ? 'cafe' : ({travel:'sea',shopping:'bag',recipe:'food'}[aiCategory] || 'book'), photo:cover,
+    art:hasEvents ? 'exhibit' : places.length ? 'cafe' : ({travel:'sea',shopping:'bag',recipe:'food'}[aiCategory] || 'missing'), photo:cover,
     url, memo:'', collection:'', aiClassified:classified,
     authorUsername:text(record.author_username, 80), authorProfilePhoto:text(record.author_profile_data_url, 700000),
     extractionPlaces, extractedPlaceCount:extractionPlaces.length, events, extractionNotes:notes,

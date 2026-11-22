@@ -28,8 +28,8 @@ function cfMatches(){
     && PinmapContentSearch.matches(x, query, [folderOf(x)]));
 }
 
-// 썸네일 URL: 사진이 있으면 사진, 없으면 기존 콘텐츠 썸네일(일러스트)을 이미지로
-const cfThumbUrl = x => libPhoto(x) || 'data:image/svg+xml,' + encodeURIComponent(art(x.art));
+// 썸네일 URL: 사진이 없으면 공통 이미지 안내를 사용해 임의의 콘텐츠 그림을 넣지 않아요.
+const cfThumbUrl = x => libPhoto(x) || PM_ENV.placeholderImage;
 // 실제 저장 시각이 최신인 콘텐츠부터. 시각이 같을 때만 사진을 우선한다.
 const cfThumbs = list => [...list].sort((a,b) => ((savedTimestamp(b) ?? -Infinity) - (savedTimestamp(a) ?? -Infinity)) || (libPhoto(b)?1:0) - (libPhoto(a)?1:0)).slice(0, 3).map(cfThumbUrl);
 
@@ -54,7 +54,7 @@ function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected 
     if (i >= shown) return '';
     const src = thumbnails[i];
     return `<span class="cf-photo cf-slot${i}${src ? '' : ' cf-empty'}">${src
-      ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('cf-empty');this.remove()">` : ''}</span>`;
+      ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=PM_ENV.placeholderImage">` : ''}</span>`;
   };
   return `<button type="button" class="cf-folder${selected ? ' on' : ''}" ${attr || `data-cffolder="${esc(id)}"`}>
     <span class="cf-shell">
