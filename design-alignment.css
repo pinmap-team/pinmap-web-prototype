@@ -1561,8 +1561,11 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .live-map .lm-header .lm-categories .lm-category-indicator{width:44px;bottom:0}
 .live-map .lm-header .lm-categories .lm-category-indicator::after{inset:0}
 
-/* Keep the sliding underline on the header/map boundary, including horizontal scroll. */
-.live-map .lm-header .lm-categories{padding-bottom:var(--space-sm);margin-bottom:calc(-1 * var(--space-sm))}
+/* Keep the sliding underline on the compact header/map boundary. */
+.live-map:not(:has(.lm-search-row.is-open)) .lm-header{padding-bottom:0}
+.live-map .lm-header .lm-categories{padding-bottom:var(--space-md);margin-bottom:0}
+.live-map .lm-header .lm-categories>button{min-height:60px;padding:var(--space-sm) 0 var(--space-xs)}
+.live-map .lm-header .lm-categories>button b{min-height:0}
 
 /* Search owns the header while open: one close control and a softly separated result card. */
 .live-map:has(.lm-search-row.is-open) .lm-header .lm-location-header{margin-bottom:0}
