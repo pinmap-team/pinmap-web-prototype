@@ -66,7 +66,7 @@ test('account edits and direct pins survive account reload and can be removed', 
     updateUser:async({data})=>{metadata={...metadata,...data};return {data:{user:{id:'user-a',user_metadata:metadata}}};},
     getSession:async()=>({data:{session:{access_token:'token'}}}),onAuthStateChange:()=>{}
   }};
-  const context={PinmapFolders:require('../account-folders.js'),PinmapFavorites:require('../favorite-state.js'),
+  const context={PinmapFolders:require('../account-folders.js'),PinmapPlaces:require('../place-state.js'),PinmapFavorites:require('../favorite-state.js'),
     PinmapAccountMapData:require('../account-map-data.js'),PM_ENV:{requiresAuth:true},
     PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
     window:{},document:{addEventListener:()=>{},getElementById:()=>null,querySelector:()=>null},
@@ -121,7 +121,7 @@ test('account history loads all pages using the backend page-size contract', asy
   const visible = [];
   const submitHandlers=[];
   const context = {
-    PinmapFolders:require('../account-folders.js'),PinmapFavorites:require('../favorite-state.js'),PinmapAccountMapData:require('../account-map-data.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
+    PinmapFolders:require('../account-folders.js'),PinmapPlaces:require('../place-state.js'),PinmapFavorites:require('../favorite-state.js'),PinmapAccountMapData:require('../account-map-data.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
     PM_ENV:{requiresAuth:true}, PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
     document:{addEventListener:(type,handler)=>{if(type==='submit')submitHandlers.push(handler);},getElementById:()=>({close:()=>{}})}, window:{}, actions:{save:()=>{}},
     FormData:class{get(){return '현장 메모';}},
@@ -210,7 +210,7 @@ test('bulk removal deletes on the server and keeps failed records visible', asyn
   const done = new Promise(resolve=>{finished=resolve;});
   const toasts = [], deletes = [];
   const context = {
-    PinmapFolders:require('../account-folders.js'),PinmapFavorites:require('../favorite-state.js'),PinmapAccountMapData:require('../account-map-data.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
+    PinmapFolders:require('../account-folders.js'),PinmapPlaces:require('../place-state.js'),PinmapFavorites:require('../favorite-state.js'),PinmapAccountMapData:require('../account-map-data.js'),settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
     PM_ENV:{requiresAuth:true},PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
     document:{addEventListener:()=>{},getElementById:()=>({close:()=>{}}),querySelector:()=>null},
     window:{},actions:{save:()=>{}},items:[],detailId:null,cfSel:null,

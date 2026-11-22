@@ -126,6 +126,7 @@ if (PM_ENV.requiresAuth) (() => {
     PinmapAccountMapData.applyEdit(item,editState[String(item.backendId)]);
     item.collection=folderState.assignments[String(item.backendId)]||'';
     item.favorite=favoriteState.includes(String(item.backendId));
+    item.placeFavorites=favoriteState.filter(id=>id.startsWith(`place:${item.backendId}:`));
     item.memo=memoState[String(item.backendId)]||'';
     return item;
   };
@@ -133,6 +134,7 @@ if (PM_ENV.requiresAuth) (() => {
     const item=PinmapAccountMapData.manualItem(pin,localId({id:'manual:'+pin.id}));
     item.collection=folderState.assignments[String(item.backendId)]||'';
     item.favorite=favoriteState.includes(String(item.backendId));
+    item.placeFavorites=favoriteState.filter(id=>id.startsWith(`place:${item.backendId}:`));
     item.memo=memoState[String(item.backendId)]??item.manualMemo;
     return item;
   });
@@ -163,7 +165,7 @@ if (PM_ENV.requiresAuth) (() => {
   function applyFavorites(value){
     favoriteState=PinmapFavorites.normalize(value);
     const selected=new Set(favoriteState);
-    for(const item of items)item.favorite=selected.has(String(item.backendId));
+    for(const item of items){item.favorite=selected.has(String(item.backendId));item.placeFavorites=favoriteState.filter(id=>id.startsWith(`place:${item.backendId}:`));}
   }
   PinmapFavorites.connect(async(item,favorite)=>{
     if(!window.PinmapAccountLoaded||window.PinmapAccountLoadError)throw Error('저장 목록을 불러온 뒤 즐겨찾기해 주세요.');
@@ -173,7 +175,8 @@ if (PM_ENV.requiresAuth) (() => {
     try{
       const {data,error}=await client.auth.getUser();
       if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)throw Error('로그인 계정을 다시 확인해 주세요.');
-      const value=PinmapFavorites.change(data.user.user_metadata?.pinmap_favorites,item.backendId,favorite);
+      const current=PinmapPlaces.expandLegacy(data.user.user_metadata?.pinmap_favorites,items);
+      const value=PinmapFavorites.change(current,item.placeId||item.id,favorite);
       const result=await client.auth.updateUser({data:{pinmap_favorites:value}});
       if(result.error)throw result.error;
       if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
@@ -189,8 +192,8 @@ if (PM_ENV.requiresAuth) (() => {
     try{
       const {data,error}=await client.auth.getUser();
       if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)throw Error('로그인 계정을 다시 확인해 주세요.');
-      const removed=new Set(chosen.map(item=>String(item.backendId)));
-      const value=PinmapFavorites.normalize(data.user.user_metadata?.pinmap_favorites).filter(id=>!removed.has(id));
+      const removed=new Set(chosen.map(item=>String(item.placeId||item.id)));
+      const value=PinmapPlaces.expandLegacy(data.user.user_metadata?.pinmap_favorites,items).filter(id=>!removed.has(id));
       const result=await client.auth.updateUser({data:{pinmap_favorites:value}});
       if(result.error)throw result.error;
       if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
@@ -480,7 +483,7 @@ if (PM_ENV.requiresAuth) (() => {
     delete folders.assignments[key];
     const memos=normalizeMemos(metadata.pinmap_memos);
     delete memos[key];
-    const favorites=PinmapFavorites.normalize(metadata.pinmap_favorites).filter(id=>id!==key);
+    const favorites=PinmapFavorites.normalize(metadata.pinmap_favorites).filter(id=>id!==key&&!id.startsWith(`place:${key}:`));
     const result=await client.auth.updateUser({data:{pinmap_manual_pins:next,
       pinmap_collections:folders,pinmap_memos:memos,pinmap_favorites:favorites}});
     if(result.error)throw result.error;

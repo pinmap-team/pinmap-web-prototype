@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const vm = require('node:vm');
 const fs = require('node:fs');
+const PinmapPlaces=require('../place-state.js');
 const source = fs.readFileSync(require('node:path').join(__dirname, '../course.js'), 'utf8');
 const appSource = fs.readFileSync(require('node:path').join(__dirname, '../app.js'), 'utf8');
 const formatDaySource = appSource.match(/^const fmtDay = .+;$/m)?.[0];
@@ -13,13 +14,14 @@ function app(seed = {}, development = false) {
   let failSave = false;
   const context = vm.createContext({
     PM_ENV: { development },
+    PinmapPlaces,
     crypto: { randomUUID: require('node:crypto').randomUUID },
     localStorage: {
       getItem: key => storage.get(key) ?? null,
       setItem: (key, value) => { if (failSave && key === 'pinmap-courses-v1') throw Error('quota'); storage.set(key, value); },
       removeItem: key => storage.delete(key)
     },
-    items: [1, 4, 8].map(id => ({ id, title: `Place ${id}`, address: 'Seoul', art: 'cafe', type: '카페' })),
+    items: [1, 4, 8].map(id => ({ id, title: `Place ${id}`, address: 'Seoul', art: 'cafe', type: '맛집/카페' })),
     isPlace: () => true, esc: value => String(value), icon: () => '',
     page: 'courses', pageName: {}, pages: {},
     document: { addEventListener: (type, fn) => (listeners[type] ??= []).push(fn), querySelector: () => null, querySelectorAll: () => [], body: { classList: { remove() {} } } },
@@ -54,14 +56,14 @@ test('new course stays a draft until Save; reload and editing update the existin
   assert.equal(a.context.page, 'course');
   assert.match(a.context.message, /한 곳 이상/);
   a.input('Weekend');
-  await a.click('data-course-add', '1');
-  await a.click('data-course-add', '1');
-  await a.click('data-course-add', '8');
+  await a.click('data-course-add', 'place:1:0');
+  await a.click('data-course-add', 'place:1:0');
+  await a.click('data-course-add', 'place:8:0');
   assert.equal(a.storage.has('pinmap-courses-v1'), false);
   await a.click('data-course-save');
   assert.equal(a.context.page, 'courses');
   let saved = JSON.parse(a.storage.get('pinmap-courses-v1'));
-  assert.deepEqual(saved[0].days[0].map(stop => stop.id), [1, 8]);
+  assert.deepEqual(saved[0].days[0].map(stop => stop.id), ['place:1:0', 'place:8:0']);
   assert.equal(a.storage.has('pinmap-course-draft-v1'), false);
   const reloaded = app(Object.fromEntries(a.storage));
   assert.match(reloaded.html('courses'), /Weekend/);
@@ -80,7 +82,7 @@ test('legacy days merge into one ordered course without losing places or origina
   const saved = JSON.parse(a.storage.get('pinmap-courses-v1'));
   assert.equal(saved.length, 1);
   assert.equal(saved[0].days.length, 1);
-  assert.deepEqual(saved[0].days[0].map(stop => stop.id), [1, 4]);
+  assert.deepEqual(saved[0].days[0].map(stop => stop.id), ['place:1:0', 'place:4:0']);
   assert.equal(a.storage.get('pinmap-course-v2'), old);
   assert.equal(saved[0].friends, undefined);
   await a.click('data-course-open', saved[0].id);
@@ -93,7 +95,7 @@ test('legacy days merge into one ordered course without losing places or origina
 test('save failure keeps the draft and does not claim success', async () => {
   const a = app();
   await a.click('data-course-new');
-  await a.click('data-course-add', '1');
+  await a.click('data-course-add', 'place:1:0');
   a.fail();
   await a.click('data-course-save');
   assert.equal(a.context.page, 'course');
@@ -104,16 +106,16 @@ test('save failure keeps the draft and does not claim success', async () => {
 
 test('new courses start empty without a resume action; existing saved courses remain', async () => {
   const a = app();
-  await a.click('data-course-new'); await a.click('data-course-add', '1'); await a.click('data-course-save');
-  await a.click('data-course-new'); a.input('Unfinished'); await a.click('data-course-add', '4');
+  await a.click('data-course-new'); await a.click('data-course-add', 'place:1:0'); await a.click('data-course-save');
+  await a.click('data-course-new'); a.input('Unfinished'); await a.click('data-course-add', 'place:4:0');
   const reloaded = app(Object.fromEntries(a.storage));
   assert.doesNotMatch(reloaded.html('courses'), /이어서|course-resume/);
   await reloaded.click('data-course-new');
   assert.doesNotMatch(reloaded.html('course'), /Unfinished|Place 4/);
-  await reloaded.click('data-course-add', '8'); await reloaded.click('data-course-save');
+  await reloaded.click('data-course-add', 'place:8:0'); await reloaded.click('data-course-save');
   const saved = JSON.parse(reloaded.storage.get('pinmap-courses-v1'));
   assert.equal(saved.length, 2);
-  assert.deepEqual(saved.map(course => course.days[0].map(stop => stop.id)), [[8], [1]]);
+  assert.deepEqual(saved.map(course => course.days[0].map(stop => stop.id)), [['place:8:0'], ['place:1:0']]);
 });
 
 test('existing multi-day courses become a single editable list with unique places', async () => {
@@ -124,12 +126,12 @@ test('existing multi-day courses become a single editable list with unique place
   await a.click('data-course-save');
   const saved = JSON.parse(a.storage.get('pinmap-courses-v1'));
   assert.equal(saved[0].days.length, 1);
-  assert.deepEqual(saved[0].days[0].map(stop=>stop.id), [1,4]);
+  assert.deepEqual(saved[0].days[0].map(stop=>stop.id), ['place:1:0','place:4:0']);
 });
 
 test('map creation opens a fresh editor directly and preserves saved courses', async () => {
   const a = app();
-  await a.click('data-course-new'); await a.click('data-course-add', '1'); await a.click('data-course-save');
+  await a.click('data-course-new'); await a.click('data-course-add', 'place:1:0'); await a.click('data-course-save');
   a.context.page='map';
   await a.click('data-course-new');
   assert.equal(a.context.page, 'course');
@@ -147,4 +149,21 @@ test('disconnected initial mode neither loads nor overwrites stored development 
   assert.equal(current.context.page,'course');
   assert.equal(current.storage.get('pinmap.dev.courses.v1'),payload);
   assert.equal(current.storage.get('pinmap.dev.course-draft.v1'),originalDraft);
+});
+
+test('one saved post contributes two separately selectable course places',async()=>{
+  const a=app();
+  a.context.items.push({id:20,backendId:'post-20',title:'카페 모음',type:'맛집/카페',
+    mapLocations:[
+      {name:'첫 카페',address:'서울 첫길 1',coordinates:{lat:37.5,lng:127.01}},
+      {name:'둘째 카페',address:'서울 둘길 2',coordinates:{lat:37.51,lng:127.02}}
+    ]});
+  await a.click('data-course-new');
+  await a.click('data-course-add','place:post-20:0');
+  await a.click('data-course-add','place:post-20:1');
+  assert.match(a.html('course'),/첫 카페/);
+  assert.match(a.html('course'),/둘째 카페/);
+  await a.click('data-course-save');
+  const saved=JSON.parse(a.storage.get('pinmap-courses-v1'));
+  assert.deepEqual(saved[0].days[0].map(stop=>stop.id),['place:post-20:0','place:post-20:1']);
 });

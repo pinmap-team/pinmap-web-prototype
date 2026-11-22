@@ -16,11 +16,13 @@ test('settings whitelist retains addresses and preferences without importing acc
 });
 test('courses persist backend references and resolve after numeric item IDs change; missing places remain recoverable',()=>{
  const values=[{id:'course',title:'나의 코스',date:'2026-11-22',days:[[{id:1,time:'10:00'},{id:2,time:'11:30'}]]}];
- const stored=State.encodeCourses(values,[{id:1,backendId:'post-a'},{id:2,backendId:'manual:pin-b'}]);
+ const item=(id,backendId)=>({id,backendId,title:'장소',type:'맛집/카페',address:'서울',lat:37.5,lng:127});
+ const stored=State.encodeCourses(values,[item(1,'post-a'),item(2,'manual:pin-b')]);
  assert.equal(stored[0].days[0][0].id,undefined);
- const restored=State.decodeCourses(stored,[{id:9001,backendId:'post-a'},{id:9009,backendId:'manual:pin-b'}]);
- assert.deepEqual(restored[0].days[0].map(s=>s.id),[9001,9009]);
- const missing=State.decodeCourses(stored,[]);assert.equal(missing[0].days[0][0].contentId,'post-a');
+ assert.deepEqual(stored[0].days[0].map(s=>s.placeId),['place:post-a:0','place:manual:pin-b:0']);
+ const restored=State.decodeCourses(stored,[item(9001,'post-a'),item(9009,'manual:pin-b')]);
+ assert.deepEqual(restored[0].days[0].map(s=>s.id),['place:post-a:0','place:manual:pin-b:0']);
+ const missing=State.decodeCourses(stored,[]);assert.equal(missing[0].days[0][0].placeId,'place:post-a:0');
  assert.deepEqual(State.encodeCourses(missing,[]),stored);
 });
 test('serialized account writes retain unrelated metadata, survive a new session, and isolate users',async()=>{
