@@ -9,12 +9,12 @@ test('only supported own screen functions can render; old aliases resolve to cur
  assert.equal(policy.resolve('profile',{}),'home');assert.equal(policy.resolve('profile',{profile:'not a component'}),'home');
 });
 test('retired actions are blocked identically in both modes while current actions remain available',()=>{
- for(const name of ['snsdemo','sample','leaveask','leaveyes','pushdemo','pushallow','pushdeny','localways','location','allow','later','resetdata'])assert.equal(policy.allowsAction(name),false,name);
- for(const name of ['save','edit','linkimport','zipimport','screenshotimport','logoutask','billing','accadd','accsync'])assert.equal(policy.allowsAction(name),true,name);
+ for(const name of ['snsdemo','sample','pushdemo','pushallow','pushdeny','localways','location','allow','later','resetdata'])assert.equal(policy.allowsAction(name),false,name);
+ for(const name of ['save','edit','linkimport','zipimport','screenshotimport','logoutask','leaveask','leaveyes','billing','accadd','accsync'])assert.equal(policy.allowsAction(name),true,name);
  for(const mode of ['prototype','account']){
   let click;const actions={},pages={placeset(){},accountaccess(){}};
   vm.runInNewContext(read('screen-access.js'),{document:{addEventListener:(name,fn)=>{if(name==='click')click=fn}},actions,pages,PinmapScreenPolicy:policy,go(){}});
-  let stopped=false;click({target:{closest:()=>({dataset:{action:'leaveyes'}})},preventDefault(){},stopImmediatePropagation(){stopped=true}});
+  let stopped=false;click({target:{closest:()=>({dataset:{action:'snsdemo'}})},preventDefault(){},stopImmediatePropagation(){stopped=true}});
   assert(stopped,mode);assert(!Object.hasOwn(pages,'placeset'));assert(!Object.hasOwn(pages,'accountaccess'));
  }
 });
@@ -34,11 +34,12 @@ test('retired assets are deleted, public documents cannot load them, and archive
  assert(/^archive\/$/m.test(read('.vercelignore')));
  assert(read('scripts/dev-auth-server.cjs').includes("pathname.startsWith('/archive/')"));
 });
-test('the public app has no fake share/permission/deletion entry controls or retired fallback forms',()=>{
+test('the public app has no fake share/permission controls or retired fallback forms',()=>{
  const source=['app.js','my.js','mypages.js','auth-app.js'].map(read).join('\n');
- for(const name of ['snsdemo','pushdemo','leaveask','leaveyes','allow','later','location'])assert(!source.includes('data-action="'+name+'"'),name);
+ for(const name of ['snsdemo','pushdemo','allow','later','location'])assert(!source.includes('data-action="'+name+'"'),name);
  assert(!source.includes('function saveDialog('));assert(!source.includes('function editDialog('));assert(!source.includes('function locationDialog('));
- assert(read('mypages.js').includes('mailto:stophyun02@gmail.com?subject=Pinmap%20account%20deletion'));
+ assert(read('mypages.js').includes('data-action="leaveask"'));
+ assert(read('auth-app.js').includes('/api/account-delete'));
  assert(read('mypages.js').includes('data-action="linkimport"'));
 });
 test('map is explicitly registered and removed pin/legacy location form handlers cannot return',()=>{

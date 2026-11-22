@@ -188,8 +188,8 @@ pages.account = () => myPage('계정 관리', `<h2 class="account-sub">프로필
     <div><dt>생년월일</dt><dd>${esc(PM_ENV.requiresAuth ? (settings.birth || '등록된 정보 없음') : (settings.birth || ACCOUNT_EXAMPLE.birth))}</dd></div>
   </dl>
   ${PM_ENV.requiresAuth ? '' : '<p class="account-note">프로토타입 예시 정보예요.</p>'}
-  <nav class="account-exit" aria-label="계정 이용">
-    <button type="button" data-action="logoutask">로그아웃</button><span aria-hidden="true">|</span><a href="mailto:stophyun02@gmail.com?subject=Pinmap%20account%20deletion">계정 삭제 문의</a>
+  <nav class="account-exit" aria-label="로그아웃 및 회원 탈퇴">
+    <button type="button" data-action="logoutask">로그아웃</button><span aria-hidden="true">|</span><button type="button" data-action="leaveask">회원 탈퇴</button>
   </nav>`, 'accountpage');
 /* ---------- 항목별 초기화: 저장 콘텐츠와 코스는 보존 ---------- */
 const RESET_OPTIONS = {
@@ -244,7 +244,9 @@ function confirmPop(title, desc, okAction, okLabel = '확인', cancelLabel = '�
 $('#sheet').addEventListener('close', () => { if($('#sheet').open)return; $('#sheet').classList.remove('confirmpop'); $('#sheet').removeAttribute('aria-labelledby'); $('#sheet').removeAttribute('aria-describedby'); });
 Object.assign(actions, {
   logoutask: () => confirmPop('로그아웃할까요?', '다시 로그인하면 저장한 콘텐츠를 그대로 볼 수 있어요.', 'logoutyes', '로그아웃', '취소'),
+  leaveask: () => confirmPop('탈퇴할까요?', '탈퇴하면 저장한 콘텐츠와 설정이 모두 지워져요.<br>이용 중인 구독도 즉시 해지되며, 되돌릴 수 없어요.', 'leaveyes', '탈퇴하기', '유지하기'),
   logoutyes: () => { $('#sheet').close(); go('home'); toast('로그아웃했어요. (체험)'); openOnboarding(0); },
+  leaveyes: () => { try { [STORAGE, ...LEGACY_KEYS].forEach(k => localStorage.removeItem(k)); } catch {} location.reload(); },
   resetask: () => go('account')
 });
 

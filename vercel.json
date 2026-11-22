@@ -26,6 +26,10 @@
       "destination": "https://pinmap-backend.vercel.app/api/content-save"
     },
     {
+      "source": "/api/account-delete",
+      "destination": "https://pinmap-backend.vercel.app/api/account-delete"
+    },
+    {
       "source": "/api/content-photo",
       "destination": "https://pinmap-backend.vercel.app/api/content-photo"
     },

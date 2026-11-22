@@ -16,6 +16,7 @@
   const fragment = new URLSearchParams(location.hash.slice(1));
   const params = new URLSearchParams(location.search);
   const showLoginChoice = params.get('screen') === 'welcome';
+  const accountDeleted = showLoginChoice && params.get('deleted') === '1';
   const callbackError = fragment.has('error') || params.has('error');
   let recovering = fragment.get('type') === 'recovery' || sessionStorage.getItem(recoveryKey) === '1';
   const fieldIcon = type => type === 'email'
@@ -138,7 +139,10 @@
         if (userError) throw userError;
         if (userData.user && !showLoginChoice) {enterApp(); return;}
       }
-      if (params.has('code') || fragment.has('access_token')) {render('signin'); notice('인증 링크를 확인하지 못했어요. 이메일에서 인증을 마쳤다면 가입한 이메일과 비밀번호로 로그인해 주세요.',true);} else render(resumeVerification ? 'verify' : mode);
+      if (params.has('code') || fragment.has('access_token')) {render('signin'); notice('인증 링크를 확인하지 못했어요. 이메일에서 인증을 마쳤다면 가입한 이메일과 비밀번호로 로그인해 주세요.',true);} else {
+        render(accountDeleted ? 'welcome' : resumeVerification ? 'verify' : mode);
+        if (accountDeleted) notice('회원 탈퇴가 완료됐어요.');
+      }
     } catch (error) {
       // Keep connection failures distinct from field validation errors.
       connectionScreen(true);

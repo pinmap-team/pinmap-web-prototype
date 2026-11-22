@@ -5,7 +5,7 @@
     'interestset','notiset','saveset','themeset','favorites','appinfo','faq','notice','terms','guide','howtopage','account','calexport','billing',
     'addresses','addressedit','addressmanage','addresssearch','addressconfirm','myaddresses','myaddressedit','myaddressmanage','myaddresssearch','myaddressconfirm']);
   const aliases={placeset:'myaddresses',accountaccess:'account'};
-  const retired=new Set(['snsdemo','sample','leaveask','leaveyes','pushdemo','pushallow','pushdeny','localways','nearbyon','location','allow','later','resetdata']);
+  const retired=new Set(['snsdemo','sample','pushdemo','pushallow','pushdeny','localways','nearbyon','location','allow','later','resetdata']);
   function resolve(value,pages){
     const key=Object.hasOwn(aliases,value)?aliases[value]:value;
     return screens.has(key)&&Object.hasOwn(pages,key)&&typeof pages[key]==='function'?key:'home';
