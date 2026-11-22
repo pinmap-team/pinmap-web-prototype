@@ -63,6 +63,7 @@ try {
 items.forEach(x => normalizeSavedAt(x));
 function persist() {
   items.forEach(x => normalizeSavedAt(x));
+  if(PM_ENV.requiresAuth)return globalThis.PinmapAccountState?.persist() ?? Promise.resolve(false);
   if(PM_ENV.development)return;
   try { localStorage.setItem(STORAGE, JSON.stringify({items,preferences,onboardDone,settings})); }
   catch { toast('브라우저 저장 공간을 쓸 수 없어서 지금 화면에서만 보관해요.'); }

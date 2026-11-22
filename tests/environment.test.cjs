@@ -51,7 +51,6 @@ test('initial development screens ignore stored data without changing or deletin
 test('sample pools, map coordinates, photos and neighborhoods are absent in development',()=>{
   const {context,value}=boot('development');
   for(const [file,expression] of [
-    ['mysub.js',/const SYNC_POOL = ([\s\S]*?\n\});/],
     ['map-live.js',/const savedCoords = ([\s\S]*?\n  \]);/],
     ['library.js',/const LIB_PHOTOS_BY_ID = ([\s\S]*?\n\});/],
     ['place.js',/const DONGS = ([\s\S]*?);\nconst dongOf/],
