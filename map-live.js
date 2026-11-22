@@ -1,7 +1,7 @@
 /* Photo place markers, real user-submitted place search, and shared navigation. */
 (() => {
   const originalRender = render;
-  let detailMap;
+  let detailMap, categoryObserver;
   let liveMap, pinLayer, locationMarker, locationHeadingMarker, placeController, mapProviderController;
   let expandedKey=null, sheetStage='peek', sheetDrag=null, suppressSheetClickUntil=0;
   let mapLocationName=null, searchOpen=false;
@@ -89,10 +89,19 @@
       notice.hidden=true;
     }
   }
+  function alignCategoryIndicator(bar) {
+    const selected=bar?.querySelector('[data-lm-cat].selected');
+    const indicator=bar?.querySelector('.lm-category-indicator');
+    if(!selected||!indicator)return;
+    const bounds=bar.getBoundingClientRect(),button=selected.getBoundingClientRect();
+    const scale=bounds.width/bar.offsetWidth;
+    if(!Number.isFinite(scale)||scale<=0)return;
+    indicator.style.width=`${button.width/scale}px`;
+    bar.style.setProperty('--lm-category-position',`${(button.left-bounds.left)/scale+bar.scrollLeft}px`);
+  }
   function selectCategory(next) {
     category=next;
     const bar=document.querySelector('.lm-categories');
-    bar?.style.setProperty('--lm-category-position',`${Math.max(0,mapCategories().findIndex(([id])=>id===next))*100}%`);
     bar?.querySelectorAll('[data-lm-cat]').forEach(button=>{
       const selected=button.dataset.lmCat===next;
       if(selected)button.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});
@@ -100,6 +109,7 @@
       button.setAttribute('aria-pressed',String(selected));
       const art=button.querySelector('.lm-category-art');if(art)art.innerHTML=categoryIcon(button.dataset.lmCat,selected);
     });
+    alignCategoryIndicator(bar);
   }
   function visiblePlaces() {
     const list = searchResults || savedPlaces();
@@ -333,6 +343,7 @@
   }
   pages.map=content; // Register the active map renderer with the shared route policy.
   render = function() {
+    categoryObserver?.disconnect();
     if(detailMap){detailMap.remove();detailMap=null;}
     sheetDrag=null;expandedKey=null;sheetStage='peek';markerEntries.clear();
     window.unmountCourseMap?.();
@@ -345,7 +356,12 @@
     const focusId = isMap ? window.pmMapFocus : null;
     if (focusId != null) { window.pmMapFocus = null; searchResults = null; searchQuery = ''; category = 'all';
       const f = savedPlaces().find(p => p.id === focusId); if (f) { center = [f.lat, f.lng]; zoom = 15; } }
-    if (isMap) { $('#app').innerHTML=content(); mount(focusId==null); if(searchOpen&&searchQuery)searchPlaces(searchQuery); else if(searchResults)showResults();
+    if (isMap) { $('#app').innerHTML=content();
+      const categoryBar=document.querySelector('.lm-categories');
+      alignCategoryIndicator(categoryBar);
+      categoryObserver=new ResizeObserver(()=>alignCategoryIndicator(categoryBar));
+      categoryObserver.observe(categoryBar);
+      mount(focusId==null); if(searchOpen&&searchQuery)searchPlaces(searchQuery); else if(searchResults)showResults();
       if (focusId != null) { const focused=savedPlaces().filter(p=>p.id===focusId); if (focused.length>1 && liveMap) liveMap.fitBounds(focused.map(p=>[p.lat,p.lng]),{maxZoom:15,padding:[48,48]});
         const f=focused[0]; if (f && liveMap) expandPlace(f,false); } }
     else { originalRender(); if(detailId)mountDetailMap(); if(page==='course' && !detailId) window.mountCourseMap?.(); if(page==='courses' && !detailId) window.mountCourseThumbnails?.(); }
