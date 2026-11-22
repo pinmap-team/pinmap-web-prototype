@@ -44,3 +44,20 @@ test('legacy account course keeps its first place without inventing extra stops'
   assert.deepEqual(State.encodeCourses(decoded,[post()])[0].days[0],
     [{placeId:'place:saved-post:0',time:'10:00'}]);
 });
+
+test('all extracted places can be liked, including those awaiting a map position',()=>{
+  const item={...post(),extractionPlaces:[
+    {name:'첫 카페',address:'서울 성동구 첫길 1',hasCoordinates:true},
+    {name:'찾는 중인 카페',address:'',hasCoordinates:false},
+    {name:'둘째 카페',address:'서울 성동구 둘길 2',hasCoordinates:true}
+  ]};
+  const places=Places.forExtracted(item);
+  assert.deepEqual(places.map(place=>place.id),[
+    'place:saved-post:0','place:saved-post:unlocated:1','place:saved-post:1']);
+  places.forEach(place=>Favorites.toggle(place));
+  assert.deepEqual(Places.favorites([item]).map(place=>place.id),places.map(place=>place.id));
+  assert.deepEqual(Places.all([item]).map(place=>place.id),['place:saved-post:0','place:saved-post:1']);
+  Favorites.toggle(Places.forExtracted(item)[1]);
+  assert.deepEqual(Places.favorites([item]).map(place=>place.id),[
+    'place:saved-post:0','place:saved-post:1']);
+});

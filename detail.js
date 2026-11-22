@@ -12,36 +12,6 @@ function dtLogo(src){
   return '';
 }
 
-// map_locations follows the order of places with coordinates. Prefer an exact
-// name/address match, then that original order when a user has edited a place.
-function dtPlacePhotoIndexes(places, locations){
-  const mapped=places.filter(place=>place.hasCoordinates).length,used=new Set(),indexes=places.map(()=>-1);
-  const clean=value=>String(value||'').trim().replace(/\s+/g,' ').toLocaleLowerCase();
-  for(const rule of ['both','name','address']){
-    places.forEach((place,placeIndex)=>{
-      if(indexes[placeIndex]>=0)return;
-      const name=clean(place.name),address=clean(place.address);
-      const index=locations.findIndex((loc,i)=>!used.has(i)&&(
-        rule==='both'?name&&address&&clean(loc.name)===name&&clean(loc.address)===address:
-        rule==='name'?name&&clean(loc.name)===name:
-        address&&clean(loc.address)===address));
-      if(index>=0){indexes[placeIndex]=index;used.add(index);}
-    });
-  }
-  if(locations.length===mapped||locations.length===places.length){
-    let order=0;
-    places.forEach((place,placeIndex)=>{
-      if(locations.length!==places.length&&!place.hasCoordinates)return;
-      if(indexes[placeIndex]<0&&!used.has(order)){indexes[placeIndex]=order;used.add(order);}
-      order++;
-    });
-    const remaining=places.map((place,i)=>(locations.length===places.length||place.hasCoordinates)&&indexes[i]<0?i:-1).filter(i=>i>=0);
-    const unused=locations.map((_,i)=>used.has(i)?-1:i).filter(i=>i>=0);
-    if(remaining.length===1&&unused.length===1)indexes[remaining[0]]=unused[0];
-  }
-  return indexes;
-}
-
 detail = function(){
   requestAnimationFrame(dtSheetLayout);
   const x = items.find(i => i.id === detailId);
@@ -59,9 +29,10 @@ detail = function(){
   const authorPhoto = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(x.authorProfilePhoto || '') ? x.authorProfilePhoto : '';
   const extracted = Array.isArray(x.extractionPlaces) ? x.extractionPlaces : [];
   const locations=Array.isArray(x.mapLocations)?x.mapLocations:[];
-  const photoIndexes=dtPlacePhotoIndexes(extracted,locations);
+  const photoIndexes=PinmapPlaces.matchExtracted(extracted,locations);
+  const extractedPlaces=PinmapPlaces.forExtracted(x);
   const mappedCount=photoIndexes.filter(index=>index>=0).length;
-  const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 확인 · 지도 표시 ${mappedCount}곳 · 위치 확인 필요 ${extracted.length - mappedCount}곳</p><ul>${extracted.map((place,i) => {const index=photoIndexes[i],favorite=index>=0?PinmapPlaces.forItem(x).find(entry=>entry.locationIndex===index):null;return `<li class="dt-extraction-place">${PinmapPlacePhotos.markup(x.backendId,index,PinmapPlacePhotos.preferredImage(index>=0?locations[index]:null,x.photo),'dt-extraction-photo')}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong><span class="${index>=0 ? 'dt-extraction-ready' : 'dt-extraction-pending'}">${index>=0 ? '지도 표시' : '위치 확인 필요'}</span></div><p>${esc(index>=0 ? (locations[index]?.address || place.address || '지도 위치 확인됨') : (place.reason || '주소를 확인하지 못했어요.'))}</p></div>${favorite?`<button type="button" class="dt-extraction-heart lm-heart-motion${favorite.favorite?' is-active':''}" data-fav-place="${index}" aria-pressed="${!!favorite.favorite}" aria-label="${esc(favorite.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>`:''}</li>`;}).join('')}</ul></section>` : '';
+  const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 확인 · 지도 표시 ${mappedCount}곳 · 위치 확인 필요 ${extracted.length - mappedCount}곳</p><ul>${extracted.map((place,i) => {const index=photoIndexes[i],favorite=extractedPlaces[i],located=index>=0&&!favorite.unlocated;return `<li class="dt-extraction-place">${located?PinmapPlacePhotos.markup(x.backendId,index,PinmapPlacePhotos.preferredImage(locations[index],x.photo),'dt-extraction-photo'):''}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong><span class="${located ? 'dt-extraction-ready' : 'dt-extraction-pending'}">${located ? '지도 표시' : '위치 확인 필요'}</span></div><p>${esc(located ? (locations[index]?.address || place.address || '지도 위치 확인됨') : (place.reason || '주소를 확인하지 못했어요.'))}</p></div><button type="button" class="dt-extraction-heart lm-heart-motion${favorite.favorite?' is-active':''}" data-fav-place-id="${esc(favorite.id)}" aria-pressed="${!!favorite.favorite}" aria-label="${esc(favorite.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button></li>`;}).join('')}</ul></section>` : '';
   const events = Array.isArray(x.events) ? x.events : [];
   const eventDate = value => {
     if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
@@ -84,7 +55,7 @@ detail = function(){
   if (x.period) info += `<section class="dtsec"><h2>운영 기간</h2><div class="dtrow">${icon('calendar')}<span>${esc(x.period)}</span>${x.deadline ? `<b class="dtdue">마감 ${esc(x.deadline)}</b>` : ''}</div></section>`;
   const factRow = x.distance && ready ? `<div class="dtfacts"><span>${icon('walk')}${esc(x.distance)}</span></div>` : '';
   const singlePlace=!extracted.length?PinmapPlaces.forItem(x).find(place=>place.locationIndex===(selectedPlaceIndex||0)):null;
-  const placeHeading=singlePlace?`<div class="dtsechead"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><button type="button" class="dt-extraction-heart lm-heart-motion${singlePlace.favorite?' is-active':''}" data-fav-place="${singlePlace.locationIndex}" aria-pressed="${!!singlePlace.favorite}" aria-label="${esc(singlePlace.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button></div>`:`<h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2>`;
+  const placeHeading=singlePlace?`<div class="dtsechead"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><button type="button" class="dt-extraction-heart lm-heart-motion${singlePlace.favorite?' is-active':''}" data-fav-place-id="${esc(singlePlace.id)}" aria-pressed="${!!singlePlace.favorite}" aria-label="${esc(singlePlace.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button></div>`:`<h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2>`;
   if (showPlaceInfo) info += ready
     ? `<section class="dtsec dtlocation">${placeHeading}${selectedPlace?PinmapPlacePhotos.markup(x.backendId,selectedPlaceIndex||0,PinmapPlacePhotos.preferredImage(selectedPlace,x.photo),'dt-place-photo'):''}<div class="dtplacecard"><div class="dtaddress">${icon('pin')}<span>${esc(selectedPlace?.address||x.address)}</span><button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button></div><div class="dtmap-preview"><div id="detail-map-canvas" role="img" aria-label="${esc(x.title)} 저장 위치 지도"></div><button type="button" class="dtmaplink" data-action="dtgomap" aria-label="${esc(x.title)} 지도 탭에서 보기"></button><p class="dtmap-fallback" id="detail-map-fallback" hidden>지도를 불러오지 못했어요. 지도에서 위치를 확인해 주세요.</p></div>${factRow}</div></section>`
     : `<section class="dtsec dtlocation"><h2>장소 정보</h2><div class="dtplacecard"><div class="dtwarn"><b>장소 확인 필요</b><p>위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.</p><button class="dtsmall" data-action="edit">장소 직접 입력</button></div></div></section>`;
@@ -257,9 +228,9 @@ actions.fav = () => {
   toast(favorite ? '게시물에 좋아요를 눌렀어요.' : '게시물 좋아요를 취소했어요.');
 };
 document.addEventListener('click',event=>{
-  const button=event.target.closest('[data-fav-place]');if(!button||detailId==null)return;
+  const button=event.target.closest('[data-fav-place-id]');if(!button||detailId==null)return;
   const item=items.find(entry=>entry.id===detailId);
-  const place=PinmapPlaces.forItem(item).find(entry=>entry.locationIndex===Number(button.dataset.favPlace));
+  const place=[...PinmapPlaces.forItem(item),...PinmapPlaces.forExtracted(item)].find(entry=>entry.id===button.dataset.favPlaceId);
   if(!place)return;
   const favorite=PinmapFavorites.toggle(place);if(favorite===null)return;
   button.classList.toggle('is-active',favorite);button.setAttribute('aria-pressed',String(favorite));

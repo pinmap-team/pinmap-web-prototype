@@ -979,6 +979,8 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .favpage .fav-group{display:grid;gap:var(--space-sm)}
 .favpage .fav-group-title{margin:0;font:var(--type-label-md);color:var(--color-on-surface)}
 .favpage .fav-row{min-height:96px;color:var(--color-on-surface);position:relative}
+.favpage .fav-unlocated-thumb{display:grid;place-items:center;color:var(--color-secondary)}
+.favpage .fav-unlocated-thumb .icon{width:24px;height:24px}
 .favpage .fav-text{gap:var(--space-xs)}
 .favpage .fav-text .fav-kind{font:var(--type-body-sm);color:var(--color-secondary)}
 .favpage .fav-text .fav-desc{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--color-secondary)}
