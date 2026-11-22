@@ -21,7 +21,8 @@ const paths = {
   event:'M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4z M16 5v3 M16 11v2 M16 16v3',
   walk:'M12 22v-7 M12 3a5 5 0 0 0-5 5 4 4 0 0 0 1 7h8a4 4 0 0 0 1-7 5 5 0 0 0-5-5z',
   shop:'M5 8h14l-1 13H6z M9 8V6a3 3 0 0 1 6 0v2',
-  route:'M7 5h8a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h8 M7 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0 M21 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0'
+  route:'M7 5h8a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h8 M7 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0 M21 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0',
+  question:'M9 9a3 3 0 1 1 5.1 2.1c-1.6 1-2.1 1.7-2.1 3.4 M12 18h.01 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0'
 };
 const icon = n => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n]||paths.bookmark}"/></svg>`;
 // Bencho Like's Lucide heart, without its pill and count.

@@ -5,12 +5,12 @@ test('only supported own screen functions can render; old aliases resolve to cur
  const pages=Object.fromEntries(policy.screens.map(name=>[name,()=>name]));
  for(const name of policy.screens)assert.equal(policy.resolve(name,pages),name);
  assert.equal(policy.resolve('placeset',pages),'myaddresses');assert.equal(policy.resolve('accountaccess',pages),'account');
- for(const name of ['__proto__','constructor','pushdemo','snsdemo','development','missing',null])assert.equal(policy.resolve(name,pages),'home');
+ for(const name of ['__proto__','constructor','pushdemo','snsdemo','accounts','development','missing',null])assert.equal(policy.resolve(name,pages),'home');
  assert.equal(policy.resolve('profile',{}),'home');assert.equal(policy.resolve('profile',{profile:'not a component'}),'home');
 });
 test('retired actions are blocked identically in both modes while current actions remain available',()=>{
- for(const name of ['snsdemo','sample','pushdemo','pushallow','pushdeny','localways','location','allow','later','resetdata'])assert.equal(policy.allowsAction(name),false,name);
- for(const name of ['save','edit','linkimport','zipimport','screenshotimport','logoutask','leaveask','leaveyes','billing','accadd','accsync'])assert.equal(policy.allowsAction(name),true,name);
+ for(const name of ['snsdemo','sample','pushdemo','pushallow','pushdeny','localways','location','allow','later','resetdata','accounts','accadd','accsync'])assert.equal(policy.allowsAction(name),false,name);
+ for(const name of ['save','edit','linkimport','zipimport','screenshotimport','logoutask','leaveask','leaveyes','billing'])assert.equal(policy.allowsAction(name),true,name);
  for(const mode of ['prototype','account']){
   let click;const actions={},pages={placeset(){},accountaccess(){}};
   vm.runInNewContext(read('screen-access.js'),{document:{addEventListener:(name,fn)=>{if(name==='click')click=fn}},actions,pages,PinmapScreenPolicy:policy,go(){}});

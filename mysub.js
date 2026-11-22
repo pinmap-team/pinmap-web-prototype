@@ -1,4 +1,4 @@
-// 마이 하위 페이지: 프로필 편집 · 저장 콘텐츠 출처 (home.js 다음, navlabels.js 앞에 불러와요)
+// 마이 하위 페이지: 프로필 편집 (home.js 다음, navlabels.js 앞에 불러와요)
 // 하단 시트가 아니라 페이지로 넘어가고, 왼쪽 위 ← 버튼으로 마이로 돌아가요.
 
 /* ---------- 프로필 사진 ---------- */
@@ -47,26 +47,8 @@ document.addEventListener('submit', async e => {
   }else{settings.nickname=nick;afterChange();render();toast('프로필을 저장했어요.');}
 });
 
-/* ---------- 저장 콘텐츠 출처: both modes use their stored records ---------- */
-const myAccounts=()=>{
-  const groups=new Map();
-  for(const item of items){const source=String(item.source||'').split(',')[0],key=source+':'+(item.authorUsername||'');const group=groups.get(key)||{id:key,source,handle:item.authorUsername?('@'+item.authorUsername):source,count:0};group.count++;groups.set(key,group);}
-  return [...groups.values()];
-};
-const accountCount=a=>a.count;
-let syncing=false;
-function cancelAccountSync(){syncing=false;}
-pages.accounts=()=>`<div class="mypage connectionpage">${subHead('콘텐츠 출처','my')}
-  <p class="hint">저장된 콘텐츠의 출처예요. 새 콘텐츠는 링크나 내보내기 파일로 추가해 주세요.</p>
-  <section class="mgroup"><h2>콘텐츠 출처 ${myAccounts().length}개</h2>${myAccounts().map(a=>`<div class="accrow"><span class="acctext"><b>${esc(a.handle)}</b><small>${esc(a.source)} · 저장 ${a.count}개</small></span></div>`).join('')||'<p class="hint accnone">저장한 콘텐츠가 없어요.</p>'}</section>
-  <button class="padd" data-action="accadd">${icon('plus')} 콘텐츠 가져오기</button>
-  <button class="syncbtn" data-action="accsync" ${syncing?'disabled aria-busy="true"':''}>${icon('sync')} 저장 목록 새로고침</button></div>`;
-actions.accounts=()=>go('accounts');
-actions.accadd=()=>modal('콘텐츠 가져오기',`<div class="dialogactions"><button type="button" data-action="zipimport">Instagram ZIP 가져오기</button><button type="button" data-action="linkimport">게시물 링크로 저장</button><button type="button" data-action="screenshotimport">캡처 화면으로 추가</button></div>`);
-actions.accsync=async()=>{if(syncing)return;syncing=true;try{if(PM_ENV.requiresAuth)await window.PinmapAccountContent.refresh();render();toast('저장 목록을 새로 불러왔어요.');}catch(error){toast(error.message||'목록을 불러오지 못했어요.');}finally{syncing=false;render();}};
 const toastBaseSync=toast;
 toast=function(t){$('#snackbar').classList.remove('oneline');return toastBaseSync(String(t).replace(/([.!?])\s+(?=\S)/g,'$1\n'));};
-paths.sync='M20 11a8 8 0 0 0-14.3-4.9L4 8 M4 4v4h4 M4 13a8 8 0 0 0 14.3 4.9L20 16 M20 20v-4h-4';
 actions.profile = () => go('profile');
 actions.profilephoto = () => $('#avatarfile')?.click();
 actions.avatarreset = () => {
@@ -74,7 +56,7 @@ actions.avatarreset = () => {
   else{delete settings.avatar;afterChange();render();toast('기본 이미지로 바꿨어요.');}
 };
 /* 하위 페이지와 캘린더에서도 하단 메뉴의 해당 탭이 켜져 있게 */
-const PARENT_TAB = {profile:'my', accounts:'my', courses:'my', course:'my', calendar:'home', topic:'home'};
+const PARENT_TAB = {profile:'my', courses:'my', course:'my', calendar:'home', topic:'home'};
 const navBase = nav;
 nav = function(){ const real = page; if (PARENT_TAB[page]) page = PARENT_TAB[page]; const h = navBase(); page = real; return h; };
 

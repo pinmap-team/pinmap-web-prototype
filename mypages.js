@@ -11,7 +11,7 @@ function myQuickCards(){
   return `<div class="my-quick" role="group" aria-label="바로가기">
     <button type="button" class="myq-card" data-page="favorites"><span class="myq-ico" aria-hidden="true">${likeHeartIcon()}</span><b>즐겨찾기</b></button>
     <button type="button" class="myq-card" data-page="courses"><span class="myq-ico" aria-hidden="true">${icon('route')}</span><b>내 코스</b></button>
-    <button type="button" class="myq-card" data-action="accounts"><span class="myq-ico" aria-hidden="true">${icon('user')}</span><b>콘텐츠 출처</b></button>
+    <div class="myq-card"><span class="myq-ico" aria-hidden="true">${icon('question')}</span><b>미정</b></div>
   </div>`;
 }
 
@@ -154,7 +154,7 @@ pages.faq = () => myPage('자주 묻는 질문', infoRows([
   ['위치 권한은 어디에서 바꾸나요?', '브라우저의 사이트 설정에서 위치 권한을 바꿀 수 있어요.']
 ]), 'settingpage');
 pages.notice = () => myPage('공지사항', infoRows([
-  ['핀맵 프로토타입 03 공개', '콘텐츠 출처 확인, 위치 편집, 마이 바로가기가 새로 생겼어요.'],
+  ['핀맵 프로토타입 03 공개', '위치 편집과 마이 바로가기가 새로 생겼어요.'],
   ['예시 데이터 안내', '지금은 예시 데이터로 체험하는 프로토타입이에요.\n데이터는 이 브라우저에만 저장돼요.']
 ]), 'settingpage');
 pages.terms = () => myPage('약관 및 정책', `<div class="mycard settings policy-list">
@@ -217,7 +217,6 @@ function resetEntry(key){
 function partialResetState(key, currentSettings, currentPreferences){
   const next = {settings:{...currentSettings}, preferences:[...currentPreferences]};
   switch (key) {
-    case 'connections': Object.assign(next.settings, {accounts:[], accSync:{}, lastSync:null}); break;
     case 'keywords': next.preferences = []; break;
     case 'notifications': Object.assign(next.settings, {push:false, notiDeadline:false, notiNearby:false, notiReminder:false}); break;
     case 'saving': next.settings.aiDefault = false; break;
@@ -235,7 +234,6 @@ async function applyPartialReset(key){
     try {localStorage.setItem(STORAGE,JSON.stringify({items,preferences:next.preferences,onboardDone,settings:next.settings}));}
     catch {toast('변경 내용을 저장하지 못해서 초기화하지 않았어요. 다시 시도해 주세요.');return;}
   }
-  if (key === 'connections') cancelAccountSync();
   settings = next.settings; preferences = next.preferences;
   if (key === 'keywords') homeViewIds = null;
   $('#sheet').close(); render(); toast(resetDoneText(RESET_OPTIONS[key].label));
