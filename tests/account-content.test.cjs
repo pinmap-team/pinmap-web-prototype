@@ -14,6 +14,44 @@ const eventRecord = {
   ], places:[], map_locations:[]
 };
 
+test('account navigation keeps posts while auth refreshes the same account', async () => {
+  let authEvent, fetchCount=0, holdRefresh=false, releaseRefresh;
+  const sdk={auth:{
+    getUser:async()=>({data:{user:{id:'user-a',user_metadata:{}}}}),
+    getSession:async()=>({data:{session:{access_token:'token'}}}),
+    onAuthStateChange:callback=>{authEvent=callback;}
+  }};
+  const context={PinmapFolders:require('../account-folders.js'),PinmapPlaces:require('../place-state.js'),
+    PinmapFavorites:require('../favorite-state.js'),PinmapAccountMapData:require('../account-map-data.js'),
+    PM_ENV:{requiresAuth:true},PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
+    window:{},document:{addEventListener:()=>{},getElementById:()=>null,querySelector:()=>null},
+    actions:{save:()=>{}},settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
+    items:[],detailId:null,render:()=>{},toast:()=>{},crypto:require('node:crypto'),setTimeout,
+    fetch:async(path,options)=>{
+      if(options.method==='GET'){
+        fetchCount++;
+        if(holdRefresh) await new Promise(resolve=>{releaseRefresh=resolve;});
+        return {ok:true,json:async()=>({items:[eventRecord],next_offset:null})};
+      }
+      return {ok:true,json:async()=>({deleted:true})};
+    }
+  };
+  vm.runInNewContext(accountSource,context);
+  for(let i=0;i<30&&!context.window.PinmapAccountLoaded;i++) await new Promise(setImmediate);
+  assert.equal(context.items.length,1);
+  const initialRequests=fetchCount;
+  authEvent('TOKEN_REFRESHED',{user:{id:'user-a'}});
+  authEvent('SIGNED_IN',{user:{id:'user-a'}});
+  await new Promise(resolve=>setTimeout(resolve,10));
+  assert.equal(fetchCount,initialRequests);
+  holdRefresh=true;
+  authEvent('USER_UPDATED',{user:{id:'user-a'}});
+  for(let i=0;i<30&&!releaseRefresh;i++) await new Promise(resolve=>setTimeout(resolve,1));
+  assert.equal(context.items.length,1);
+  assert.equal(fetchCount,initialRequests+1);
+  releaseRefresh();
+});
+
 test('event-only account content keeps schedules separate from map pins', () => {
   const source = accountSource.split('\nif (PM_ENV.requiresAuth)')[0];
   const item = vm.runInNewContext(`${source}\npinmapAccountItem(record, 7)`, {record:eventRecord});
