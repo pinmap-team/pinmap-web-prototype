@@ -59,6 +59,12 @@
       stage.querySelector('.home-add-options button')?.focus();
     }, 60);
   };
+  actions.analysisretry=()=>{
+    const item=items.find(x=>x.id===detailId);
+    actions.linkimport();
+    const input=document.getElementById('es-url');
+    if(input&&item?.url){input.value=item.url;input.focus();}
+  };
   actions.linkimport = () => {
     setAddMenuOpen(false);
     sheet.className = '';

@@ -63,9 +63,36 @@ function pinmapAgeRestricted(x){
   return (Array.isArray(x?.extractionNotes)?x.extractionNotes:[]).some(note=>
     typeof note==='string'&&/연령\s*제한|나이\s*제한|age[-_ ]restrict(?:ed|ion)|age[-_ ]gat(?:e|ed)/i.test(note));
 }
-function restrictedCover(){return `<span class="pm-restricted-cover"><span class="pm-restricted-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg></span><b>연령 제한</b><span class="pm-restricted-hint">Instagram에서 확인해 주세요</span></span>`;}
-const libPhoto = x => pinmapAgeRestricted(x) ? '' : x.photo || (PM_ENV.development ? '' : LIB_PHOTOS_BY_ID[x.id] || LIB_PHOTOS[x.art]);
-const libThumb = x => pinmapAgeRestricted(x) ? restrictedCover() : libPhoto(x)
+const ANALYSIS_FAILURE_STATES={
+  age:{label:'연령 제한',title:'Instagram에서 확인이 필요해요',description:'연령 제한으로 게시물의 사진과 내용을 확인하지 못했어요. Instagram에 로그인한 뒤 원본을 확인해 주세요.',hint:'Instagram에서 확인해 주세요',icon:'user',action:'original',actionLabel:'Instagram에서 확인'},
+  private:{label:'비공개 게시물',title:'공개된 게시물만 분석할 수 있어요',description:'계정 또는 게시물이 비공개여서 내용을 가져오지 못했어요. Instagram에서 공개 범위를 확인해 주세요.',hint:'원본의 공개 범위를 확인해 주세요',icon:'user',action:'original',actionLabel:'Instagram에서 확인'},
+  deleted:{label:'원본 확인 불가',title:'원본 게시물을 찾을 수 없어요',description:'게시물이 삭제되었거나 더 이상 제공되지 않아 내용을 가져오지 못했어요. 저장한 링크와 메모는 유지돼요.',hint:'원본 링크를 확인해 주세요',icon:'close',action:'original',actionLabel:'원본 링크 확인'},
+  login:{label:'로그인 필요',title:'Instagram에서 로그인해 주세요',description:'Instagram이 로그인 화면을 표시해 내용을 가져오지 못했어요. 원본에서 접근 가능한지 확인해 주세요. 로그인만으로 자동 재분석되지는 않아요.',hint:'Instagram에서 접근 상태를 확인해 주세요',icon:'link',action:'original',actionLabel:'Instagram에서 확인'},
+  media:{label:'미디어 확인 실패',title:'사진과 영상을 불러오지 못했어요',description:'미디어를 가져오지 못해 분석을 시작하거나 완료할 수 없었어요. 원본이 정상 재생되는지 확인해 주세요.',hint:'사진·영상의 재생 상태를 확인해 주세요',icon:'image',action:'original',actionLabel:'원본에서 확인'},
+  temporary:{label:'분석 연결 오류',title:'분석을 완료하지 못했어요',description:'응답 지연이나 일시적인 분석 서비스 오류로 결과를 받지 못했어요. 잠시 후 같은 링크를 다시 추가할 수 있어요.',hint:'잠시 후 다시 시도해 주세요',icon:'clock',action:'analysisretry',actionLabel:'링크 다시 추가'},
+  quota:{label:'이용 한도 도달',title:'분석 이용 한도를 확인해 주세요',description:'이용 한도에 도달해 게시물을 분석하지 못했어요. 요금제와 다음 이용 가능 시점을 확인해 주세요.',hint:'분석 이용량을 확인해 주세요',icon:'clock',action:'billing',actionLabel:'이용량 확인'},
+  unknown:{label:'분석 확인 필요',title:'분석 결과를 얻지 못했어요',description:'결과가 없지만 정확한 실패 원인은 확인되지 않았어요. 원본이 열리는지 확인한 뒤 다시 시도해 주세요.',hint:'원본 상태를 확인해 주세요',icon:'spark',action:'original',actionLabel:'원본에서 확인'}
+};
+function pinmapAnalysisFailure(x){
+  // Any useful analysis keeps the normal result screen, including partial success.
+  if(x?.desc?.trim()||x?.searchSummary?.trim()||x?.aiSummary===true||x?.aiClassified||x?.extractionPlaces?.length||x?.events?.length||x?.mapLocations?.length||x?.address)return null;
+  const code=String(x?.analysisFailureCode||x?.accessStatus||x?.status||'').toLowerCase();
+  const notes=(Array.isArray(x?.extractionNotes)?x.extractionNotes:[]).filter(n=>typeof n==='string').join(' ');
+  let kind=null;
+  if(pinmapAgeRestricted(x))kind='age';
+  else if(/^(private|private_account|private_post)$/.test(code)||/비공개 (계정|게시물)|private (account|post)/i.test(notes))kind='private';
+  else if(x?.deleted||/^(deleted|source_deleted|source_not_found|post_not_found)$/.test(code)||/게시물이 삭제|삭제된 게시물|post (?:was )?deleted/i.test(notes))kind='deleted';
+  else if(/^(login_required|instagram_login_required)$/.test(code)||/로그인 화면|로그인이 필요|login required/i.test(notes))kind='login';
+  else if(/^(media_download_failed|media_fetch_failed|media_unavailable)$/.test(code)||/미디어.*(?:다운로드|수집).*실패|(?:사진|영상).*불러오지 못/i.test(notes))kind='media';
+  else if(/^(monthly_analysis_limit|free_monthly_analysis_limit|daily_extraction_limit)$/.test(code))kind='quota';
+  else if(/^(timeout|analysis_timeout|ai_error|ai_unavailable|service_unavailable)$/.test(code)||/시간 초과|응답 시간|timed? ?out|AI.*오류/i.test(notes))kind='temporary';
+  else if(/^(failed|error|analysis_failed)$/.test(code)||(x?.contentKind==='unknown'&&x?.status==='needs_review'&&notes))kind='unknown';
+  return kind?{kind,...ANALYSIS_FAILURE_STATES[kind]}:null;
+}
+function analysisFailureNotice(state,showAction=true){return `<section class="dtsec dt-restricted-notice dt-failure-notice" data-failure-kind="${state.kind}"><span class="dt-failure-label">${icon(state.icon)}${esc(state.label)}</span><h2>${esc(state.title)}</h2><p>${esc(state.description)}</p>${showAction?`<button type="button" class="outlined dt-failure-action" data-action="${state.action}">${esc(state.actionLabel)}</button>`:''}</section>`;}
+function restrictedCover(state=ANALYSIS_FAILURE_STATES.age){return `<span class="pm-restricted-cover"><span class="pm-restricted-symbol" aria-hidden="true">${state===ANALYSIS_FAILURE_STATES.age||state.kind==='age'?'<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>':icon(state.icon)}</span><b>${esc(state.label)}</b><span class="pm-restricted-hint">${esc(state.hint)}</span></span>`;}
+const libPhoto = x => pinmapAnalysisFailure(x) ? '' : x.photo || (PM_ENV.development ? '' : LIB_PHOTOS_BY_ID[x.id] || LIB_PHOTOS[x.art]);
+const libThumb = x => pinmapAnalysisFailure(x) ? restrictedCover(pinmapAnalysisFailure(x)) : libPhoto(x)
   ? `<img src="${esc(libPhoto(x))}" alt="" loading="lazy">` : art(x.art);
 function libCard(x, gallery){
   const ratio = gallery ? [1.2,1.5,1.3,1.6][x.id % 4] : 2.1;

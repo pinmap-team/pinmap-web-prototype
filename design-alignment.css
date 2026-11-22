@@ -1644,3 +1644,8 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .dt.dt-restricted .dthpill{color:var(--color-secondary);background:var(--color-surface);border-color:var(--color-disabled)}
 .dt-restricted-notice{padding:var(--space-lg);background:var(--color-neutral);border-radius:var(--rounded-lg)}
 .dt-restricted-notice p{margin:var(--space-sm) 0 0;font:var(--type-body-md);color:var(--color-secondary);word-break:keep-all}
+
+.dt-failure-label{display:flex;align-items:center;gap:var(--space-sm);margin-bottom:var(--space-sm);font:var(--type-body-sm);color:var(--color-secondary)}
+.dt-failure-notice .dt-failure-action{width:100%;min-height:48px;margin-top:var(--space-lg);border-radius:var(--rounded-sm)}
+
+.dt-failure-label .icon{width:16px;height:16px;flex:none}
