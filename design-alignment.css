@@ -1645,6 +1645,16 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .dt.dt-restricted .dthero .dtsrc small{color:var(--color-secondary);text-shadow:none}
 .dt.dt-restricted .dthero .dtbtn{background:var(--color-surface);color:var(--color-primary);border-color:var(--color-disabled);text-shadow:none}
 .dt.dt-restricted .dthpill{color:var(--color-secondary);background:var(--color-surface);border-color:var(--color-disabled)}
+/* The existing error-cover presentation also handles missing or broken photos. */
+.dt-photo:has(.dthero .pm-restricted-cover) .dtambient,.dt-photo:has(.dthero .pm-restricted-cover) .dtshade{display:none}
+.dt-photo:has(.dthero .pm-restricted-cover) .dthero .pm-restricted-cover{padding-top:160px;padding-bottom:var(--space-2xl);gap:var(--space-md)}
+.dt-photo:has(.dthero .pm-restricted-cover) .dthero .pm-restricted-symbol{width:72px;height:72px}
+.dt-photo:has(.dthero .pm-restricted-cover) .dthero .pm-restricted-symbol svg{width:32px;height:32px}
+.dt-photo:has(.dthero .pm-restricted-cover) .dthero .dtsrc{color:var(--color-on-surface);text-shadow:none}
+.dt.dt-photo:has(.dthero .pm-restricted-cover) .dthero .dtsrc h1{font:var(--type-headline-md);color:var(--color-on-surface);text-shadow:none}
+.dt.dt-photo:has(.dthero .pm-restricted-cover) .dthero .dtsrc small{color:var(--color-secondary);text-shadow:none}
+.dt.dt-photo:has(.dthero .pm-restricted-cover) .dthero .dtbtn{background:var(--color-surface);color:var(--color-primary);border-color:var(--color-disabled);text-shadow:none}
+.dt.dt-photo:has(.dthero .pm-restricted-cover) .dthpill{color:var(--color-secondary);background:var(--color-surface);border-color:var(--color-disabled)}
 .dt-restricted-notice{padding:var(--space-lg);background:var(--color-neutral);border-radius:var(--rounded-lg)}
 .dt-restricted-notice p{margin:var(--space-sm) 0 0;font:var(--type-body-md);color:var(--color-secondary);word-break:keep-all}
 
