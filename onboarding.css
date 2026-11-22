@@ -108,7 +108,7 @@ body.onboarding-open{overflow:hidden}
 .ob-screen.bare .ob-top{display:none}
 /* 첫 화면: 로고만 (어두운 배경) */
 #onboarding:has(.step1),#onboarding:has(.step4),.ob-screen.step1,.ob-screen.step4{background:var(--color-primary)!important}
-.ob-splash{flex:1;display:grid;place-items:center;width:100%;padding:0;background:none;cursor:pointer}
+.ob-splash{flex:1;display:grid;place-items:center;width:100%;padding:0;background:none}
 .ob-splash img{width:min(56%,240px);height:auto;animation:obFadeUp .4s ease both}
 @keyframes obFadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 /* 저장 방법 안내: 카드 그림자 · 블러 없이 얇은 선만 */
