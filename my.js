@@ -7,19 +7,24 @@ const dueNum = x => Number(String(x.deadline || '').replace(/\D/g, '')); // 'D-3
 function notifications(){
   const list = [];
   // 홈 띠배너의 마감 임박 콘텐츠는 알림 목록에도 항상 보여줘요 (설정은 휴대폰 푸시 알림에만 적용)
-  items.filter(x => x.deadline).sort((a,b) => dueNum(a) - dueNum(b)).forEach(x => list.push({
-    id:'due-'+x.id, emoji:'⏰', title:`마감 ${x.deadline}, ${x.title}`,
-    body:`${x.period ? x.period.replace(', 예시 기간','')+' 운영, ' : ''}끝나기 전에 다녀와 보세요.`, time:'오늘 오전 9:00', detail:x.id
-  }));
+  const dates=typeof calDueList==='function'?calDueList().filter(x=>!x.eventCandidate&&calDue(x)>=calToday):items.filter(x=>x.deadline);
+  dates.forEach(x=>{
+    const source=items.find(item=>item.id===x.id)||x,days=typeof calDays==='function'?calDays(x):dueNum(x);
+    if(settings.notiDeadline&&days>3)return;
+    const dateKey=x.eventDate||x.deadline;
+    list.push({id:'due-'+(source.backendId??source.id)+'-'+dateKey+'-'+(x.dueLabel||''),emoji:'⏰',
+      title:['마감',days===0?'오늘':`D-${days}`,x.title].join(' '),body:(x.period?x.period+' 운영, ':'')+'끝나기 전에 확인해 보세요.',
+      time:typeof calDue==='function'&&calDue(x)?fmtDay(calDue(x)):'다가오는 일정',detail:source.id});
+  });
   if (settings.notiNearby) {
     const near = readyPlaces().filter(x => distanceOf(x) < 999).sort((a,b) => distanceOf(a)-distanceOf(b));
-    if (near.length) list.push({id:'near', emoji:'📍', title:`성수동 근처에 저장한 장소 ${near.length}곳`, body:`${near[0].title} 외, 지금 가까이에 있어요.`, time:'1시간 전', page:'map'});
+    if (near.length) list.push({id:'near', emoji:'📍', title:`${settings.placeLabels?.[mainPlace()]||mainPlace()||'현재 위치'} 근처에 저장한 장소 ${near.length}곳`, body:`${near[0].title} 외, 지금 가까이에 있어요.`, time:'저장한 장소 기준', page:'map'});
   }
   const pending = items.filter(x => isPlace(x) && (x.pending || !x.address));
-  if (pending.length) list.push({id:'pending', emoji:'🔎', title:`장소 확인이 필요한 콘텐츠 ${pending.length}개`, body:'AI가 위치를 확정하지 못했어요. 주소를 확인해 주세요.', time:'어제', detail:pending[0].id});
+  if (pending.length) list.push({id:'pending', emoji:'🔎', title:`장소 확인이 필요한 콘텐츠 ${pending.length}개`, body:'AI가 위치를 확정하지 못했어요. 주소를 확인해 주세요.', time:'위치 확인 필요', detail:pending[0].id});
   if (settings.notiReminder && items.length) {
     const old = items[items.length-1];
-    list.push({id:'remind-'+old.id, emoji:'🔖', title:'잊고 있던 저장, 다시 볼까요?', body:`${old.title}, ${savedAgo(old)} 저장`, time:'2일 전', detail:old.id});
+    list.push({id:'remind-'+(old.backendId??old.id), emoji:'🔖', title:'잊고 있던 저장, 다시 볼까요?', body:`${old.title}, ${savedAgo(old)} 저장`, time:savedAgo(old), detail:old.id});
   }
   return list;
 }
@@ -72,7 +77,7 @@ pages.my = function(){
     ${myRow('billing',icon('bookmark'),'요금제 및 결제','월 5,000원')}
     ${myRow('savesheet','✨','저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
     ${myRow('appearance','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>','화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
-    ${myRow('notisheet','🔔','알림 설정', settings.push ? `푸시 켜짐, ${notiOn}개` : '푸시 꺼짐')}
+    ${myRow('notisheet','🔔','알림 설정', settings.push ? `미리보기 켜짐, ${notiOn}개` : '미리보기 꺼짐')}
     ${myRow('calexport',icon('calendar'),'캘린더로 내보내기', typeof calExportList === 'function' ? `마감 ${calExportList().length}개` : '')}
   </section>
   <section class="mgroup my-section" aria-label="도움말">
@@ -89,9 +94,9 @@ let mySheet = null; // 지금 열린 설정 시트 (설정을 바꾸면 다시 �
 function openMySheet(fn){ mySheet = fn; fn(); $('#sheet').classList.add('bottomsheet'); }
 function notiSettings(){
   modal('알림 설정', `<div class="mycard settings">
-    ${sw('push','푸시 알림 허용', settings.push ? '앱을 켜지 않아도 휴대폰 알림으로 받아요' : '꺼져 있으면 앱 밖에서는 알림이 오지 않아요')}
-    ${sw('notiNearby','현재 위치 기반 추천 알림','앱을 켜지 않아도 근처의 저장 콘텐츠를 알려드려요')}
-    ${settings.notiNearby && settings.push && settings.locPerm!=='always' ? `<button class="setwarn" data-action="location"><span>앱을 켜지 않았을 때도 위치에 맞춰 알려드리려면<br>위치 권한을 ‘항상 허용’으로 바꿔주세요</span>${icon('chevright')}</button>` : ''}
+    ${sw('push','알림 미리보기','잠금화면 모양의 알림을 앱 안에서 미리 볼 수 있어요')}
+    ${sw('notiNearby','현재 위치 기반 추천 알림','저장한 위치 기준으로 가까운 콘텐츠를 앱 안에서 알려드려요')}
+    ${settings.push ? `<button class="setwarn" data-action="pushdemo"><span>알림 미리보기 열기</span>${icon('chevright')}</button>` : ''}
     ${sw('notiDeadline','마감 임박 알림','전시/팝업이 끝나기 3일 전에 알려드려요')}
     ${sw('notiReminder','다시 보기 리마인드','잊고 있던 저장 콘텐츠를 가끔 꺼내드려요')}
   </div>`);
