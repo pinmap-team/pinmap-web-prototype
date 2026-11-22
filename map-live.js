@@ -554,7 +554,7 @@
   // Address settings page shares the existing map selection and location behavior.
   function chooseAddressOnMap(name){
     if(name!==null&&!myPlaces().includes(name))return false;
-    mapLocationName=name;searchOpen=false;
+    mapLocationName=name;settings.selectedPlace=name;afterChange();searchOpen=false;
     go('map');
     if(name)window.dispatchEvent(new CustomEvent('pinmap:place-changed',{detail:{name}}));
     else locate();
@@ -563,8 +563,9 @@
   }
   window.PinmapLocation={
     selected:()=>mapLocationName,
+    restore:name=>{mapLocationName=myPlaces().includes(name)?name:null;},
     choose:chooseAddressOnMap,
-    clear:name=>{if(mapLocationName===name)mapLocationName=null;}
+    clear:name=>{if(mapLocationName===name){mapLocationName=null;settings.selectedPlace=null;afterChange();}}
   };
   render();
 })();

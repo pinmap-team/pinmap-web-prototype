@@ -4,7 +4,7 @@ const fs=require('node:fs/promises');
 const path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const backend='https://pinmap-backend.vercel.app';
-const apiMethods=new Map([['/api/auth/config','GET'],['/api/map-config','GET'],['/api/auth/test-login','POST'],['/api/content-save','GET'],['/api/content-photo','GET']]);
+const apiMethods=new Map([['/api/auth/config','GET'],['/api/billing/config','GET'],['/api/billing/account','GET'],['/api/map-config','GET'],['/api/auth/test-login','POST'],['/api/content-save','GET'],['/api/content-photo','GET']]);
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.geojson':'application/geo+json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.woff2':'font/woff2'};
 const server=http.createServer(async(req,res)=>{
   const url=new URL(req.url,'http://localhost');

@@ -301,6 +301,7 @@ if (PM_ENV.requiresAuth) (() => {
   async function loadAccount() {
     if (!client) return;
     const version = ++loadVersion;
+    const stateRevision=window.PinmapAccountState?.revision;
     window.PinmapAccountLoadError = false;
     let userId=currentUserId;
     try {
@@ -311,6 +312,7 @@ if (PM_ENV.requiresAuth) (() => {
       userId=data.user.id;
       if(currentUserId&&currentUserId!==userId){window.dispatchEvent(new Event('pinmap:account-cleared'));items=[];applyFolders(null);applyFavorites(null);applyMemos(null);applyMapData(null);applyProfile(null);detailId=null;}
       currentUserId=userId;
+      window.PinmapAccountState?.hydrate(data.user,client,stateRevision);
       applyFolders(data.user.user_metadata?.pinmap_collections);
       applyFavorites(data.user.user_metadata?.pinmap_favorites);
       applyMemos(data.user.user_metadata?.pinmap_memos);
@@ -337,6 +339,7 @@ if (PM_ENV.requiresAuth) (() => {
       items = [...staged, ...manualItems()];
       window.PinmapAccountLoaded = true;
       window.PinmapAccountLoadError = false;
+      window.PinmapAccountState?.resolveCourses();
       refreshVisibleContent();
     } catch (error) {
       if (version === loadVersion && currentUserId === userId) {

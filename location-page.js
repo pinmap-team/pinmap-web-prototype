@@ -76,7 +76,6 @@
     const version=++geoVersion;
     $('#location-confirm-title').textContent='현재 위치를 찾고 있어요';$('#location-confirm-save').disabled=true;
     const fail=message=>{if(version!==geoVersion||!onConfirm())return;$('#location-confirm-title').textContent='현재 위치를 확인하지 못했어요';$('#location-confirm-detail').textContent=message;$('#location-confirm-save').disabled=!draftCoords;};
-    if(PM_ENV.development){fail('아직 위치 기능이 연결되지 않았어요.');return;}
     if(!navigator.geolocation){fail('이 기기는 위치 찾기를 지원하지 않아요. 돌아가서 위치를 검색해 주세요.');return;}
     navigator.geolocation.getCurrentPosition(pos=>{
       if(version!==geoVersion||!onConfirm())return;
@@ -100,7 +99,6 @@
     if(event.target.id!=='address-new-search')return;event.preventDefault();
     const input=$('#address-new-query'),q=input.value.trim(),host=$('#address-new-results');
     if(q.length<2){host.textContent='두 글자 이상 입력해 주세요.';return;}
-    if(PM_ENV.development){host.textContent='아직 위치 검색이 연결되지 않았어요.';return;}
     input.blur();host.textContent='위치를 찾고 있어요…';
     try{
       const response=await fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(q)+'&lat=37.55&lon=126.98&limit=6');
@@ -112,8 +110,8 @@
   });
   document.addEventListener('click',event=>{const b=event.target.closest('[data-new-address]');if(!b)return;const r=searchMatches[Number(b.dataset.newAddress)];if(!r)return;draftAddress=r.address;draftCoords={lat:r.lat,lng:r.lng};openEditor(null);});
 
-  function commit(next){
-    if(PM_ENV.development){toast('아직 데이터가 연결되지 않았어요.');return false;}
+  async function commit(next){
+    if(PM_ENV.requiresAuth){const previous=settings;settings=next;const saved=await persist();if(!saved)settings=previous;return saved;}
     try{localStorage.setItem(STORAGE,JSON.stringify({items,preferences,onboardDone,settings:next}));}
     catch{toast('위치를 저장하지 못했어요. 다시 시도해 주세요.');return false;}
     settings=next;return true;
@@ -128,11 +126,11 @@
     addresscurrent:()=>actions.addressnewcurrent(),
     addressadd:()=>{if(myPlaces().length>=MAX_PLACES){toast(`위치는 최대 ${MAX_PLACES}개까지 저장할 수 있어요.`);return;}draftAddress='';draftCoords=null;go(fromMy()?'myaddresssearch':'addresssearch');$('#address-new-query')?.focus();},
     addressclear:()=>{queryText='';const input=$('#address-search');if(input)input.value='';updateResults();input?.focus();},
-    addressdeleteconfirm:()=>{
+    addressdeleteconfirm:async()=>{
       const name=pendingDelete;if(!name||!myPlaces().includes(name)||myPlaces().length<=1)return;
       const labels={...settings.placeLabels},details={...settings.placeDetails};delete labels[name];delete details[name];
       const next={...settings,places:myPlaces().filter(value=>value!==name),placeLabels:labels,placeDetails:details};
-      if(!commit(next))return;
+      if(!await commit(next))return;
       window.PinmapLocation?.clear(name);pendingDelete=null;$('#sheet').close();showList();toast('저장한 위치를 삭제했어요.');
     }
   });
@@ -154,7 +152,7 @@
       else modal('위치 삭제',`<p>‘${esc(recordOf(pendingDelete).label)}’ 위치를 삭제할까요? 저장한 콘텐츠는 유지돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button type="button" class="filled" data-action="addressdeleteconfirm">위치 삭제</button></div>`);
     }
   });
-  document.addEventListener('submit',event=>{
+  document.addEventListener('submit',async event=>{
     if(event.target.id==='address-search-form'){event.preventDefault();$('#address-search')?.blur();return;}
     if(event.target.id!=='address-edit-form')return;
     event.preventDefault();
@@ -170,7 +168,7 @@
     if(!editKey&&draftCoords&&address===draftAddress)Object.assign(detail,draftCoords);
     const labels={...settings.placeLabels,[name]:label||name};
     const next={...settings,places,placeLabels:labels,placeDetails:{...settings.placeDetails,[name]:detail}};
-    if(!commit(next))return;
+    if(!await commit(next))return;
     queryText='';showList();toast('위치를 저장했어요.');
   });
 })();

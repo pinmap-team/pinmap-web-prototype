@@ -11,7 +11,7 @@ function myQuickCards(){
   return `<div class="my-quick" role="group" aria-label="바로가기">
     <button type="button" class="myq-card" data-page="favorites"><span class="myq-ico" aria-hidden="true">${likeHeartIcon()}</span><b>즐겨찾기</b></button>
     <button type="button" class="myq-card" data-page="courses"><span class="myq-ico" aria-hidden="true">${icon('route')}</span><b>내 코스</b></button>
-    <button type="button" class="myq-card" data-action="accounts"><span class="myq-ico" aria-hidden="true">${icon('user')}</span><b>연동 계정 관리</b></button>
+    <button type="button" class="myq-card" data-action="accounts"><span class="myq-ico" aria-hidden="true">${icon('user')}</span><b>콘텐츠 출처</b></button>
   </div>`;
 }
 
@@ -237,19 +237,20 @@ function partialResetState(key, currentSettings, currentPreferences){
     case 'connections': Object.assign(next.settings, {accounts:[], accSync:{}, lastSync:null}); break;
     case 'keywords': next.preferences = []; break;
     case 'notifications': Object.assign(next.settings, {push:false, notiDeadline:false, notiNearby:false, notiReminder:false}); break;
-    case 'saving': next.settings.aiDefault = !PM_ENV.development; break;
+    case 'saving': next.settings.aiDefault = false; break;
     default: throw new Error('알 수 없는 초기화 항목');
   }
   return next;
 }
-function applyPartialReset(key){
+async function applyPartialReset(key){
   if (!Object.hasOwn(RESET_OPTIONS, key)) return;
-  if (PM_ENV.development) { toast('아직 데이터가 연결되지 않았어요.'); return; }
   const next = partialResetState(key, settings, preferences);
-  try {
-    localStorage.setItem(STORAGE, JSON.stringify({items, preferences:next.preferences, onboardDone, settings:next.settings}));
-  } catch {
-    toast('변경 내용을 저장하지 못해서 초기화하지 않았어요. 다시 시도해 주세요.'); return;
+  if(PM_ENV.requiresAuth){
+    const before={settings,preferences};settings=next.settings;preferences=next.preferences;
+    if(!await persist()){settings=before.settings;preferences=before.preferences;return;}
+  }else{
+    try {localStorage.setItem(STORAGE,JSON.stringify({items,preferences:next.preferences,onboardDone,settings:next.settings}));}
+    catch {toast('변경 내용을 저장하지 못해서 초기화하지 않았어요. 다시 시도해 주세요.');return;}
   }
   if (key === 'connections') cancelAccountSync();
   settings = next.settings; preferences = next.preferences;

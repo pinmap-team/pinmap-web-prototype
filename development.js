@@ -1,5 +1,5 @@
 // Use the existing screens with disconnected, empty data. No development-only UI.
-if(PM_ENV.development) {
+if(PM_ENV.cloudPlaceTest) {
   document.body.classList.add('development-mode');
   startCoach=()=>{};
   const unavailable=()=>toast('아직 데이터가 연결되지 않았어요.');

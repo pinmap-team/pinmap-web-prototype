@@ -358,8 +358,6 @@ document.addEventListener('click', e => {
 // app.js의 저장 처리(#saveform 제출)를 그대로 쓰도록 입력 이름(url · title · type · collection · memo)과 #saveerror를 유지해요.
 function saveSheet(){
   const label = (ic, text, extra='') => `<div class="eslabel">${icon(ic)}<span>${text}</span>${extra}</div>`;
-  const colChip = (name, text) => `<button type="button" class="eschip ${name===''?'on':''}" data-escol="${esc(name)}" aria-pressed="${name===''}">${esc(text)}</button>`;
-  if (!PM_ENV.development) {
     modal('', `<form id="saveform" class="esform" novalidate>
       <div class="eshead"><span class="esicon" aria-hidden="true">${icon('link')}</span><div><h2>게시물 링크로 저장</h2><p>콘텐츠 링크를 저장해요.</p></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
       <div class="esbody">
@@ -371,40 +369,12 @@ function saveSheet(){
         <input type="hidden" name="collection" value="">
         <input type="hidden" name="memo" value="">
         <p class="eshint">이 브라우저에 저장돼요. 장소·일정 자동 추출은 로그인 화면에서 이용할 수 있어요.</p>
-        <p class="eserror" id="saveerror" role="alert"></p>
+        <div class="esprogress" id="saveprogress" role="status" aria-live="polite" hidden></div><p class="eserror" id="saveerror" role="alert"></p>
       </div>
       <div class="esfoot"><button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
     </form>`);
     $('#sheet').classList.add('editsheet');
-    return;
-  }
-  modal('', `<form id="saveform" class="esform" novalidate>
-    <div class="eshead"><span class="esicon" aria-hidden="true">${icon('link')}</span><div><h2>게시물 링크로 저장</h2><p>SNS 링크를 붙여넣으면 바로 저장돼요.</p></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
-    <div class="esbody">
-      <label class="esfield">${label('link',PM_ENV.development ? 'Instagram 게시물 주소 (URL)' : '링크', `<button type="button" class="essample" data-action="sample">예시 링크로 채우기</button>`)}
-        <span class="esinput withicon">${icon('link')}<input type="url" name="url" id="es-url" placeholder="${PM_ENV.development ? 'https://www.instagram.com/p/…/' : 'https://'}" required inputmode="url"></span>
-      </label>
-      <label class="esfield">${label('text','제목', '<small class="esopt">선택</small>')}
-        <span class="esinput"><input name="title" id="es-title" placeholder="${PM_ENV.cloudPlaceTest ? '비워두면 Instagram 장소 게시물로 저장' : '비워두면 링크 이름으로 저장'}" maxlength="50"><small class="escount" data-for="es-title"></small></span>
-      </label>
-      <label class="esfield">${label('grid','카테고리')}
-        <span class="esselect"><span class="esemoji" aria-hidden="true">${settings.aiDefault ? '✨' : typeOf('기타').emoji}</span><select name="type" id="es-type"><option value="ai" ${settings.aiDefault?'selected':''}>AI 자동 분류</option>${TYPES.map(t => `<option value="${t.id}" ${!settings.aiDefault&&t.id==='기타'?'selected':''}>${t.id}</option>`).join('')}</select>${icon('chevron')}</span>
-      </label>
-      <div class="esfield">${label('folder','모음', '<small class="esopt">선택</small>')}
-        <input type="hidden" name="collection" id="es-col" value="">
-        <div class="eschips">${colChip('', '나중에 정리')}${collectionNames().map(c => colChip(c, c)).join('')}<button type="button" class="eschip add" data-esnew>${icon('plus')}새 모음</button></div>
-        <input class="esnewcol" id="es-newcol" maxlength="30" placeholder="새 모음 이름 (예: 10월 데이트)" hidden>
-      </div>
-      <label class="esfield">${label('note','저장한 이유', '<small class="esopt">선택</small>')}
-        <span class="esinput area"><textarea name="memo" id="es-memo" rows="2" maxlength="200" placeholder="어떤 순간에 다시 보고 싶나요?"></textarea></span><small class="escount" data-for="es-memo"></small>
-      </label>
-      <p class="eshint">이 브라우저에 저장돼요. AI 분류는 프로토타입용 간단한 규칙이에요.</p>
-      <p class="eserror" id="saveerror" role="alert"></p>
-    </div>
-    <div class="esfoot">${PM_ENV.cloudPlaceTest || PM_ENV.requiresAuth ? '<div class="esprogress" id="saveprogress" role="status" aria-live="polite" hidden></div>' : ''}<button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
-  </form>`);
-  $('#sheet').classList.add('editsheet');
-  esCounts();
+
 }
 actions.save = saveSheet;
 // 예시 링크로 채우기: 기존 동작 후 화면(글자 수 · 카테고리 · 모음 칩)도 맞춰요
@@ -413,7 +383,7 @@ actions.sample = () => {
   fillSample();
   esCounts(); $('#saveerror').textContent = '';
   $('#es-type')?.dispatchEvent(new Event('change',{bubbles:true}));
-  const v = $('#es-col').value;
+  const v = $('#es-col')?.value;
   document.querySelectorAll('[data-escol]').forEach(b => { const on = b.dataset.escol === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
 };
 // 링크를 비워둔 채 저장하면 안내 (제목은 선택 사항이에요).

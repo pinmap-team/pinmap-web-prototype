@@ -47,127 +47,33 @@ document.addEventListener('submit', async e => {
   }else{settings.nickname=nick;afterChange();render();toast('프로필을 저장했어요.');}
 });
 
-/* ---------- SNS 계정 연동 ---------- */
-const SNS = {
-  instagram:{name:'Instagram', logo:'img/logo-instagram.png'},
-  youtube:{name:'YouTube', logo:'img/logo-youtube.png'},
-  tiktok:{name:'TikTok', logo:'img/logo-tiktok.png'},
-  x:{name:'X', logo:'img/logo-x.png'}
+/* ---------- 저장 콘텐츠 출처: both modes use their stored records ---------- */
+const SNS={instagram:{name:'Instagram',logo:'img/logo-instagram.png'},youtube:{name:'YouTube',logo:'img/logo-youtube.png'},tiktok:{name:'TikTok',logo:'img/logo-tiktok.png'},x:{name:'X',logo:'img/logo-x.png'}};
+const myAccounts=()=>{
+  const groups=new Map();
+  for(const item of items){const source=String(item.source||'').split(',')[0],key=source+':'+(item.authorUsername||'');const group=groups.get(key)||{id:key,source,handle:item.authorUsername?('@'+item.authorUsername):source,count:0};group.count++;groups.set(key,group);}
+  return [...groups.values()];
 };
-const myAccounts = () => (settings.accounts ??= PM_ENV.development ? [] : [{id:'a1', sns:'instagram', handle:'@seoyeon.daily'}, {id:'a2', sns:'youtube', handle:'서연의 기록'}]);
-// 계정별 저장 수: 콘텐츠의 출처(SNS)와 같은 계정 중 첫 번째에 모아 세요 (예시)
-const accountCount = a => { const first = myAccounts().find(b => b.sns === a.sns); return first === a ? items.filter(x => String(x.source||'').toLowerCase().includes(SNS[a.sns].name.toLowerCase())).length : 0; };
-const snsLogo = sns => `<img class="snslogo" src="${SNS[sns].logo}" alt="">`;
-
-pages.accounts = function(){
-  const acc = myAccounts(), total = acc.reduce((n, a) => n + accountCount(a), 0);
-  return `<div class="mypage connectionpage">${subHead('연동 계정 관리', 'my')}
-  ${syncBtn()}
-  <section class="mgroup"><h2>연동된 계정 ${acc.length}개</h2>
-    ${acc.length ? acc.map(a => `<div class="accrow">${snsLogo(a.sns)}<span class="acctext"><b>${esc(a.handle)}</b><small>저장 ${accountCount(a)}개<br>${syncingAcc === a.id ? '가져오는 중…' : syncTime(settings.accSync?.[a.id])}</small></span>${accSyncBtn(a)}<button class="accoff" data-acc-off="${a.id}">연동 중지</button></div>`).join('')
-      : '<p class="hint accnone">연동된 계정이 없어요. 아래에서 추가해 보세요.</p>'}
-  </section>
-  <button class="padd accadd" data-action="accadd">${icon('plus')} SNS 계정 연동 추가</button>
-</div>`;
-};
-function accAddSheet(sns){
-  if (!sns) {
-    modal('SNS 계정 연동 추가', `<p class="muted">저장 콘텐츠를 가져올 SNS를 골라요.</p><div class="snspick">${Object.entries(SNS).map(([k, v]) => `<button class="snsopt" data-acc-sns="${k}">${snsLogo(k)}<b>${v.name}</b>${icon('chevron')}</button>`).join('')}</div>`);
-  } else {
-    modal(`${SNS[sns].name} 연동`, `<form id="accform" data-sns="${sns}"><div class="snshead">${snsLogo(sns)}<b>${SNS[sns].name}</b></div><label class="field"><span>계정 이름</span><input name="handle" required maxlength="30" placeholder="${sns === 'youtube' ? '채널 이름' : '@아이디'}"></label><p class="hint">실제 서비스에서는 이 단계에서 ${SNS[sns].name} 로그인 화면이 열려요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="accadd">뒤로</button><button class="filled" type="submit">연동하기</button></div></form>`);
-  }
-  $('#sheet').classList.add('bottomsheet');
-}
-actions.accadd = () => accAddSheet();
-actions.accounts = () => go('accounts');
+const accountCount=a=>a.count;
+let syncing=false;
+function cancelAccountSync(){syncing=false;}
+pages.accounts=()=>`<div class="mypage connectionpage">${subHead('콘텐츠 출처','my')}
+  <p class="hint">저장된 콘텐츠의 출처예요. 새 콘텐츠는 링크나 내보내기 파일로 추가해 주세요.</p>
+  <section class="mgroup"><h2>콘텐츠 출처 ${myAccounts().length}개</h2>${myAccounts().map(a=>`<div class="accrow"><span class="acctext"><b>${esc(a.handle)}</b><small>${esc(a.source)} · 저장 ${a.count}개</small></span></div>`).join('')||'<p class="hint accnone">저장한 콘텐츠가 없어요.</p>'}</section>
+  <button class="padd" data-action="accadd">${icon('plus')} 콘텐츠 가져오기</button>
+  <button class="syncbtn" data-action="accsync" ${syncing?'disabled aria-busy="true"':''}>${icon('sync')} 저장 목록 새로고침</button></div>`;
+actions.accounts=()=>go('accounts');
+actions.accadd=()=>modal('콘텐츠 가져오기',`<div class="dialogactions"><button type="button" data-action="zipimport">Instagram ZIP 가져오기</button><button type="button" data-action="linkimport">게시물 링크로 저장</button><button type="button" data-action="screenshotimport">캡처 화면으로 추가</button></div>`);
+actions.accsync=async()=>{if(syncing)return;syncing=true;try{if(PM_ENV.requiresAuth)await window.PinmapAccountContent.refresh();render();toast('저장 목록을 새로 불러왔어요.');}catch(error){toast(error.message||'목록을 불러오지 못했어요.');}finally{syncing=false;render();}};
+const toastBaseSync=toast;
+toast=function(t){$('#snackbar').classList.remove('oneline');return toastBaseSync(String(t).replace(/([.!?])\s+(?=\S)/g,'$1\n'));};
+paths.sync='M20 11a8 8 0 0 0-14.3-4.9L4 8 M4 4v4h4 M4 13a8 8 0 0 0 14.3 4.9L20 16 M20 20v-4h-4';
 actions.profile = () => go('profile');
 actions.profilephoto = () => $('#avatarfile')?.click();
 actions.avatarreset = () => {
   if(PM_ENV.requiresAuth)window.PinmapAccountProfile?.save({avatar:''}).then(()=>toast('기본 이미지로 바꿨어요.')).catch(error=>toast(error.message||'사진을 변경하지 못했어요.'));
   else{delete settings.avatar;afterChange();render();toast('기본 이미지로 바꿨어요.');}
 };
-actions.accoffyes = () => {
-  const id = $('#sheet').dataset.acc, acc = myAccounts(), a = acc.find(x => x.id === id);
-  if (a) { settings.accounts = acc.filter(x => x.id !== id); afterChange(); toast(`${a.handle} 연동을 중지했어요.`); }
-  $('#sheet').close(); render();
-};
-document.addEventListener('click', e => {
-  const s = e.target.closest('[data-acc-sns]'); if (s) { accAddSheet(s.dataset.accSns); setTimeout(() => $('#accform input')?.focus(), 50); return; }
-  const off = e.target.closest('[data-acc-off]');
-  if (off) {
-    const a = myAccounts().find(x => x.id === off.dataset.accOff); if (!a) return;
-    modal('연동을 중지할까요?', `<div class="snshead">${snsLogo(a.sns)}<b>${esc(a.handle)}</b></div><p>이 계정에서 새로 저장한 콘텐츠를 더 이상 가져오지 않아요.</p><p class="hint">이미 핀맵에 저장된 콘텐츠는 그대로 남아요.</p><div class="dialogactions"><button class="textbtn" data-action="close">취소</button><button class="filled danger" data-action="accoffyes">연동 중지</button></div>`);
-    $('#sheet').dataset.acc = a.id; $('#sheet').classList.add('bottomsheet');
-  }
-});
-document.addEventListener('submit', e => {
-  if (e.target.id !== 'accform') return;
-  e.preventDefault();
-  const sns = e.target.dataset.sns, handle = e.target.handle.value.trim(); if (!handle) return;
-  const h = sns !== 'youtube' && !handle.startsWith('@') ? '@' + handle : handle;
-  if (myAccounts().some(a => a.sns === sns && a.handle === h)) { toast('이미 연동된 계정이에요.'); return; }
-  myAccounts().push({id:'a' + Date.now(), sns, handle:h}); afterChange();
-  $('#sheet').close(); render(); toast(`${SNS[sns].name} ${h} 계정을 연동했어요.`);
-});
-
-/* ---------- 연동 새로고침 ---------- */
-// 계정마다 아직 반영되지 않은 저장 콘텐츠가 있다고 가정한 예시 (한 번 가져오면 다시 나오지 않아요)
-const SYNC_POOL = PM_ENV.development ? {} : { // SNS마다 아직 안 가져온 저장이 2개씩 있다고 가정해요
-  instagram:[
-    {id:101, title:'연남동 골목 와인바', type:'맛집/카페', category:'와인바', ago:'방금', desc:'작은 골목 안 조용한 와인바', memo:'', art:'cafe', distance:'지하철 20분', address:'서울 마포구 연남동, 예시 장소', aiClassified:true},
-    {id:105, title:'망원동 빈티지 소품샵', type:'쇼핑', category:'소품', ago:'방금', desc:'주말에 들르기 좋은 작은 가게', memo:'', art:'bag', price:'1만 원대', aiClassified:true}],
-  youtube:[
-    {id:102, title:'10분 아침 스트레칭 루틴', type:'생활 정보', category:'운동', ago:'방금', desc:'출근 전 가볍게 따라 하기', memo:'', art:'tips', aiClassified:true},
-    {id:106, title:'원룸 조명 바꾸기 꿀팁', type:'생활 정보', category:'인테리어', ago:'방금', desc:'스탠드 하나로 분위기 바꾸기', memo:'', art:'tips', aiClassified:true}],
-  tiktok:[
-    {id:103, title:'편의점 디저트 꿀조합', type:'레시피', category:'디저트', ago:'방금', desc:'5분이면 끝나는 간단 디저트', memo:'', art:'food', recipe:'5분, 재료 3가지', aiClassified:true},
-    {id:107, title:'에어프라이어 감자칩', type:'레시피', category:'간식', ago:'방금', desc:'기름 없이 바삭하게', memo:'', art:'food', recipe:'20분, 재료 2가지', aiClassified:true}],
-  x:[
-    {id:104, title:'성수 플리마켓 일정 정리', type:'전시/팝업', category:'마켓', ago:'방금', desc:'이번 달 주말 플리마켓 모음', memo:'', art:'exhibit', address:'서울 성동구 성수동, 예시 장소', distance:'도보 10분', aiClassified:true},
-    {id:108, title:'이번 주 무료 전시 모음', type:'전시/팝업', category:'전시', ago:'방금', desc:'예약 없이 볼 수 있는 곳', memo:'', art:'exhibit', aiClassified:true}]
-};
-let syncTimer = null;
-function cancelAccountSync(){ clearTimeout(syncTimer); syncTimer = null; syncing = false; syncingAcc = null; }
-let syncing = false, syncingAcc = null; // 전체 새로고침 중 / 계정 하나만 새로고침 중
-const syncTime = t => t ? (Date.now() - t < 60000 ? '방금 업데이트' : `${new Date(t).toLocaleString('ko-KR', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'})} 업데이트`) : '아직 업데이트 안 함';
-const syncLabel = () => syncTime(settings.lastSync);
-// 계정 하나에서 아직 안 가져온 저장을 모두 가져와요
-function pullAccount(a){
-  if(PM_ENV.development)return [];
-  const got = [];
-  (SYNC_POOL[a.sns] || []).forEach(p => { if (!items.some(x => x.id === p.id)) { items.unshift({...p, source:SNS[a.sns].name, account:a.id}); got.push(p); } });
-  settings.accSync = {...(settings.accSync || {}), [a.id]: Date.now()};
-  return got;
-}
-// 연동 새로고침 결과 안내는 줄 바꿈 없이 한 줄로 (다른 안내는 기존 그대로)
-const toastBaseSync = toast;
-// 2026-11-04: 스낵바는 최대한 한 줄, 문장이 여러 개면 문장이 끝날 때마다 줄바꿈
-toast = function(t){ $('#snackbar').classList.remove('oneline'); return toastBaseSync(String(t).replace(/([.!?])\s+(?=\S)/g, '$1\n')); };
-const syncToast = (n, who) => { toast(n ? `${who ? who + '에서 ' : ''}새 저장 콘텐츠 ${n}개를 가져왔어요.` : `${who ? who + '에서 ' : ''}새로 가져올 저장 콘텐츠가 없어요.`); $('#snackbar').classList.add('oneline'); };
-actions.accsync = () => { // 연동한 계정 전체
-  if (syncing || syncingAcc) return;
-  syncing = true; render();
-  syncTimer = setTimeout(() => {
-    syncTimer = null;
-    const got = myAccounts().flatMap(pullAccount);
-    settings.lastSync = Date.now(); syncing = false; afterChange(); render(); syncToast(got.length);
-  }, 1200);
-};
-document.addEventListener('click', e => { // 계정별 새로고침
-  const b = e.target.closest('[data-acc-sync]'); if (!b) return;
-  if (syncing || syncingAcc) return;
-  const a = myAccounts().find(x => x.id === b.dataset.accSync); if (!a) return;
-  syncingAcc = a.id; render();
-  syncTimer = setTimeout(() => {
-    syncTimer = null;
-    const got = pullAccount(a); syncingAcc = null; afterChange(); render(); syncToast(got.length, a.handle);
-  }, 1000);
-});
-const syncBtn = () => `<button class="syncbtn ${syncing ? 'on' : ''}" data-action="accsync" ${syncing ? 'aria-busy="true"' : ''}><span class="syncico">${icon('sync')}</span><span><b>${syncing ? '가져오는 중…' : '전체 연동 새로고침'}</b><small>${syncing ? '연동한 모든 계정의 새 저장을 확인하고 있어요' : syncLabel()}</small></span></button>`;
-const accSyncBtn = a => { const on = syncing || syncingAcc === a.id;
-  return `<button class="accsync ${on ? 'on' : ''}" data-acc-sync="${a.id}" aria-label="${esc(a.handle)} 새로고침" ${on ? 'aria-busy="true"' : ''}>${icon('sync')}</button>`; };
-paths.sync = 'M20 11a8 8 0 0 0-14.3-4.9L4 8 M4 4v4h4 M4 13a8 8 0 0 0 14.3 4.9L20 16 M20 20v-4h-4';
-
 /* 하위 페이지와 캘린더에서도 하단 메뉴의 해당 탭이 켜져 있게 */
 const PARENT_TAB = {profile:'my', accounts:'my', courses:'my', course:'my', calendar:'home', topic:'home'};
 const navBase = nav;

@@ -15,7 +15,6 @@ const dongOf = name => DONGS.find(d => d.name === name) || {name, full:name};
 
 const myPlaces = () => {
   if (!Array.isArray(settings.places)) settings.places = PM_ENV.development ? [] : ['성수동'];
-  if (!PM_ENV.development && !settings.places.length) settings.places = ['성수동'];
   if (settings.places.length > MAX_PLACES) {
     settings.archivedPlaces = [...new Set([...(settings.archivedPlaces || []), ...settings.places.slice(MAX_PLACES)])];
     settings.places.length = MAX_PLACES;
@@ -29,7 +28,7 @@ const inMainPlace = x => !!mainPlace() && (x.address||'').includes(mainPlace().r
 
 let placeSwapped = false; // 위치를 바꿨을 때만 글자 애니메이션
 function placebar(){
-  if(PM_ENV.development&&!myPlaces().length)return `<div class="placebar"><button class="placemain" data-page="map">${icon('pin')}<b>위치를 아직 설정하지 않았어요</b></button></div>`;
+  if(!myPlaces().length)return `<div class="placebar"><button class="placemain" data-action="mapaddresses">${icon('pin')}<b>위치를 아직 설정하지 않았어요</b></button></div>`;
   const [main, ...others] = myPlaces();
   const mainLabel = settings.placeLabels?.[main] || main;
   const swapped = placeSwapped; placeSwapped = false;
@@ -85,7 +84,6 @@ function placeSearch(mode){
   setTimeout(() => $('#placeq')?.focus(), 50);
 }
 function placeResults(q){
-  if(PM_ENV.development)return '<p class="muted pempty">동네 검색은 아직 연결하지 않았어요. 지도에서는 실제 장소 검색과 현재 위치 기능을 사용할 수 있어요.</p>';
   const mine = myPlaces();
   const row = d => `<button class="pres ${mine.includes(d.name)?'mine':''}" data-place-choose="${esc(d.name)}">${esc(d.full)}${mine.includes(d.name)?'<span>설정됨</span>':''}</button>`;
   if (q.trim()) {
