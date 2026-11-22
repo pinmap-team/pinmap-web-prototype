@@ -126,6 +126,22 @@ test('map search updates on one character using saved places without external re
   assert.equal(networkCalls,0);
 });
 
+test('map search refreshes on every Korean IME input event',()=>{
+  const source=read('map-live.js');
+  const listener=source.split('\n').find(line=>line.includes("document.addEventListener('input',event=>") && line.includes('#lm-search input'));
+  let onInput;
+  const values=[];
+  const clearButton={hidden:true};
+  vm.runInNewContext(listener,{
+    document:{addEventListener:(type,callback)=>{assert.equal(type,'input');onInput=callback;}},
+    $:()=>clearButton,
+    searchPlaces:value=>values.push(value)
+  });
+  for(const value of ['ㄱ','가','가게'])onInput({target:{matches:()=>true,value},isComposing:true});
+  assert.deepEqual(values,['ㄱ','가','가게']);
+  assert.equal(clearButton.hidden,false);
+});
+
 test('empty development home keeps decorative cards and a three-path home add menu',()=>{
   const source=read('home.js'),start=source.indexOf('pages.home = function(){'),end=source.indexOf('\n};',start)+3;
   const placeholderStart=source.indexOf('function emptyPickCards(){'),placeholderEnd=source.indexOf('\n/* ---------- 캘린더',placeholderStart);
