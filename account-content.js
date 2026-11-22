@@ -175,8 +175,8 @@ if (PM_ENV.requiresAuth) (() => {
     try{
       const {data,error}=await client.auth.getUser();
       if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)throw Error('로그인 계정을 다시 확인해 주세요.');
-      const current=PinmapPlaces.expandLegacy(data.user.user_metadata?.pinmap_favorites,items);
-      const value=PinmapFavorites.change(current,item.placeId||item.id,favorite);
+      const current=PinmapFavorites.normalize(data.user.user_metadata?.pinmap_favorites);
+      const value=PinmapFavorites.change(current,item.placeId||item.backendId,favorite);
       const result=await client.auth.updateUser({data:{pinmap_favorites:value}});
       if(result.error)throw result.error;
       if(currentUserId!==expected)throw Error('계정이 변경됐어요.');
@@ -192,8 +192,8 @@ if (PM_ENV.requiresAuth) (() => {
     try{
       const {data,error}=await client.auth.getUser();
       if(error||!expected||data?.user?.id!==expected||currentUserId!==expected)throw Error('로그인 계정을 다시 확인해 주세요.');
-      const removed=new Set(chosen.map(item=>String(item.placeId||item.id)));
-      const value=PinmapPlaces.expandLegacy(data.user.user_metadata?.pinmap_favorites,items).filter(id=>!removed.has(id));
+      const removed=new Set(chosen.map(item=>String(item.placeId||item.backendId)));
+      const value=PinmapFavorites.normalize(data.user.user_metadata?.pinmap_favorites).filter(id=>!removed.has(id));
       const result=await client.auth.updateUser({data:{pinmap_favorites:value}});
       if(result.error)throw result.error;
       if(currentUserId!==expected)throw Error('계정이 변경됐어요.');

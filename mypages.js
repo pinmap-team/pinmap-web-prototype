@@ -62,12 +62,20 @@ document.addEventListener('click', e => {
 
 /* ---------- 즐겨찾기 ---------- */
 let favSel = null, favRemoving = false;
-const favoriteItems = () => PinmapPlaces.all(items).filter(place => place.favorite);
+const favoriteItems = () => [
+  ...items.filter(item=>item.favorite).map(item=>({
+    id:`post:${item.backendId??item.id}`,backendId:item.backendId??String(item.id),kind:'post',
+    sourceId:item.id,sourceItem:item,title:item.title,desc:item.desc,memo:item.memo,
+    category:item.category,type:item.type,savedAt:item.savedAt,ago:item.ago,favorite:true,
+    onFavoriteChange(value){item.favorite=value;}
+  })),
+  ...PinmapPlaces.all(items).filter(place=>place.favorite).map(place=>({...place,kind:'place'}))
+];
 function favSyncSelection(){
   if (!favSel) return;
   const list=favoriteItems(), count=favSel.size;
   const label=document.querySelector('.fav-selcount');
-  if(label)label.textContent=count ? `${count}개 선택` : '장소를 골라 주세요';
+  if(label)label.textContent=count ? `${count}개 선택` : '게시물이나 장소를 골라 주세요';
   const all=document.querySelector('.fav-selall');
   if(all)all.textContent=list.length&&list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택';
   const remove=document.querySelector('.fav-remove');
@@ -79,21 +87,23 @@ pages.favorites = () => {
   else if(favSel)favSel=new Set([...favSel].filter(id=>list.some(item=>item.id===id)));
   const count=favSel?.size||0;
   const row = x => {
+    const isPlace=x.kind==='place';
     const description = x.desc || x.memo;
-    const place = x.address ? `${icon('pin')}<span>${esc(x.address)}</span>` : `<span>${esc(x.category || x.type || '')}</span>`;
+    const place = isPlace&&x.address ? `${icon('pin')}<span>${esc(x.address)}</span>` : `<span>${esc(x.category || x.type || '')}</span>`;
     const on=favSel?.has(x.id);
-    return `<button type="button" class="calrow fav-row${on?' on':''}" ${favSel?`role="checkbox" aria-checked="${!!on}"`:`data-detail="${x.sourceId}"`} data-favitem="${esc(x.id)}" data-fav-place-index="${x.locationIndex}" aria-label="${esc(x.title)}${favSel?' 선택':' 상세 보기'}">
-    <span class="calthumb">${x.photo?`<img src="${esc(x.photo)}" alt="">`:libThumb(x.sourceItem)}</span>
-    <span class="caltext fav-text"><b>${esc(x.title)}</b>${description ? `<small class="fav-desc">${esc(description)}</small>` : ''}
+    return `<button type="button" class="calrow fav-row${on?' on':''}" ${favSel?`role="checkbox" aria-checked="${!!on}"`:`data-detail="${x.sourceId}"`} data-favitem="${esc(x.id)}" data-fav-kind="${x.kind}" ${isPlace?`data-fav-place-index="${x.locationIndex}"`:''} aria-label="${esc(x.title)} ${isPlace?'장소':'게시물'}${favSel?' 선택':' 상세 보기'}">
+    <span class="calthumb">${isPlace&&x.photo?`<img src="${esc(x.photo)}" alt="">`:libThumb(x.sourceItem)}</span>
+    <span class="caltext fav-text"><b>${esc(x.title)}</b><small class="fav-kind">${isPlace?'장소':'게시물'}</small>${description ? `<small class="fav-desc">${esc(description)}</small>` : ''}
       <small class="fav-meta">${place}<span class="fav-time">${esc(savedAgo(x))} 저장</span></small></span>
     ${favSel?`<span class="fav-choice" aria-hidden="true">${icon('check')}</span>`:''}
   </button>`;
   };
+  const posts=list.filter(entry=>entry.kind==='post'),places=list.filter(entry=>entry.kind==='place');
   return myPage('즐겨찾기', list.length
     ? `<div class="fav-header"><p class="fav-count">${list.length}개</p><button type="button" class="cf-textbtn" data-action="${favSel?'favselectoff':'favselect'}">${favSel?'취소':'선택'}</button></div>
-      <div class="fav-items">${list.map(row).join('')}</div>
-      ${favSel?`<div class="cf-selbar" role="toolbar" aria-label="선택한 즐겨찾기"><button type="button" class="cf-selall fav-selall" data-action="favselall">${list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택'}</button><span class="cf-selcount fav-selcount" aria-live="polite">${count?`${count}개 선택`:'장소를 골라 주세요'}</span><button type="button" class="cf-seldel fav-remove" data-action="favremove" ${count&&!favRemoving?'':'disabled'}>${likeHeartIcon()}좋아요 취소</button></div>`:''}`
-    : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 장소가 없어요</h3><p class="muted">지도나 장소 상세에서 하트를 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="map">지도로 가기</button></div>`, `favpage${favSel?' cf-selecting':''}`);
+      <div class="fav-items">${posts.length?`<section class="fav-group"><h2 class="fav-group-title">게시물 좋아요</h2>${posts.map(row).join('')}</section>`:''}${places.length?`<section class="fav-group"><h2 class="fav-group-title">장소 좋아요</h2>${places.map(row).join('')}</section>`:''}</div>
+      ${favSel?`<div class="cf-selbar" role="toolbar" aria-label="선택한 즐겨찾기"><button type="button" class="cf-selall fav-selall" data-action="favselall">${list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택'}</button><span class="cf-selcount fav-selcount" aria-live="polite">${count?`${count}개 선택`:'게시물이나 장소를 골라 주세요'}</span><button type="button" class="cf-seldel fav-remove" data-action="favremove" ${count&&!favRemoving?'':'disabled'}>${likeHeartIcon()}좋아요 취소</button></div>`:''}`
+    : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 좋아요한 게시물이나 장소가 없어요</h3><p class="muted">게시물 상세나 지도에서 하트를 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="map">지도로 가기</button></div>`, `favpage${favSel?' cf-selecting':''}`);
 };
 actions.favselect=()=>{favSel=new Set();render();};
 actions.favselectoff=()=>{favSel=null;render();};
@@ -116,7 +126,7 @@ actions.favremove=async()=>{
 document.addEventListener('click',event=>{
   if(page!=='favorites')return;
   const card=event.target.closest('[data-favitem]');
-  if(card&&!favSel){window.pmDetailPlace={id:Number(card.dataset.detail),index:Number(card.dataset.favPlaceIndex)};return;}
+  if(card&&!favSel){window.pmDetailPlace=card.dataset.favKind==='place'?{id:Number(card.dataset.detail),index:Number(card.dataset.favPlaceIndex)}:null;return;}
   if(!favSel)return;
   if(card){
     event.stopPropagation();

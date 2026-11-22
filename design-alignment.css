@@ -976,8 +976,11 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .my-quick .myq-card b{word-break:keep-all}
 .favpage .fav-count{margin:0 0 var(--space-md);font:var(--type-body-sm);color:var(--color-secondary)}
 .favpage .fav-items{display:grid;gap:var(--space-md)}
+.favpage .fav-group{display:grid;gap:var(--space-sm)}
+.favpage .fav-group-title{margin:0;font:var(--type-label-md);color:var(--color-on-surface)}
 .favpage .fav-row{min-height:96px;color:var(--color-on-surface);position:relative}
 .favpage .fav-text{gap:var(--space-xs)}
+.favpage .fav-text .fav-kind{font:var(--type-body-sm);color:var(--color-secondary)}
 .favpage .fav-text .fav-desc{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--color-secondary)}
 .favpage .fav-text .fav-meta{display:flex;min-width:0;gap:var(--space-xs);color:var(--color-secondary)}
 .favpage .fav-meta>span:first-of-type{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1121,10 +1124,10 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 [data-theme="dark"] #onboarding .step3 .ob-option.on .ob-emoji{background:var(--color-on-surface)!important;color:var(--color-surface)!important}
 .dtbtn.dtfavorite.is-active .icon,.live-map .lm-carousel-heart.is-active .icon{fill:currentColor}
 .dtbtn.dtfavorite.is-active,.live-map button.lm-carousel-heart.is-active{color:var(--color-primary)!important}
-.dt-extraction-place .dt-extraction-heart{position:relative;flex:0 0 44px;width:44px;height:44px;display:grid;place-items:center;border:0;background:transparent;color:var(--color-on-surface);cursor:pointer}
-.dt-extraction-place .dt-extraction-heart.is-active{color:var(--color-primary)}
-.dt-extraction-place .dt-extraction-heart.is-active .icon{fill:currentColor}
-.dt-extraction-place .dt-extraction-heart:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px;border-radius:var(--rounded-md)}
+.dt-extraction-place .dt-extraction-heart,.dtlocation .dt-extraction-heart{position:relative;flex:0 0 44px;width:44px;height:44px;display:grid;place-items:center;border:0;background:transparent;color:var(--color-on-surface);cursor:pointer}
+.dt-extraction-place .dt-extraction-heart.is-active,.dtlocation .dt-extraction-heart.is-active{color:var(--color-primary)}
+.dt-extraction-place .dt-extraction-heart.is-active .icon,.dtlocation .dt-extraction-heart.is-active .icon{fill:currentColor}
+.dt-extraction-place .dt-extraction-heart:focus-visible,.dtlocation .dt-extraction-heart:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px;border-radius:var(--rounded-md)}
 
 .dtsum h2 .icon path{fill:currentColor}
 

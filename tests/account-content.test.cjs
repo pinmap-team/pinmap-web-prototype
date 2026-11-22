@@ -107,6 +107,46 @@ test('account edits and direct pins survive account reload and can be removed', 
   assert.equal(context.items.length,1);
 });
 
+test('account post likes and each place like use separate metadata keys', async () => {
+  let metadata={pinmap_favorites:['10']};
+  const record={...eventRecord,content_kind:'place',events:[],places:[{name:'첫 카페'},{name:'둘째 카페'}],
+    map_locations:[
+      {name:'첫 카페',address:'서울 성동구 첫길 1',coordinates:{lat:37.55,lng:127.04}},
+      {name:'둘째 카페',address:'서울 성동구 둘길 2',coordinates:{lat:37.56,lng:127.05}}
+    ]};
+  const sdk={auth:{
+    getUser:async()=>({data:{user:{id:'user-a',user_metadata:metadata}}}),
+    updateUser:async({data})=>{metadata={...metadata,...data};return {data:{user:{id:'user-a',user_metadata:metadata}}};},
+    getSession:async()=>({data:{session:{access_token:'token'}}}),onAuthStateChange:()=>{}
+  }};
+  const favoritesContext={window:{}};
+  vm.runInNewContext(fs.readFileSync('favorite-state.js','utf8'),favoritesContext);
+  const places=require('../place-state.js');
+  const context={PinmapFolders:require('../account-folders.js'),PinmapPlaces:places,
+    PinmapFavorites:favoritesContext.window.PinmapFavorites,
+    PinmapAccountMapData:require('../account-map-data.js'),PM_ENV:{requiresAuth:true},
+    PinmapAuth:{ready:async()=>sdk,verifiedUser:client=>client.auth.getUser()},
+    window:{},document:{addEventListener:()=>{},getElementById:()=>null,querySelector:()=>null},
+    actions:{save:()=>{}},settings:{customFolders:[]},COLLECTIONS:[],cfCustom:()=>[],cfSyncCollections:()=>{},
+    items:[],detailId:null,render:()=>{},toast:()=>{},crypto:require('node:crypto'),
+    fetch:async()=>({ok:true,json:async()=>({items:[record],next_offset:null})})
+  };
+  vm.runInNewContext(accountSource,context);
+  for(let attempt=0;attempt<30&&!context.window.PinmapAccountLoaded;attempt++)
+    await new Promise(resolve=>setImmediate(resolve));
+  assert(context.window.PinmapAccountLoaded);
+  const item=context.items[0];
+  assert.equal(item.favorite,true);
+  assert.deepEqual(places.forItem(item).map(place=>place.favorite),[false,false]);
+  context.PinmapFavorites.toggle(places.forItem(item)[1]);
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(Array.from(metadata.pinmap_favorites),['10','place:10:1']);
+  context.PinmapFavorites.toggle(item);
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(Array.from(metadata.pinmap_favorites),['place:10:1']);
+  assert.deepEqual(places.forItem(item).map(place=>place.favorite),[false,true]);
+});
+
 test('account history loads all pages using the backend page-size contract', async () => {
   const requests = [];
   let sessionReads = 0;
