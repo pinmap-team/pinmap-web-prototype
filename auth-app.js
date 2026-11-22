@@ -40,6 +40,46 @@ if (PM_ENV.requiresAuth) (() => {
   actions.logout = logout;
   actions.logoutask = () => confirmPop('로그아웃할까요?', '다시 로그인하면 저장한 콘텐츠를 그대로 볼 수 있어요.', 'logoutyes','로그아웃','취소');
   actions.logoutyes = logout;
+  // Never run the old prototype's destructive local reset as account deletion.
+  actions.leaveask = () => confirmPop('탈퇴할까요?', '탈퇴하면 저장한 콘텐츠와 설정이 모두 지워져요.<br>이용 중인 구독도 즉시 해지되며, 되돌릴 수 없어요.', 'leaveyes', '탈퇴하기', '유지하기');
+  actions.leaveyes = async () => {
+    const button = document.querySelector('[data-action="leaveyes"]');
+    try {
+      await PinmapButton.run(button, async () => {
+        if (!client) throw Error('로그인 상태를 확인하지 못했어요.');
+        const {data, error} = await PinmapAuth.verifiedUser(client);
+        if (error || !data?.user?.id || data.user.id !== user?.id)
+          throw Error('로그인 계정을 다시 확인해 주세요.');
+        const session = await client.auth.getSession();
+        if (session.error || session.data?.session?.user?.id !== data.user.id ||
+            !session.data.session.access_token) throw Error('다시 로그인한 뒤 탈퇴해 주세요.');
+        const response = await fetch('/api/account-delete', {
+          method: 'DELETE',
+          headers: {Authorization: `Bearer ${session.data.session.access_token}`},
+          cache: 'no-store', signal: AbortSignal.timeout(30000)
+        });
+        let result;
+        try { result = await response.json(); } catch { result = {}; }
+        if (!response.ok || result.deleted !== true) {
+          if (response.status === 403 && result.error === 'test_account_cannot_delete')
+            throw Error('공용 테스트 계정은 탈퇴할 수 없어요.');
+          if (result.error === 'checkout_pending')
+            throw Error('결제 처리 중이에요. 결제 상태가 확정된 뒤 다시 시도해 주세요.');
+          if (result.error === 'subscription_cancellation_failed')
+            throw Error('구독 해지를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.');
+          throw Error('탈퇴를 완료하지 못했어요. 잠시 후 다시 시도해 주세요.');
+        }
+        window.PinmapZipImport?.pause();
+        try { await client.auth.signOut({scope: 'local'}); } catch {}
+        try {
+          localStorage.removeItem('pinmap.auth.v1');
+          localStorage.removeItem(`pinmap.zip-import.v1.${data.user.id}`);
+        } catch {}
+        user = null; window.PinmapAccountIdentity = null;
+        window.top.location.replace(new URL('auth.html?screen=welcome&deleted=1', location.href).href);
+      }, '탈퇴 처리 중');
+    } catch (error) { toast(error.message || '탈퇴를 완료하지 못했어요. 다시 시도해 주세요.'); }
+  };
   async function verify() {
     if (resolving) return; resolving = true;
     try {
