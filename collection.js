@@ -231,7 +231,7 @@ function cfRememberSearch(value){
   cfRecent=[text,...cfRecent.filter(x=>x.toLocaleLowerCase()!==text.toLocaleLowerCase())].slice(0,8);cfPersistRecent();
 }
 function recentSearchMarkup(entries,{pick='data-cf-recent',remove='data-cf-recent-remove',clear='data-cf-recent-clear',target='콘텐츠'}={}){
-  return `<div class="cf-recent-head"><h2>최근 검색</h2>${entries.length?`<button type="button" ${clear}>전체 삭제</button>`:''}</div>${entries.length?`<ul class="cf-recent-list">${entries.map((text,index)=>`<li><button type="button" class="cf-recent-query" ${pick}="${index}" aria-label="${esc(text)} 다시 검색">${icon('clock')}<span>${esc(text)}</span></button><button type="button" class="cf-recent-remove" ${remove}="${index}" aria-label="${esc(text)} 검색 기록 삭제">${icon('close')}</button></li>`).join('')}</ul>`:`<p class="cf-recent-empty">최근 검색어가 없어요.<br>찾고 싶은 ${esc(target)}를 검색해 보세요.</p>`}`;
+  return `<div class="cf-recent-head"><h2>최근 검색</h2>${entries.length?`<button type="button" ${clear}>전체 삭제</button>`:''}</div>${entries.length?`<ul class="cf-recent-list">${entries.map((text,index)=>`<li><button type="button" class="cf-recent-query" ${pick}="${index}" aria-label="${esc(text)} 다시 검색">${icon('clock')}<span>${esc(text)}</span></button><button type="button" class="cf-recent-remove" ${remove}="${index}" aria-label="${esc(text)} 검색 기록 삭제">${icon('trash')}</button></li>`).join('')}</ul>`:`<p class="cf-recent-empty">최근 검색어가 없어요.<br>찾고 싶은 ${esc(target)}를 검색해 보세요.</p>`}`;
 }
 function cfRecentContent(){return recentSearchMarkup(cfRecent);}
 function cfRefreshRecent(){
@@ -274,7 +274,7 @@ pages.library = function(){
     <div class="cf-search-header">
     <div class="libhead cf-fhead${back ? ' hasback' : ''}">${back}<h1>${esc(open || '컬렉션')}</h1>${open ? `<span class="cf-hcount" aria-label="저장 ${cfTotal()}개">${cfTotal()}</span>` : ''}${collection && cfCustom().includes(collection) && !cfSel ? `<button type="button" class="cf-delfolder" data-action="cfdelfolder" aria-label="‘${esc(collection)}’ 폴더 삭제">${icon('trash')}</button>` : ''}</div>
       <div class="cf-search-row${cfSearchOpen?' is-open':''}" id="cf-search-row" aria-hidden="${!cfSearchOpen}" ${cfSearchOpen?'':'inert'}>
-        <label class="libsearch"><input id="search" type="search" enterkeyhint="search" aria-label="${esc(ph)}" placeholder="${esc(ph)}" value="${esc(query)}" autocomplete="off" maxlength="80" ${cfSearchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-action="clear" aria-label="검색 지우기" ${query?'':'hidden'}>${icon('close')}</button></label>
+        <label class="libsearch"><input id="search" type="search" enterkeyhint="search" aria-label="${esc(ph)}" placeholder="${esc(ph)}" value="${esc(query)}" autocomplete="off" maxlength="80" ${cfSearchOpen?'':'tabindex="-1"'}></label>
       </div>
       <button type="button" class="cf-header-search" data-action="cftogglesearch" aria-label="${cfSearchOpen?'컬렉션 검색창 닫기':'컬렉션에서 콘텐츠 검색'}" aria-expanded="${cfSearchOpen}" aria-controls="cf-search-row"><span class="lm-search-open-icon">${icon('search')}</span><span class="lm-search-close-icon">${icon('close')}</span></button>
       <section class="cf-recent" id="cf-recent" aria-label="최근 검색어" ${cfSearchOpen&&!query.trim()?'':'hidden'}>${cfRecentContent()}</section>
@@ -299,7 +299,6 @@ actions.cftogglesearch = () => {
   if(cfSearchOpen)requestAnimationFrame(()=>input.focus());
   else {
     input.blur();input.value='';query='';
-    row.querySelector('[data-action="clear"]').hidden=true;
     $('#results').innerHTML=resultCards();$('#resultcount').textContent=cfStatus();toggle.focus();
   }
 };

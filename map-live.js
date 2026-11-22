@@ -43,7 +43,7 @@
   document.addEventListener('click',event=>{
     if(page!=='map')return;
     const pick=event.target.closest('[data-lm-recent]'),remove=event.target.closest('[data-lm-recent-remove]');
-    if(pick){const q=recentSearches[Number(pick.dataset.lmRecent)];if(!q)return;const input=$('#lm-search input');input.value=q;$('#lm-search [data-lm="clear-search"]').hidden=false;input.blur();searchPlaces(q,true);return;}
+    if(pick){const q=recentSearches[Number(pick.dataset.lmRecent)];if(!q)return;const input=$('#lm-search input');input.value=q;input.blur();searchPlaces(q,true);return;}
     if(remove){recentSearches.splice(Number(remove.dataset.lmRecentRemove),1);persistRecentSearches();refreshRecentSearches();$('#lm-recent .cf-recent-remove')?.focus();return;}
     if(event.target.closest('[data-lm-recent-clear]')){recentSearches=[];persistRecentSearches();refreshRecentSearches();$('#lm-search input')?.focus();}
   });
@@ -68,7 +68,7 @@
       <header class="lm-header">
         <h1 class="lm-sr-only">지도에서 저장한 장소 찾기</h1>
         <div class="lm-location-header"><button type="button" class="lm-location-title" data-action="mapaddresses">${icon('pin')}<span>${safe((n => n ? (settings.placeLabels?.[n] || n) : '현재 위치')(mapLocationName))}</span>${icon('chevron')}</button><button type="button" class="lm-header-search" data-lm="toggle-search" aria-label="${searchOpen?'검색창 닫기':'지도에서 장소 검색'}" aria-expanded="${searchOpen}" aria-controls="lm-search-row"><span class="lm-search-open-icon">${icon('search')}</span><span class="lm-search-close-icon">${icon('close')}</span></button></div>
-        <div class="lm-search-row cfpage${searchOpen?' is-open':''}" id="lm-search-row" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><input name="q" type="search" enterkeyhint="search" aria-label="지도 저장 장소 검색" placeholder="저장한 장소명·주소 검색" value="${safe(searchQuery)}" autocomplete="off" maxlength="80" ${searchOpen?'':'tabindex="-1"'}><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button></form></div>
+        <div class="lm-search-row cfpage${searchOpen?' is-open':''}" id="lm-search-row" aria-hidden="${!searchOpen}" ${searchOpen?'':'inert'}><form class="libsearch" id="lm-search" role="search"><input name="q" type="search" enterkeyhint="search" aria-label="지도 저장 장소 검색" placeholder="저장한 장소명·주소 검색" value="${safe(searchQuery)}" autocomplete="off" maxlength="80" ${searchOpen?'':'tabindex="-1"'}></form></div>
         <section class="cf-recent lm-recent" id="lm-recent" aria-label="최근 지도 검색어" ${searchOpen&&!searchQuery.trim()?'':'hidden'}>${mapRecentContent()}</section>
         <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,mapCategories().findIndex(([id])=>id===category))*100}%">${mapCategories().map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id,category===id)}</span><b>${label.replace('·','·<wbr>')}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
       </header>
@@ -435,7 +435,7 @@
     const panel=$('#lm-search-results'); if(!panel) return;
     if(!searchResults) { panel.hidden=true; return; }
     const list=visiblePlaces(); panel.hidden=false;
-    panel.innerHTML=`<div class="lm-results-head"><b>저장한 장소, ${list.length}곳</b><button data-lm="clear-search" aria-label="검색 지우기">✕</button></div><small class="lm-result-credit">현재 지도 중심에서 가까운 순서</small>`+
+    panel.innerHTML=`<div class="lm-results-head"><b>저장한 장소, ${list.length}곳</b></div><small class="lm-result-credit">현재 지도 중심에서 가까운 순서</small>`+
       (list.length ? list.map((x,i) => `<button class="lm-result-row" data-result="${i}"><img src="${safe(x.image)}" alt=""><span><b>${safe(x.title)}</b><small>${safe(x.address)}</small></span>${icon('arrow')}</button>`).join('') : '<p>일치하는 저장 장소가 없어요. 다른 이름이나 주소로 검색해 보세요.</p>');
   }
   function searchPlaces(raw,remember=false) {
@@ -474,8 +474,8 @@
         toggle.setAttribute('aria-expanded',String(searchOpen));
         toggle.setAttribute('aria-label',searchOpen?'검색창 닫기':'지도에서 장소 검색');
         input.tabIndex=searchOpen?0:-1;
-        if(searchOpen){requestAnimationFrame(()=>input.focus());if(searchQuery)searchPlaces(searchQuery);}
-        else {input.blur();searchQuery='';searchResults=null;$('#lm-search-results').hidden=true;input.value='';$('#lm-search [data-lm="clear-search"]').hidden=true;markers();}
+        if(searchOpen){if(listOpen)setList(false,false);requestAnimationFrame(()=>input.focus());if(searchQuery)searchPlaces(searchQuery);}
+        else {input.blur();searchQuery='';searchResults=null;$('#lm-search-results').hidden=true;input.value='';markers();toggle.focus();}
         refreshRecentSearches();
         break;
       }
@@ -495,13 +495,12 @@
       case 'focus-address':{if(button.closest('.just-dragged'))break;const place=markerEntries.get(button.dataset.placeKey)?.place;if(place)expandPlace(place,true,false);break;}
       case 'close-place':clearSelection();renderSheet();break;
       case 'open-place':{if(button.closest('.just-dragged'))break;const place=markerEntries.get(button.dataset.placeKey)?.place;if(!place)break;window.pmDetailPlace={id:place.id,index:place.locationIndex};openDetail(place.id,button);break;}
-      case 'clear-search':$('#lm-search input').value='';$('#lm-search [data-lm="clear-search"]').hidden=true;searchPlaces('');$('#lm-search input').focus();break;
     }
   });
   document.addEventListener('error',event=>{if(event.target.matches?.('.lm-badge-image img'))event.target.hidden=true;},true);
   document.addEventListener('keydown',event=>{if(page==='map'&&event.key===' '&&event.target.closest('.lm-photo-marker')){event.preventDefault();event.target.closest('.lm-photo-marker').click();}});
   document.addEventListener('keydown',event=>{if(page==='map'&&event.key==='Escape')hideProviderOptions();});
-  document.addEventListener('input',event=>{if(event.target.matches('#lm-search input')){$('#lm-search [data-lm="clear-search"]').hidden=!event.target.value;searchPlaces(event.target.value);}});
+  document.addEventListener('input',event=>{if(event.target.matches('#lm-search input'))searchPlaces(event.target.value);});
   document.addEventListener('compositionend',event=>{if(event.target.matches('#lm-search input'))searchPlaces(event.target.value);});
   document.addEventListener('submit',event => {
     if(event.target.id!=='lm-search')return;
