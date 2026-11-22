@@ -21,7 +21,7 @@
       }
     }
     settings.selectedPlace=settings.places.includes(s.selectedPlace)?s.selectedPlace:null;
-    return {settings,preferences:list(v.preferences,24),appearance:['light','dark','system'].includes(v.appearance)?v.appearance:'system'};
+    return {settings,preferences:list(v.preferences,24),appearance:['light','dark','system'].includes(v.appearance)?v.appearance:'system',onboardingDone:v.onboardingDone===true};
   }
   function encodeCourses(courses,items){
     const places=PinmapPlaces.all(items),byId=new Map(places.map(place=>[place.id,place]));

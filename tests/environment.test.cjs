@@ -22,18 +22,11 @@ test('development starts with no seeded content, profile, accounts or places',()
   assert.deepEqual(app.value('settings.accounts'),[]);
   assert.equal(app.value('STORAGE'),'pinmap.dev.v1');
 });
-test('prototype retains the 13 seeded items and original default profile',()=>{
-  const app=boot('prototype');
-  assert.equal(app.value('items.length'),13);
-  assert.equal(app.value('settings.nickname'),'서연');
-  assert.equal(app.value('COLLECTIONS.length'),3);
-  assert.equal(app.value('STORAGE'),'pinmap.v3');
-});
-test('only the explicit post-login app requires authentication; previews remain open',()=>{
-  assert.equal(boot('development').value('PM_ENV.requiresAuth'),false);
-  assert.equal(boot('prototype').value('PM_ENV.requiresAuth'),false);
+test('all app states require an account and start without sample data',()=>{
+  assert.equal(boot('development').value('PM_ENV.requiresAuth'),true);
+  assert.equal(boot('prototype').value('PM_ENV.requiresAuth'),true);
   assert.equal(boot('development&auth=required').value('PM_ENV.requiresAuth'),true);
-  assert.equal(boot('prototype&auth=required').value('PM_ENV.requiresAuth'),false);
+  assert.equal(boot('prototype&auth=required').value('items.length'),0);
 });
 test('initial development screens ignore stored data without changing or deleting any saved records',()=>{
   const payload=JSON.stringify({items:[{id:1,title:'Existing content',type:'기타'}],settings:{nickname:'Existing user',calSeeded:true}});
@@ -45,8 +38,8 @@ test('initial development screens ignore stored data without changing or deletin
   for(const [key,value] of Object.entries(entries))assert.equal(app.stored.get(key),value);
   const reload=boot('development',Object.fromEntries(app.stored));
   assert.equal(reload.value('items.length'),0);
-  const prototype=boot('prototype',Object.fromEntries(app.stored));
-  assert.equal(prototype.value('items[0].title'),'Existing content');
+  const oldLink=boot('prototype',Object.fromEntries(app.stored));
+  assert.equal(oldLink.value('items.length'),0);
 });
 test('sample pools, map coordinates, photos and neighborhoods are absent in development',()=>{
   const {context,value}=boot('development');
@@ -64,42 +57,36 @@ test('sample pools, map coordinates, photos and neighborhoods are absent in deve
   assert(read('course.js').includes('else if(!PM_ENV.development)'));
 });
 function route(search, navigationType='navigate') {
-  const frame={src:'app.html?mode=prototype'},replacements=[];
+  const frame={src:'app.html?mode=development&auth=required'},replacements=[],redirects=[];
   vm.runInNewContext(read('entry-router.js'),{
-    location:{search,pathname:'/index.html',hash:''},
+    location:{search,pathname:'/index.html',hash:'',replace:url=>redirects.push(url)},
     performance:{getEntriesByType:()=>[{type:navigationType}]},
     history:{replaceState:(state,title,url)=>replacements.push(url)},
     URLSearchParams,document:{querySelector:()=>frame}
   });
-  return {src:frame.src,replacements};
+  return {src:frame.src,replacements,redirects};
 }
-test('explicit choices enter the selected app once and remove the mode from the top URL',()=>{
-  const result=route('?mode=prototype');
-  assert.equal(result.src,'app.html?mode=prototype');
-  assert.deepEqual(result.replacements,['/index.html']);
-  assert.equal(route('?mode=development').src,'entry.html');
-  assert.equal(route('').src,'entry.html');
-  assert.equal(route('?mode=invalid').src,'entry.html');
-});
-test('refresh always returns to version selection, including old links with a mode parameter',()=>{
-  for(const query of ['', '?mode=development','?mode=prototype']) {
-    assert.equal(route(query,'reload').src,'entry.html');
-  }
-  const first=route('?mode=development&v=review');
-  assert.equal(first.src,'entry.html');
-  assert.deepEqual(first.replacements,['/index.html?v=review']);
-  assert.equal(route('?v=review','reload').src,'entry.html');
-});
-test('post-login auth flag reaches only the development frame and is removed from the top URL',()=>{
+test('root and signed-in links open only the account app',()=>{
+  assert.equal(route('').src,'app.html?mode=development&auth=required');
   const result=route('?mode=development&auth=required');
   assert.equal(result.src,'app.html?mode=development&auth=required');
   assert.deepEqual(result.replacements,['/index.html']);
-  assert.equal(route('?mode=prototype&auth=required').src,'app.html?mode=prototype');
-  assert.equal(route('?mode=development&auth=required','reload').src,'entry.html');
+});
+test('refresh stays on the account app and legacy links return to login',()=>{
+  assert.equal(route('','reload').src,'app.html?mode=development&auth=required');
+  assert.deepEqual(route('?mode=prototype').redirects,['auth.html?screen=welcome']);
+  assert.deepEqual(route('?mode=development').redirects,['auth.html?screen=welcome']);
+  assert.deepEqual(route('?mode=invalid').redirects,['auth.html?screen=welcome']);
+  assert.deepEqual(route('?mode=development&place-test=1').redirects,['auth.html?screen=welcome']);
+});
+test('old account link is normalized without discarding other query parameters',()=>{
+  const result=route('?mode=development&auth=required');
+  assert.equal(result.src,'app.html?mode=development&auth=required');
+  assert.deepEqual(result.replacements,['/index.html']);
+  assert.deepEqual(route('?mode=development&auth=required&v=review','reload').replacements,['/index.html?v=review']);
 });
 
-test('login-free development can display backend place results, while signed-in mode remains separate',()=>{
-  assert.equal(route('?mode=development&place-test=1').src,'entry.html');
+test('old place-test mode cannot enable anonymous place results',()=>{
   assert.equal(boot('development').value('PM_ENV.cloudPlaceTest'),false);
   assert.equal(boot('development&auth=required').value('PM_ENV.cloudPlaceTest'),false);
   assert.equal(boot('prototype').value('PM_ENV.cloudPlaceTest'),false);

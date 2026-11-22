@@ -13,6 +13,8 @@ test('settings whitelist retains addresses and preferences without importing acc
  assert.deepEqual(value.settings.places,['학교']);assert.equal(value.settings.placeDetails.학교.lat,37);assert.equal(value.settings.notiDeadline,true);
  assert.equal(value.settings.active,undefined);assert.equal(value.settings.avatar,undefined);assert.equal({}.evil,undefined);
  assert.equal(State.normalize({settings:{placeDetails:{bad:{lat:99}}}}).settings.placeDetails.bad,undefined);
+ assert.equal(State.normalize({onboardingDone:true}).onboardingDone,true);
+ assert.equal(State.normalize({onboardingDone:'true'}).onboardingDone,false);
 });
 test('courses persist backend references and resolve after numeric item IDs change; missing places remain recoverable',()=>{
  const values=[{id:'course',title:'나의 코스',date:'2026-11-22',days:[[{id:1,time:'10:00'},{id:2,time:'11:30'}]]}];
@@ -39,9 +41,9 @@ test('a failed metadata update rejects and a later retry can succeed',async()=>{
 });
 function ui(){
  const db=server(),events={},messages=[];
- const context=vm.createContext({PM_ENV:{requiresAuth:true},PinmapUserState:State,PinmapCategories:{get:id=>['cafe','food'].includes(id)?{id}:null},settings:{},preferences:[],homeViewIds:null,items:[],PinmapAccountLoaded:true,PinmapAccountLoadError:false,
+ const context=vm.createContext({PM_ENV:{requiresAuth:true},PinmapUserState:State,PinmapCategories:{get:id=>['cafe','food'].includes(id)?{id}:null},settings:{},preferences:[],onboardDone:false,homeViewIds:null,items:[],PinmapAccountLoaded:true,PinmapAccountLoadError:false,
   PinmapTheme:{mode:'system',set(v){this.mode=v}},render(){},toast:m=>messages.push(m),console});
- context.window=context;context.addEventListener=(name,fn)=>events[name]=fn;
+ context.window=context;context.addEventListener=(name,fn)=>events[name]=fn;context.dispatchEvent=()=>{};
  vm.runInContext(fs.readFileSync('account-state.js','utf8'),context);
  return {db,context,events,messages,api:context.PinmapAccountState};
 }
@@ -51,6 +53,15 @@ test('account adapter saves settings, rolls back errors, reloads them, and clear
  context.settings.notiNearby=false;api.hydrate(db.users.a,db.client);assert.equal(context.settings.notiNearby,true);assert.equal(context.preferences[0],'cafe');
  db.fail();context.settings.notiNearby=false;assert.equal(await api.persist(),false);assert.equal(context.settings.notiNearby,true);assert(messages.includes('offline'));
  events['pinmap:account-cleared']();assert.equal(context.settings.places.length,0);assert.equal(context.preferences.length,0);assert.equal(api.userId,null);
+});
+test('first-run onboarding completion is saved per account and restored on login',async()=>{
+ const {db,context,api,events}=ui();api.hydrate(db.users.a,db.client);
+ assert.equal(context.onboardDone,false);
+ context.onboardDone=true;assert.equal(await api.persist(),true);
+ assert.equal(db.users.a.user_metadata.pinmap_preferences.onboardingDone,true);
+ api.clear();api.hydrate(db.users.a,db.client);assert.equal(context.onboardDone,true);
+ api.clear();db.switch('b');api.hydrate(db.users.b,db.client);assert.equal(context.onboardDone,false);
+ events['pinmap:account-cleared']();assert.equal(context.onboardDone,false);
 });
 test('retired development restrictions are not shipped in the shared app',()=>{
  assert(!fs.readFileSync('app.html','utf8').includes('src="development.js'));

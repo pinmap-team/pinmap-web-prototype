@@ -239,7 +239,9 @@ function drawOnboarding() {
 }
 let onboardPreview = false; // 이용 가이드 > 온보딩 다시 보기: 고른 관심사를 반영하지 않고, 끝나면 가이드로
 let onboardFull = false; // 처음부터 본 온보딩일 때만 끝나고 튜토리얼을 보여줘요
+let onboardFinishing = false;
 function openOnboarding(step = 0) {
+  onboardFinishing = false;
   onboardFull = step === 0; onboardPreview = false;
   onboardDraft = onboardFull ? [] : [...preferences];
   onboardStep = step;
@@ -263,10 +265,13 @@ function closeOnboarding() {
   document.body.classList.remove('onboarding-open');
   $('#app').inert = false;
 }
-function finishOnboarding() {
+async function finishOnboarding() {
   if (onboardPreview) { onboardPreview = false; closeOnboarding(); go('guide'); return; }
+  if (onboardFinishing) return;
+  onboardFinishing = true;
   onboardDone = true;
-  persist();
+  const saved = await persist();
+  if (!saved) { onboardDone = false; onboardFinishing = false; return; }
   closeOnboarding();
   go('home');
   // 온보딩이 끝나면 홈 화면 사용법을 코치마크로 간단히 안내해요 (coach.js)
@@ -297,18 +302,17 @@ document.addEventListener('click',e=>{
   const step=e.target.closest('[data-ob]');
   if(!step)return;
   const v=step.dataset.ob;
-  if(v==='exit'&&onboardPreview){finishOnboarding();return;}
-  if(v==='skip'){if(onboardFull&&!onboardPreview)preferences=[...onboardDraft];homeViewIds=null;finishOnboarding();return;}
+  if(v==='exit'&&onboardPreview){void finishOnboarding();return;}
+  if(v==='skip'){if(onboardFull&&!onboardPreview)preferences=[...onboardDraft];homeViewIds=null;void finishOnboarding();return;}
   if(v==='back'){onboardStep=Math.max(1,onboardStep-1);drawOnboarding();return;}
   if(v==='next'){
     if(onboardStep===1&&obSlideNext())return;
-    if(onboardStep===2){if(!onboardPreview){preferences=[...onboardDraft];homeViewIds=null;}finishOnboarding();return;}
+    if(onboardStep===2){if(!onboardPreview){preferences=[...onboardDraft];homeViewIds=null;}void finishOnboarding();return;}
     onboardStep=Math.min(2,onboardStep+1);drawOnboarding();
   }
 });
 render();
-// 페이지를 열 때마다 온보딩부터 보여줍니다. (이전에 고른 관심사는 3단계에 미리 선택돼 있어요)
-openOnboarding(0);
+// 로그인 계정의 저장된 상태를 읽은 뒤 auth-app.js가 첫 방문 온보딩을 엽니다.
 
 // 추천 카드 넘길 때 아래 점 표시 갱신
 document.addEventListener('scroll', e => {

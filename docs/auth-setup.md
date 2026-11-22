@@ -8,11 +8,11 @@
 - `auth-client.js`: Supabase JS 클라이언트. PKCE, 세션 보관과 자동 갱신을 사용한다.
 - `auth-page.js`: 이메일 가입/로그인, 카카오 OAuth, 비밀번호 재설정·변경.
 - 별도 [`pinmap-backend` 저장소](https://github.com/pinmap-team/pinmap-backend)의 `api/auth/config.js`: Vercel 환경 변수에서 브라우저용 URL·공개 키만 전달한다. 웹 배포의 `/api/auth/config`는 이 백엔드로 전달된다.
-- `auth-app.js`: 개발 테스트 버전의 로그인 상태 확인, 로그인 계정 표시, 실제 로그아웃. 프로토타입 체험 모드와 기존 저장 데이터는 유지한다.
+- `auth-app.js`: 계정 앱의 로그인 상태 확인, 첫 로그인 온보딩, 로그인 계정 표시와 실제 로그아웃.
 - `entry-router.js`: Supabase가 루트 Site URL로 돌려보낸 code/error/token을 `auth.html`로 전달한다.
 - `vendor/supabase.js`: 공식 `@supabase/supabase-js` 2.119.0 UMD 배포본. MIT 라이선스는 `vendor/supabase-LICENSE.txt`.
 
-로그인은 버전 선택 화면의 ‘이메일 · 카카오로 로그인하기’ 또는 개발 테스트 버전에서 시작한다. 인증된 개발 모드에서는 계정에 저장된 콘텐츠를 백엔드 API로 불러온다. 프로토타입 체험 모드의 브라우저 저장 데이터와는 분리된다. 구글 버튼과 OAuth 호출도 연결했으며, 실제 사용에는 Google Cloud와 Supabase의 공급자 설정이 필요하다. 회원 탈퇴는 구현하지 않았으며, 실제 계정에 기존 체험용 데이터 삭제 동작을 실행하지 않는다.
+로그인은 루트 앱의 로그인 안내 또는 `auth.html`에서 시작한다. 인증된 앱은 계정에 저장된 콘텐츠를 백엔드 API로 불러온다. 온보딩 완료 여부와 관심사는 계정에 저장한다. 구글 버튼과 OAuth 호출도 연결했으며, 실제 사용에는 Google Cloud와 Supabase의 공급자 설정이 필요하다. 회원 탈퇴는 인증된 계정 삭제 API를 호출한다.
 
 ## Vercel
 
@@ -67,7 +67,7 @@ node --env-file=.env.local scripts/dev-auth-server.cjs
 5. 카카오 로그인 → 동의 → 앱 복귀. 취소/만료 시 재시도 가능 여부.
 6. 마이 → 계정에서 실제 이메일 또는 카카오 로그인 안내 확인.
 7. 새 탭의 로그인 복원, 로그아웃 후 다른 탭의 접근 차단.
-8. 기존 프로토타입 체험 저장 데이터 유지, 라이트·다크·모바일 입력 확인.
+8. 첫 로그인 온보딩·코치마크, 재접속 시 완료 상태 복원, 라이트·다크·모바일 입력 확인.
 
 ## 공식 문서
 
@@ -80,7 +80,7 @@ node --env-file=.env.local scripts/dev-auth-server.cjs
 
 ## 화면 검토용 시작 순서 (최신)
 
-루트 `/`에서 프로토타입 체험 또는 로그인 테스트를 고른다. 로그인 완료 후 실제 세션이 필요한 앱은 `index.html?mode=development&auth=required`로 열고, 이 화면에서 Instagram 링크의 장소·일정 추출과 저장을 시험한다. 인증된 계정의 저장 콘텐츠는 서버에서 불러오며, 기존 프로토타입 체험 데이터는 분리되어 유지된다.
+루트 `/`는 로그인 계정 앱으로 연결된다. 로그인 완료 후 Instagram 링크의 장소·일정 추출과 저장을 시험한다. 인증된 계정의 저장 콘텐츠는 서버에서 불러오며, 새 계정은 첫 실행 온보딩을 거친다. 이전 프로토타입 체험 주소는 로그인 화면으로 이동한다.
 
 ## 구글 로그인 (2026-11-10)
 

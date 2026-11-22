@@ -1,5 +1,4 @@
-// Authenticated development mode uses the account API as its content source.
-// The prototype and the anonymous extraction preview keep their own flows.
+// The authenticated app uses the account API as its content source.
 function pinmapAccountItem(record, id) {
   if (!record || typeof record !== 'object') throw Error('저장된 콘텐츠 형식이 올바르지 않습니다.');
   const text = (value, limit = 300) => typeof value === 'string' ? value.trim().slice(0, limit) : '';

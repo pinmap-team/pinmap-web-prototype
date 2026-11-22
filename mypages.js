@@ -140,8 +140,8 @@ document.addEventListener('click',event=>{
 },true);
 pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
     <div class="setrow"><div><b>핀맵</b><small>저장을 다시, 일상으로</small></div></div>
-    <div class="setrow"><div><b>이용 환경</b><small>${PM_ENV.requiresAuth ? '로그인 서비스' : '프로토타입 체험'}</small></div></div>
-    <div class="setrow"><div><b>데이터 보관</b><small>${PM_ENV.requiresAuth ? '저장한 콘텐츠와 설정은 로그인한 계정에서 다시 볼 수 있어요.' : '예시 데이터와 변경한 내용은 이 브라우저에 저장돼요.'}</small></div></div>
+    <div class="setrow"><div><b>이용 환경</b><small>로그인 서비스</small></div></div>
+    <div class="setrow"><div><b>데이터 보관</b><small>저장한 콘텐츠와 설정은 로그인한 계정에서 다시 볼 수 있어요.</small></div></div>
   </div>`);
 
 /* ---------- 자주 묻는 질문 · 공지사항 · 약관 및 정책 (2026-11-03, 마이 하단 도움말) ---------- */
@@ -153,12 +153,9 @@ pages.faq = () => myPage('자주 묻는 질문', infoRows([
   ['원본 게시물이 삭제되면 어떻게 되나요?', '원본 링크가 열리지 않을 수 있어요. 핀맵에 저장된 장소 정보와 내 메모는 남지만, 원본 삭제 여부를 자동으로 확인하지는 않아요.'],
   ['위치 권한은 어디에서 바꾸나요?', '브라우저의 사이트 설정에서 위치 권한을 바꿀 수 있어요.']
 ]), 'settingpage');
-pages.notice = () => myPage('공지사항', infoRows(PM_ENV.requiresAuth ? [
+pages.notice = () => myPage('공지사항', infoRows([
   ['콘텐츠 추가 안내', 'Instagram 게시물·릴스 링크, 저장 게시물 ZIP 또는 캡처 이미지를 추가할 수 있어요.'],
   ['웹 공유받기 안내', '현재 웹에서는 다른 앱의 공유 메뉴에서 핀맵으로 바로 저장할 수 없어요. Instagram 링크를 복사해 추가창에 붙여넣거나 캡처 화면으로 추가해 주세요.']
-] : [
-  ['프로토타입 체험 안내', '예시 콘텐츠와 화면을 체험할 수 있어요. 변경한 내용은 이 브라우저에 저장돼요.'],
-  ['분석 기능 안내', 'Instagram ZIP과 캡처 이미지 분석·저장은 로그인한 계정에서 사용할 수 있어요.']
 ]), 'settingpage');
 pages.terms = () => myPage('약관 및 정책', `<div class="mycard settings policy-list">
   <a class="setrow" href="terms.html" target="_top"><div><b>서비스 이용약관</b><small>계정·콘텐츠 분석·월간 이용권의 이용 조건이에요.</small></div></a>

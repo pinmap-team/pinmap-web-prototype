@@ -1,12 +1,13 @@
-/* Account adapter for the same settings and course screens used by the prototype. */
+/* Account adapter for settings, onboarding and courses. */
 if(PM_ENV.requiresAuth)(()=>{
   let userId=null,store=null,version=0,pending=0,confirmed=null,courses=[],courseOwner=null,revision=0;
   let lastRequested=null,appearanceApplying=false;
-  const snapshot=()=>PinmapUserState.normalize({settings,preferences,appearance:PinmapTheme.mode});
+  const snapshot=()=>PinmapUserState.normalize({settings,preferences,appearance:PinmapTheme.mode,onboardingDone:onboardDone});
   function apply(value){
     const v=PinmapUserState.normalize(value);
     Object.assign(settings,v.settings);
     preferences=v.preferences.map(id=>PinmapCategories.get(id)?.id).filter(Boolean);homeViewIds=null;
+    onboardDone=v.onboardingDone;
     appearanceApplying=true;try{PinmapTheme.set(v.appearance);}finally{appearanceApplying=false;}
     window.PinmapLocation?.restore?.(settings.selectedPlace);
   }
@@ -21,6 +22,7 @@ if(PM_ENV.requiresAuth)(()=>{
       if(userId!==user.id){clear();userId=user.id;const owner=userId,epoch=version;store=PinmapUserState.createStore(client,owner,()=>owner===userId&&epoch===version);}
       if(pending)return;
       confirmed=PinmapUserState.normalize(user.user_metadata?.pinmap_preferences);lastRequested=JSON.stringify(confirmed);apply(confirmed);
+      if(typeof CustomEvent==='function')window.dispatchEvent(new CustomEvent('pinmap:account-profile-loaded',{detail:{userId}}));
       courses=Array.isArray(user.user_metadata?.pinmap_courses)?user.user_metadata.pinmap_courses:[];courseOwner=userId;
     },
     resolveCourses(){window.PinmapCourses?.restore(courses,courseOwner);},

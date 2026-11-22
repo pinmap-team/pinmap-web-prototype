@@ -22,11 +22,9 @@ fs.mkdirSync(output,{recursive:true});
   };`}));
   try{
     await page.goto(origin+'/index.html');
-    const entry=page.frameLocator('.phone-frame');
-    await entry.getByText('로그인 테스트').waitFor();
-    await checkFit(page,'.phone-frame','start');
-    await entry.getByText('로그인 테스트').click();
-    await page.waitForURL(/\/auth\.html\?screen=welcome/);
+    await page.frameLocator('.phone-frame').locator('#auth-gate').waitFor();
+    await checkFit(page,'.phone-frame','login gate');
+    await page.goto(origin+'/auth.html?screen=welcome');
     await page.locator('#auth-main[data-screen="welcome"]').waitFor();
     for(const [width,height] of [[320,640],[402,874],[1440,700],[1440,960]]){
       await page.setViewportSize({width,height});
@@ -51,11 +49,11 @@ fs.mkdirSync(output,{recursive:true});
     await page.locator('[data-auth="reset"]').click();
     await page.locator('#auth-main[data-screen="reset"]').waitFor();
     await checkAuthSizes(page,'password reset');
-    await page.goto(origin+'/entry.html');
-    await page.waitForURL(/\/index\.html$/);
-    await checkFit(page,'.phone-frame','direct entry');
+    await page.goto(origin+'/index.html?mode=prototype');
+    await page.waitForURL(/\/auth\.html\?screen=welcome/);
+    await page.locator('#auth-main[data-screen="welcome"]').waitFor();
     assert.deepEqual(errors,[]);
-    console.log('phone viewport passed: start, welcome, sign in, sign up, email verification, reset at mobile and desktop sizes');
+    console.log('phone viewport passed: login gate, welcome, sign in, sign up, email verification, reset and legacy URL at mobile and desktop sizes');
   }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exit(1);});
 
