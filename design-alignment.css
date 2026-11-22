@@ -1653,24 +1653,24 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 
 .dt-failure-label .icon{width:16px;height:16px;flex:none}
 /* Collection sort grows from its own trigger as one liquid menu surface. */
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort{isolation:isolate}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort.is-open{z-index:20}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort::before{content:"";position:absolute;z-index:0;top:0;left:0;width:100%;height:44px;opacity:0;pointer-events:none;border:1px solid color-mix(in srgb,var(--color-surface) 70%,var(--color-disabled));border-radius:22px;background:linear-gradient(145deg,color-mix(in srgb,var(--color-surface) 94%,transparent),color-mix(in srgb,var(--color-surface) 72%,transparent) 58%,color-mix(in srgb,var(--color-surface) 82%,transparent));-webkit-backdrop-filter:blur(22px) saturate(1.45);backdrop-filter:blur(22px) saturate(1.45);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--color-surface) 88%,transparent),var(--shadow-sm);transition:opacity .18s ease,width .42s cubic-bezier(.22,1,.36,1),height .42s cubic-bezier(.22,1,.36,1),border-radius .42s cubic-bezier(.22,1,.36,1),box-shadow .42s cubic-bezier(.22,1,.36,1)}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort.is-open::before{width:var(--sort-menu-width,224px);height:var(--sort-menu-height,320px);opacity:1;border-radius:20px;box-shadow:inset 0 1px 0 color-mix(in srgb,var(--color-surface) 88%,transparent),var(--shadow-md)}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort.opens-up::before{top:auto;bottom:0}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-trigger{position:relative;z-index:1;min-height:44px;padding-inline:0!important;border:0;background:transparent!important;color:var(--color-secondary)!important}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort.is-open .pm-choice-trigger{opacity:0;pointer-events:none}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-trigger>.icon:last-child{color:var(--color-secondary)}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-trigger:active{scale:.96}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-trigger:focus-visible{outline:2px solid var(--color-border);outline-offset:-4px}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-options{top:0;left:0;right:auto;width:max-content;min-width:0;max-width:calc(100vw - 2 * var(--space-xl));border:0!important;background:transparent!important;box-shadow:none!important;animation:none!important;overflow-y:auto}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort.opens-up .pm-choice-options{top:auto;bottom:0}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort.is-open .pm-choice-options{animation:cf-sort-items .2s .16s both!important}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-options>button{color:var(--color-on-surface)!important;font:var(--type-label-md)!important;font-weight:var(--weight-regular)!important}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-options>button[aria-pressed="true"]{position:relative;margin-bottom:var(--space-lg)}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-options>button[aria-pressed="true"]::after{content:"";position:absolute;left:0;right:0;bottom:calc(-1 * var(--space-md));height:1px;background:var(--color-disabled)}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-options>button:is(:hover,:focus-visible,[aria-pressed="true"]){background:color-mix(in srgb,var(--color-neutral) 76%,transparent)!important;color:var(--color-on-surface)!important;font-weight:var(--weight-regular)!important}
-.cfpage .cf-folder-toolbar .pm-choice-folder-sort .pm-choice-options>button>.icon:last-child{color:var(--color-on-surface)}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort{isolation:isolate}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort.is-open{z-index:20}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort::before{content:"";position:absolute;z-index:0;top:0;left:0;width:100%;height:44px;opacity:0;pointer-events:none;border:1px solid color-mix(in srgb,var(--color-surface) 70%,var(--color-disabled));border-radius:22px;background:linear-gradient(145deg,color-mix(in srgb,var(--color-surface) 94%,transparent),color-mix(in srgb,var(--color-surface) 72%,transparent) 58%,color-mix(in srgb,var(--color-surface) 82%,transparent));-webkit-backdrop-filter:blur(22px) saturate(1.45);backdrop-filter:blur(22px) saturate(1.45);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--color-surface) 88%,transparent),var(--shadow-sm);transition:opacity .18s ease,width .42s cubic-bezier(.22,1,.36,1),height .42s cubic-bezier(.22,1,.36,1),border-radius .42s cubic-bezier(.22,1,.36,1),box-shadow .42s cubic-bezier(.22,1,.36,1)}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort.is-open::before{width:var(--sort-menu-width,224px);height:var(--sort-menu-height,320px);opacity:1;border-radius:20px;box-shadow:inset 0 1px 0 color-mix(in srgb,var(--color-surface) 88%,transparent),var(--shadow-md)}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort.opens-up::before{top:auto;bottom:0}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort .pm-choice-trigger{position:relative;z-index:1;min-height:44px;padding-inline:0!important;border:0;background:transparent!important;color:var(--color-secondary)!important}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort.is-open .pm-choice-trigger{opacity:0;pointer-events:none}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort .pm-choice-trigger>.icon:last-child{color:var(--color-secondary)}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort .pm-choice-trigger:active{scale:.96}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort .pm-choice-trigger:focus-visible{outline:2px solid var(--color-border);outline-offset:-4px}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort .pm-choice-options{top:0;left:0;right:auto;width:max-content;min-width:0;max-width:calc(100vw - 2 * var(--space-xl));border:0!important;background:transparent!important;box-shadow:none!important;animation:none!important;overflow-y:auto}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort.opens-up .pm-choice-options{top:auto;bottom:0}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort.is-open .pm-choice-options{animation:cf-sort-items .2s .16s both!important}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort .pm-choice-options>button{color:var(--color-on-surface)!important;font:var(--type-label-md)!important;font-weight:var(--weight-regular)!important}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort .pm-choice-options>button[aria-pressed="true"]{position:relative;margin-bottom:var(--space-lg)}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort .pm-choice-options>button[aria-pressed="true"]::after{content:"";position:absolute;left:0;right:0;bottom:calc(-1 * var(--space-md));height:1px;background:var(--color-disabled)}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort .pm-choice-options>button:is(:hover,:focus-visible,[aria-pressed="true"]){background:color-mix(in srgb,var(--color-neutral) 76%,transparent)!important;color:var(--color-on-surface)!important;font-weight:var(--weight-regular)!important}
+.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort .pm-choice-options>button>.icon:last-child{color:var(--color-on-surface)}
 @keyframes cf-sort-items{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.cfpage .cf-folder-toolbar .pm-choice-folder-sort::before{background:var(--color-surface)}}
-@media(prefers-reduced-motion:reduce){.cfpage .cf-folder-toolbar .pm-choice-folder-sort::before{transition:none}.cfpage .cf-folder-toolbar .pm-choice-folder-sort.is-open .pm-choice-options{animation:none!important}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort::before{background:var(--color-surface)}}
+@media(prefers-reduced-motion:reduce){.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort::before{transition:none}.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort.is-open .pm-choice-options{animation:none!important}}

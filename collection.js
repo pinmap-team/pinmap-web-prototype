@@ -84,14 +84,19 @@ function cfSyncCollections(){
 document.addEventListener('DOMContentLoaded', cfSyncCollections);
 
 /* Folder ordering does not change saved content or content-level sorting. */
-const CF_FOLDER_SORTS=[['saved','최근 담은 순'],['name','이름 오름차순'],['name-desc','이름 내림차순'],['count-desc','저장 많은 순'],['count-asc','저장 적은 순']];
+const CF_FOLDER_SORTS=[['saved','최근 담은 순'],['oldest','오래 담은 순'],['name','이름 오름차순'],['name-desc','이름 내림차순'],['count-desc','저장 많은 순'],['count-asc','저장 적은 순']];
+function cfCompareSavedTime(left,right,oldest=false){
+  if(!Number.isFinite(left))return Number.isFinite(right)?1:0;
+  if(!Number.isFinite(right))return -1;
+  return oldest?left-right:right-left;
+}
 function cfOrderFolders(folders){
   const mode=CF_FOLDER_SORTS.some(([k])=>k===settings.folderSort)?settings.folderSort:'saved',custom=cfCustom();
-  const latest=f=>items.filter(x=>f.attr ? x.collection===f.id : folderOf(x)===f.id).reduce((max,x)=>Math.max(max,savedTimestamp(x)||0),0);
+  const latest=f=>items.filter(x=>f.attr ? x.collection===f.id : folderOf(x)===f.id).reduce((max,x)=>Math.max(max,savedTimestamp(x)??-Infinity),-Infinity);
   return [...folders].sort((a,b)=>{
     if(mode==='name'||mode==='name-desc')return a.title.localeCompare(b.title,'ko',{numeric:true})*(mode==='name-desc'?-1:1);
-    if(mode==='count-desc'||mode==='count-asc')return (a.count-b.count)*(mode==='count-desc'?-1:1)||latest(b)-latest(a)||a.title.localeCompare(b.title,'ko');
-    if(mode==='saved')return latest(b)-latest(a)||a.title.localeCompare(b.title,'ko');
+    if(mode==='count-desc'||mode==='count-asc')return (a.count-b.count)*(mode==='count-desc'?-1:1)||cfCompareSavedTime(latest(a),latest(b))||a.title.localeCompare(b.title,'ko');
+    if(mode==='saved'||mode==='oldest')return cfCompareSavedTime(latest(a),latest(b),mode==='oldest')||a.title.localeCompare(b.title,'ko');
     const ai=custom.indexOf(a.id),bi=custom.indexOf(b.id);
     if(ai>=0 && bi>=0)return mode==='old'?ai-bi:bi-ai;
     if(ai>=0 || bi>=0)return ai>=0?-1:1;
@@ -123,18 +128,13 @@ function cfStatus(){
   return `콘텐츠 ${cfOpenList().length}개`;
 }
 /* ---------- 폴더 안 콘텐츠: 1단 카드 리스트 ---------- */
-// 정렬: 최근 담은 순(기본) · 이름 오름차순 · 이름 내림차순 (2026-11-10)
-const CF_SORTS = {recent:'최근 담은 순', name:'이름 오름차순', 'name-desc':'이름 내림차순'};
+// 폴더 안 콘텐츠는 폴더 목록과 같은 저장 시각 기준으로 정렬합니다.
+const CF_SORTS = {recent:'최근 담은 순', oldest:'오래 담은 순', name:'이름 오름차순', 'name-desc':'이름 내림차순'};
 const cfHasPlaces = list => list.some(x => isPlace(x) && !x.pending && x.address);
 // 날짜 미상은 마지막에 두고 실제 저장 시각으로 정렬합니다.
 function cfSort(list){
   if (libSort === 'name' || libSort === 'name-desc') return [...list].sort((a,b) => String(a.title).localeCompare(String(b.title),'ko',{numeric:true}) * (libSort === 'name-desc' ? -1 : 1));
-  return [...list].sort((a,b) => {
-    const left = savedTimestamp(a), right = savedTimestamp(b);
-    if (left === null) return right === null ? 0 : 1;
-    if (right === null) return -1;
-    return right - left;
-  });
+  return [...list].sort((a,b) => cfCompareSavedTime(savedTimestamp(a),savedTimestamp(b),libSort==='oldest'));
 }
 // 선택 모드: null이면 꺼짐, Set이면 선택한 콘텐츠 id
 let cfSel = null, cfSelKey = '';

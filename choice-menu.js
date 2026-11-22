@@ -34,7 +34,7 @@
       // 2026-11-10 정렬 선택은 앞 픽토그램 없이 글자만(카테고리 선택은 그대로)
       const iconFor=option=>isSort?'':PinmapCategories.get(option.value.replace(/^category:/,''))?PinmapCategories.icon(option.value.replace(/^category:/,''),option.selected):icon(option.dataset.icon || categoryIcons[option.value] || 'grid');
       if(isSort)host.classList.add('pm-choice-sort');
-      if(select.hasAttribute('data-folder-sort'))host.classList.add('pm-choice-folder-sort');
+      if(isSort)host.classList.add('pm-choice-collection-sort');
       const update=()=>{
         const selected=select.selectedOptions[0];if(!selected)return;
         trigger.innerHTML=iconFor(selected)+'<span></span>'+icon('chevron');
@@ -42,7 +42,7 @@
         trigger.setAttribute('aria-label',(isSort?'정렬: ':fieldName+': ')+selected.textContent);
         const buttons=[...panel.querySelectorAll('button')];
         buttons.forEach(button=>button.setAttribute('aria-pressed',String(select.options[Number(button.dataset.optionIndex)].selected)));
-        if(host.classList.contains('pm-choice-folder-sort')){
+        if(host.classList.contains('pm-choice-collection-sort')){
           buttons.sort((a,b)=>Number(b.getAttribute('aria-pressed')==='true')-Number(a.getAttribute('aria-pressed')==='true') || Number(a.dataset.optionIndex)-Number(b.dataset.optionIndex));
           panel.replaceChildren(...buttons);
         }
@@ -68,10 +68,11 @@
         const rect=trigger.getBoundingClientRect(),bounds=host.closest('dialog')?.getBoundingClientRect();
         const below=Math.min(innerHeight,bounds?.bottom??innerHeight)-rect.bottom;
         const above=rect.top-Math.max(0,bounds?.top??0);
-        const upwards=below<Math.min(panel.scrollHeight,320)+16 && above>below;
+        const maxHeight=host.classList.contains('pm-choice-collection-sort')?384:320;
+        const upwards=below<Math.min(panel.scrollHeight,maxHeight)+16 && above>below;
         host.classList.toggle('opens-up',upwards);
-        panel.style.maxHeight=Math.max(96,Math.min(320,(upwards?above:below)-16))+'px';
-        if(host.classList.contains('pm-choice-folder-sort')){
+        panel.style.maxHeight=Math.max(96,Math.min(maxHeight,(upwards?above:below)-16))+'px';
+        if(host.classList.contains('pm-choice-collection-sort')){
           host.style.setProperty('--sort-menu-width',Math.max(trigger.offsetWidth,panel.offsetWidth)+'px');
           host.style.setProperty('--sort-menu-height',panel.offsetHeight+'px');
         }
@@ -79,7 +80,7 @@
       trigger.addEventListener('click',event=>{
         event.preventDefault();const open=!host.classList.contains('is-open');closeMenus(host);
         host.classList.toggle('is-open',open);panel.hidden=!open;trigger.setAttribute('aria-expanded',String(open));
-        if(open){positionPanel();if(host.classList.contains('pm-choice-folder-sort'))panel.querySelector('[aria-pressed="true"]')?.focus();}
+        if(open){positionPanel();if(host.classList.contains('pm-choice-collection-sort'))panel.querySelector('[aria-pressed="true"]')?.focus();}
       });
       host.addEventListener('keydown',event=>{
         const buttons=[...panel.querySelectorAll('button:not(:disabled)')];

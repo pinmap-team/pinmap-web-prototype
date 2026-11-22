@@ -34,9 +34,11 @@ test('user timestamp ids recover exact dates; valid savedAt always takes priorit
 test('recent sorting uses timestamps; supported name sorting and legacy fallback remain stable',()=>{
   context.libSort='recent';context.cfHasPlaces=()=>false;
   const collection=fs.readFileSync('collection.js','utf8');
+  vm.runInContext(collection.slice(collection.indexOf('function cfCompareSavedTime('),collection.indexOf('function cfOrderFolders(')),context);
   vm.runInContext(collection.slice(collection.indexOf('function cfSort('),collection.indexOf('// 선택 모드:')),context);
   const items=[{id:1,title:'가',savedAt:'2026-01-01T00:00:00Z'},{id:3,title:'나'},{id:2,title:'다',savedAt:'2026-10-01T00:00:00Z'}];
   assert.deepEqual(Array.from(context.cfSort(items),x=>x.id),[2,1,3]);
+  context.libSort='oldest';assert.deepEqual(Array.from(context.cfSort(items),x=>x.id),[1,2,3]);
   context.libSort='name';assert.deepEqual(Array.from(context.cfSort(items),x=>x.id),[1,3,2]);
   context.libSort='name-desc';assert.deepEqual(Array.from(context.cfSort(items),x=>x.id),[2,3,1]);
   context.libSort='old';assert.deepEqual(Array.from(context.cfSort(items),x=>x.id),[2,1,3]);

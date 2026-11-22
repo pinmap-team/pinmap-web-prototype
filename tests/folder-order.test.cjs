@@ -20,6 +20,10 @@ test('folder names sort in both directions without changing source data',()=>{
 });
 test('recently saved ordering derives from content timestamps',()=>{
  assert.deepEqual(Array.from(setup('saved').cfOrderFolders(folders),x=>x.id),['나','다','가']);
+ const oldest=setup('oldest');oldest.items=[{collection:'나',stamp:9},{collection:'가',stamp:3},{folder:'다',stamp:6}];
+ assert.deepEqual(Array.from(oldest.cfOrderFolders(folders),x=>x.id),['가','다','나']);
+ oldest.items=[{collection:'나',stamp:9},{folder:'다',stamp:6}];
+ assert.deepEqual(Array.from(oldest.cfOrderFolders(folders),x=>x.id),['다','나','가']);
 });
 test('folder content counts sort in both directions, breaking ties by latest save',()=>{
  const counted=[{...folders[0],count:2},{...folders[1],count:1},{...folders[2],count:2}];
