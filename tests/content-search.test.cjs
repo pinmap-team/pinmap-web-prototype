@@ -2,7 +2,7 @@ const {test} = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-const {matches, findPlaces} = require('../search-content.js');
+const {matches, findPlaces, nearbyPlaces} = require('../search-content.js');
 
 test('map search returns individual places and ranks place details above post context', () => {
   const places = [
@@ -11,10 +11,22 @@ test('map search returns individual places and ranks place details above post co
     {id:2,locationIndex:0,title:'북촌 사진관',address:'서울 종로구 북촌로 8',sourceTitle:'사진 기록'}
   ];
   assert.deepEqual(findPlaces(places,'달빛 카페').map(x=>x.locationIndex),[1]);
+  assert.deepEqual(findPlaces(places,'달').map(x=>x.title),['달빛 카페']);
   assert.deepEqual(findPlaces(places,'삼청로').map(x=>x.title),['달빛 카페']);
   assert.deepEqual(findPlaces(places,'카페 서점').map(x=>x.title),['느린 서점','달빛 카페']);
   assert.deepEqual(findPlaces(places,'북촌').map(x=>x.title),['느린 서점','북촌 사진관','달빛 카페']);
   assert.deepEqual(findPlaces(places,'부산').map(x=>x.title),[]);
+});
+
+test('map suggestions put closer places first without changing saved place records', () => {
+  const places = [
+    {title:'먼 카페',lat:37.7,lng:127.1,saved:true},
+    {title:'가까운 서점',lat:37.546,lng:127.044,saved:true},
+    {title:'가까운 저장 장소',lat:37.546,lng:127.044,saved:true}
+  ];
+  assert.deepEqual(nearbyPlaces(places,[37.546,127.043]).map(x=>x.title),
+    ['가까운 서점','가까운 저장 장소','먼 카페']);
+  assert.equal(places[0].title,'먼 카페');
 });
 
 test('searches title, summary and place fields across words', () => {

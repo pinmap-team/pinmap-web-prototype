@@ -107,16 +107,23 @@ test('login-free development can display backend place results, while signed-in 
   assert.equal(boot('prototype').value('PM_ENV.cloudPlaceTest'),false);
 });
 
-test('disconnected external place search does not fetch outside data',async()=>{
+test('map search updates on one character using saved places without external requests',()=>{
   const source=read('map-live.js');
-  let messages=[],networkCalls=0;
-  const context=vm.createContext({PM_ENV:{development:true,requiresAuth:false},items:[],toast:text=>messages.push(text),fetch:()=>{networkCalls++;throw Error('Unexpected network');},navigator:{get geolocation(){throw Error('Unexpected geolocation');}}});
-  const search=source.slice(source.indexOf('  async function searchPlaces('),source.indexOf("  document.addEventListener('click',event =>"));
+  let networkCalls=0,rendered=0;
+  const context=vm.createContext({page:'map',liveMap:{getCenter:()=>({lat:37.546,lng:127.043})},
+    searchQuery:'',searchResults:null,PinmapContentSearch:require('../search-content.js'),
+    savedPlaces:()=>[{id:1,title:'카페 A',lat:37.546,lng:127.044,saved:true},
+      {id:2,title:'카페 B',lat:37.7,lng:127.1,saved:true}],
+    selectCategory:()=>{},markers:()=>{rendered++;},showResults:()=>{},refreshRecentSearches:()=>{},
+    fetch:()=>{networkCalls++;throw Error('Unexpected network');}});
+  const search=source.slice(source.indexOf('  function searchPlaces('),source.indexOf("  document.addEventListener('click',event =>"));
   vm.runInContext(search,context);
-  await vm.runInContext("searchPlaces('서울숲')",context);
+  vm.runInContext("searchPlaces('카')",context);
+  assert.deepEqual(Array.from(context.searchResults,x=>x.title),['카페 A','카페 B']);
+  vm.runInContext("searchPlaces('없는 장소')",context);
+  assert.equal(context.searchResults.length,0);
+  assert.equal(rendered,2);
   assert.equal(networkCalls,0);
-  assert.equal(messages.length,1);
-  assert(messages.every(text=>text.includes('연결되지')));
 });
 
 test('empty development home keeps decorative cards and a three-path home add menu',()=>{

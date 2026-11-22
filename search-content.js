@@ -32,6 +32,19 @@ const PinmapContentSearch = (() => {
       .sort((a, b) => b.rank - a.rank || a.index - b.index)
       .map(result => result.place);
   }
-  return {matches, placeRank, findPlaces};
+  function nearbyPlaces(places, point) {
+    const [latitude, longitude] = point;
+    const distance = place => {
+      const lat = (place.lat - latitude) * Math.PI / 180;
+      const lon = (place.lng - longitude) * Math.PI / 180;
+      const a = Math.sin(lat / 2) ** 2 + Math.cos(latitude * Math.PI / 180) *
+        Math.cos(place.lat * Math.PI / 180) * Math.sin(lon / 2) ** 2;
+      return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(Math.max(0, 1 - a)));
+    };
+    return places.map((place, index) => ({place, index, distance:distance(place)}))
+      .sort((a, b) => a.distance - b.distance || a.index - b.index)
+      .map(result => result.place);
+  }
+  return {matches, placeRank, findPlaces, nearbyPlaces};
 })();
 if (typeof module === 'object' && module.exports) module.exports = PinmapContentSearch;
