@@ -1437,7 +1437,7 @@ html,body{overscroll-behavior-y:contain}
 .cfpage .cf-itemtext h3,.cfpage .cf-itemdesc,.cfpage .cf-itemmeta{color:#fff!important;text-shadow:0 1px 5px #0009}
 
 /* The home pill is the menu surface: one shape expands upward from the add action. */
-.home-add-menu{position:fixed;right:max(calc(12.5vw - 24px),calc(50vw - 168px));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;width:246px;height:116px;pointer-events:none}
+.home-add-menu{position:fixed;right:calc((100vw - min(100vw,480px)) / 2 + var(--gutter));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;width:246px;height:116px;pointer-events:none}
 .home-add-body{box-sizing:border-box;position:absolute;right:0;bottom:0;width:90px;height:44px;border:1px solid rgba(255,255,255,.26);border-radius:22px;background:linear-gradient(155deg,rgba(255,255,255,.18),rgba(255,255,255,.03) 48%,rgba(0,0,0,.12)),rgba(17,17,17,.78);-webkit-backdrop-filter:blur(22px) saturate(1.45);backdrop-filter:blur(22px) saturate(1.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 12px 30px rgba(0,0,0,.22);transition:width .42s cubic-bezier(.22,1,.36,1),height .42s cubic-bezier(.22,1,.36,1),border-radius .42s cubic-bezier(.22,1,.36,1),scale .22s cubic-bezier(.22,1,.36,1)}
 .home-add-menu[data-open="true"] .home-add-body{width:246px;height:162px;border-radius:20px}
 .home-add-fab{position:absolute;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:var(--space-xs);width:90px;height:44px;min-height:44px;padding:0;border:0;border-radius:22px;background:transparent;color:#fff;font:var(--type-label-md);cursor:pointer;pointer-events:auto;transition:opacity .16s,scale .22s cubic-bezier(.22,1,.36,1)}
