@@ -516,7 +516,7 @@
   document.addEventListener('error',event=>{if(event.target.matches?.('.lm-badge-image img'))event.target.hidden=true;},true);
   document.addEventListener('keydown',event=>{if(page==='map'&&event.key===' '&&event.target.closest('.lm-photo-marker')){event.preventDefault();event.target.closest('.lm-photo-marker').click();}});
   document.addEventListener('keydown',event=>{if(page==='map'&&event.key==='Escape')hideProviderOptions();});
-  document.addEventListener('input',event=>{if(event.target.matches('#lm-search input')){$('#lm-search [data-lm="clear-search"]').hidden=!event.target.value;if(!event.isComposing)searchPlaces(event.target.value);}});
+  document.addEventListener('input',event=>{if(event.target.matches('#lm-search input')){$('#lm-search [data-lm="clear-search"]').hidden=!event.target.value;searchPlaces(event.target.value);}});
   document.addEventListener('compositionend',event=>{if(event.target.matches('#lm-search input'))searchPlaces(event.target.value);});
   document.addEventListener('submit',event => {
     if(event.target.id!=='lm-search')return;
