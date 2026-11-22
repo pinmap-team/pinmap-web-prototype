@@ -839,10 +839,6 @@ body.auth-body{display:grid;grid-template-columns:minmax(0,1fr);grid-template-ro
 @media(min-width:480px){.auth-body .auth-shell{box-shadow:var(--shadow-md)}}
 html.auth-pending #app{visibility:hidden;pointer-events:none}
 .auth-gate{position:fixed;inset:0;overflow:auto;background:var(--color-surface);z-index:100;display:flex;flex-direction:column;justify-content:center;align-items:stretch}
-.auth-gate>img{margin-bottom:var(--space-lg)}
-.auth-gate h1{margin:var(--space-sm) 0 var(--space-md)}
-.auth-gate>p{font:var(--type-body-md);color:var(--color-secondary);margin:0}
-.auth-gate .auth-submit{margin-top:var(--space-xl);width:100%;border-radius:var(--rounded-sm)}
 .auth-account-status{margin:var(--space-lg) 0;padding:var(--space-lg);border:1px solid var(--color-border);border-radius:var(--rounded-md);font:var(--type-label-md);overflow-wrap:anywhere}
 .auth-account-status p{margin:var(--space-sm) 0;font:var(--type-body-md)}
 .auth-account-status small{font:var(--type-body-sm);color:var(--color-secondary)}
@@ -873,9 +869,6 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .auth-shell:is([data-screen="verify"],[data-screen="error"]) .auth-heading h1{font:var(--type-headline-md)}
 .auth-shell[data-screen="verify"] .auth-mail-icon{margin-left:0;background:var(--color-surface)}
 .auth-shell[data-screen="error"] .auth-connection{align-items:stretch;text-align:left}
-.auth-gate{justify-content:flex-start}
-.auth-gate:has(>.pm-loading){justify-content:center}
-.auth-gate h1{font:var(--type-headline-md)}
 .auth-mail-icon{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;background:var(--color-neutral);color:var(--color-on-surface);margin:0 auto var(--space-xl)}
 .auth-mail-icon svg{width:28px;height:28px;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .auth-verification-email{overflow-wrap:anywhere;color:var(--color-on-surface)!important}
