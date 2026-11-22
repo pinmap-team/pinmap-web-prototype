@@ -15,7 +15,12 @@
   const recoveryKey = 'pinmap.auth.recovery';
   const fragment = new URLSearchParams(location.hash.slice(1));
   const params = new URLSearchParams(location.search);
-  const showLoginChoice = params.get('screen') === 'welcome';
+  const logoutOnReload = performance.getEntriesByType('navigation')[0]?.type === 'reload'
+    && !params.has('code') && !params.has('error') && !fragment.has('access_token') && !fragment.has('error');
+  if (logoutOnReload) {
+    try { localStorage.removeItem('pinmap.auth.v1'); } catch {}
+  }
+  const showLoginChoice = logoutOnReload || params.get('screen') === 'welcome';
   const accountDeleted = showLoginChoice && params.get('deleted') === '1';
   const callbackError = fragment.has('error') || params.has('error');
   let recovering = fragment.get('type') === 'recovery' || sessionStorage.getItem(recoveryKey) === '1';

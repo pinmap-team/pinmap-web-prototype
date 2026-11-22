@@ -19,11 +19,14 @@ test('retired actions are blocked in the account app while current actions remai
  }
 });
 test('iframe guard permits only the authenticated app route',()=>{
- function enter(search,top=false){const urls=[],style={},classes=[];const self={};vm.runInNewContext(read('app-entry-guard.js'),{window:{self,top:top?self:{location:{replace:url=>urls.push(url)}}},location:{search,hash:'',replace:url=>urls.push(url)},URLSearchParams,document:{documentElement:{style,classList:{add:value=>classes.push(value)}}}});return {urls,style,classes};}
+ function enter(search,top=false,navigationType='navigate'){const urls=[],style={},classes=[],removed=[];const self={};vm.runInNewContext(read('app-entry-guard.js'),{window:{self,top:top?self:{location:{replace:url=>urls.push(url)}}},location:{search,hash:'',replace:url=>urls.push(url)},performance:{getEntriesByType:()=>[{type:navigationType}]},localStorage:{removeItem:key=>removed.push(key)},URLSearchParams,document:{documentElement:{style,classList:{add:value=>classes.push(value)}}}});return {urls,style,classes,removed};}
  for(const search of ['', '?mode=development','?mode=unknown','?mode=development&place-test=1','?mode=prototype'])assert.deepEqual(enter(search).urls,['auth.html?screen=welcome']);
  assert.deepEqual(enter('?mode=development&auth=required').urls,[]);
  assert.deepEqual(enter('?mode=development&auth=required').classes,['auth-pending']);
  assert.deepEqual(enter('?mode=development&auth=required',true).urls,['index.html']);
+ const refreshed=enter('?mode=development&auth=required',false,'reload');
+ assert.deepEqual(refreshed.urls,['auth.html?screen=welcome']);
+ assert.deepEqual(refreshed.removed,['pinmap.auth.v1']);
 });
 test('retired assets are deleted, public documents cannot load them, and archive URLs are excluded',()=>{
  const retired=['share.js','share.css','push.js','push.css','development.js','online-place-test.js','place-report-bridge.js','pull-refresh.js'];
