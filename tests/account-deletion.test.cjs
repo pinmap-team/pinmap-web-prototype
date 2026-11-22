@@ -6,13 +6,14 @@ const vm = require('node:vm');
 const userId = '12345678-1234-1234-1234-123456789012';
 
 async function app(response) {
-  const calls = [], classes = {add() {}, remove() {}};
+  const calls = [], classes = {add() {}, remove() {}, contains() {return false;}};
+  let authListener;
   const sheet = {open: false, close() {}, classList: classes};
   const button = {disabled: false};
   const client = {auth: {
     getSession: async () => ({data: {session: {user: {id: userId}, access_token: 'account-token'}}}),
-    onAuthStateChange: () => ({data: {subscription: {unsubscribe() {}}}}),
-    signOut: async () => {calls.push('signout'); return {error: null};}
+    onAuthStateChange: listener => {authListener = listener;return {data: {subscription: {unsubscribe() {}}}};},
+    signOut: async () => {calls.push('signout');authListener?.('SIGNED_OUT');return {error: null};}
   }};
   const document = {
     documentElement: {classList: classes}, body: {append() {}},
@@ -46,6 +47,7 @@ test('confirmed account deletion uses authenticated API and clears local session
   assert(state.calls.indexOf('signout') > state.calls.findIndex(x => Array.isArray(x) && x[0] === 'request'));
   assert(state.calls.some(x => Array.isArray(x) && x[0] === 'remove' && x[1] === `pinmap.zip-import.v1.${userId}`));
   assert(state.calls.some(x => Array.isArray(x) && x[0] === 'redirect' && x[1].includes('deleted=1')));
+  assert.equal(state.calls.filter(x => Array.isArray(x) && x[0] === 'redirect').length,1);
 });
 
 test('failed server deletion keeps the signed-in session for retry', async () => {
@@ -54,4 +56,12 @@ test('failed server deletion keeps the signed-in session for retry', async () =>
   assert(state.calls.some(x => Array.isArray(x) && x[0] === 'toast' && x[1].includes('구독 해지')));
   assert.equal(state.calls.includes('signout'), false);
   assert.equal(state.calls.some(x => Array.isArray(x) && x[0] === 'redirect'), false);
+});
+
+test('logout reaches its final login screen once when the auth event fires', async () => {
+  const state = await app({ok: true, status: 200, json: async () => ({deleted: true})});
+  await state.actions.logoutyes();
+  const redirects = state.calls.filter(x => Array.isArray(x) && x[0] === 'redirect');
+  assert.equal(redirects.length, 1);
+  assert(redirects[0][1].endsWith('/auth.html'));
 });

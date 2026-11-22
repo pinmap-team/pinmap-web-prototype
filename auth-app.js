@@ -1,8 +1,8 @@
 // The account app is the only supported application entry.
 if (PM_ENV.requiresAuth) (() => {
-  let client, user, resolving = false, onboardingUserId = null;
+  let client, user, resolving = false, onboardingUserId = null, leavingAccount = false;
   const app = document.getElementById('app');
-  const login = () => PinmapAuth.login();
+  const login = () => window.top.location.replace(new URL('auth.html?screen=welcome', location.href).href);
   function maybeStartOnboarding() {
     if (!user?.id || window.PinmapAccountState?.userId !== user.id || onboardDone ||
         document.documentElement.classList.contains('auth-pending') || document.getElementById('onboarding') ||
@@ -11,7 +11,7 @@ if (PM_ENV.requiresAuth) (() => {
     openOnboarding(0);
   }
   window.addEventListener('pinmap:account-profile-loaded',maybeStartOnboarding);
-  function gate(message = '로그인하고 나만의 핀맵을 시작해 보세요.',loading=false) {
+  function gate(loading=false) {
     onboardingUserId = null;
     document.documentElement.classList.add('auth-pending');
     app.inert = true;
@@ -19,15 +19,14 @@ if (PM_ENV.requiresAuth) (() => {
     if(document.getElementById('coach')){document.getElementById('coach').remove();lockScroll(false);}
     app.inert = true;
     if (document.getElementById('sheet').open) document.getElementById('sheet').close();
+    if (!loading) { if (!leavingAccount) login(); return; }
     let node = document.getElementById('auth-gate');
     if (!node) {
       node = document.createElement('section'); node.id = 'auth-gate';
       node.className = 'pm-auth auth-gate'; node.setAttribute('aria-label','핀맵 로그인');
       document.body.append(node);
     }
-    if(loading){node.innerHTML='<div class="pm-loading" role="status" aria-label="로그인 상태 확인 중"><span class="pm-spinner" aria-hidden="true"></span></div>';return;}
-    node.innerHTML = `<img src="img/pinmap-symbol-splash.svg" alt="" width="48" height="48"><h1>나의 취향을 한곳에</h1><p>${esc(message)}</p><button class="filled auth-submit" id="auth-enter">로그인 · 회원가입</button><a class="auth-home" href="auth.html?screen=welcome" target="_top">로그인 화면으로 이동</a>`;
-    node.querySelector('button').onclick = login;
+    node.innerHTML='<div class="pm-loading" role="status" aria-label="로그인 상태 확인 중"><span class="pm-spinner" aria-hidden="true"></span></div>';
   }
   function unlock() {
     document.getElementById('auth-gate')?.remove();
@@ -40,11 +39,12 @@ if (PM_ENV.requiresAuth) (() => {
     const button = document.querySelector('[data-action="logoutyes"]');
     try {
       await PinmapButton.run(button, async () => {
+        leavingAccount = true;
         const {error} = await client.auth.signOut({scope:'local'});
         if (error) throw error;
         user = null; window.PinmapAccountIdentity = null; window.top.location.replace(new URL('auth.html',location.href).href);
       },'로그아웃 중');
-    } catch (error) {toast(PinmapAuth.message(error));}
+    } catch (error) {leavingAccount = false;toast(PinmapAuth.message(error));}
   };
   actions.logout = logout;
   actions.logoutask = () => confirmPop('로그아웃할까요?', '다시 로그인하면 저장한 콘텐츠를 그대로 볼 수 있어요.', 'logoutyes','로그아웃','취소');
@@ -79,6 +79,7 @@ if (PM_ENV.requiresAuth) (() => {
           throw Error('탈퇴를 완료하지 못했어요. 잠시 후 다시 시도해 주세요.');
         }
         window.PinmapZipImport?.pause();
+        leavingAccount = true;
         try { await client.auth.signOut({scope: 'local'}); } catch {}
         try {
           localStorage.removeItem('pinmap.auth.v1');
@@ -98,10 +99,10 @@ if (PM_ENV.requiresAuth) (() => {
       user = data.user;
       window.PinmapAccountIdentity = {email:user.email || ''};
       if (!alreadyOpen) unlock();
-    } catch {gate('로그인 상태를 확인하지 못했어요. 다시 연결해 주세요.');}
+    } catch {gate();}
     finally {resolving = false;}
   }
-  gate('',true);
+  gate(true);
   PinmapAuth.ready().then(async sdk => {
     client = sdk;
     client.auth.onAuthStateChange((event) => {
@@ -115,5 +116,5 @@ if (PM_ENV.requiresAuth) (() => {
     window.PinmapAccountIdentity = {email:user.email || ''};
     unlock();
     void verify();
-  }).catch(error => gate(PinmapAuth.message(error)));
+  }).catch(() => gate());
 })();

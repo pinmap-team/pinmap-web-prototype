@@ -22,10 +22,9 @@ fs.mkdirSync(output,{recursive:true});
   };`}));
   try{
     await page.goto(origin+'/index.html');
-    await page.frameLocator('.phone-frame').locator('#auth-gate').waitFor();
-    await checkFit(page,'.phone-frame','login gate');
-    await page.goto(origin+'/auth.html?screen=welcome');
+    await page.waitForURL(/\/auth\.html\?screen=welcome/);
     await page.locator('#auth-main[data-screen="welcome"]').waitFor();
+    assert.equal(await page.locator('#auth-enter').count(),0);
     for(const [width,height] of [[320,640],[402,874],[1440,700],[1440,960]]){
       await page.setViewportSize({width,height});
       await checkFit(page,'#auth-main',`auth welcome ${width}x${height}`);
@@ -53,7 +52,7 @@ fs.mkdirSync(output,{recursive:true});
     await page.waitForURL(/\/auth\.html\?screen=welcome/);
     await page.locator('#auth-main[data-screen="welcome"]').waitFor();
     assert.deepEqual(errors,[]);
-    console.log('phone viewport passed: login gate, welcome, sign in, sign up, email verification, reset and legacy URL at mobile and desktop sizes');
+    console.log('phone viewport passed: loading to login, sign in, sign up, email verification, reset and legacy URL at mobile and desktop sizes');
   }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exit(1);});
 
