@@ -255,7 +255,7 @@ $('#sheet').addEventListener('close', () => { if($('#sheet').open)return; $('#sh
 Object.assign(actions, {
   logoutask: () => confirmPop('로그아웃할까요?', '다시 로그인하면 저장한 콘텐츠를 그대로 볼 수 있어요.', 'logoutyes', '로그아웃', '취소'),
   leaveask: () => confirmPop('탈퇴할까요?', '탈퇴하면 저장한 콘텐츠와 설정이 모두 지워져요.<br>이용 중인 구독도 즉시 해지되며, 되돌릴 수 없어요.', 'leaveyes', '탈퇴하기', '유지하기'),
-  logoutyes: () => { $('#sheet').close(); go('home'); toast('로그아웃했어요. (체험)'); openOnboarding(0); },
+  logoutyes: () => { $('#sheet').close(); go('home'); toast('로그아웃했어요. (체험)'); openOnboarding(1); },
   leaveyes: () => { try { [STORAGE, ...LEGACY_KEYS].forEach(k => localStorage.removeItem(k)); } catch {} location.reload(); },
   resetask: () => go('account')
 });

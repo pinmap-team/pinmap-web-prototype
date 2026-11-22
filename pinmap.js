@@ -7,7 +7,7 @@ const interestOptions = PinmapCategories.all.map(c=>({id:c.id,label:c.label,shor
 const interestIds = interestOptions.map(x => x.id);
 const MAX_INTERESTS = Infinity; // 관심사 키워드 개수 제한 없음
 const interestOf = id => interestOptions.find(x => x.id === (PinmapCategories.get(id)?.id || id)) || {short:'',label:'',emoji:''};
-let preferences = [], onboardStep = 0, onboardDone = false, onboardDraft = [], onboardTimer = null;
+let preferences = [], onboardStep = 1, onboardDone = false, onboardDraft = [];
 
 /* ---------- 브라우저 저장 · 이전 버전 변환 ---------- */
 // 이전 유형(장소·상품·글·영상)을 새 저장 카테고리로 바꿉니다.
@@ -172,8 +172,6 @@ function obSlideNext(){
 document.addEventListener('scroll', e => { if (e.target?.classList?.contains('ob-slides')) obSyncDots(e.target); }, true);
 function onboardScreen() {
   const s = onboardStep;
-  // 첫 화면은 잠시 보여준 뒤 자동으로 넘어가며, 로고에는 클릭 동작이 없어요.
-  if (s === 0) return `<div class="ob-splash"><img class="ob-splash-wordmark" src="img/pinmap-logo-splash.svg" alt="Pinmap"></div>`;
   // 2026-11-04: 세 단계를 세로 카드 대신 가로로 넘기는 큰 카드(레퍼런스: 라벨 칩 + 큰 이미지 + 점 표시)로 보여줘요.
   if (s === 1) return `
     <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를<br><em>발견</em>했나요?</h1>
@@ -221,11 +219,9 @@ try {
 } catch {}
 document.fonts?.ready.then(fitOnboardingViewport);
 function drawOnboarding() {
-  clearTimeout(onboardTimer);
   const el = $('#onboarding');
   if (!el) return;
-  const bare = onboardStep === 0; // 첫 화면은 위쪽 단계 표시 없이
-  el.innerHTML = `<div class="ob-screen step${onboardStep+1}${bare ? ' bare' : ''}${onboardPreview ? ' ob-preview' : ''}">
+  el.innerHTML = `<div class="ob-screen step${onboardStep+1}${onboardPreview ? ' ob-preview' : ''}">
     <div class="ob-top">
       <div class="ob-topleft"><span class="ob-count" role="group" aria-label="${onboardStep}단계, 전체 2단계"><b>${onboardStep}</b> / 2</span></div>
       ${onboardPreview ? '<button class="ob-skip" data-ob="exit">종료하기</button>' : '<button class="ob-skip" data-ob="skip">건너뛰기</button>'}
@@ -235,14 +231,13 @@ function drawOnboarding() {
   fitOnboardingViewport();
   el.scrollTop = 0;
   el.querySelector('.ob-title')?.focus?.();
-  if (onboardStep === 0) onboardTimer = setTimeout(() => { onboardStep = 1; drawOnboarding(); }, 1400);
 }
 let onboardPreview = false; // 이용 가이드 > 온보딩 다시 보기: 고른 관심사를 반영하지 않고, 끝나면 가이드로
 let onboardFull = false; // 처음부터 본 온보딩일 때만 끝나고 튜토리얼을 보여줘요
 let onboardFinishing = false;
-function openOnboarding(step = 0) {
+function openOnboarding(step = 1) {
   onboardFinishing = false;
-  onboardFull = step === 0; onboardPreview = false;
+  onboardFull = step === 1; onboardPreview = false;
   onboardDraft = onboardFull ? [] : [...preferences];
   onboardStep = step;
   if ($('#sheet').open) $('#sheet').close();
@@ -260,7 +255,6 @@ function openOnboarding(step = 0) {
   drawOnboarding();
 }
 function closeOnboarding() {
-  clearTimeout(onboardTimer);
   $('#onboarding')?.remove();
   document.body.classList.remove('onboarding-open');
   $('#app').inert = false;
@@ -279,9 +273,9 @@ async function finishOnboarding() {
   if (onboardFull) setTimeout(() => { if (page === 'home' && !detailId) startCoach(); }, 350);
   else if (preferences.length) toast('관심사 기본값을 바꿨어요.');
 }
-intro = function() { openOnboarding(0); };
+intro = function() { openOnboarding(1); };
 // 온보딩 다시 보기 (처음 온보딩과 같은 화면이지만 연습용: 관심사 저장 안 함 · 끝나면 이용 가이드)
-function openOnboardingPreview(){ openOnboarding(0); onboardPreview = true; onboardFull = false; onboardDraft = []; drawOnboarding(); }
+function openOnboardingPreview(){ openOnboarding(1); onboardPreview = true; onboardFull = false; onboardDraft = []; drawOnboarding(); }
 
 actions.interests = () => openOnboarding(2);
 

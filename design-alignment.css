@@ -834,7 +834,6 @@ body.auth-body{display:grid;grid-template-columns:minmax(0,1fr);grid-template-ro
 .auth-home{display:flex;justify-content:center;align-items:center;min-height:44px;margin-top:var(--space-md);font:var(--type-body-sm);color:var(--color-secondary);text-decoration:underline;text-underline-offset:var(--space-xs)}
 .auth-sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;clip:rect(0,0,0,0);overflow:hidden;white-space:nowrap}
 .pm-auth :is(button,a):focus-visible{outline:2px solid var(--color-primary);outline-offset:4px}
-.auth-hero .auth-brand:focus-visible{outline-color:var(--color-neutral)}
 .pm-auth button:disabled{cursor:wait;opacity:.6}
 @media(min-width:480px){.auth-body .auth-shell{box-shadow:var(--shadow-md)}}
 html.auth-pending #app{visibility:hidden;pointer-events:none}
@@ -1345,11 +1344,6 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .main>.topbar .bellbtn .icon{width:28px;height:28px}
 
 
-/* Loading uses the same vector wordmark as Home, in white on the dark backdrop. */
-#onboarding .ob-screen.step1,#onboarding:has(.step1){background:var(--color-primary)!important}
-[data-theme="dark"] #onboarding .ob-screen.step1,[data-theme="dark"] #onboarding:has(.step1){background:var(--color-neutral)!important}
-#onboarding .ob-splash{display:grid;place-items:center}
-#onboarding .ob-splash img.ob-splash-wordmark{width:70%!important;max-width:320px;height:auto!important;object-fit:contain;filter:brightness(0) invert(1)}
 
 /* 2026-11-17 verified accessibility follow-up: preserve existing semantic tokens. */
 .strip-hide,.confirmpop .cfok{color:var(--color-on-surface)!important}
@@ -1372,6 +1366,13 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 @keyframes pm-spin{to{transform:rotate(360deg)}}
 /* Disable browser pull-to-refresh while keeping normal vertical scrolling. */
 html,body{overscroll-behavior-y:contain}
+
+/* Entry logo is a separate, passive screen before the login choices. */
+.auth-shell[data-screen="intro"] .auth-hero{display:flex;flex:1;min-height:100%;pointer-events:none}
+.auth-shell[data-screen="intro"] .auth-panel{display:none}
+.auth-shell[data-screen="welcome"] .auth-hero{display:none}
+.auth-shell[data-screen="welcome"] .auth-panel{display:flex;flex:1;flex-direction:column;justify-content:center;min-height:100%;border-radius:0;background:var(--color-neutral);padding:var(--space-2xl) var(--space-xl)}
+.auth-shell[data-screen="welcome"] #auth-content{width:100%;margin:auto}
 @media(prefers-reduced-motion:reduce){.pm-spinner,button[aria-busy="true"]::after{animation:none}}
 
 /* Current location: blue position and a compass cone only when heading is available. */
