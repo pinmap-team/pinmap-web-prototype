@@ -1,4 +1,4 @@
-// Both previews use the same place-level favorite action.
+// Both previews share favorite actions; record IDs identify posts and place IDs identify places.
 (function(root){
   const normalize = value => [...new Set((Array.isArray(value) ? value : [])
     .filter(id => (typeof id === 'string' || typeof id === 'number') && String(id).length <= 200)

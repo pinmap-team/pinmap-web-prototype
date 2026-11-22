@@ -20,24 +20,16 @@
         sourceItem:item,locationIndex:index,title:loc.name||item.title,address:loc.address||item.address||'',
         lat,lng,photo:image||item.photo||'',art:item.art,type:item.type,category:item.category,
         desc:item.desc,memo:item.memo,savedAt:item.savedAt,ago:item.ago,
-        favorite:!!item.favorite||Array.isArray(item.placeFavorites)&&item.placeFavorites.includes(id),
+        favorite:Array.isArray(item.placeFavorites)&&item.placeFavorites.includes(id),
         onFavoriteChange(value){
           const previous=new Set(item.placeFavorites||[]);
-          if(item.favorite)locations.forEach((_,i)=>previous.add(key(item,i)));
           if(value)previous.add(id);else previous.delete(id);
-          item.placeFavorites=[...previous];item.favorite=false;
+          item.placeFavorites=[...previous];
         }};
     }).filter(Boolean);
   }
   const all=items=>(Array.isArray(items)?items:[]).flatMap(forItem);
   const legacyKey=(items,id)=>forItem((Array.isArray(items)?items:[]).find(item=>item.id===id))[0]?.id||null;
-  const expandLegacy=(value,items)=>{
-    const result=new Set(Array.isArray(value)?value.map(String):[]);
-    for(const item of Array.isArray(items)?items:[]){
-      if(result.delete(sourceId(item)))forItem(item).forEach(place=>result.add(place.id));
-    }
-    return [...result];
-  };
-  root.PinmapPlaces={all,forItem,key,legacyKey,expandLegacy};
+  root.PinmapPlaces={all,forItem,key,legacyKey};
   if(typeof module!=='undefined'&&module.exports)module.exports=root.PinmapPlaces;
 })(typeof window!=='undefined'?window:globalThis);

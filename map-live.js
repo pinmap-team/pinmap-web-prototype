@@ -178,7 +178,7 @@
       setSheetStage(stages[Math.max(0,Math.min(stages.length-1,stages.indexOf(sheetStage)+(event.key==='ArrowUp'?1:-1)))]);
     });
   }
-  const favoriteButton = place => place.saved ? `<button type="button" class="lm-carousel-heart lm-heart-motion${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>` : '';
+  const favoriteButton = place => place.saved ? `<button type="button" class="lm-carousel-heart lm-heart-motion${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>` : '';
   function playHeartMotion(button, liked) {
     button.querySelector('.lm-heart-burst')?.remove();
     button.classList.remove('is-bursting');
@@ -472,7 +472,7 @@
         searchResults?.forEach(result=>{if(result.placeId===item.id)result.favorite=favorite;});
         for(const entry of markerEntries.values())if(entry.place?.placeId===item.id)entry.place.favorite=favorite;
         document.querySelectorAll('.lm-carousel-heart').forEach(node=>{if(node.dataset.placeKey!==item.id)return;node.classList.toggle('is-active',favorite);node.setAttribute('aria-pressed',String(favorite));if(node.classList.contains('lm-heart-motion'))playHeartMotion(node,favorite);});
-        toast(favorite?'즐겨찾기에 추가했어요.':'즐겨찾기에서 뺐어요.');
+        toast(favorite?'장소를 즐겨찾기에 추가했어요.':'장소 즐겨찾기를 취소했어요.');
         break;
       }
       case 'select-place':{const place=markerEntries.get(button.dataset.placeKey)?.place;if(place)expandPlace(place);break;}

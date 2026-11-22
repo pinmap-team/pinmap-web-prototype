@@ -23,12 +23,17 @@ test('one post exposes independent places for course stops and favorites',()=>{
   assert.deepEqual(loaded[0].days[0].map(stop=>stop.id),['place:saved-post:1','place:saved-post:0']);
 });
 
-test('legacy post favorite becomes separate place favorites on first change',()=>{
+test('post and place likes stay independent on the same post',()=>{
   const item={...post(),favorite:true};
-  assert.deepEqual(Places.all([item]).map(place=>place.favorite),[true,true]);
+  assert.deepEqual(Places.all([item]).map(place=>place.favorite),[false,false]);
   Favorites.toggle(Places.all([item])[0]);
-  assert.deepEqual(Places.all([item]).map(place=>place.favorite),[false,true]);
-  assert.deepEqual(Places.expandLegacy(['saved-post'],[post()]),['place:saved-post:0','place:saved-post:1']);
+  assert.equal(item.favorite,true);
+  assert.deepEqual(Places.all([item]).map(place=>place.favorite),[true,false]);
+  Favorites.toggle(item);
+  assert.equal(item.favorite,false);
+  assert.deepEqual(Places.all([item]).map(place=>place.favorite),[true,false]);
+  Favorites.toggle(Places.all([item])[1]);
+  assert.deepEqual(Places.all([item]).map(place=>place.favorite),[true,true]);
 });
 
 test('legacy account course keeps its first place without inventing extra stops',()=>{
