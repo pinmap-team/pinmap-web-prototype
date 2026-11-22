@@ -145,6 +145,17 @@ test('account post likes and each place like use separate metadata keys', async 
   await new Promise(resolve=>setImmediate(resolve));
   assert.deepEqual(Array.from(metadata.pinmap_favorites),['place:10:1']);
   assert.deepEqual(places.forItem(item).map(place=>place.favorite),[false,true]);
+  context.PinmapFavorites.toggle(places.forItem(item)[0]);
+  context.PinmapFavorites.toggle(places.forItem(item)[1]);
+  for(let attempt=0;attempt<20&&metadata.pinmap_favorites.length;attempt++)
+    await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(Array.from(metadata.pinmap_favorites),['place:10:0']);
+  assert.deepEqual(places.forItem(item).map(place=>place.favorite),[true,false]);
+  context.PinmapFavorites.toggle(places.forItem(item)[0]);
+  context.PinmapFavorites.toggle(places.forItem(item)[0]);
+  for(let attempt=0;attempt<20;attempt++)await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(Array.from(metadata.pinmap_favorites),['place:10:0']);
+  assert.equal(places.forItem(item)[0].favorite,true);
 });
 
 test('account history loads all pages using the backend page-size contract', async () => {
