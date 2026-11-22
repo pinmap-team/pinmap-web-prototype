@@ -15,7 +15,7 @@ test('the home coach starts only while the home screen is open',()=>{
 });
 
 test('coach step 1 points at a home screen element, not a global overlay',()=>{
-  const step=read('coach.js').match(/\{sel:'([^']+)'[^}]*관심사 추천 콘텐츠/);
+  const step=read('coach.js').match(/\{sel:'([^']+)'[^}]*최근 저장한 콘텐츠/);
   assert(step,'first coach step selector');
   assert(step[1].includes('.mainpick'),'coach step 1 targets the home pick card');
 });

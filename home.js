@@ -1,5 +1,5 @@
 // 홈 화면 (레이아웃 개편) · calendar.js 다음, navlabels.js 앞에 불러와요
-// 구성: 마감 임박 띠배너(맨 위 고정) → 내 동네 · 알림 → 관심 키워드 → 메인 추천 카드 → 캘린더 위젯 → 작은 위젯 · 최근 저장
+// 구성: 마감 임박 띠배너(맨 위 고정) → 최근 저장 카드 → 캘린더 위젯 → 카테고리 · 최근 저장
 
 /* ---------- 홈 관심 키워드 추가 (온보딩 선택지에는 나오지 않아요) ---------- */
 PinmapCategories.all.forEach(c=>{homeSections[c.id]=()=>({list:items.filter(x=>PinmapCategories.of(x).id===c.id)});});
@@ -30,25 +30,12 @@ actions.striphide = () => {
   toast('오늘은 마감 임박 배너를 보지 않아요.'); $('#snackbar').classList.add('oneline');
 };
 
-/* ---------- 메인 추천 카드 (크게 · 좌우로 넘기기) ---------- */
-// 고른 관심사를 우선하고, 선택하지 않았다면 최근 저장 순서를 유지해요.
+/* ---------- 메인 최근 저장 카드 (크게 · 좌우로 넘기기) ---------- */
 function homePicks(){
-  const ready = items;
-  const photoFirst = (a,b) => (libPhoto(b)?1:0) - (libPhoto(a)?1:0);
-  // Every saved post remains visible even if its map position needs review.
-  if (!preferences.length) {
-    return ready.slice(0,8).map(x => ({x,id:null}));
-  }
-  const seen = new Set(), lists = preferences.map(id => ({id, list: (homeSections[PinmapCategories.get(id)?.id]?.().list || []).filter(x => !x.pending).sort(photoFirst)})), picks = [];
-  // 관심사를 번갈아 하나씩 꺼내 고르게 섞어요
-  for (let round = 0; picks.length < 8 && lists.some(l => l.list.length > round); round++)
-    lists.forEach(({id, list}) => { const x = list[round]; if (x && !seen.has(x.id) && picks.length < 8) { seen.add(x.id); picks.push({x, id}); } });
-  // 관심사 콘텐츠가 3개보다 적으면 다른 저장 콘텐츠로 조금 채워요
-  if (picks.length < 3) ready.filter(x => !seen.has(x.id)).sort(photoFirst).slice(0, 3 - picks.length).forEach(x => picks.push({x, id:null}));
-  return picks;
+  return items.slice(0,8).map(x => ({x,id:null}));
 }
 function pickCard({x, id}, i, total = 1){
-  // 관심사 이름을 보여주고, '기타(나중에 보기)'나 최근 저장 순서이면 콘텐츠별 키워드를 보여줘요.
+  // 저장된 콘텐츠의 카테고리를 보여줘요.
   const tag = PinmapCategories.of(x).label;
   const desc = (x.desc || '').trim().replace(/[.。]+$/, '');
   return `<button class="pick" data-detail="${x.id}" data-i="${i}">
@@ -139,8 +126,8 @@ pages.home = function(){
   const main = accountError
     ? '<div class="empty small" role="status"><p class="muted">저장한 콘텐츠를 불러오지 못했어요.</p><button class="tonal" data-action="accountretry">다시 불러오기</button></div>'
     : picks.length || emptyHome
-    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'role="group" aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${emptyHome ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
-    : `<div class="empty small"><p class="muted">선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.</p></div>`;
+    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'role="group" aria-label="최근 저장한 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${emptyHome ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
+    : `<div class="empty small"><p class="muted">아직 저장한 콘텐츠가 없어요.</p></div>`;
   const brand = '<div class="homebrand" aria-label="Pinmap"><img class="homebrand-symbol" src="img/pinmap-symbol-splash.svg" alt=""><span class="homebrand-name" aria-hidden="true">Pinmap</span></div>';
   const addButton = `<div class="home-add-menu" id="home-add-menu" data-open="false"><div class="home-add-body" aria-hidden="true"></div><button type="button" class="home-add-fab" data-action="addoptions" aria-label="콘텐츠 추가하기" aria-expanded="false" aria-controls="home-add-options">${icon('plus')}<span>추가</span></button><div class="home-add-options" id="home-add-options" role="group" aria-label="콘텐츠 추가 방법" aria-hidden="true" inert><button type="button" data-action="zipimport">${icon('folder')}<span>Instagram ZIP 가져오기</span></button><button type="button" data-action="linkimport">${icon('link')}<span>게시물 링크로 저장</span></button><button type="button" data-action="screenshotimport">${icon('image')}<span>캡처 화면으로 추가</span></button></div></div>`;
   return stripBar() + brand + main + (accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + chips + (emptyHome || accountError ? '' : subWidgets()) + addButton;

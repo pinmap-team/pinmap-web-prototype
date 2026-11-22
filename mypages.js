@@ -154,7 +154,7 @@ pages.faq = () => myPage('자주 묻는 질문', infoRows([
   ['위치 권한은 어디에서 바꾸나요?', '브라우저의 사이트 설정에서 위치 권한을 바꿀 수 있어요.']
 ]), 'settingpage');
 pages.notice = () => myPage('공지사항', infoRows([
-  ['핀맵 프로토타입 03 공개', '연동 계정 관리, 위치 편집, 마이 바로가기가 새로 생겼어요.'],
+  ['핀맵 프로토타입 03 공개', '콘텐츠 출처 확인, 위치 편집, 마이 바로가기가 새로 생겼어요.'],
   ['예시 데이터 안내', '지금은 예시 데이터로 체험하는 프로토타입이에요.\n데이터는 이 브라우저에만 저장돼요.']
 ]), 'settingpage');
 pages.terms = () => myPage('약관 및 정책', `<div class="mycard settings policy-list">
@@ -187,7 +187,7 @@ pages.howtopage = function(){
     <div class="ob-actions"><button class="filled ob-next" data-action="linkimport">게시물 링크로 저장하기</button></div></div>`, 'howtopage', 'guide');
 };
 
-/* ---------- 프로필: 사진/이름 직접 편집 (2026-11-04: SNS 연동 계정은 마이 바로가기 '연동 계정 관리' 페이지로 분리) ---------- */
+/* ---------- 프로필: 사진/이름 직접 편집 ---------- */
 /* ---------- 계정 관리 (2026-11-10): 프로필 · 개인정보(연락처, 생년월일) 보기, 맨 아래 로그아웃 | 회원 탈퇴 ---------- */
 // 사진 · 이름은 마이 프로필 카드에서 바로 바꿔요. 연락처 · 생년월일은 프로토타입 예시 값이에요.
 const ACCOUNT_EXAMPLE = {email:'seoyeon@example.com', phone:'010-0000-0000', birth:'2002년 3월 14일'};
@@ -206,7 +206,7 @@ pages.account = () => myPage('계정 관리', `<h2 class="account-sub">프로필
 /* ---------- 항목별 초기화: 저장 콘텐츠와 코스는 보존 ---------- */
 const RESET_OPTIONS = {
   keywords: {label:'키워드 초기화', description:'선택한 관심 키워드만 해제해요. 저장한 카테고리와 콘텐츠는 유지돼요.'},
-  notifications: {label:'알림 설정 초기화', description:'푸시와 마감/주변/리마인드 알림을 꺼요.'},
+  notifications: {label:'알림 설정 초기화', description:'앱 안 마감/주변/리마인드 알림을 꺼요.'},
 };
 // '저장 설정 초기화' → '저장 설정을 초기화했어요.' (받침에 따라 을/를)
 function resetDoneText(label){ const base = label.replace(/\s*초기화$/, ''), c = base.charCodeAt(base.length - 1) - 0xAC00; return `${base}${c >= 0 && c % 28 ? '을' : '를'} 초기화했어요.`; }
