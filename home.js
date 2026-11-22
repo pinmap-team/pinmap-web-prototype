@@ -129,7 +129,7 @@ pages.home = function(){
     ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'role="group" aria-label="최근 저장한 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${emptyHome ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
     : `<div class="empty small"><p class="muted">아직 저장한 콘텐츠가 없어요.</p></div>`;
   const brand = '<div class="homebrand" aria-label="Pinmap"><img class="homebrand-symbol" src="img/pinmap-symbol-splash.svg" alt=""><span class="homebrand-name" aria-hidden="true">Pinmap</span></div>';
-  const addButton = `<div class="home-add-menu" id="home-add-menu" data-open="false"><div class="home-add-body" aria-hidden="true"></div><button type="button" class="home-add-fab" data-action="addoptions" aria-label="콘텐츠 추가하기" aria-expanded="false" aria-controls="home-add-options">${icon('plus')}<span>추가</span></button><div class="home-add-options" id="home-add-options" role="group" aria-label="콘텐츠 추가 방법" aria-hidden="true" inert><button type="button" data-action="zipimport">${icon('folder')}<span>Instagram ZIP 가져오기</span></button><button type="button" data-action="linkimport">${icon('link')}<span>게시물 링크로 저장</span></button><button type="button" data-action="screenshotimport">${icon('image')}<span>캡처 화면으로 추가</span></button></div></div>`;
+  const addButton = `<div class="home-add-menu" id="home-add-menu" data-open="false"><div class="home-add-body" aria-hidden="true"></div><button type="button" class="home-add-fab" data-action="addoptions" aria-label="콘텐츠 추가하기" aria-expanded="false" aria-controls="home-add-options">${icon('plus')}<span>추가</span></button><div class="home-add-options" id="home-add-options" role="group" aria-label="콘텐츠 추가 방법" aria-hidden="true" inert><button type="button" data-action="zipimport">${icon('folder')}<span>Instagram ZIP 가져오기</span></button><button type="button" data-action="linkimport">${icon('link')}<span>Instagram 링크로 저장</span></button><button type="button" data-action="screenshotimport">${icon('image')}<span>캡처 화면으로 추가</span></button></div></div>`;
   return stripBar() + brand + main + (accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + chips + (emptyHome || accountError ? '' : subWidgets()) + addButton;
 };
 
@@ -137,8 +137,8 @@ pages.home = function(){
 actions.sharehelp = () => modal('공유로 저장하기', `<div class="home-share-guide">
   <p>안드로이드에서는 별도의 단축어가 필요 없어요.</p>
   <ol><li><b>저장할 콘텐츠에서 공유 누르기</b><span>인스타그램/유튜브 등에서 공유 메뉴를 열어요.</span></li><li><b>공유할 앱에서 핀맵 선택하기</b><span>공유받기 기능이 연결된 핀맵 앱을 설치한 뒤 사용할 수 있어요.</span></li><li><b>핀맵에서 내용 확인 후 저장하기</b><span>카테고리와 메모를 확인해 저장해요.</span></li></ol>
-  <p class="home-share-note">현재 웹 미리보기는 앱 설치/공유받기가 연결되지 않았어요. 링크를 복사해 추가창에 붙여넣어 주세요.</p>
-  <button type="button" data-action="save">링크 직접 추가하기</button>
+  <p class="home-share-note">현재 웹에서는 공유받기가 연결되지 않았어요. Instagram 링크는 복사해 추가창에 붙여넣고, 다른 콘텐츠는 캡처 화면으로 추가해 주세요.</p>
+  <button type="button" data-action="save">Instagram 링크로 저장하기</button>
 </div>`);
 
 /* 캘린더 위젯의 날짜를 누르면 그 날짜가 선택된 캘린더로 */
