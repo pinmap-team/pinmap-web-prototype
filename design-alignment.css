@@ -1564,6 +1564,17 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 /* Keep the sliding underline on the header/map boundary, including horizontal scroll. */
 .live-map .lm-header .lm-categories{padding-bottom:var(--space-sm);margin-bottom:calc(-1 * var(--space-sm))}
 
+/* Search owns the header while open: one close control, then results directly below the field. */
+.live-map:has(.lm-search-row.is-open) .lm-header .lm-location-header{margin-bottom:0}
+.live-map:has(.lm-search-row.is-open) .lm-header .lm-categories{display:none}
+.live-map:has(.lm-search-row.is-open) .lm-search-results{top:calc(var(--top) + 55px);left:var(--gutter);right:var(--gutter);border-radius:0 0 var(--rounded-lg) var(--rounded-lg)}
+.live-map:has(.lm-search-row.is-open) .lm-header .lm-recent{top:calc(var(--top) + 55px);border-radius:0 0 var(--rounded-lg) var(--rounded-lg)}
+.live-map:has(.lm-search-row.is-open) .lm-selected-host{visibility:hidden;pointer-events:none}
+.cfpage:has(.cf-search-row.is-open) .cf-folder-toolbar,
+.cfpage:has(.cf-search-row.is-open) .cf-grid{display:none}
+.cfpage .cf-search-row input::-webkit-search-cancel-button,
+.live-map .lm-search-row input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+
 /* Billing: existing semantic tokens and shared buttons. */
 .billing-plan{padding:var(--space-xl);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:var(--shadow-sm)}
 .billing-tag{display:inline-block;padding:var(--space-xs) var(--space-sm);border-radius:var(--rounded-sm);background:var(--color-accent);font:var(--type-label-md);color:var(--color-on-surface)}

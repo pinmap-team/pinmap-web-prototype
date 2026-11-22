@@ -86,11 +86,10 @@ resultCards = function(){
     || `<div class="empty">${icon('search')}<h3>아직 찾는 콘텐츠가 없어요</h3><p class="muted">다른 키워드나 유형으로 다시 찾아 보세요.</p><button class="tonal" data-action="resetfilter">전체 콘텐츠 보기</button></div>`;
 };
 
-// 검색할 때 개수 배지와 지우기 버튼 갱신 (app.js의 검색 처리 다음에 실행돼요)
+// 검색할 때 개수 배지 갱신 (app.js의 검색 처리 다음에 실행돼요)
 document.addEventListener('input', e => {
   if (e.target.id !== 'search' || page !== 'library') return;
   const n = $('#resultcount'); if (n) n.textContent = filtered().length;
-  const clear = $('.libsearch [data-action="clear"]'); if (clear) clear.hidden = !e.target.value;
 });
 // 스크롤하는 동안만 보이는 얇은 스크롤 바 (화면 · 팝업 · 온보딩 등 세로로 스크롤되는 모든 곳)
 (() => {
