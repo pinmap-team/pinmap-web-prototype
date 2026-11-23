@@ -1750,13 +1750,13 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 @media(prefers-reduced-motion:reduce){.pm-savefx,.pm-savefx-check,.pm-savefx-fly,.pm-ai-chip,.lm-photo-marker.is-selected .lm-place-badge,.lm-carousel-card.pm-land,.pm-attn,.pm-press,.pm-pop,.pm-roll,.pm-step-fill,.pm-nav-bump .navicon,.pm-nav-plus{animation:none!important}.pm-savefx-check{stroke-dashoffset:0}}
 
 /* FAQ: 한 장의 패널이 열린 질문으로 이동하고 답변 높이에 맞춰집니다. */
-.faq-panel-card{position:relative;padding:var(--space-xs);border:1px solid var(--color-disabled);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:none;overflow:hidden;transition:min-height .3s cubic-bezier(.64,0,.2,1)}
+.faq-panel-card{position:relative;padding:var(--space-xs);border:1px solid var(--color-disabled);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:none;overflow:hidden}
 .faq-slide{position:absolute;top:0;left:var(--space-xs);right:var(--space-xs);height:0;border-radius:var(--rounded-md);background:var(--color-neutral);opacity:0;pointer-events:none}
 .faq-panel-card:not([data-ready]) .faq-slide{visibility:hidden}
 .faq-panel-card:not([data-ready]) .faq-item:has([aria-expanded="true"]){border-radius:var(--rounded-md);background:var(--color-neutral)}
 .faq-item{position:relative}
 .faq-item h2{margin:0;font:inherit}
-.faq-trigger{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);width:100%;min-height:64px;padding:var(--space-md) var(--space-lg);border:0;border-radius:var(--rounded-md);background:transparent;color:var(--color-on-surface);font:var(--type-body-md);font-weight:var(--weight-semibold);text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.faq-trigger{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);width:100%;min-height:56px;padding:var(--space-md) var(--space-lg);border:0;border-radius:var(--rounded-md);background:transparent;color:var(--color-on-surface);font:var(--type-body-md);font-weight:var(--weight-semibold);text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .faq-trigger>span{min-width:0}
 .faq-trigger:focus-visible{outline:2px solid var(--color-primary);outline-offset:-3px}
 .faq-chevron{width:18px;height:18px;flex:none;fill:none;stroke:var(--color-secondary);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(.64,0,.2,1)}
