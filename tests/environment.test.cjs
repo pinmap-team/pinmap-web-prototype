@@ -129,9 +129,10 @@ test('map search refreshes on every Korean IME input event',()=>{
 });
 
 test('empty development home keeps decorative cards and a three-path home add menu',()=>{
-  const source=read('home.js'),start=source.indexOf('pages.home = function(){'),end=source.indexOf('\n};',start)+3;
+  // 2026-11-23: 추가 메뉴는 홈 본문 대신 하단 메뉴 가운데에서 그려요(homeAddMarkup).
+  const source=read('home.js'),start=source.indexOf('const homeAddMarkup = '),end=source.indexOf('\n};',start)+3;
   const placeholderStart=source.indexOf('function emptyPickCards(){'),placeholderEnd=source.indexOf('\n/* ---------- 캘린더',placeholderStart);
-  const html=vm.runInNewContext(source.slice(placeholderStart,placeholderEnd)+source.slice(start,end)+';pages.home();',{
+  const html=vm.runInNewContext(source.slice(placeholderStart,placeholderEnd)+source.slice(start,end)+';pages.home()+homeAddMarkup();',{
     PM_ENV:{development:true,requiresAuth:true},window:{PinmapAccountLoaded:false,PinmapAccountLoadError:false},items:[],pages:{},preferences:[],interestOptions:[],homePicks:()=>[],icon:()=>'<svg></svg>',
     homeCategoryChips:()=>'',stripBar:()=>'',calWidget:()=>'<section id="calendar"></section>',subWidgets:()=>'<section>최근 저장한 목록</section>',PM_IMG:{logo:'logo.png'}
   });

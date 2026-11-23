@@ -133,6 +133,8 @@ document.addEventListener('click', e => {
 });
 
 /* ---------- 홈 ---------- */
+// 2026-11-23: '추가' 버튼은 홈 화면 대신 하단 메뉴 가운데에 있어요 (app.js nav()).
+const homeAddMarkup = () => `<div class="home-add-menu" id="home-add-menu" data-open="false"><div class="home-add-body" aria-hidden="true"></div><button type="button" class="home-add-fab" data-action="addoptions" aria-label="콘텐츠 추가하기" aria-expanded="false" aria-controls="home-add-options">${icon('plus')}<span>추가</span></button><div class="home-add-options" id="home-add-options" role="group" aria-label="콘텐츠 추가 방법" aria-hidden="true" inert><button type="button" data-action="zipimport">${icon('folder')}<span>Instagram ZIP 가져오기</span></button><button type="button" data-action="linkimport">${icon('link')}<span>Instagram 링크로 저장</span></button><button type="button" data-action="screenshotimport">${icon('image')}<span>캡처 화면으로 추가</span></button></div></div>`;
 pages.home = function(){
   const chips = homeCategoryChips();
   const picks = homePicks();
@@ -144,8 +146,8 @@ pages.home = function(){
     ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'role="group" aria-label="최근 저장한 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${emptyHome ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
     : `<div class="empty small"><p class="muted">아직 저장한 콘텐츠가 없어요.</p></div>`;
   const brand = '<div class="homebrand" aria-label="Pinmap"><img class="homebrand-symbol" src="img/pinmap-symbol-splash.svg" alt=""><span class="homebrand-name" aria-hidden="true">Pinmap</span></div>';
-  const addButton = `<div class="home-add-menu" id="home-add-menu" data-open="false"><div class="home-add-body" aria-hidden="true"></div><button type="button" class="home-add-fab" data-action="addoptions" aria-label="콘텐츠 추가하기" aria-expanded="false" aria-controls="home-add-options">${icon('plus')}<span>추가</span></button><div class="home-add-options" id="home-add-options" role="group" aria-label="콘텐츠 추가 방법" aria-hidden="true" inert><button type="button" data-action="zipimport">${icon('folder')}<span>Instagram ZIP 가져오기</span></button><button type="button" data-action="linkimport">${icon('link')}<span>Instagram 링크로 저장</span></button><button type="button" data-action="screenshotimport">${icon('image')}<span>캡처 화면으로 추가</span></button></div></div>`;
-  return stripBar() + brand + main + (accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + chips + (emptyHome || accountError ? '' : subWidgets()) + addButton;
+  // 2026-11-23: 마감 임박 배너는 맨 위 고정 대신 캘린더 위젯 바로 아래에 보여줘요.
+  return brand + main + (accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + stripBar() + chips + (emptyHome || accountError ? '' : subWidgets());
 };
 
 // Android 공유 안내: 실제 설치나 공유 수신이 연결된 것으로 표시하지 않아요.

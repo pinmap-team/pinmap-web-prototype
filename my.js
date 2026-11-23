@@ -84,8 +84,7 @@ pages.my = function(){
     ${myRow('savesheet','✨','저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
     ${myRow('appearance','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>','화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
     ${myRow('notisheet','🔔','알림 설정', notiOn ? `${notiOn}개 켜짐` : '꺼짐')}
-    ${myRow('calsettings',icon('calendar'),'캘린더 설정', settings.calendarWeekStart === 'monday' ? '월요일 시작' : '일요일 시작')}
-    ${myRow('calexport',icon('calendar'),'캘린더로 내보내기', typeof calExportList === 'function' ? `마감 ${calExportList().length}개` : '')}
+    ${myRow('calsettings',icon('calendar'),'캘린더 설정')}
   </section>
   <section class="mgroup my-section" aria-label="도움말">
     ${myRow('guide','📚','이용 가이드')}

@@ -79,7 +79,7 @@ detail = function(){
     <div class="dthero">${libThumb(x)}<div class="dtshade" aria-hidden="true"></div>
       <div class="dttop"><button class="dtbtn" data-action="back" aria-label="돌아가기">${icon('chevleft')}</button>
         <div class="dttopr">
-          <button type="button" class="dtbtn dtfavorite lm-heart-motion${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 게시물 좋아요" title="게시물 좋아요" aria-pressed="${!!x.favorite}"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>
+          <button type="button" class="dtbtn dtfavorite lm-heart-motion${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 게시물 즐겨찾기" title="즐겨찾기" aria-pressed="${!!x.favorite}"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>
           <button class="dtbtn dtmorebtn" data-action="dtmore" aria-label="더보기" aria-haspopup="menu" aria-expanded="false" aria-controls="dtmenu">${icon('more')}</button>
           <div class="dtmenu" id="dtmenu" role="menu" aria-label="콘텐츠 메뉴" hidden>
             <button type="button" role="menuitem" data-action="dtshare">${icon('share')}공유</button>
@@ -216,14 +216,14 @@ actions.dtshare = async () => {
 paths.trash = 'M4 7h16 M10 11v6 M14 11v6 M6 7l1 13h10l1-13 M9 7V4h6v3';
 paths.walk = 'M13 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0 M9 21l2-6 2 2v4 M8 11l2-3 3 1 2 3 2 1 M11 15l1-5';
 
-// 상세 상단은 게시물 좋아요, 추출 장소 목록은 장소 좋아요예요.
+// 상세 상단은 게시물 즐겨찾기, 추출 장소 목록은 장소 즐겨찾기예요.
 actions.fav = () => {
   const x = items.find(i => i.id === detailId); if (!x) return;
   const favorite = PinmapFavorites.toggle(x); if (favorite === null) return;
   const y = scrollY; render(); scrollTo(0, y);
   const button = document.querySelector('.dt-photo .dtfavorite');
   if (button) window.PinmapHeartMotion?.(button, favorite);
-  toast(favorite ? '게시물에 좋아요를 눌렀어요.' : '게시물 좋아요를 취소했어요.');
+  toast(favorite ? '즐겨찾기에 추가했어요.' : '즐겨찾기에서 뺐어요.');
 };
 document.addEventListener('click',event=>{
   const button=event.target.closest('[data-fav-place-id]');if(!button||detailId==null)return;
