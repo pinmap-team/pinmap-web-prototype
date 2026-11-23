@@ -7,11 +7,12 @@ PinmapCategories.all.forEach(c=>{homeSections[c.id]=()=>({list:items.filter(x=>P
 // 개발 단계라 저장하지 않아요: 새로고침하면 다시 뜨고, 앱 안에서 다른 화면에 갔다 와도 숨긴 상태가 유지돼요
 let stripHidden = false;
 const stripHiddenToday = () => stripHidden;
-const dLabel = x => x.eventCandidate ? '확인 필요' : calDays(x) === 0 ? 'D-day' : 'D-' + calDays(x);
+const dLabel = x => x.eventCandidate ? '확인 필요' : calDays(x) < 0 ? '지난 일정' : calDays(x) === 0 ? 'D-day' : 'D-' + calDays(x);
+const dueSoon = x => !x.eventCandidate && calDays(x) >= 0 && calDays(x) <= 3;
 function stripBar(){
   const due = calDueList().filter(x => calDue(x) >= calToday && calDays(x) <= 14);
   if (!due.length || stripHiddenToday()) return '';
-  const item = x => `<button class="strip-item ${calDays(x) <= 3 ? 'soon' : ''}" data-detail="${x.id}"><b>${dLabel(x)}</b><span>${esc(x.title)}</span></button>`;
+  const item = x => `<button class="strip-item ${dueSoon(x) ? 'soon' : ''}" data-detail="${x.id}"><b>${dLabel(x)}</b><span>${esc(x.title)}</span></button>`;
   // 끝에서 처음으로 자연스럽게 이어지도록 첫 항목을 한 번 더 붙여요
   return `<div class="strip" role="region" aria-label="마감 임박 콘텐츠"><div class="strip-roll"><div class="strip-track" data-n="${due.length}">${due.map(item).join('')}${due.length > 1 ? item(due[0]) : ''}</div></div><button class="strip-hide" data-action="striphide">오늘 다시 보지 않기</button></div>`;
 }
@@ -64,7 +65,7 @@ function calWidget(){
   return `<section class="hwidget calw">
     <div class="hwhead"><h2>${calToday.getMonth()+1}월 일정</h2><button type="button" class="calgo" data-action="gocal" aria-label="캘린더 전체보기">전체보기${icon('chevright')}</button></div>
     <div class="calw-days" role="group" aria-label="날짜 선택">${days.map(day=>`<button type="button" data-calday="${calKey(day)}" aria-pressed="${calKey(day)===calSel}" aria-label="${day.getMonth()+1}월 ${day.getDate()}일"><span>${['일','월','화','수','목','금','토'][day.getDay()]}</span><b>${day.getDate()}</b></button>`).join('')}</div>
-    ${due.length ? `<div class="calnext">${due.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cncontent"><span class="cntext">${esc(x.title)}</span></span><span class="cnbadge ${calDays(x) <= 3 ? 'soon' : ''}">${dLabel(x)}</span></button>`).join('')}</div>` : '<p class="hint calnone">이 날짜에 등록된 일정이 없어요.</p>'}
+    ${due.length ? `<div class="calnext">${due.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cncontent"><span class="cntext">${esc(x.title)}</span></span><span class="cnbadge ${dueSoon(x) ? 'soon' : ''}">${dLabel(x)}</span></button>`).join('')}</div>` : '<p class="hint calnone">이 날짜에 등록된 일정이 없어요.</p>'}
   </section>`;
 }
 
