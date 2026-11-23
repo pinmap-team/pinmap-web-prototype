@@ -282,7 +282,7 @@ body.dtscrolled:has(.dt)::before{content:"";position:fixed;inset:0 0 auto;height
 .ntrow:focus-visible{outline:2px solid var(--t-ink,var(--color-primary));outline-offset:0}
 .ntsheet .ntthumb{flex:none;width:52px;height:52px;border-radius:var(--rounded-md);overflow:hidden;background:var(--color-disabled)}
 .ntsheet .ntthumb>img,.ntsheet .ntthumb>svg{width:100%;height:100%;object-fit:cover;display:block;border-radius:0}
-.ntsheet .ntemoji{display:grid;place-items:center;width:100%;height:100%;color:#6B6B70}
+.ntsheet .ntemoji{display:grid;place-items:center;width:100%;height:100%;color:#6C6C6C}
 .ntsheet .ntemoji .icon{width:22px;height:22px}
 .ntsheet .nttext{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .ntsheet .nttext b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden;font:var(--type-label-md);letter-spacing:-.3px}

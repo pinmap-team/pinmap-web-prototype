@@ -14,7 +14,7 @@
     const theme=mode==='system'?(media.matches?'dark':'light'):mode;
     document.documentElement.dataset.theme=theme;
     document.documentElement.style.colorScheme=theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content',theme==='dark'?'#111111':'#F4F4F5');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content',theme==='dark'?'#1E1E1E':'#F4F4F4');
     document.querySelectorAll('[data-theme-label]').forEach(el=>el.textContent=labels[mode]);
     document.querySelectorAll('[data-theme-choice]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.themeChoice===mode)));
     updatePreview();

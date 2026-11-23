@@ -234,7 +234,7 @@ body.notipanel-open .bottomnav{display:none!important}
 .npread{margin-left:auto;min-height:44px;padding:0 var(--space-xs);font:var(--type-body-sm);color:var(--color-on-surface)}
 .nplist{flex:1;display:flex;flex-direction:column;padding:0!important}
 .nplist .ntgroup h3{margin:var(--space-lg) 0 var(--space-sm);font:var(--type-label-md);color:var(--t-sub,var(--color-secondary))}
-.npfoot{position:sticky;bottom:0;padding-top:var(--space-lg);background:linear-gradient(180deg,rgba(244,244,245,0),var(--t-bg,#F4F4F5) 40%)}
+.npfoot{position:sticky;bottom:0;padding-top:var(--space-lg);background:linear-gradient(180deg,rgba(244,244,245,0),var(--t-bg,#F4F4F4) 40%)}
 .npfoot .ntprimary{width:100%}
 @media(prefers-reduced-motion:reduce){#notipanel{transition:none}}
 

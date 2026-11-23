@@ -18,7 +18,7 @@
 
 /* 마이 */
 .profile{display:flex;align-items:center;gap:var(--space-lg);padding:var(--space-lg);border-radius:var(--rounded-lg);background:linear-gradient(135deg,#EFEFEF,#FAFAFA)}
-.pavatar{flex:none;width:58px;height:58px;border-radius:50%;background:#111111;color:#FFFFFF;display:grid;place-items:center;font-size:24px;font-weight:800}
+.pavatar{flex:none;width:58px;height:58px;border-radius:50%;background:var(--color-primary);color:var(--color-neutral);display:grid;place-items:center;font-size:24px;font-weight:800}
 .pinfo{flex:1;min-width:0}.pinfo b{display:block;font:var(--type-body-md);letter-spacing:-.4px}.pinfo span{font:var(--type-body-sm);color:var(--md-sys-color-on-surface-variant)}
 .tonal.small{min-height:36px;padding:0 var(--space-lg);font:var(--type-body-sm);background:var(--color-surface)}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-sm);margin:var(--space-md) 0 var(--space-xs)}

@@ -96,7 +96,7 @@ detail = function(){
     <section class="dtsheet" id="detail-info" aria-label="콘텐츠 상세 정보">
       <button type="button" class="dt-sheet-handle" data-action="dtsheettoggle" aria-label="상세 정보 펼치기" aria-controls="detail-info" aria-expanded="false"><span aria-hidden="true"></span></button>
       ${author ? `<div class="dt-author">${authorPhoto ? `<img src="${esc(authorPhoto)}" alt="">` : `<span class="dt-author-fallback" aria-hidden="true">@</span>`}<span>게시물 작성자 <b>@${esc(author)}</b></span></div>` : ''}
-      ${x.desc ? `<section class="dtsum"><h2${x.source === '직접 추가' || x.aiSummary === false ? '' : ' class="dtai"'}>${icon('spark')}${esc(x.source === '직접 추가' || x.aiSummary === false ? '장소 설명' : 'AI 설명')}</h2><p>${esc(x.desc)}</p></section>` : ''}
+      ${x.desc ? `<section class="dtsum" data-dtsum><h2${x.source === '직접 추가' || x.aiSummary === false ? '' : ' class="dtai"'}>${icon('spark')}${esc(x.source === '직접 추가' || x.aiSummary === false ? '장소 설명' : 'AI 설명')}</h2>${dtSummaryBody(x.desc)}</section>` : ''}
       ${extractionInfo}
       ${eventInfo}
       ${reviewInfo}
@@ -395,4 +395,26 @@ document.addEventListener('click', async event => {
   const address=String((locationIndex>=0?locations[locationIndex]?.address:'')||extracted[index].address||'').trim();
   if(!address)return;
   toast(await dtCopy(address)?'주소를 복사했어요.':`주소: ${address}`);
+});
+
+/* 2026-11-24 AI 설명: 한 줄이 넘으면 첫 문장(한 줄 요약)만 보이고, 오른쪽 끝 화살표로 펼쳐 전체 설명을 봐요. */
+function dtSummaryBody(text){
+  const all = String(text || '').trim();
+  const parts = all.split(/(?<=[.!?。])\s+/);
+  const head = parts[0] || all, rest = parts.slice(1).join(' ');
+  return `<button type="button" class="dtsum-head" data-dtsum-toggle aria-expanded="false"><span class="dtsum-line">${esc(head)}</span>${icon('chevron')}</button>${rest ? `<p class="dtsum-rest">${esc(rest)}</p>` : ''}`;
+}
+function dtFitSummaries(){
+  document.querySelectorAll('[data-dtsum]:not([data-fit])').forEach(box => {
+    box.dataset.fit = '1';
+    const line = box.querySelector('.dtsum-line');
+    const more = box.querySelector('.dtsum-rest') || (line && line.scrollWidth > line.clientWidth + 1);
+    if (!more) { box.classList.add('is-single'); const b = box.querySelector('[data-dtsum-toggle]'); b?.setAttribute('tabindex', '-1'); b?.removeAttribute('aria-expanded'); }
+  });
+}
+new MutationObserver(() => { if (document.querySelector('[data-dtsum]:not([data-fit])')) requestAnimationFrame(dtFitSummaries); }).observe(document.body, {childList:true, subtree:true});
+document.addEventListener('click', event => {
+  const toggle = event.target.closest('[data-dtsum-toggle]'); if (!toggle) return;
+  const box = toggle.closest('[data-dtsum]'); if (!box || box.classList.contains('is-single')) return;
+  const open = !box.classList.contains('is-open'); box.classList.toggle('is-open', open); toggle.setAttribute('aria-expanded', String(open));
 });

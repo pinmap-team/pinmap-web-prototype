@@ -1,18 +1,20 @@
 ---
-version: 2026-11-10-mint-favorites
+version: 2026-11-24-soft-black
 name: Pinmap
 description: 팀이 채택한 9주차 통합안 기반 디자인 규칙
 colors:
-  neutral: "#F4F4F5"
+  neutral: "#F4F4F4"
   surface: "#FFFFFF"
-  on-surface: "#111111"
-  secondary: "#6B6B70"
-  border: "#6B6B70"
-  primary: "#111111"
-  primary-pressed: "#333333"
-  disabled: "#E8E8EA"
+  on-surface: "#333333"
+  secondary: "#6C6C6C"
+  border: "#6C6C6C"
+  primary: "#333333"
+  primary-pressed: "#4D4D4D"
+  disabled: "#E8E8E8"
   error: "#D13D3D"
   accent: "#C6F5E1"
+  icon-muted: "#9C9C9C"
+  icon-hover: "#4C4C4C"
 typography:
   headline-lg: {fontFamily: Pretendard, fontSize: 28px, lineHeight: 36px, fontWeight: 700}
   headline-md: {fontFamily: Pretendard, fontSize: 22px, lineHeight: 30px, fontWeight: 700}
@@ -23,6 +25,9 @@ typography:
 fontWeights: {regular: 400, semibold: 600, bold: 700}
 spacing: {xs: 4px, sm: 8px, md: 12px, lg: 16px, xl: 24px, 2xl: 32px}
 rounded: {sm: 8px, md: 12px, lg: 16px}
+# Project extension (2026-11-24, user approved): gradient used by the AI 설명 card.
+gradients:
+  accent: "linear-gradient(90deg, #C6F5E1 0%, #AFF3E4 100%)"
 # Project extensions: mode overrides and Effect Styles, not standard schema keys.
 shadows:
   shadow-sm: "0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06)"
@@ -30,16 +35,18 @@ shadows:
 modes:
   dark:
     colors:
-      neutral: "#111111"
-      surface: "#1B1B1D"
-      on-surface: "#F4F4F5"
-      secondary: "#B4B4B8"
-      border: "#8A8A8E"
-      primary: "#F4F4F5"
-      primary-pressed: "#D4D4D8"
-      disabled: "#333333"
+      neutral: "#1E1E1E"
+      surface: "#2A2A2A"
+      on-surface: "#F4F4F4"
+      secondary: "#B4B4B4"
+      border: "#8A8A8A"
+      primary: "#F4F4F4"
+      primary-pressed: "#D4D4D4"
+      disabled: "#3D3D3D"
       error: "#D73535"
       accent: "#C6F5E1"
+      icon-muted: "#8A8A8A"
+      icon-hover: "#D4D4D4"
     shadows:
       shadow-sm: "0 1px 2px rgba(0,0,0,.24), 0 8px 24px rgba(0,0,0,.36)"
       shadow-md: "0 12px 40px rgba(0,0,0,.48)"
@@ -1704,3 +1711,48 @@ Figma의 colors/accent 변수(VariableID:1393:207), 선택 카드·관심 키워
 ## 2026-11-23 온보딩 관심사 묶음 선택
 
 - 2/2는 8묶음 카드(2열)를 고른다. 카드 = 대표 카테고리 아이콘 원 + 묶음 이름(label-md) + 포함 카테고리(body-sm secondary, 쉼표 구분). 선택 시 accent 바탕·채운 아이콘(다크는 neutral 글자). 저장 값은 묶음에 든 카테고리 id 전체이고, 선택 수 문구는 묶음 개수를 센다. 마이 > 관심 키워드 설정은 지금처럼 카테고리 단위로 고친다.
+
+
+## 2026-11-24 기본 블랙 #333333
+
+- 사용자 요청: 순검정에 가까운 #111111이 너무 진해 기본 블랙을 #333333으로 바꾼다. 위쪽 colors·modes 값이 기준이다.
+- 라이트: on-surface·primary #111111 → #333333, primary-pressed #333333 → #4D4D4D(기존처럼 primary보다 한 단계 밝게). secondary·border #6B6B70은 #333333과 구분되고 흰 바탕 대비 5.2:1이라 유지.
+- 다크: neutral #111111 → #1E1E20, surface #1B1B1D → #2A2A2D, disabled #333333 → #3D3D40. 글자·primary(#F4F4F5)는 그대로.
+- 코드에 직접 적힌 #111(온보딩 휴대폰 모사, 저장 캡슐, 하단 메뉴 아바타, 테마 미리보기, 브라우저 theme-color)도 같은 값으로 맞췄다. 그림자의 #111111+알파와 사진 자리 바탕은 그대로 둔다.
+- 하단 메뉴(.pm-nav-main)와 가운데 추가 버튼은 테두리 선 없이 shadow만 쓴다.
+- 온보딩 2/2 묶음 카드: 윗줄은 아이콘 원(40px, 아이콘 24px)과 그 오른쪽 묶음 이름(간격 space-sm), 아랫줄은 포함 카테고리(줄 간격 space-md). 안쪽 여백 space-lg, 카드 높이는 내용만큼(약 100px). 설명과 카드 사이 space-2xl(32px), 카드 묶음은 위쪽에 붙는다.
+- 다크 모드 묶음 카드: 다크 전용 `.ob-option` 규칙이 더 강해서 높이가 줄지 않던 것을 다크에서도 같은 값(space-sm/space-md)으로 맞췄다.
+- 카테고리 아이콘(img/category/*-active.svg)의 채움 #111111 → #333333. Figma 마스터 기준 파일(category-masters.json)도 같이 바꿨다.
+- 다크 모드 지도 상단 카테고리: 선택된 아이콘이 #333333이라 어두운 바탕에 묻혀서, 이 자리에서만 `*-active-dark.svg`(채움 #F4F4F5 = 다크 on-surface, 안쪽 선 #2A2A2D = 다크 surface)를 쓴다. 관심사 칩·온보딩처럼 민트/흰 바탕 위에 놓이는 선택 아이콘은 라이트와 같은 파일.
+- 온보딩 휴대폰 모사 글자색, 지도 핀 카드 제목의 #222 → #333.
+- 아이콘 정리: Figma `Pinmap / Icons · 2026-11-24`(선 아이콘 67 · 작은 아이콘 · 카테고리 24 · 선택 상태 · 로고)와 `Pinmap / Icons · Dark preview`. 선 아이콘 색 변형은 On-surface · Secondary · Inverse(검정 원 위) · White/White 85%(사진·지도 위)이며 Tokens 29 변수에 연결돼 있다.
+- 아이콘 선 굵기 통일: 모든 선 아이콘(svg.icon·코스 버튼·카테고리 SVG)은 표시 크기(14~36px)와 상관없이 화면에서 1.7px(vector-effect: non-scaling-stroke), 끝·꺾임은 둥글게. 지도 상단 '전체' 채움 별도 1.7px 둥근 테두리.
+- 내비 아이콘: 선택 전=선(Secondary), 선택 후=같은 윤곽을 채운 모양(On-surface)이고 안쪽 선(문·접힌 선)은 mask로 비운다. 모양이 바뀌던 꽉 찬 실루엣(pm-solid)은 쓰지 않는다. 지도 탭은 카테고리 '여행·명소'와 같은 아이콘.
+- icon('eat') 나이프: 손잡이가 칼날 오른쪽 등선에서 이어지도록 수정. icon('more') 점은 지름 약 3.7px 원으로 키움.
+- Figma `Small · 16px`: 14~18px로 쓰이는 아이콘 12개(image·chevron·chevright·check·clock·pin·folder·link·more·plus·spark·pencil)와 지도 배지용 카테고리 24개를 16px로 따로 둔다(선 1.7 유지).
+- 카테고리 아이콘 크기: 관심 키워드 설정·카테고리 선택 메뉴·지도 상단·온보딩 24px, 홈 캘린더 아래 카테고리 칩 20px, 지도 사진 배지 16px. 모두 글자와 세로 가운데를 맞춘다.
+- 지도 상단 카테고리에서 카페·전시 아이콘은 모양(손잡이·절취선) 때문에 왼쪽으로 쏠려 보여 1px 오른쪽으로 옮겨 글자와 가운데가 맞아 보이게 한다.
+- 마이 페이지 아이콘: 메뉴 줄 아이콘은 모두 24px(24px 칸 가운데, 글자와 간격 space-md), 줄 끝 화살표 20px, 바로가기 카드 아이콘 24px. 상단 알림 아이콘은 다른 화면 상단 아이콘(검색 등)과 같은 24px.
+- 예외: 작게(12~18px) 쓰는 아이콘은 선 1.3px — 카드 메타(시계·핀), 추가 메뉴, 휴대폰 모형, 코스 장소 추가·제목 편집, AI 설명, 프로필 사진 변경, 지도 사진 배지 카테고리(`*-inactive-sm.svg`). 펼침·오른쪽 화살표와 체크는 작아도 1.7px. Figma `Small · 16px`도 같은 기준.
+- icon('list')(지도 목록 열기) 글머리 점은 지름 약 2.7px(선보다 조금 큰 점).
+- 예외: 하단 내비 가운데 + 추가 버튼의 + 선은 검정 원 위 26px에서 얇아 보여 2.2px.
+- 마이 페이지와 하위 화면에서 쓰는 아이콘은 모두 Figma 라이브러리에 있다. 출처 로고(Instagram·YouTube·TikTok·X)와 휴대폰 모형 속 인스타그램 보내기 이미지는 Brand 섹션 '외부 서비스 로고 · 모형 이미지'에 둔다.
+- 2026-11-24 묶음 조정: 첫 묶음 이름 맛·음식 → 맛집·카페(맛집·카페), 요리는 즐길 거리(창작·요리·콘텐츠·유머)로 옮김. 설명과 카드 사이 space-2xl(32px).
+
+## 2026-11-24 회색 무채색화 · 아이콘 색 2개 추가 · 스낵바 위치
+
+- 회색에 섞여 있던 파란 기운을 뺐다(R=G=B). neutral #F4F4F5→#F4F4F4, secondary·border #6B6B70→#6C6C6C, disabled #E8E8EA→#E8E8E8. 다크 neutral #1E1E20→#1E1E1E, surface #2A2A2D→#2A2A2A, secondary #B4B4B8→#B4B4B4, border #8A8A8E→#8A8A8A, pressed #D4D4D8→#D4D4D4, disabled #3D3D40→#3D3D3D. 코드에 직접 적힌 푸른 회색(카테고리 SVG, 유리 효과 회색 등)도 같은 밝기의 무채색으로 바꿨다. 민트·지도·사진 자리 색은 회색이 아니라 그대로.
+- 사용자 승인 토큰 2개 추가(색 10→12, 전체 29→31): `--color-icon-muted` 라이트 #9C9C9C / 다크 #8A8A8A, `--color-icon-hover` 라이트 #4C4C4C / 다크 #D4D4D4. 홈 캘린더 아래 카테고리 칩 아이콘의 기본색과 마우스를 올렸을 때(또는 키보드 포커스) 색. 칩 아이콘은 SVG를 mask로 써서 색을 토큰으로 칠한다.
+- 스낵바: 화면 세로·가로 가운데에 띄우고, 좌우 여백 space-2xl(32px)·위아래 space-lg.
+- 마이 바로가기 카드는 즐겨찾기·내 코스 2개(‘미정’ 카드 삭제), 2열.
+- 그라디언트 `--gradient-accent`(Figma 페인트 스타일 `Pinmap/gradients/accent`): 왼쪽→오른쪽 #C6F5E1 → #AFF3E4. 상세 화면 AI 설명 카드(.dtsum, Figma `Type=AI Summary, Tone=Accent`) 배경. 라이트·다크 같음.
+- Figma: 변수 컬렉션 이름 Tokens 29 → Tokens 31, 색 변수 12개를 페인트 스타일 `Pinmap/colors/*`로도 연결했다.
+
+## 2026-11-24 상세·컬렉션·마이·캘린더 다듬기
+
+- 상세 사진 위 카테고리 알약(.dthpill): 테두리 없음.
+- AI 설명(.dtsum): 설명이 한 줄을 넘으면 첫 문장만 한 줄로 보이고(넘치면 말줄임) 오른쪽 끝에 16px 펼침 화살표(Figma `Icon / chevron / 16`). 누르면 전체 설명이 펼쳐지고 화살표가 위로 돈다. '한줄 요약' 같은 이름표는 붙이지 않는다. 한 줄로 다 들어가면 화살표 없음.
+- 컬렉션 폴더 안 콘텐츠 카드: 제목·설명·정보 줄은 단어 단위 줄바꿈(keep-all). 사진 오른쪽 위 '○일 전 저장' 자리에 즐겨찾기 별(32px 유리 원, 별 20px, 누르면 채운 별). 카드 열기와 따로 동작.
+- 마이: '무료 분석'은 카드(surface, rounded-lg, 안쪽 space-lg, shadow-sm). 남은 횟수가 5회 이하이면 사용량 막대를 error 색으로. 다크 모드에서 메뉴 묶음 뒤 별도 배경 없음(기본 배경 위에 바로).
+- 탈퇴 확인 창: 왼쪽 '탈퇴하기' 글씨 error 색, 다크 모드 버튼 바탕은 neutral(한 단계 어둡게).
+- 캘린더: 맨 위 카테고리 버튼(일정이 있는 저장 콘텐츠의 카테고리만, 앞에 '전체'). 선택한 버튼은 accent 바탕. 카테고리를 고르면 그 카테고리 콘텐츠의 시작일~마감일을 accent 막대(높이 16px, 양 끝 rounded-sm, 최대 3줄)로 이어서 보여 주고, 막대 시작과 주 첫 칸에 제목(body-sm)을 쓴다. 시작일은 일정의 시작 날짜 → 기간 글의 시작 → 저장한 날 순으로 정한다. '전체'는 기존처럼 마감일 점 표시.

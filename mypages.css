@@ -37,7 +37,7 @@
 .howtobody .ob-title{font:var(--type-headline-md) !important;margin:var(--space-sm) 0 var(--space-sm)!important}
 .howtobody .howtosub{margin:0;font:var(--type-body-md);color:var(--color-secondary)}
 .howtobody .ob-flowcard{background:var(--color-surface)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid var(--color-disabled)!important;box-shadow:none!important}
-.howtobody .ob-mock{background:#F6F6F7!important;border:0!important}
+.howtobody .ob-mock{background:#F6F6F6!important;border:0!important}
 .howtobody .ob-next{min-height:60px!important;border-radius:var(--rounded-lg)!important}
 .main:has(.howtopage)>.topbar .bellbtn{display:none!important}
 

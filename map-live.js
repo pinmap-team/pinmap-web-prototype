@@ -5,7 +5,7 @@
   let liveMap, pinLayer, locationMarker, locationHeadingMarker, placeController, mapProviderController;
   let expandedKey=null, sheetStage='peek', sheetDrag=null, suppressSheetClickUntil=0;
   let mapLocationName=null, searchOpen=false;
-  if(!paths.list)paths.list='M9 6h11 M9 12h11 M9 18h11 M4.5 6h.01 M4.5 12h.01 M4.5 18h.01';
+  if(!paths.list)paths.list='M9 6h11 M9 12h11 M9 18h11 M5 6a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z M5 12a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z M5 18a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z';
   let listOpen=false, listGesture=null; // 2026-11-10 목록 시트 · 직접 핀 찍기
   let followNextFix=false;
   const markerEntries=new Map();

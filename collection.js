@@ -159,7 +159,7 @@ function cfItem(x){
   const on = cfSel?.has(x.id);
   const role = cfSel ? `role="checkbox" aria-checked="${!!on}"` : `role="button" data-detail="${x.id}"`;
   return `<div class="cf-item${on ? ' on' : ''}" tabindex="0" ${role} data-cfitem="${x.id}" aria-label="${esc(x.title)}${cfSel ? '' : ' 상세 보기'}">
-    <div class="cf-itemimg">${libPhoto(x) ? `<span class="cf-itemback" aria-hidden="true"><img src="${esc(libPhoto(x))}" alt="" loading="lazy"></span>` : ''}${libThumb(x)}${cfSel ? `<span class="cf-check cf-glass" aria-hidden="true">${icon('check')}</span>` : `<span class="cf-saved-time">${esc(savedAgo(x))} 저장</span>`}</div>
+    <div class="cf-itemimg">${libPhoto(x) ? `<span class="cf-itemback" aria-hidden="true"><img src="${esc(libPhoto(x))}" alt="" loading="lazy"></span>` : ''}${libThumb(x)}${cfSel ? `<span class="cf-check cf-glass" aria-hidden="true">${icon('check')}</span>` : `<button type="button" class="cf-fav lm-heart-motion${x.favorite ? ' is-active' : ''}" data-cf-fav="${x.id}" aria-pressed="${!!x.favorite}" aria-label="${esc(x.title)} 즐겨찾기">${likeHeartIcon()}</button>`}</div>
     <div class="cf-itembody">
       <div class="cf-itemtext"><h3>${esc(x.title)}</h3><p class="cf-itemdesc">${esc(x.desc || x.memo || '')}</p>${cfMetaLine(x)}</div>
     </div>
@@ -517,3 +517,15 @@ document.addEventListener('contextmenu',e=>{
   const tile=e.target.closest('.cf-folder[data-collection]');if(!tile)return;
   e.preventDefault();cfCancelHold();cfAskDeleteFolder(tile.dataset.collection);
 });
+
+// 2026-11-24 폴더 안 콘텐츠 카드: 저장 시점 대신 즐겨찾기(별). 카드 열기와 따로 동작해요.
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-cf-fav]'); if (!button) return;
+  event.preventDefault(); event.stopPropagation();
+  const x = items.find(i => String(i.id) === button.dataset.cfFav); if (!x) return;
+  const favorite = PinmapFavorites.toggle(x); if (favorite === null) return;
+  button.classList.toggle('is-active', favorite); button.setAttribute('aria-pressed', String(favorite));
+  window.PinmapHeartMotion?.(button, favorite);
+  toast(favorite ? '즐겨찾기에 추가했어요.' : '즐겨찾기에서 뺐어요.');
+}, true);
+document.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.key === ' ') && event.target.closest?.('[data-cf-fav]')) event.stopPropagation(); }, true);

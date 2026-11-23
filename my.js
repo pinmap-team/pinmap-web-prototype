@@ -69,7 +69,7 @@ pages.my = function(){
     <span class="myprofile-name"><b>${esc(settings.nickname || '이름 설정')}</b></span>
     <button type="button" class="myprofile-go" data-page="account" aria-label="계정 관리로 이동">${icon('chevright')}</button>
   </div>${myQuickCards()}
-  <section class="my-quota mgroup my-section" aria-label="월간 분석 사용량">
+  <section class="my-quota mgroup my-section${quotaUsed !== null && quotaLimit - quotaUsed <= 5 ? ' is-urgent' : ''}" aria-label="월간 분석 사용량">
     <div class="my-quota-head"><div><b>${quotaTitle}</b><small>매월 ${quotaLimit}회</small></div><strong>${quotaUsed === null ? '—' : `${quotaUsed} / ${quotaLimit}`}</strong></div>
     <div class="my-quota-track" role="progressbar" aria-label="${quotaTitle} 사용량" aria-valuemin="0" aria-valuemax="${quotaLimit}" ${quotaUsed === null ? '' : `aria-valuenow="${quotaUsed}"`}><span style="width:${quotaPercent}%"></span></div>
     <p role="status">${esc(quotaDetail)}</p>

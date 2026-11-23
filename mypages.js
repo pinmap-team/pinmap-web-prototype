@@ -11,7 +11,6 @@ function myQuickCards(){
   return `<div class="my-quick" role="group" aria-label="바로가기">
     <button type="button" class="myq-card" data-page="favorites"><span class="myq-ico" aria-hidden="true">${likeHeartIcon()}</span><b>즐겨찾기</b></button>
     <button type="button" class="myq-card" data-page="courses"><span class="myq-ico" aria-hidden="true">${icon('route')}</span><b>내 코스</b></button>
-    <div class="myq-card"><span class="myq-ico" aria-hidden="true">${icon('question')}</span><b>미정</b></div>
   </div>`;
 }
 
@@ -274,7 +273,7 @@ Object.entries(RESET_OPTIONS).forEach(([key, option]) => {
 // 확인(회색 · 왼쪽) / 유지하기(검정 · 오른쪽)
 function confirmPop(title, desc, okAction, okLabel = '확인', cancelLabel = '유지하기'){
   modal('', `<div class="cfpop"><b id="confirm-title">${title}</b><p id="confirm-desc">${desc}</p>
-    <div class="cfpopbtns"><button class="cfok" data-action="${okAction}">${okLabel}</button><button class="cfkeep" data-action="close">${cancelLabel}</button></div></div>`);
+    <div class="cfpopbtns"><button class="cfok${okAction === 'leaveyes' ? ' is-danger' : ''}" data-action="${okAction}">${okLabel}</button><button class="cfkeep" data-action="close">${cancelLabel}</button></div></div>`);
   $('#sheet').classList.add('confirmpop');
   $('#sheet').setAttribute('aria-labelledby','confirm-title');
   $('#sheet').setAttribute('aria-describedby','confirm-desc');

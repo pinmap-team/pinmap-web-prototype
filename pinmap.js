@@ -213,14 +213,14 @@ obAutoplay();
 // 2026-11-23: 카테고리 하나씩이 아니라 묶음 단위로 골라요. 고른 묶음의 카테고리가 모두 관심사로 저장돼요(아이콘은 묶음의 대표 카테고리).
 const obGroupCount = () => OB_GROUPS.filter(([, ids]) => ids.every(id => onboardDraft.includes(id))).length;
 const OB_GROUPS = [
-  ['맛·음식', ['food', 'cafe', 'recipe']],
+  ['맛집·카페', ['food', 'cafe']],
   ['나들이', ['nature', 'travel', 'stay']],
   ['문화·체험', ['exhibition', 'festival', 'activity']],
   ['쇼핑·스타일', ['fashion', 'beauty', 'interior']],
   ['건강·가족', ['fitness', 'pets', 'family']],
   ['배움·일', ['learning', 'career', 'finance']],
   ['생활·디지털', ['life', 'tech']],
-  ['즐길 거리', ['creative', 'media', 'humor']]
+  ['즐길 거리', ['creative', 'recipe', 'media', 'humor']]
 ];
 function onboardScreen() {
   const s = onboardStep;

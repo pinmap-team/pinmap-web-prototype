@@ -141,7 +141,7 @@ body:has(.main .strip)::before{display:none!important}
 .course-timeline:before{display:none}
 .course-row:not(:last-child):before{content:'';position:absolute;left:2px;top:31px;bottom:-21px;width:2px;background:var(--color-disabled)}
 /* The dock avatar uses the same markup and saved photo as the My page. */
-.bottomnav .navitem .pm-nav-avatar{box-sizing:border-box;width:28px;height:28px;min-width:28px;border-radius:50%;font-size:12px;line-height:1;background:#111!important;color:#fff!important;overflow:hidden}
+.bottomnav .navitem .pm-nav-avatar{box-sizing:border-box;width:28px;height:28px;min-width:28px;border-radius:50%;font-size:12px;line-height:1;background:#333!important;color:#fff!important;overflow:hidden}
 .bottomnav .navitem .pm-nav-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 /* Course action spacing. */
 
@@ -160,7 +160,7 @@ body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:no
 .lm-expanded-pin{position:relative;display:flex;align-items:center;gap:var(--space-md);width:240px;height:88px;padding:var(--space-md) var(--space-xl) var(--space-md) var(--space-sm);border:2px solid var(--color-surface);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);cursor:pointer;text-align:left;animation:pin-expand .16s ease-out;transform-origin:23px center}
 .lm-pin-symbol{flex:none;width:28px;font-size:25px;text-align:center}
 .lm-pin-copy{min-width:0;flex:1;display:grid;gap:3px}
-.lm-pin-copy b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#222}
+.lm-pin-copy b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#333}
 .lm-pin-copy small{font-size:10px;color:#777}
 .lm-pin-copy>span{font-size:10px;color:#555;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .lm-pin-collapse{position:absolute;right:9px;top:8px;color:#888;font-size:16px;line-height:1}
@@ -211,7 +211,7 @@ body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:no
 
 .lm-expanded-pin{flex-direction:row;align-items:center;gap:var(--space-md);width:240px;height:88px;padding:var(--space-md) var(--space-xl) var(--space-md) var(--space-sm);overflow:hidden;transform-origin:23px center}
 .lm-pin-photo,.lm-pin-photo-placeholder{display:block;width:60px;height:60px;flex:0 0 60px;object-fit:cover;border-radius:11px}
-.lm-pin-photo-placeholder{display:grid;place-items:center;font-size:28px;background:var(--t-soft,#EFEFF1)}
+.lm-pin-photo-placeholder{display:grid;place-items:center;font-size:28px;background:var(--t-soft,#EFEFEF)}
 .lm-expanded-pin .lm-pin-copy{padding:0;gap:3px}
 .lm-pin-collapse{display:grid;place-items:center;width:16px;height:16px;right:6px;top:7px;background:transparent;color:#888;font-size:16px;box-shadow:none}
 

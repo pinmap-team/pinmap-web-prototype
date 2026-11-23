@@ -24,7 +24,7 @@
 .my-shortcuts button:focus-visible{outline:2px solid currentColor;outline-offset:-2px;border-radius:var(--rounded-sm)}
 
 /* Simulated keyboard appears only in the desktop-sized prototype preview. */
-#pm-keyboard-preview{position:fixed;inset:auto 0 0;z-index:2000;display:grid;gap:8px;max-width:480px;margin:auto;padding:6px 5px 0;background:#D9DDE4;box-shadow:0 -8px 24px #1112;transform:translateY(105%);opacity:0;visibility:hidden;pointer-events:none;transition:transform .24s ease,opacity .24s ease,visibility .24s}
+#pm-keyboard-preview{position:fixed;inset:auto 0 0;z-index:2000;display:grid;gap:8px;max-width:480px;margin:auto;padding:6px 5px 0;background:#DDDDDD;box-shadow:0 -8px 24px #1112;transform:translateY(105%);opacity:0;visibility:hidden;pointer-events:none;transition:transform .24s ease,opacity .24s ease,visibility .24s}
 .pm-keyboard-open #pm-keyboard-preview{transform:translateY(0);opacity:1;visibility:visible;pointer-events:auto}
 .pm-keyboard-open .bottomnav{visibility:hidden!important}
 
@@ -98,16 +98,16 @@
 .bottomnav .pm-nav-main .pm-nav-indicator{top:4px;height:56px}
 .bottomnav .pm-nav-indicator::before{height:56px;border-radius:28px}
 @media(prefers-reduced-motion:reduce){.live-map .lm-header .lm-search-row,.live-map .lm-header-search .lm-search-open-icon,.live-map .lm-header-search .lm-search-close-icon{transition:none}}
-.pm-keyboard-tools{display:flex;justify-content:space-between;align-items:center;height:31px;padding:0 18px;color:#4C5058;font-size:13px}
+.pm-keyboard-tools{display:flex;justify-content:space-between;align-items:center;height:31px;padding:0 18px;color:#505050;font-size:13px}
 .pm-keyboard-tools span:first-child,.pm-keyboard-tools span:last-child{font-size:20px}
 .pm-keyboard-row{display:flex;justify-content:center;gap:5px;width:100%;height:44px}
-.pm-keyboard-row button{flex:1;min-width:0;padding:0;border:0;border-radius:5px;background:#fff;box-shadow:0 1px 0 #AEB2BA;color:#202127;font:500 18px -apple-system,BlinkMacSystemFont,sans-serif}
+.pm-keyboard-row button{flex:1;min-width:0;padding:0;border:0;border-radius:5px;background:#fff;box-shadow:0 1px 0 #B2B2B2;color:#212121;font:500 18px -apple-system,BlinkMacSystemFont,sans-serif}
 .pm-keyboard-third button:first-child,.pm-keyboard-third button:last-child,.pm-keyboard-bottom button:first-child{background:#ABB2BE}
 .pm-keyboard-bottom{height:45px;margin:1px 0 0}
 .pm-keyboard-bottom button{font-size:14px}
 .pm-keyboard-bottom button:nth-child(2){flex:5;font-size:13px}
 .pm-keyboard-bottom button:last-child{flex:1.5;background:#477ED5;color:#fff}
-.pm-keyboard-home{width:108px;height:4px;margin:8px auto 6px;border-radius:4px;background:#26282D}
+.pm-keyboard-home{width:108px;height:4px;margin:8px auto 6px;border-radius:4px;background:#282828}
 @media (hover:none) and (pointer:coarse){#pm-keyboard-preview{display:none!important}}
 @media (prefers-reduced-motion:reduce){#pm-keyboard-preview{transition:none}}
 

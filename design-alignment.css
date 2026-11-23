@@ -257,8 +257,8 @@ button[aria-busy="true"]>*{visibility:hidden}
 
 [data-theme="dark"] .bottomnav .pm-nav-indicator::before{background:linear-gradient(145deg,#ffffff24,#ffffff0d 52%,#ffffff1c);border-color:#ffffff30}
 [data-theme="dark"] .bottomnav .pm-nav-main::after{background:linear-gradient(120deg,#ffffff40,#ffffff0d,#ffffff30)}
-[data-theme="dark"] #pm-keyboard-preview{background:#202023;color:var(--color-on-surface)}
-[data-theme="dark"] #pm-keyboard-preview button{background:#3b3b40;color:#fff}
+[data-theme="dark"] #pm-keyboard-preview{background:#202020;color:var(--color-on-surface)}
+[data-theme="dark"] #pm-keyboard-preview button{background:#3c3c3c;color:#fff}
 [data-theme="dark"] :is(.choice-popover,.choice-option,.cm-sheet,.cm-search,.course-card){background:var(--color-surface);color:var(--color-on-surface)}
 [data-theme="dark"] .main .strip{background:var(--color-disabled)!important;color:var(--color-on-surface)}
 [data-theme="dark"] .cfpage .cf-front{background:linear-gradient(180deg,rgba(45,45,49,.55),rgba(32,32,35,.92))}
@@ -269,7 +269,7 @@ button[aria-busy="true"]>*{visibility:hidden}
 [data-theme="dark"] .leaflet-container{background:var(--color-neutral)!important}
 [data-theme="dark"] .lm-location-demo{background:var(--color-surface);color:var(--color-secondary)}
 [data-theme="dark"] :is(.dt,.dtsheet,.esfoot,.esshare,.ntcard,.ntghost){background:var(--color-surface);color:var(--color-on-surface)}
-[data-theme="dark"] .dtbar::before{background:linear-gradient(180deg,#1b1b1d00,var(--color-surface) 50px)}
+[data-theme="dark"] .dtbar::before{background:linear-gradient(180deg,#1b1b1b00,var(--color-surface) 50px)}
 [data-theme="dark"] :is(.dtbtn,.dtfav){background:var(--t-glass);color:var(--color-on-surface)}
 [data-theme="dark"] :is(.dtprimary,.essubmit,.ntprimary){background:var(--color-primary);color:var(--color-neutral)}
 [data-theme="dark"] :is(.dtwarn,.dtgone,.eschip,.ntclose,.dtcopy:hover){background:var(--color-disabled);color:var(--color-on-surface)}
@@ -288,8 +288,8 @@ button[aria-busy="true"]>*{visibility:hidden}
 [data-theme="dark"] #onboarding .ob-action-back{background:var(--color-disabled);color:var(--color-on-surface)}
 [data-theme="dark"] #onboarding .ob-num{background:var(--color-primary);color:var(--color-neutral)}
 /* External app illustrations retain their own light appearance. */
-[data-theme="dark"] #onboarding .ob-phone{background:#fff!important;color:#111;--ob-ink:#111;--ob-sub:#606060;--ob-key:#111;--ob-on-key:#fff}
-[data-theme="dark"] #onboarding .ob-phone-sheet{color:#111}
+[data-theme="dark"] #onboarding .ob-phone{background:#fff!important;color:#333;--ob-ink:#333;--ob-sub:#606060;--ob-key:#333;--ob-on-key:#fff}
+[data-theme="dark"] #onboarding .ob-phone-sheet{color:#333}
 
 /* Onboarding uses the existing 25 design roles; external phone UI remains artwork. */
 #onboarding{--ob-key:var(--color-primary);--ob-key-strong:var(--color-primary);--ob-key-soft:var(--color-disabled);--ob-on-key:var(--color-neutral);--ob-ink:var(--color-on-surface);--ob-sub:var(--color-secondary);--ob-line:var(--color-border)}
@@ -770,7 +770,7 @@ body:has(.location-confirm) .bottomnav{display:none!important}
 .address-search-entry>span{flex:1}
 
 /* Reuse the light token values inside a light preview on a dark settings page. */
-.pm-theme-preview[data-theme="light"]{--color-neutral:#F4F4F5;--color-surface:#FFFFFF;--color-on-surface:#111111;--color-secondary:#6B6B70;--color-border:#6B6B70;--color-primary:#111111;--color-primary-pressed:#333333;--color-disabled:#E8E8EA;--color-error:#D13D3D;--color-accent:#C6F5E1;color-scheme:light}
+.pm-theme-preview[data-theme="light"]{--color-neutral:#F4F4F4;--color-surface:#FFFFFF;--color-on-surface:#333333;--color-secondary:#6C6C6C;--color-border:#6C6C6C;--color-primary:#333333;--color-primary-pressed:#4D4D4D;--color-disabled:#E8E8E8;--color-error:#D13D3D;--color-accent:#C6F5E1;color-scheme:light}
 .pm-theme-preview[data-theme="dark"]{color-scheme:dark}
 
 /* Authentication: simple introduction and a separate sign-in panel. */
@@ -1393,8 +1393,8 @@ html,body{overscroll-behavior-y:contain}
 .bottomnav .pm-nav-main{border-color:#ffffffbd!important;box-shadow:0 12px 32px #26334c29,0 2px 8px #26334c18,inset 0 1px 0 #ffffffdd!important}
 .bottomnav .pm-nav-main::before,.bottomnav .pm-nav-main[data-refraction="true"]::before{background:radial-gradient(ellipse 48% 90% at var(--nav-light) 0%,#ffffffb8,transparent 85%),linear-gradient(150deg,#ffffffbd 0%,#ffffff70 49%,#e9f0ff9e 100%);-webkit-backdrop-filter:blur(26px) saturate(1.95);backdrop-filter:blur(26px) saturate(1.95)}
 .bottomnav .pm-nav-main::after{content:'';background:conic-gradient(from 115deg,#ffffffeb,#ffffff38 15%,#c5d3f58c 29%,#ffffffec 43%,#ffffff69 65%,#cbd7f371 80%,#ffffffeb)}
-.bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffffed,#eef3ffaf 68%,#ffffffc4)!important;border-color:#ffffffdf!important;box-shadow:none!important;transition:left .34s cubic-bezier(.2,.9,.25,1.2)}
-[data-theme="dark"] .bottomnav .pm-nav-main::before,[data-theme="dark"] .bottomnav .pm-nav-main[data-refraction="true"]::before{background:linear-gradient(145deg,#434751b8,#272b36a8 60%,#3d4351a8)}
+.bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffffed,#f3f3f3af 68%,#ffffffc4)!important;border-color:#ffffffdf!important;box-shadow:none!important;transition:left .34s cubic-bezier(.2,.9,.25,1.2)}
+[data-theme="dark"] .bottomnav .pm-nav-main::before,[data-theme="dark"] .bottomnav .pm-nav-main[data-refraction="true"]::before{background:linear-gradient(145deg,#474747b8,#2b2b2ba8 60%,#434343a8)}
 [data-theme="dark"] .bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffff42,#ffffff13)!important;border-color:#ffffff52!important;box-shadow:none!important}
 
 /* Keep the in-tab save job visible after its modal closes or the app page changes. */
@@ -1424,7 +1424,7 @@ html,body{overscroll-behavior-y:contain}
 /* Reels keep their 9:16 frame; landscape assets stay fully visible over a soft copy. */
 .cfpage .cf-items{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-md);justify-items:stretch}
 .cfpage .cf-item{width:100%;min-width:0;background:#111}
-.cfpage .cf-itemimg{aspect-ratio:9/16;background:#171719}
+.cfpage .cf-itemimg{aspect-ratio:9/16;background:#171717}
 .cfpage .cf-itemback{position:absolute;inset:0;overflow:hidden}
 .cfpage .cf-itemback img{display:block;width:100%;height:100%;object-fit:cover;filter:blur(20px) brightness(.65);transform:scale(1.12)}
 .cfpage .cf-itemimg>img,.cfpage .cf-itemimg>svg{position:relative;width:100%;height:100%;object-fit:cover}
@@ -1473,7 +1473,7 @@ html,body{overscroll-behavior-y:contain}
 .home-add-menu[data-open="true"] .home-add-options button:nth-child(2){transition-delay:52ms}
 .home-add-menu[data-open="true"] .home-add-options button:nth-child(3){transition-delay:74ms}
 .home-add-options button:hover,.home-add-options button:focus-visible{background:rgba(255,255,255,.14)}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.home-add-body{background:#1b1b1d}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.home-add-body{background:#1b1b1b}}
 @media(prefers-reduced-motion:reduce){.home-add-body,.home-add-fab,.home-add-options button{transition-duration:0s!important}.home-add-menu[data-sink="true"] :is(.home-add-body,.home-add-fab){scale:1}}
 
 /* The two input screens keep their existing save and ZIP handling. */
@@ -1750,7 +1750,7 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 @media(prefers-reduced-motion:reduce){.pm-savefx,.pm-savefx-check,.pm-savefx-fly,.pm-ai-chip,.lm-photo-marker.is-selected .lm-place-badge,.lm-carousel-card.pm-land,.pm-attn,.pm-press,.pm-pop,.pm-roll,.pm-step-fill,.pm-nav-bump .navicon,.pm-nav-plus{animation:none!important}.pm-savefx-check{stroke-dashoffset:0}}
 
 /* 2026-11-23 홈 마감 임박 배너: 캘린더 위젯 아래 카드로 (맨 위 고정 해제) */
-.layout .main .strip{position:relative!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important;width:auto!important;height:auto!important;z-index:auto!important;margin:var(--space-lg) 0 0;padding:var(--space-xs) var(--space-xs) var(--space-xs) var(--space-lg)!important;border-radius:var(--rounded-md);background:var(--color-surface)!important;box-shadow:var(--shadow-sm)}
+.layout .main .strip{position:relative!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important;width:auto!important;height:auto!important;z-index:auto!important;margin:var(--space-lg) 0 0;padding:var(--space-xs) var(--space-xs) var(--space-xs) var(--space-lg)!important;border-radius:var(--rounded-md);background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important}
 .layout .main:has(.strip){padding-top:var(--space-2xl)!important}
 [data-theme="dark"] .layout .main .strip{background:var(--color-surface)!important}
 
@@ -1768,7 +1768,7 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .bottomnav .pm-nav-main .pm-nav-gap{flex:0 0 64px;height:54px}
 .bottomnav .pm-nav-main .pm-nav-indicator{left:calc(4px + var(--nav-index,0) * (100% - 72px) / 4 + var(--nav-shift,0) * 64px)!important;width:calc((100% - 72px) / 4)!important}
 .bottomnav .home-add-menu{position:absolute!important;left:50%!important;right:auto!important;top:0!important;bottom:auto!important;width:64px!important;height:100%!important;translate:-50% 0;z-index:3;pointer-events:none}
-.bottomnav .home-add-fab{position:absolute!important;left:50%!important;right:auto!important;top:-20px!important;bottom:auto!important;width:60px!important;height:60px!important;min-height:60px;border-radius:50%!important;background:var(--color-primary)!important;color:var(--color-neutral)!important;box-shadow:0 0 0 5px var(--color-surface),var(--shadow-md)!important;transform:translateX(-50%);pointer-events:auto;transition:transform .2s cubic-bezier(.3,1.4,.5,1)}
+.bottomnav .home-add-fab{position:absolute!important;left:50%!important;right:auto!important;top:-20px!important;bottom:auto!important;width:60px!important;height:60px!important;min-height:60px;border-radius:50%!important;background:var(--color-primary)!important;color:var(--color-neutral)!important;box-shadow:var(--shadow-md)!important;transform:translateX(-50%);pointer-events:auto;transition:transform .2s cubic-bezier(.3,1.4,.5,1)}
 .bottomnav .home-add-fab .icon{width:26px!important;height:26px!important;stroke-width:2.2}
 .bottomnav .home-add-fab>span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .bottomnav .home-add-fab:active{transform:translateX(-50%) scale(.94)}
@@ -1809,13 +1809,13 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .ob-demo[data-stage="1"] .ob-demo-send{animation:pm-demo-press .3s ease-out 1.25s both}
 .ob-demo .ob-phone-options .ob-phone-selected{outline-color:transparent;background:transparent;transition:outline-color .2s,background .2s}
 .ob-demo[data-stage="2"] .ob-demo-share .ob-phone-selected,.ob-demo[data-stage="3"] .ob-demo-system .ob-phone-selected{animation:pm-demo-select .2s ease-out 1.25s both}
-.ob-demo .ob-demo-saved{position:absolute;left:50%;bottom:22px;z-index:3;display:flex;align-items:center;gap:5px;padding:5px 9px 5px 6px;border-radius:999px;background:#111;color:#fff;font-size:8px;font-weight:700;white-space:nowrap;opacity:0;transform:translate(-50%,10px);transition:opacity .3s,transform .35s cubic-bezier(.3,1.4,.5,1)}
+.ob-demo .ob-demo-saved{position:absolute;left:50%;bottom:22px;z-index:3;display:flex;align-items:center;gap:5px;padding:5px 9px 5px 6px;border-radius:999px;background:#333;color:#fff;font-size:8px;font-weight:700;white-space:nowrap;opacity:0;transform:translate(-50%,10px);transition:opacity .3s,transform .35s cubic-bezier(.3,1.4,.5,1)}
 .ob-demo .ob-demo-saved img{width:13px;height:13px;border-radius:4px;background:#fff}
 .ob-demo[data-stage="4"] .ob-demo-saved{opacity:1;transform:translate(-50%,0)}
 .ob-demo .ob-chip,.ob-demo .ob-demo-desc{transition:opacity .2s}
 @keyframes pm-demo-tap{0%{opacity:0;scale:.4}35%{opacity:1;scale:1}100%{opacity:0;scale:1.35}}
 @keyframes pm-demo-press{0%,100%{scale:1}50%{scale:.88}}
-@keyframes pm-demo-select{to{outline-color:#111;background:#F0F0F2}}
+@keyframes pm-demo-select{to{outline-color:#333;background:#F0F0F0}}
 @media(prefers-reduced-motion:reduce){.ob-demo .ob-demo-dim,.ob-demo .ob-demo-share,.ob-demo .ob-demo-system,.ob-demo .ob-demo-saved{transition:none}.ob-demo [class*="ob-demo-"]::after,.ob-demo .ob-demo-send,.ob-demo .ob-phone-selected{animation:none!important}}
 body:has(.dt) .bottomnav .home-add-menu{display:none!important}
 
@@ -1833,3 +1833,170 @@ body:has(.dt) .bottomnav .home-add-menu{display:none!important}
 #onboarding .step3 .ob-groupcard .ob-grouptext small{font:var(--type-body-sm);color:var(--color-secondary);white-space:normal;word-break:keep-all;line-height:1.35}
 #onboarding .step3 .ob-groupcard.on .ob-grouptext small{color:var(--color-on-surface);opacity:.75}
 [data-theme="dark"] #onboarding .step3 .ob-groupcard.on .ob-grouptext small{color:var(--color-neutral)}
+
+
+/* 2026-11-24 하단 메뉴·추가 버튼의 흰 테두리 선 제거(유리 바탕·그림자는 유지) */
+.bottomnav .pm-nav-main,.pm-nav-main{border:0!important;box-shadow:var(--shadow-sm)!important}
+.bottomnav .home-add-fab{border:0!important;outline:0}
+
+/* 2026-11-24 온보딩 2/2 묶음 카드 높이 축소: 고정 높이 없이 내용 + 위아래 space-sm, 아이콘 원 32px */
+#onboarding .ob-screen.step3 .ob-groupcards{grid-auto-rows:auto!important}
+#onboarding .step3 .ob-groupcard{min-height:0!important;height:auto!important;padding:var(--space-sm) var(--space-md)!important;gap:var(--space-sm)!important}
+#onboarding .step3 .ob-groupcard .ob-emoji{width:32px!important;height:32px!important;min-width:32px}
+#onboarding .step3 .ob-groupcard .ob-emoji :is(img,svg){width:20px!important;height:20px!important}
+#onboarding .step3 .ob-groupcard .ob-grouptext{gap:0}
+/* 2026-11-24: 다크 모드에서도 묶음 카드 높이를 똑같이 줄여요 (다크 전용 .ob-option 규칙보다 우선) */
+[data-theme="dark"] #onboarding .step3 .ob-groupcard{min-height:0!important;height:auto!important;padding:var(--space-sm) var(--space-md)!important;gap:var(--space-sm)!important}
+/* 2026-11-24: 다크 모드 지도 상단 카테고리 — 선택된 아이콘이 어두운 바탕(--color-surface)에 묻히지 않게 다크 전용 파일(on-surface #F4F4F4 · 안쪽 선 surface #2A2A2A)로 바꿔요 */
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/activity-active.svg"]{content:url("img/category/activity-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/beauty-active.svg"]{content:url("img/category/beauty-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/cafe-active.svg"]{content:url("img/category/cafe-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/career-active.svg"]{content:url("img/category/career-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/creative-active.svg"]{content:url("img/category/creative-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/exhibition-active.svg"]{content:url("img/category/exhibition-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/family-active.svg"]{content:url("img/category/family-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/fashion-active.svg"]{content:url("img/category/fashion-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/festival-active.svg"]{content:url("img/category/festival-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/finance-active.svg"]{content:url("img/category/finance-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/fitness-active.svg"]{content:url("img/category/fitness-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/food-active.svg"]{content:url("img/category/food-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/humor-active.svg"]{content:url("img/category/humor-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/interior-active.svg"]{content:url("img/category/interior-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/learning-active.svg"]{content:url("img/category/learning-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/life-active.svg"]{content:url("img/category/life-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/media-active.svg"]{content:url("img/category/media-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/nature-active.svg"]{content:url("img/category/nature-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/other-active.svg"]{content:url("img/category/other-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/pets-active.svg"]{content:url("img/category/pets-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/recipe-active.svg"]{content:url("img/category/recipe-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/stay-active.svg"]{content:url("img/category/stay-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/tech-active.svg"]{content:url("img/category/tech-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/travel-active.svg"]{content:url("img/category/travel-active-dark.svg")}
+/* 2026-11-24: 아이콘 선 굵기 통일 — 크기(14~36px)와 상관없이 화면에서 1.7px, 끝·꺾임은 둥글게 */
+html body :is(svg.icon,.course-share svg,.course-header-actions svg,.course-title-edit svg,svg.ob-icon) :is(path,circle,rect,line,polyline,polygon,ellipse){vector-effect:non-scaling-stroke;stroke-width:1.7px!important;stroke-linecap:round;stroke-linejoin:round}
+.live-map .lm-category-svg .lm-category-all{stroke:currentColor;stroke-width:1.7px;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+/* 2026-11-24: 내비 아이콘 — 선택 전(선)과 선택 후(같은 윤곽을 채움) 모양이 같아요 */
+html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph{width:26px!important;height:26px!important;fill:none!important;stroke:currentColor!important}
+html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph.is-selected .pm-nav-fill{fill:currentColor!important;stroke:currentColor!important}
+/* 2026-11-24: 묶음 카드 높이 조금 늘림(위아래 space-md) · 카드 묶음을 남는 공간 세로 가운데에 둠 */
+html body #onboarding .ob-screen.step3 .ob-groupcard{padding:var(--space-md)!important;gap:var(--space-sm)!important}
+html body #onboarding .ob-screen.step3 .ob-groupcards{align-content:center!important;margin-top:0!important;padding-block:var(--space-lg)!important}
+/* 2026-11-24: 온보딩 2/2 묶음 카드 — 아이콘 원 위·글자 아래로 쌓아 카드 높이를 내용으로 채움. 설명과 버튼 사이 공간을 거의 채우고 세로 가운데 */
+html body #onboarding .ob-screen.step3 .ob-groupcard{flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;padding:var(--space-lg)!important;gap:var(--space-md)!important;text-align:left}
+html body #onboarding .ob-screen.step3 .ob-groupcard .ob-emoji{width:40px!important;height:40px!important;min-width:40px}
+html body #onboarding .ob-screen.step3 .ob-groupcard .ob-grouptext{gap:var(--space-xs)}
+html body #onboarding .ob-screen.step3 .ob-groupcards{gap:var(--space-sm)!important;padding-block:var(--space-md)!important}
+/* 2026-11-24: 카테고리 아이콘 크기 통일 — 목록·칩·메뉴·지도 상단·온보딩 모두 24px(지도 사진 배지만 16px), 글자와 세로 가운데 */
+html body img.pm-category-icon{width:24px!important;height:24px!important;vertical-align:middle}
+html body .live-map .lm-badge-category img.pm-category-icon{width:16px!important;height:16px!important}
+html body .live-map .lm-header .lm-categories .lm-category-svg{width:24px!important;height:24px!important}
+html body .kwopt .kwico{width:24px!important;height:24px;display:grid;place-items:center;flex:none}
+/* 지도 상단: 카페(손잡이)·전시(오른쪽 절취선) 아이콘은 모양 때문에 왼쪽으로 쏠려 보여 1px 오른쪽으로 */
+html body .live-map .lm-header .lm-categories img.pm-category-icon:is([src*="/cafe-"],[src*="/exhibition-"]){transform:translateX(1px)}
+html body #onboarding .ob-screen.step3 .ob-groupcard .ob-emoji :is(img,svg){width:24px!important;height:24px!important}
+/* 2026-11-24: 마이 페이지 아이콘 크기·정렬 통일 — 메뉴 줄 아이콘 24px(24px 칸 가운데), 줄 끝 화살표 20px, 상단 알림 24px(다른 상단 아이콘과 같게) */
+html body .mrow .mrico{width:24px!important;min-width:24px;display:inline-grid!important;place-items:center;text-align:center}
+html body .mrow .mrico svg.icon{width:24px!important;height:24px!important;vertical-align:middle}
+html body .mrow>svg.icon:last-child,html body .myprofile .myprofile-go .icon{width:20px!important;height:20px!important}
+html body .main>.topbar .bellbtn .icon{width:24px!important;height:24px!important}
+/* 2026-11-24: 묶음 카드 — 아이콘 원 오른쪽에 묶음 이름, 그 아래 줄 전체에 포함 카테고리 */
+html body #onboarding .ob-screen.step3 .ob-groupcard{display:grid!important;grid-template-columns:40px minmax(0,1fr);grid-template-areas:"icon title" "desc desc";align-items:center!important;align-content:center;column-gap:var(--space-sm)!important;row-gap:var(--space-md)!important}
+html body #onboarding .ob-screen.step3 .ob-groupcard .ob-emoji{grid-area:icon}
+html body #onboarding .ob-screen.step3 .ob-groupcard .ob-grouptext{display:contents!important}
+html body #onboarding .ob-screen.step3 .ob-groupcard .ob-label{grid-area:title;min-width:0}
+html body #onboarding .ob-screen.step3 .ob-groupcard .ob-grouptext small{grid-area:desc}
+/* 2026-11-24: 카드 묶음이 설명~버튼 사이를 채움 — 4줄이 남는 높이를 나눠 갖고, 카드 안은 위(아이콘·이름)·아래(포함 카테고리)로 */
+html body #onboarding .ob-screen.step3 .ob-groupcards{align-content:stretch!important;grid-auto-rows:minmax(0,1fr)!important;padding-block:var(--space-lg)!important}
+html body #onboarding .ob-screen.step3 .ob-groupcard{align-content:space-between!important;height:auto!important}
+/* 2026-11-24: 프로필 사진 변경 갤러리 아이콘(16~18px)은 작아서 선을 1.3px로 얇게 */
+html body :is(.account-photo-edit,.pfchange) svg.icon :is(path,circle,rect){stroke-width:1.3px!important}
+/* 2026-11-24: 하단 내비 가운데 + 추가 버튼 — 검정 원 위 26px +가 얇아 보여 선 2.2px(예외) */
+html body .bottomnav .home-add-fab svg.icon :is(path,line){stroke-width:2.2px!important}
+/* 2026-11-24: 지도 화면에서도 + 추가 버튼은 홈과 같은 primary 원(지도용 반투명 흰 버튼 스타일이 덮어써 +가 안 보이던 것) */
+html body .bottomnav .home-add-menu .home-add-fab{background:var(--color-primary)!important;color:var(--color-neutral)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+/* 2026-11-24: 작게(12~18px) 쓰는 아이콘은 선 1.3px — 카드 메타(시계·핀), 추가 메뉴, 휴대폰 모형, 코스 장소 추가·제목 편집, AI 설명, 프로필 사진 변경. 펼침·오른쪽 화살표와 체크는 1.7px 유지 */
+html body :is(.cf-itemmeta,.home-add-options,.ob-phone,.course-add-place,.dtai,.account-photo-edit,.pfchange) svg.icon :is(path,circle,rect,line),html body .course-title-edit svg :is(path,circle,rect,line){stroke-width:1.3px!important}
+/* 지도 사진 배지(16px) 카테고리 아이콘은 선 1.3px 전용 파일 */
+html body .lm-badge-category img.pm-category-icon[src*="/activity-inactive.svg"]{content:url("img/category/activity-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/beauty-inactive.svg"]{content:url("img/category/beauty-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/cafe-inactive.svg"]{content:url("img/category/cafe-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/career-inactive.svg"]{content:url("img/category/career-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/creative-inactive.svg"]{content:url("img/category/creative-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/exhibition-inactive.svg"]{content:url("img/category/exhibition-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/family-inactive.svg"]{content:url("img/category/family-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/fashion-inactive.svg"]{content:url("img/category/fashion-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/festival-inactive.svg"]{content:url("img/category/festival-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/finance-inactive.svg"]{content:url("img/category/finance-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/fitness-inactive.svg"]{content:url("img/category/fitness-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/food-inactive.svg"]{content:url("img/category/food-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/humor-inactive.svg"]{content:url("img/category/humor-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/interior-inactive.svg"]{content:url("img/category/interior-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/learning-inactive.svg"]{content:url("img/category/learning-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/life-inactive.svg"]{content:url("img/category/life-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/media-inactive.svg"]{content:url("img/category/media-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/nature-inactive.svg"]{content:url("img/category/nature-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/other-inactive.svg"]{content:url("img/category/other-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/pets-inactive.svg"]{content:url("img/category/pets-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/recipe-inactive.svg"]{content:url("img/category/recipe-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/stay-inactive.svg"]{content:url("img/category/stay-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/tech-inactive.svg"]{content:url("img/category/tech-inactive-sm.svg")}
+html body .lm-badge-category img.pm-category-icon[src*="/travel-inactive.svg"]{content:url("img/category/travel-inactive-sm.svg")}
+/* 2026-11-24: 온보딩 2/2 — 설명과 카드 사이 space-xl, 카드는 내용 높이(늘이지 않음) */
+html body #onboarding .ob-screen.step3 .ob-groupcards{align-content:start!important;grid-auto-rows:auto!important;padding-top:var(--space-xl)!important;padding-bottom:var(--space-md)!important}
+html body #onboarding .ob-screen.step3 .ob-groupcard{align-content:center!important;row-gap:var(--space-md)!important}
+/* 2026-11-24: 홈 캘린더 아래 카테고리 칩 아이콘은 20px(칩 높이 32px에 맞춰 한 단계 작게) */
+html body .homecategories .prefchip img.pm-category-icon{width:20px!important;height:20px!important}
+/* 2026-11-24: 온보딩 2/2 설명과 카드 사이 space-2xl(32px) */
+html body #onboarding .ob-screen.step3 .ob-groupcards{padding-top:var(--space-2xl)!important}
+/* 2026-11-24: 홈 카테고리 칩 아이콘 — SVG를 mask로 써서 토큰 색으로 칠함(기본 icon-muted, 마우스 올림·포커스 icon-hover) */
+html body .homecategories .prefchip .pm-category-mask{display:inline-block;flex:none;width:20px;height:20px;vertical-align:middle;background-color:var(--color-icon-muted);-webkit-mask:var(--pm-cat-icon) center/contain no-repeat;mask:var(--pm-cat-icon) center/contain no-repeat;transition:background-color .15s ease}
+html body .homecategories .prefchip:is(:hover,:focus-visible) .pm-category-mask{background-color:var(--color-icon-hover)}
+/* 2026-11-24: 스낵바 — 화면 가운데, 좌우 여백 space-2xl */
+html body #snackbar{top:50%!important;bottom:auto!important;padding:var(--space-lg) var(--space-2xl)!important;transform:translate(-50%,-50%) scale(.96)!important;opacity:0;transition:opacity .2s ease,transform .2s ease,visibility .2s}
+html body #snackbar.show{transform:translate(-50%,-50%)!important;opacity:1}
+/* 2026-11-24: 마이 바로가기 카드 2개(‘미정’ 삭제) → 2열 */
+html body .my-quick{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+/* 2026-11-24: AI 설명 카드 배경 = --gradient-accent (라이트·다크 같음) */
+html body .dtsum,html body [data-theme="dark"] .dtsum,html body .dt.dt-photo .dtsheet>.dtsum,html body[data-theme="dark"] .dtsum,[data-theme="dark"] body .dtsum{background:var(--gradient-accent)!important}
+html body .dtsum h2.dtai{background:transparent!important}
+html[data-theme="dark"] body .dt.dt-photo .dtsheet>.dtsum,html[data-theme="dark"] body .dtsum{background:var(--gradient-accent)!important}
+/* 2026-11-24: 상세 사진 위 카테고리 알약(카페·팝업)은 테두리 없이 */
+html body .dthpill{border:0!important}
+/* 2026-11-24: AI 설명 — 한 줄 요약(첫 문장) + 오른쪽 끝 16px 펼침 화살표, 펼치면 전체 설명 */
+html body .dtsum .dtsum-head{display:flex;align-items:center;gap:var(--space-sm);width:100%;margin:var(--space-sm) 0 0;padding:0;border:0;background:none;color:inherit;text-align:left;font:var(--type-body-md);cursor:pointer}
+html body .dtsum .dtsum-line{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;word-break:keep-all}
+html body .dtsum .dtsum-head>svg.icon{flex:none;width:16px!important;height:16px!important;transition:transform .2s ease}
+html body .dtsum.is-open .dtsum-line{white-space:normal;overflow:visible}
+html body .dtsum.is-open .dtsum-head>svg.icon{transform:rotate(180deg)}
+html body .dtsum .dtsum-rest{display:none;margin:var(--space-xs) 0 0;font:var(--type-body-md);word-break:keep-all}
+html body .dtsum.is-open .dtsum-rest{display:block}
+html body .dtsum.is-single .dtsum-head{cursor:default}
+html body .dtsum.is-single .dtsum-head>svg.icon{display:none}
+@media(prefers-reduced-motion:reduce){html body .dtsum .dtsum-head>svg.icon{transition:none}}
+/* 2026-11-24: 컬렉션 폴더 안 카드 — 단어 단위 줄바꿈, 저장 시점 자리에 즐겨찾기 별 */
+html body .cf-item :is(h3,.cf-itemdesc,.cf-itemmeta,.cf-itemmeta span){word-break:keep-all;overflow-wrap:break-word}
+html body .cf-item .cf-fav{position:absolute;top:var(--space-sm);right:var(--space-sm);z-index:2;display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:rgba(17,17,17,.32);color:#fff;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+html body .cf-item .cf-fav svg.icon{width:20px!important;height:20px!important}
+html body .cf-item .cf-fav::after{content:'';position:absolute;inset:-6px}
+/* 2026-11-24: 마이 — 무료 분석은 카드, 다크에서 섹션 배경 없음, 남은 횟수 5회 이하면 막대 빨강 */
+html body .my-quota.my-section{padding:var(--space-lg)!important;border:0!important;border-radius:var(--rounded-lg)!important;margin-bottom:var(--space-lg)!important;background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important}
+html[data-theme="dark"] body .mgroup.my-section:not(.my-quota){background:transparent!important}
+html body .my-quota.is-urgent .my-quota-track span{background:var(--color-error)!important}
+/* 2026-11-24: 탈퇴 확인 — 왼쪽 '탈퇴하기' 글씨 빨강, 다크 모드 버튼은 한 단계 어둡게(surface) */
+html body .confirmpop .cfok.is-danger{color:var(--color-error)!important}
+html[data-theme="dark"] body .confirmpop .cfok.is-danger{background:var(--color-neutral)!important}
+/* 2026-11-24: 캘린더 카테고리 버튼 + 카테고리 선택 시 시작일~마감일 막대 */
+html body .calcats{display:flex;gap:var(--space-sm);overflow-x:auto;margin:0 calc(-1 * var(--space-xl)) var(--space-md);padding:var(--space-xs) var(--space-xl);scrollbar-width:none}
+html body .calcats::-webkit-scrollbar{display:none}
+html body .calcat{flex:none;display:inline-flex;align-items:center;gap:var(--space-xs);min-height:32px;padding:0 var(--space-md);border:0;border-radius:999px;background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md);box-shadow:var(--shadow-sm)}
+html body .calcat :is(img.pm-category-icon,svg.icon){width:20px!important;height:20px!important}
+html body .calcat.on{background:var(--color-accent);color:var(--color-on-surface)}
+html[data-theme="dark"] body .calcat.on{color:var(--color-neutral)}
+html body .calgrid.is-range .calcell{height:calc(40px + var(--cal-lanes,0) * 18px + var(--space-xs));align-items:start;overflow:visible}
+html body .calgrid.is-range .calcell>span{width:32px;height:32px;margin-top:2px}
+html body .calspan{position:absolute;left:0;right:0;height:16px;background:var(--color-accent);pointer-events:none}
+html body .calspan.lane-0{top:40px}html body .calspan.lane-1{top:58px}html body .calspan.lane-2{top:76px}
+html body .calspan.is-start{left:var(--space-xs);border-top-left-radius:var(--rounded-sm);border-bottom-left-radius:var(--rounded-sm)}
+html body .calspan.is-end{right:var(--space-xs);border-top-right-radius:var(--rounded-sm);border-bottom-right-radius:var(--rounded-sm)}
+html body .calspan em{position:absolute;z-index:2;top:0;left:var(--space-xs);width:calc(var(--span,1) * 100% - var(--space-sm));overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:var(--type-body-sm);font-style:normal;color:var(--color-on-surface);text-align:left}
+html[data-theme="dark"] body .calspan em{color:var(--color-neutral)}
