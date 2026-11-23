@@ -34,8 +34,10 @@ function pinmapAccountItem(record, id) {
       .filter(word=>typeof word==='string').map(word=>word.normalize('NFKC').trim().replace(/\s+/g,' '))
       .filter(word=>word.length>=2&&word.length<=24&&/^[\p{L}\p{N}_ ·-]+$/u.test(word)&&
         !['기타','일반','생활정보','콘텐츠','미분류','전체','전체저장'].includes(word.replace(/\s/g,''))))].slice(0,4) : [];
-  const fixedClassified = classification?.source === 'gemini_decisions' && classification.status === 'classified'
-    && classification.model === 'gemini-decision-1' && Number.isFinite(classification.confidence)
+  const decisionModelValid = (classification?.source === 'gemini_decisions' && classification.model === 'gemini-decision-1')
+    || (classification?.source === 'openai_decisions' && /^gpt-[A-Za-z0-9.-]{1,50}$/.test(classification.model || ''));
+  const fixedClassified = decisionModelValid && classification.status === 'classified'
+    && Number.isFinite(classification.confidence)
     && classification.confidence >= .8 && classification.confidence <= 1
     && Object.hasOwn(categoryLabels, classification.category);
   const classified = fixedClassified || keywords.length > 0;
