@@ -190,19 +190,7 @@ const faqSetPanel = (panel, box, opacity) => {
 };
 function faqInit(root){
   if (!root || !root.isConnected) return;
-  root.style.minHeight = '';
-  const items = [...root.querySelectorAll('.faq-item')], answers = items.map(item => item.querySelector('.faq-answer'));
-  const openHeight = faqOpen === null ? 0 : answers[faqOpen].getBoundingClientRect().height;
-  const maxHeight = Math.max(...answers.map(answer => {
-    const hidden = answer.hidden; answer.hidden = false;
-    const height = answer.scrollHeight; answer.hidden = hidden;
-    return height;
-  }));
-  const scale = root.getBoundingClientRect().width / root.offsetWidth || 1;
-  const baseHeight = root.offsetHeight - openHeight / scale;
-  root.dataset.baseHeight = String(baseHeight);
-  root.dataset.maxAnswerHeight = String(maxHeight);
-  root.style.minHeight = `${baseHeight + (faqOpen === null ? 0 : maxHeight)}px`;
+  const items = [...root.querySelectorAll('.faq-item')];
   if (faqOpen !== null) faqSetPanel(root.querySelector('.faq-slide'),faqBox(root,items[faqOpen]),1);
   root.dataset.ready = 'true';
 }
@@ -229,7 +217,6 @@ function faqChoose(root, index){
   faqSetPanel(panel,fromPanel,fromOpacity);
   root.offsetHeight;
   faqOpen = next;
-  root.style.minHeight = `${Number(root.dataset.baseHeight) + (next === null ? 0 : Number(root.dataset.maxAnswerHeight))}px`;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const settle = () => {
     if (moveId !== faqMoveId) return;
