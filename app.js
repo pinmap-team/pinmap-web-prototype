@@ -248,7 +248,7 @@ document.addEventListener('submit',async e=>{
     const title=f.elements.namedItem('title').value.trim()||sourceName.slice(0,50), ai=!PM_ENV.development&&f.type.value==='ai', type=ai?guessType(title+' '+u.href):f.type.value, sample=!PM_ENV.development&&f.url.value.includes('sample-prototype');
     const x={id:Date.now(),title,type,category:shortType(type),source:sample?'YouTube':u.hostname.replace(/^www\./,''),ago:'방금',savedAt:new Date().toISOString(),desc:PM_ENV.development?'':'새롭게 담아둔 나의 취향',memo:f.memo.value,art:typeOf(type).art,collection:f.collection.value,url:u.href,sample,aiClassified:ai};
     if(typeOf(type).place)x.pending=true;
-    items.unshift(x);afterChange();$('#sheet').close();page='library';openDetail(x.id);
+    items.unshift(x);afterChange();$('#sheet').close();page='library';openDetail(x.id);window.PinmapSaveFx?.(ai?shortType(type):'');
     toast(ai?`저장했어요. AI가 ‘${type}’로 분류했어요.`:'저장했어요. 필요할 때 다시 꺼내 보세요.');
   } else if(e.target.id==='editform'){
     e.preventDefault();const data=new FormData(e.target),x=items.find(x=>x.id===detailId);

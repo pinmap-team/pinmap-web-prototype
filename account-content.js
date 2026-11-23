@@ -460,7 +460,7 @@ if (PM_ENV.requiresAuth) (() => {
       const item = accountItem(result.item);
       items = [item, ...items.filter(x => x.url !== item.url)];
       void window.PinmapBilling?.refresh();
-      PinmapSaveProgress.finish();
+      PinmapSaveProgress.finish('', {category:item.contentKind === 'unknown' && item.status !== 'extracted' ? '' : item.category});
       document.getElementById('sheet')?.close();
       closeOnboarding();
       if (item.mapLocations.length && !item.events.length) {window.pmMapFocus = item.id; go('map');}

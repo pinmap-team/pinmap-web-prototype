@@ -289,7 +289,7 @@
   });
   function expandPlace(place,moveMap=true,scrollCard=true) {
     const key=placeKey(place),entry=markerEntries.get(key);if(!entry)return;
-    if(expandedKey!==key){clearSelection();expandedKey=key;updateMarker(entry,true);}
+    if(expandedKey!==key){clearSelection();expandedKey=key;updateMarker(entry,true);window.PinmapFx?.landCard(key);}
     if(scrollCard){
       const card=[...document.querySelectorAll('.lm-carousel-card')].find(node=>node.dataset.placeKey===key);
       card?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});

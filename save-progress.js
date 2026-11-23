@@ -22,7 +22,13 @@
       : job.phase === 'done' ? '저장 결과를 확인했어요.' : escapeHtml(job.error);
     return `${job.phase === 'running' ? '<div class="pm-loading pm-loading-compact"><span class="pm-spinner" aria-hidden="true"></span></div>' : ''}<div class="pm-save-status-row"><strong>${title}</strong><span>${percent}%</span></div>
       <div class="pm-save-meter" role="progressbar" aria-label="${title} 예상 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}"><span style="width:${percent}%"></span></div>
-      <p>${detail}</p>`;
+      <p>${detail}</p>${aiChip()}`;
+  }
+  // 2026-11-23 AI 분류: 분석하는 동안 반짝이는 칩, 끝나면 결과 카테고리로 바뀌어요.
+  function aiChip() {
+    if (job.phase === 'running') return `<span class="pm-ai-chip is-loading" style="animation-delay:-${(Date.now() % 1400) / 1000}s">AI가 분류하는 중</span>`;
+    if (job.phase === 'done' && job.category) return `<span class="pm-ai-chip is-done">AI 분류 · ${escapeHtml(job.category)}</span>`;
+    return '';
   }
   function render() {
     panel.hidden = !job;
@@ -69,14 +75,15 @@
     }, 1000);
     return true;
   }
-  function finish(error) {
+  function finish(error, info = {}) {
     if (!job || job.phase !== 'running') return;
     clearInterval(ticker);
     ticker = null;
     job.phase = error ? 'failed' : 'done';
     job.error = error || '';
-    if (!error) job.percent = 100;
+    if (!error) { job.percent = 100; job.category = info.category || ''; }
     render();
+    if (!error) window.PinmapSaveFx?.(job.category);
     dismiss = setTimeout(clear, error ? 8000 : 5000);
   }
   window.PinmapSaveProgress = Object.freeze({start, finish, clear, render,

@@ -1711,3 +1711,40 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .calxpage .calx-check .icon{width:14px;height:14px}
 .calxpage .calx-pick.on .calx-check{background:var(--color-primary);border-color:var(--color-primary)}
 .calxpage .calx-pick:not(.on) b{color:var(--color-secondary)}
+
+/* 2026-11-23 인터랙션 (150~550ms, 기존 색·그림자 토큰만 사용, 동작 줄이기 설정이면 끔) */
+.pm-savefx{position:fixed;left:50%;bottom:calc(112px + env(safe-area-inset-bottom));z-index:1100;display:flex;align-items:center;gap:var(--space-sm);padding:var(--space-sm) var(--space-lg) var(--space-sm) var(--space-md);border-radius:999px;background:var(--color-primary);color:var(--color-neutral);box-shadow:var(--shadow-md);font:var(--type-label-md);white-space:nowrap;transform:translateX(-50%);pointer-events:none;animation:pm-savefx-in .32s cubic-bezier(.2,.9,.3,1.2) both}
+.pm-savefx span{font:var(--type-body-sm);opacity:.8}
+.pm-savefx-check{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;animation:pm-check-draw .36s .18s ease-out forwards}
+.pm-savefx.is-leaving{animation:pm-savefx-out .28s ease-in forwards}
+.pm-savefx-fly{position:fixed;z-index:1101;width:28px;height:28px;border-radius:999px;background:var(--color-accent);box-shadow:var(--shadow-sm);pointer-events:none;animation:pm-fly .55s cubic-bezier(.45,0,.55,1) forwards}
+.bottomnav .navitem{position:relative}
+.bottomnav .navitem.pm-nav-bump .navicon{animation:pm-bump .42s cubic-bezier(.3,1.6,.5,1)}
+.pm-nav-plus{position:absolute;top:2px;right:14%;font-style:normal;padding:0 6px;border-radius:999px;background:var(--color-accent);color:var(--color-on-surface);font:var(--type-body-sm);font-weight:var(--weight-bold);pointer-events:none;animation:pm-plus 1s ease-out forwards}
+[data-theme="dark"] .pm-nav-plus,[data-theme="dark"] .pm-ai-chip.is-done{color:var(--color-neutral)}
+.pm-ai-chip{display:inline-flex;align-items:center;margin-top:var(--space-sm);padding:2px var(--space-sm);border-radius:999px;font:var(--type-body-sm);color:var(--color-on-surface);background:var(--color-disabled)}
+.pm-ai-chip.is-loading{background:linear-gradient(100deg,var(--color-disabled) 30%,var(--color-surface) 50%,var(--color-disabled) 70%) 0 0/250% 100%;animation:pm-shimmer 1.4s linear infinite}
+.pm-ai-chip.is-done{background:var(--color-accent);animation:pm-chip-in .38s cubic-bezier(.2,.9,.3,1.3)}
+.lm-photo-marker.is-selected .lm-place-badge{animation:pm-pin-hop .46s cubic-bezier(.3,1.4,.5,1)}
+.lm-carousel-card.pm-land{animation:pm-land .36s cubic-bezier(.3,1.4,.5,1)}
+.pm-attn{animation:pm-attn .9s ease-out 1}
+#onboarding .step3 .ob-option.pm-press{animation:pm-press .22s ease-out}
+#onboarding .step3 .ob-option .ob-emoji.pm-pop{animation:pm-pop .36s cubic-bezier(.3,1.6,.5,1)}
+#onboarding .ob-pickcount.pm-roll{display:inline-block;animation:pm-roll .28s ease-out}
+.coursepage .course-steps li span.pm-step-fill{animation:pm-step .5s cubic-bezier(.3,1.4,.5,1)}
+@keyframes pm-savefx-in{from{opacity:0;transform:translate(-50%,12px) scale(.92)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes pm-savefx-out{to{opacity:0;transform:translate(-50%,6px) scale(.96)}}
+@keyframes pm-check-draw{to{stroke-dashoffset:0}}
+@keyframes pm-fly{0%{transform:translate(0,0) scale(1)}50%{transform:translate(calc(var(--dx) * .45),calc(var(--dy) * .25 - 56px)) scale(.85)}100%{transform:translate(var(--dx),var(--dy)) scale(.35);opacity:.6}}
+@keyframes pm-bump{0%{scale:1}40%{scale:1.22}100%{scale:1}}
+@keyframes pm-plus{0%{opacity:0;translate:0 6px}20%{opacity:1;translate:0 0}70%{opacity:1}100%{opacity:0;translate:0 -14px}}
+@keyframes pm-shimmer{from{background-position:100% 0}to{background-position:-150% 0}}
+@keyframes pm-chip-in{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+@keyframes pm-pin-hop{0%{translate:0 0}35%{translate:0 -12px}70%{translate:0 2px}100%{translate:0 0}}
+@keyframes pm-land{0%{scale:.96}60%{scale:1.02}100%{scale:1}}
+@keyframes pm-attn{0%,100%{rotate:0deg;scale:1}15%{rotate:-6deg;scale:1.1}30%{rotate:5deg;scale:1.1}45%{rotate:-3deg}60%{rotate:0deg;scale:1}}
+@keyframes pm-press{0%{scale:1}40%{scale:.96}100%{scale:1}}
+@keyframes pm-pop{0%{scale:.7}60%{scale:1.15}100%{scale:1}}
+@keyframes pm-roll{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
+@keyframes pm-step{0%{scale:.8}50%{scale:1.15}100%{scale:1}}
+@media(prefers-reduced-motion:reduce){.pm-savefx,.pm-savefx-check,.pm-savefx-fly,.pm-ai-chip,.lm-photo-marker.is-selected .lm-place-badge,.lm-carousel-card.pm-land,.pm-attn,.pm-press,.pm-pop,.pm-roll,.pm-step-fill,.pm-nav-bump .navicon,.pm-nav-plus{animation:none!important}.pm-savefx-check{stroke-dashoffset:0}}
