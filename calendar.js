@@ -62,10 +62,20 @@ function calEventEntries(item){
     ];
   });
 }
-const calDueList = () => items.flatMap(item => {
-  const eventEntries = calEventEntries(item);
-  return eventEntries.length ? eventEntries : calDue(item) ? [item] : [];
-}).sort((a,b) => calDue(a) - calDue(b));
+const calDueList = () => {
+  const seenEvents = new Set();
+  return items.flatMap(item => {
+    const eventEntries = calEventEntries(item);
+    return eventEntries.length ? eventEntries : calDue(item) ? [item] : [];
+  }).filter(entry => {
+    if (!entry.eventDate) return true;
+    const title = String(entry.title || '').normalize('NFKC').toLocaleLowerCase('ko').replace(/[^\p{L}\p{N}]/gu, '');
+    const key = [entry.eventDate, entry.dueLabel || '', title].join('|');
+    if (seenEvents.has(key)) return false;
+    seenEvents.add(key);
+    return true;
+  }).sort((a,b) => calDue(a) - calDue(b));
+};
 let calPick = false; // 월 선택 패널 열림
 let calMonth = new Date(calToday.getFullYear(), calToday.getMonth(), 1);
 let calSel = calKey(calToday);

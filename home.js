@@ -10,7 +10,7 @@ const stripHiddenToday = () => stripHidden;
 const dLabel = x => x.eventCandidate ? '확인 필요' : calDays(x) < 0 ? '지난 일정' : calDays(x) === 0 ? 'D-day' : 'D-' + calDays(x);
 const dueSoon = x => !x.eventCandidate && calDays(x) >= 0 && calDays(x) <= 3;
 function stripBar(){
-  const due = calDueList().filter(x => calDue(x) >= calToday && calDays(x) <= 14);
+  const due = calDueList().filter(x => calDue(x) >= calToday && calDays(x) <= 14 && x.dueLabel !== '행사 시작');
   if (!due.length || stripHiddenToday()) return '';
   const item = x => `<button class="strip-item ${dueSoon(x) ? 'soon' : ''}" data-detail="${x.id}"><b>${dLabel(x)}</b><span>${esc(x.title)}</span></button>`;
   // 끝에서 처음으로 자연스럽게 이어지도록 첫 항목을 한 번 더 붙여요
