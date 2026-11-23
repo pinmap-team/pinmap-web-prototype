@@ -153,6 +153,27 @@ function onboardPhone(stage){
     <div class="ob-phone-options"><span><img src="img/logo-instagram.png" alt=""><small>Instagram</small></span><span class="ob-phone-selected"><img src="img/pinmap-symbol-splash.svg" alt=""><small>핀맵</small></span><span>${icon('more')}<small>더보기</small></span></div><div class="ob-phone-copy">${icon('link')} 링크 복사</div></div>` : '';
   return `<div class="ob-phone-stage ob-phone-crop ob-phone-crop${stage}" aria-hidden="true"><div class="ob-phone"><div class="ob-phone-status"><b>9:41</b><i></i><span>▮▮ ▰</span></div><div class="ob-phone-feed">${feed}</div>${sharing}<i class="ob-phone-home"></i></div></div>`;
 }
+// 2026-11-23: 저장 방법은 휴대폰 한 대 안에서 눌리고 시트가 올라오며 저장되는 과정으로 보여줘요.
+const OB_DEMO = [
+  ['콘텐츠 발견', 'SNS를 보다가 마음에 드는 콘텐츠를 발견해요'],
+  ['공유하기', '게시물 아래의 공유하기 버튼을 눌러요'],
+  ['핀맵으로 보내기', '[핀맵]을 고르면 바로 저장돼요'],
+  ['저장 완료', '저장한 콘텐츠는 핀맵에서 다시 찾아볼 수 있어요']
+];
+function onboardDemoPhone(){
+  const feed = `<div class="ob-phone-app"><img src="img/logo-instagram.png" alt=""><b>Instagram</b>${icon('more')}</div>
+    <div class="ob-phone-posthead"><i></i><span>daily.place</span></div>
+    <img class="ob-phone-photo" src="img/cafe.jpg" alt="">
+    <div class="ob-phone-toolbar">${icon('heart')}${icon('comment')}<span class="ob-demo-send"><img src="${PM_IMG.send}" alt=""></span><span class="ob-phone-bookmark">${icon('bookmark')}</span></div>
+    <div class="ob-phone-lines"><i></i><i></i></div>`;
+  const share = `<div class="ob-phone-sheet ob-demo-share"><i class="ob-phone-grip"></i><b>게시물 공유</b>
+    <div class="ob-phone-people"><i></i><i></i><i></i></div>
+    <div class="ob-phone-options"><span>${icon('link')}<small>링크 복사</small></span><span class="ob-phone-selected ob-demo-tap">${icon('share')}<small>공유하기</small></span><span>${icon('comment')}<small>메시지</small></span></div></div>`;
+  const system = `<div class="ob-phone-sheet ob-phone-system ob-demo-system"><i class="ob-phone-grip"></i><div class="ob-phone-preview"><img src="img/cafe.jpg" alt=""><span>마음에 드는 콘텐츠<small>instagram.com</small></span></div>
+    <div class="ob-phone-options"><span><img src="img/logo-instagram.png" alt=""><small>Instagram</small></span><span class="ob-phone-selected ob-demo-tap"><img src="img/pinmap-symbol-splash.svg" alt=""><small>핀맵</small></span><span>${icon('more')}<small>더보기</small></span></div><div class="ob-phone-copy">${icon('link')} 링크 복사</div></div>`;
+  const saved = `<div class="ob-demo-saved"><img src="img/pinmap-symbol-splash.svg" alt="">핀맵에 저장했어요</div>`;
+  return `<div class="ob-phone-stage ob-phone-crop ob-demo-stage" aria-hidden="true"><div class="ob-phone"><div class="ob-phone-status"><b>9:41</b><i></i><span>▮▮ ▰</span></div><div class="ob-phone-feed">${feed}</div><div class="ob-phone-dim ob-demo-dim"></div>${share}${system}${saved}<i class="ob-phone-home"></i></div></div>`;
+}
 const OB_SLIDES = [
   ['콘텐츠 발견', 'SNS를 보다가 마음에 드는 콘텐츠를 발견해요'],
   ['공유하기', '게시물 아래의 공유하기 버튼을 눌러요'],
@@ -170,40 +191,58 @@ function obSlideNext(){
   return true;
 }
 document.addEventListener('scroll', e => { if (e.target?.classList?.contains('ob-slides')) obSyncDots(e.target); }, true);
-// 2026-11-23: 저장 방법 세 장면은 저절로 넘어가며 보여줘요. 손으로 넘기면 6초 동안 멈추고, '다음'은 바로 2/2로 가요.
+// 2026-11-23: 저장 방법 데모는 2.4초마다 다음 장면으로 넘어가요(끝나면 처음부터). 화면을 누르면 6초 멈춰요.
 let obAuto = null, obHoldUntil = 0;
-function obAutoplay(){
-  clearInterval(obAuto); obAuto = null;
-  if (!document.querySelector('#onboarding .ob-slides')) return;
-  obAuto = setInterval(() => {
-    const list = document.querySelector('#onboarding .ob-slides');
-    if (!list) { clearInterval(obAuto); obAuto = null; return; }
-    if (Date.now() < obHoldUntil || document.hidden) return;
-    if (!obSlideNext()) list.scrollTo({left: 0, behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
-  }, 2800);
+function obDemoStep(demo, stage){
+  demo.dataset.stage = String(stage);
+  const [title, desc] = OB_DEMO[stage - 1];
+  const num = demo.querySelector('.ob-num'), t = demo.querySelector('.ob-demo-title'), d = demo.querySelector('.ob-demo-desc');
+  if (num) num.textContent = stage; if (t) t.textContent = title; if (d) d.textContent = desc;
+  demo.querySelectorAll('.ob-dots i').forEach((dot, i) => dot.classList.toggle('on', i === stage - 1));
 }
-document.addEventListener('pointerdown', e => { if (e.target.closest?.('#onboarding .ob-slides')) obHoldUntil = Date.now() + 6000; }, true);
+function obAutoplay(){
+  clearInterval(obAuto); // 온보딩을 새로 열면 1단계부터 제 시간만큼 보여줘요.
+  obAuto = setInterval(() => {
+    if (Date.now() < obHoldUntil || document.hidden) return;
+    document.querySelectorAll('.ob-demo').forEach(demo => obDemoStep(demo, (Number(demo.dataset.stage) || 1) % OB_DEMO.length + 1));
+  }, 2400);
+}
+document.addEventListener('pointerdown', e => { if (e.target.closest?.('.ob-demo')) obHoldUntil = Date.now() + 6000; }, true);
+obAutoplay();
+// 2026-11-23: 2/2 관심사는 목적별 8묶음으로 보여줘요. '분류보류'는 AI가 쓰는 칸이라 고르는 목록에서 빼요.
+// 2026-11-23: 카테고리 하나씩이 아니라 묶음 단위로 골라요. 고른 묶음의 카테고리가 모두 관심사로 저장돼요(아이콘은 묶음의 대표 카테고리).
+const obGroupCount = () => OB_GROUPS.filter(([, ids]) => ids.every(id => onboardDraft.includes(id))).length;
+const OB_GROUPS = [
+  ['맛·음식', ['food', 'cafe', 'recipe']],
+  ['나들이', ['nature', 'travel', 'stay']],
+  ['문화·체험', ['exhibition', 'festival', 'activity']],
+  ['쇼핑·스타일', ['fashion', 'beauty', 'interior']],
+  ['건강·가족', ['fitness', 'pets', 'family']],
+  ['배움·일', ['learning', 'career', 'finance']],
+  ['생활·디지털', ['life', 'tech']],
+  ['즐길 거리', ['creative', 'media', 'humor']]
+];
 function onboardScreen() {
   const s = onboardStep;
   // 2026-11-04: 세 단계를 세로 카드 대신 가로로 넘기는 큰 카드(레퍼런스: 라벨 칩 + 큰 이미지 + 점 표시)로 보여줘요.
   if (s === 1) return `
     <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를<br><em>발견</em>했나요?</h1>
-    <div class="ob-carousel">
-      <ol class="ob-slides" tabindex="0" aria-label="저장하는 방법, 옆으로 넘겨 보세요">
-        ${OB_SLIDES.map(([title, desc], i) => `<li class="ob-slide" aria-label="3단계 중 ${i + 1}단계, ${title}">
-          <span class="ob-chip"><span class="ob-num">${i + 1}</span>${title}</span>
-          ${onboardPhone(i + 1)}
-          <p class="ob-slide-desc">${desc}</p>
-        </li>`).join('')}
+    <div class="ob-carousel ob-demo" data-stage="1">
+      <ol class="ob-slides" aria-label="저장하는 방법">
+        <li class="ob-slide" aria-live="polite">
+          <span class="ob-chip"><span class="ob-num">1</span><span class="ob-demo-title">${OB_DEMO[0][0]}</span></span>
+          ${onboardDemoPhone()}
+          <p class="ob-slide-desc ob-demo-desc">${OB_DEMO[0][1]}</p>
+        </li>
       </ol>
-      <div class="ob-dots" aria-hidden="true">${OB_SLIDES.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>
+      <div class="ob-dots" aria-hidden="true">${OB_DEMO.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>
     </div>
     <div class="ob-actions"><button class="filled ob-next" data-ob="next">다음</button></div>`;
   if (s === 2) return `
     <h1 class="ob-title ob-mixtitle" tabindex="-1"><b>저장한 콘텐츠</b>를<br>언제 다시 찾아보나요?</h1>
-    <p class="ob-desc">고른 키워드의 콘텐츠를 홈에서 먼저 보여 드려요.<br>여러 개를 골라도 돼요<span class="ob-pickcount" aria-live="polite">${onboardDraft.length ? `${onboardDraft.length}개 선택했어요` : ''}</span></p>
-    <div class="ob-options" role="group" aria-label="관심사, 활용 목적">
-      ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${PinmapCategories.icon(o.id,on)}</span><span class="ob-label">${o.label}</span></button>`; }).join('')}
+    <p class="ob-desc">고른 키워드의 콘텐츠를 홈에서 먼저 보여 드려요.<br>여러 개를 골라도 돼요<span class="ob-pickcount" aria-live="polite">${obGroupCount() ? `${obGroupCount()}개 선택했어요` : ''}</span></p>
+    <div class="ob-options ob-groupcards" role="group" aria-label="관심사, 활용 목적">
+      ${OB_GROUPS.map(([title, ids], i) => { const on = ids.every(id => onboardDraft.includes(id)); return `<button class="ob-option ob-groupcard ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-group="${i}"><span class="ob-emoji" aria-hidden="true">${PinmapCategories.icon(ids[0],on)}</span><span class="ob-grouptext"><span class="ob-label">${title}</span><small>${ids.map(id => interestOptions.find(o => o.id === id)?.label).filter(Boolean).join(', ')}</small></span></button>`; }).join('')}
     </div>
     <div class="ob-actions"><button class="ob-action-back" data-ob="back">이전</button><button class="filled ob-next" data-ob="next">${onboardPreview ? '종료하기' : '시작하기'}</button></div>`;
   // 마지막 화면: 문구 없이, 저장 카드에서 핀맵으로 점이 하나씩 채워지며 이어지는 애니메이션
@@ -292,6 +331,17 @@ function openOnboardingPreview(){ openOnboarding(1); onboardPreview = true; onbo
 actions.interests = () => openOnboarding(2);
 
 document.addEventListener('click',e=>{
+  const groupCard=e.target.closest('[data-ob-group]');
+  if(groupCard){
+    const ids=OB_GROUPS[Number(groupCard.dataset.obGroup)]?.[1]||[];
+    const on=!ids.every(id=>onboardDraft.includes(id));
+    onboardDraft=on?[...new Set([...onboardDraft,...ids])]:onboardDraft.filter(id=>!ids.includes(id));
+    groupCard.classList.toggle('on',on);groupCard.setAttribute('aria-checked',on);
+    const pictogram=groupCard.querySelector('.ob-emoji');if(pictogram)pictogram.innerHTML=PinmapCategories.icon(ids[0],on);
+    const count=document.querySelector('#onboarding .ob-pickcount');if(count)count.textContent=obGroupCount()?`${obGroupCount()}개 선택했어요`:'';
+    window.PinmapFx?.replay(groupCard,'pm-press');if(on)window.PinmapFx?.replay(pictogram,'pm-pop');window.PinmapFx?.replay(count,'pm-roll');
+    return;
+  }
   const choice=e.target.closest('[data-ob-interest]');
   if(choice){
     const id=choice.dataset.obInterest;

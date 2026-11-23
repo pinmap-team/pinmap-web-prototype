@@ -1749,24 +1749,6 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 @keyframes pm-step{0%{scale:.8}50%{scale:1.15}100%{scale:1}}
 @media(prefers-reduced-motion:reduce){.pm-savefx,.pm-savefx-check,.pm-savefx-fly,.pm-ai-chip,.lm-photo-marker.is-selected .lm-place-badge,.lm-carousel-card.pm-land,.pm-attn,.pm-press,.pm-pop,.pm-roll,.pm-step-fill,.pm-nav-bump .navicon,.pm-nav-plus{animation:none!important}.pm-savefx-check{stroke-dashoffset:0}}
 
-/* FAQ: 한 장의 패널이 열린 질문으로 이동하고 답변 높이에 맞춰집니다. */
-.faq-panel-card{position:relative;padding:var(--space-xs);border:1px solid var(--color-disabled);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:none;overflow:hidden}
-.faq-slide{position:absolute;top:0;left:var(--space-xs);right:var(--space-xs);height:0;border-radius:var(--rounded-md);background:var(--color-neutral);opacity:0;pointer-events:none}
-.faq-panel-card:not([data-ready]) .faq-slide{visibility:hidden}
-.faq-panel-card:not([data-ready]) .faq-item:has([aria-expanded="true"]){border-radius:var(--rounded-md);background:var(--color-neutral)}
-.faq-item{position:relative}
-.faq-item h2{margin:0;font:inherit}
-.faq-trigger{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);width:100%;min-height:56px;padding:var(--space-md) var(--space-lg);border:0;border-radius:var(--rounded-md);background:transparent;color:var(--color-on-surface);font:var(--type-body-md);font-weight:var(--weight-semibold);text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.faq-trigger>span{min-width:0}
-.faq-trigger:focus-visible{outline:2px solid var(--color-primary);outline-offset:-3px}
-.faq-chevron{width:18px;height:18px;flex:none;fill:none;stroke:var(--color-secondary);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(.64,0,.2,1)}
-.faq-trigger[aria-expanded="true"] .faq-chevron{transform:rotate(180deg)}
-.faq-answer{height:auto;overflow:hidden}
-.faq-answer[hidden]{display:none}
-.faq-text{margin:0;padding:0 var(--space-lg) var(--space-lg);color:var(--color-secondary);font:var(--type-body-sm);line-height:1.5;word-break:keep-all}
-@media(hover:hover) and (pointer:fine){.faq-trigger[aria-expanded="false"]:hover{background:var(--color-neutral)}}
-@media(prefers-reduced-motion:reduce){.faq-panel-card,.faq-chevron{transition:none}}
-
 /* 2026-11-23 홈 마감 임박 배너: 캘린더 위젯 아래 카드로 (맨 위 고정 해제) */
 .layout .main .strip{position:relative!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important;width:auto!important;height:auto!important;z-index:auto!important;margin:var(--space-lg) 0 0;padding:var(--space-xs) var(--space-xs) var(--space-xs) var(--space-lg)!important;border-radius:var(--rounded-md);background:var(--color-surface)!important;box-shadow:var(--shadow-sm)}
 .layout .main:has(.strip){padding-top:var(--space-2xl)!important}
@@ -1814,9 +1796,40 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .calxpage .calx-hint{text-align:center}
 .calset-page .calset-list{margin-top:0}
 
-/* 2026-11-23 온보딩 1/2: 저장 방법 장면이 저절로 넘어가요. 누를 곳(공유하기·핀맵)에 탭 표시가 퍼져요. */
-#onboarding .ob-slide .ob-phone-selected{position:relative}
-#onboarding .ob-slide .ob-phone-selected::after{content:'';position:absolute;inset:-6px;border-radius:12px;border:2px solid var(--color-accent);opacity:0;animation:pm-tap-ring 1.4s ease-out .5s infinite}
-@keyframes pm-tap-ring{0%{opacity:.9;scale:.85}70%{opacity:0;scale:1.25}100%{opacity:0}}
-@media(prefers-reduced-motion:reduce){#onboarding .ob-slide .ob-phone-selected::after{animation:none;opacity:.8}}
+/* 2026-11-23 온보딩 1/2 저장 방법 데모: 휴대폰 한 대 안에서 공유 버튼 누름 → 공유 시트 → 핀맵 선택 → 저장 완료가 차례로 이어져요(data-stage 1~4). */
+#onboarding .ob-demo .ob-slides{overflow:hidden;scroll-snap-type:none}
+.ob-demo .ob-demo-dim{opacity:0;transition:opacity .35s ease}
+.ob-demo:is([data-stage="2"],[data-stage="3"]) .ob-demo-dim{opacity:1}
+.ob-demo .ob-demo-share,.ob-demo .ob-demo-system{transform:translateY(110%);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.ob-demo[data-stage="2"] .ob-demo-share,.ob-demo[data-stage="3"] .ob-demo-system{transform:none}
+.ob-demo .ob-demo-send,.ob-demo .ob-demo-tap{position:relative}
+.ob-demo .ob-demo-send::after,.ob-demo .ob-demo-tap::after{content:'';position:absolute;inset:-6px;border-radius:999px;background:color-mix(in srgb,var(--color-accent) 55%,transparent);opacity:0;scale:.4;pointer-events:none}
+.ob-demo .ob-demo-tap::after{border-radius:10px}
+.ob-demo[data-stage="1"] .ob-demo-send::after,.ob-demo[data-stage="2"] .ob-demo-share .ob-demo-tap::after,.ob-demo[data-stage="3"] .ob-demo-system .ob-demo-tap::after{animation:pm-demo-tap .7s ease-out 1.25s both}
+.ob-demo[data-stage="1"] .ob-demo-send{animation:pm-demo-press .3s ease-out 1.25s both}
+.ob-demo .ob-phone-options .ob-phone-selected{outline-color:transparent;background:transparent;transition:outline-color .2s,background .2s}
+.ob-demo[data-stage="2"] .ob-demo-share .ob-phone-selected,.ob-demo[data-stage="3"] .ob-demo-system .ob-phone-selected{animation:pm-demo-select .2s ease-out 1.25s both}
+.ob-demo .ob-demo-saved{position:absolute;left:50%;bottom:22px;z-index:3;display:flex;align-items:center;gap:5px;padding:5px 9px 5px 6px;border-radius:999px;background:#111;color:#fff;font-size:8px;font-weight:700;white-space:nowrap;opacity:0;transform:translate(-50%,10px);transition:opacity .3s,transform .35s cubic-bezier(.3,1.4,.5,1)}
+.ob-demo .ob-demo-saved img{width:13px;height:13px;border-radius:4px;background:#fff}
+.ob-demo[data-stage="4"] .ob-demo-saved{opacity:1;transform:translate(-50%,0)}
+.ob-demo .ob-chip,.ob-demo .ob-demo-desc{transition:opacity .2s}
+@keyframes pm-demo-tap{0%{opacity:0;scale:.4}35%{opacity:1;scale:1}100%{opacity:0;scale:1.35}}
+@keyframes pm-demo-press{0%,100%{scale:1}50%{scale:.88}}
+@keyframes pm-demo-select{to{outline-color:#111;background:#F0F0F2}}
+@media(prefers-reduced-motion:reduce){.ob-demo .ob-demo-dim,.ob-demo .ob-demo-share,.ob-demo .ob-demo-system,.ob-demo .ob-demo-saved{transition:none}.ob-demo [class*="ob-demo-"]::after,.ob-demo .ob-demo-send,.ob-demo .ob-phone-selected{animation:none!important}}
 body:has(.dt) .bottomnav .home-add-menu{display:none!important}
+
+/* 2026-11-23 온보딩 2/2 목적별 8묶음: 묶음 목록만 세로 스크롤, 묶음 제목 label-md secondary + 2열 카드 */
+#onboarding .ob-screen.step3 .ob-groups{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin:var(--space-md) calc(-1 * var(--space-sm)) 0;padding:var(--space-xs) var(--space-sm) var(--space-md);scrollbar-width:none;display:grid;gap:var(--space-lg);align-content:start}
+#onboarding .ob-screen.step3 .ob-groups::-webkit-scrollbar{display:none}
+#onboarding .ob-screen.step3 .ob-group-title{margin:0 0 var(--space-sm);font:var(--type-label-md);color:var(--color-secondary)}
+#onboarding .ob-screen.step3 .ob-groups .ob-options{flex:none!important;overflow:visible!important;margin:0!important;padding:0!important;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-sm)!important}
+#onboarding .ob-screen.step3 .ob-groups .ob-option{grid-column:auto!important;width:auto!important}
+
+/* 2026-11-23 온보딩 2/2 묶음 카드: 8묶음을 2열 카드로 고른다. 카드 = 대표 아이콘 + 묶음 이름(label-md) + 포함 카테고리(body-sm secondary). */
+#onboarding .ob-screen.step3 .ob-groupcards{grid-template-columns:1fr 1fr;gap:var(--space-sm)!important;grid-auto-rows:1fr}
+#onboarding .step3 .ob-groupcard{align-items:center!important;min-height:76px!important}
+#onboarding .step3 .ob-groupcard .ob-grouptext{display:grid;gap:2px;min-width:0;text-align:left}
+#onboarding .step3 .ob-groupcard .ob-grouptext small{font:var(--type-body-sm);color:var(--color-secondary);white-space:normal;word-break:keep-all;line-height:1.35}
+#onboarding .step3 .ob-groupcard.on .ob-grouptext small{color:var(--color-on-surface);opacity:.75}
+[data-theme="dark"] #onboarding .step3 .ob-groupcard.on .ob-grouptext small{color:var(--color-neutral)}

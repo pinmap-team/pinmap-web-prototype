@@ -22,6 +22,6 @@
     const query=params.toString();
     history.replaceState(null,'',location.pathname+(query?'?'+query:'')+location.hash);
   }
-  // A fresh document has no session; the login page keeps it only in memory.
-  location.replace('auth.html?screen=welcome');
+  // The only application route is the authenticated account app.
+  document.querySelector('.phone-frame').src = 'app.html?mode=development&auth=required';
 })();
