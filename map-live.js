@@ -405,7 +405,7 @@
       // A GPS travel heading is not the direction the person is facing.
       if(followNextFix&&!mapLocationName){liveMap.setView(userPosition,16);followNextFix=false;}
       drawLocation();
-    },error=>{if(liveMap!==activeMap||page!=='map')return;locationBusy=false;if(locationWatch!==null)navigator.geolocation.clearWatch(locationWatch);locationWatch=null;toast(error.code===1?'현재 위치를 보려면 브라우저에서 위치 접근을 허용해 주세요.':'현재 위치를 확인하지 못했어요. 현위치 버튼으로 다시 시도해 주세요.');},{enableHighAccuracy:true,maximumAge:30000,timeout:12000});
+    },error=>{if(liveMap!==activeMap||page!=='map')return;locationBusy=false;if(locationWatch!==null)navigator.geolocation.clearWatch(locationWatch);locationWatch=null;toast(error.code===1?'현재 위치를 보려면 브라우저에서\n위치 접근을 허용해 주세요.':'현재 위치를 확인하지 못했어요. 현위치 버튼으로 다시 시도해 주세요.');},{enableHighAccuracy:true,maximumAge:30000,timeout:12000});
   }
   function showResults() {
     const panel=$('#lm-search-results'); if(!panel) return;

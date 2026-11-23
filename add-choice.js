@@ -33,8 +33,10 @@
     if (screenshotPreviewUrl) URL.revokeObjectURL(screenshotPreviewUrl);
     screenshotPreviewUrl = null;
   }
+  // 2026-11-23: 추가 버튼이 하단 메뉴에 들어가면서 지도용 메뉴에도 같은 버튼이 있어요. 지금 보이는 것을 써요.
+  const addStage = () => [...document.querySelectorAll('#home-add-menu')].find(node => node.getClientRects().length) || document.getElementById('home-add-menu');
   function setAddMenuOpen(open, restoreFocus = false) {
-    const stage = document.getElementById('home-add-menu');
+    const stage = addStage();
     if (!stage) return;
     clearTimeout(openTimer);
     stage.removeAttribute('data-sink');
@@ -49,7 +51,7 @@
     if (restoreFocus || (!open && optionFocused)) trigger.focus();
   }
   actions.addoptions = () => {
-    const stage = document.getElementById('home-add-menu');
+    const stage = addStage();
     if (!stage || stage.dataset.sink === 'true') return;
     if (stage.dataset.open === 'true') { setAddMenuOpen(false, true); return; }
     stage.dataset.sink = 'true';
@@ -125,14 +127,14 @@
     sheet.classList.remove('zip-import-sheet', 'screenshot-import-sheet', 'add-import-sheet');
   });
   document.addEventListener('pointerdown', event => {
-    const stage = document.getElementById('home-add-menu');
+    const stage = addStage();
     if (!stage || stage.dataset.open !== 'true') return;
     if(stage.contains(event.target))return;
     const box = stage.querySelector('.home-add-body').getBoundingClientRect();
     if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) setAddMenuOpen(false);
   });
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && document.getElementById('home-add-menu')?.dataset.open === 'true') {
+    if (event.key === 'Escape' && addStage()?.dataset.open === 'true') {
       event.preventDefault();
       setAddMenuOpen(false, true);
     }

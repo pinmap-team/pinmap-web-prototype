@@ -26,7 +26,8 @@ const paths = {
 };
 const icon = n => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n]||paths.bookmark}"/></svg>`;
 // Bencho Like's Lucide heart, without its pill and count.
-const likeHeartIcon = () => '<svg class="icon lm-like-heart" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"></path></svg>';
+// 2026-11-23: 즐겨찾기는 하트 대신 별(Figma Pinmap / Companion / star, Outline·Fill)을 써요. 이름은 기존 호출을 위해 그대로 둬요.
+const likeHeartIcon = () => '<svg class="icon lm-like-heart pm-star" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path class="pm-star-line" d="M7.76408 9.07742L5.02401 9.47177C3.79061 9.64928 3.29891 11.1661 4.19363 12.0335L6.18779 13.9666C6.54004 14.3081 6.70305 14.8003 6.62427 15.2845L6.17584 18.0409C5.97742 19.2606 7.2562 20.1836 8.35129 19.6111L10.8051 18.3284C11.2404 18.1008 11.7596 18.1008 12.1949 18.3284L14.6487 19.6111C15.7438 20.1836 17.0226 19.2606 16.8242 18.0409L16.3757 15.2845C16.297 14.8003 16.46 14.3081 16.8122 13.9666L18.8064 12.0335C19.7011 11.1661 19.2094 9.64928 17.976 9.47177L15.2359 9.07742C14.7474 9.00711 14.3247 8.70095 14.1055 8.25867L12.8441 5.71269C12.2931 4.60062 10.7069 4.60062 10.1559 5.71269L8.89447 8.25867C8.67533 8.70095 8.25264 9.00711 7.76408 9.07742Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path class="pm-star-fill" d="M10.6537 5.74075C11.203 4.62255 12.797 4.62255 13.3463 5.74075L14.4515 7.99047C14.6696 8.43454 15.0927 8.74249 15.5823 8.81356L17.9975 9.16415C19.2269 9.34261 19.7189 10.8526 18.8307 11.7211L17.056 13.4563C16.7074 13.7972 16.5462 14.2863 16.6238 14.7677L17.0213 17.2322C17.2183 18.4536 15.9352 19.3749 14.8408 18.7979L12.6996 17.6689C12.2618 17.438 11.7382 17.438 11.3004 17.6689L9.15915 18.7979C8.06477 19.3749 6.78168 18.4536 6.97868 17.2322L7.37618 14.7677C7.45382 14.2863 7.29263 13.7972 6.94399 13.4563L5.16931 11.7211C4.28107 10.8526 4.77311 9.34261 6.0025 9.16415L8.41769 8.81356C8.90731 8.74249 9.3304 8.43455 9.54854 7.99048L10.6537 5.74075Z" fill="currentColor" stroke="currentColor" fill-rule="evenodd" clip-rule="evenodd"/></svg>';
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ---------- 콘텐츠 유형 (저장 카테고리) ---------- */
@@ -150,7 +151,7 @@ let card, gcard;
 /* ---------- 공통 레이아웃 ---------- */
 const NAV = [['home','home','홈'],['map','map','지도'],['library','bookmark','저장함'],['my','user','마이']];
 const pageName = {home:'홈',map:'지도',library:'저장함',my:'마이'};
-function nav(){return NAV.map(([p,i,l])=>`<button class="navitem ${page===p&&!detailId?'active':''}" data-page="${p}" ${page===p?'aria-current="page"':''}><span class="navicon">${icon(i)}</span><span>${l}</span></button>`).join('')}
+function nav(){const items=NAV.map(([p,i,l])=>`<button class="navitem ${page===p&&!detailId?'active':''}" data-page="${p}" ${page===p?'aria-current="page"':''}><span class="navicon">${icon(i)}</span><span>${l}</span></button>`);return items.join('')}
 function filtered(){return items.filter(x=>(filter==='전체'||x.type===filter)&&(!collection||x.collection===collection)&&PinmapContentSearch.matches(x,query))}
 const galleryMode = () => !collection && filter!=='전체' && !typeOf(filter).place;
 

@@ -2,7 +2,7 @@
 // 마이에서 누르는 기능은 아래에서 올라오는 시트 대신 새 페이지로 열리고, 왼쪽 위 ← 로 마이로 돌아가요.
 // 현재 위치 · 관심 키워드 · 알림 · 저장 · 위치/지도 · 저장하는 방법 · 앱 정보 · 핀맵 계정 설정
 
-const MY_PAGES = {calexport:'캘린더로 내보내기', calsettings:'캘린더 설정', favorites:'즐겨찾기', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리'};
+const MY_PAGES = {calexport:'캘린더로 내보내기', calsettings:'캘린더 설정', calweek:'한 주의 시작 요일', favorites:'즐겨찾기', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리'};
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
 const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
@@ -42,11 +42,16 @@ function pageFromModal(fn){ // my.js의 시트 내용을 그대로 페이지에 
 }
 pages.notiset = () => myPage('알림 설정', pageFromModal(notiSettings), 'settingpage');
 pages.saveset = () => myPage('저장 설정', pageFromModal(saveSettings), 'settingpage');
-pages.calsettings = () => myPage('캘린더 설정', `<fieldset class="calendar-week-settings" aria-describedby="calendar-week-hint">
-  <legend>한 주의 시작 요일</legend>
+// 2026-11-23 캘린더 설정: 내보내기와 시작 요일을 한곳에서 들어가요.
+pages.calsettings = () => myPage('캘린더 설정', `<section class="mgroup my-section calset-list" aria-label="캘린더 설정">
+  ${myRow('calexport', icon('share'), '캘린더로 내보내기', typeof calExportList === 'function' ? `마감 ${calExportList().length}개` : '')}
+  ${myRow('calweek', icon('calendar'), '한 주의 시작 요일', settings.calendarWeekStart === 'monday' ? '월요일' : '일요일')}
+</section>`, 'settingpage calset-page');
+pages.calweek = () => myPage('한 주의 시작 요일', `<fieldset class="calendar-week-settings" aria-describedby="calendar-week-hint">
+  <legend class="auth-sr-only">한 주의 시작 요일</legend>
   <p id="calendar-week-hint">홈의 주간 일정과 캘린더에 함께 적용돼요.</p>
   ${[['sunday','일요일 시작'],['monday','월요일 시작']].map(([value,label])=>`<label class="calendar-week-option"><span>${label}</span><input type="radio" name="calendar-week-start" value="${value}" ${settings.calendarWeekStart===value||!settings.calendarWeekStart&&value==='sunday'?'checked':''}></label>`).join('')}
-</fieldset>`, 'settingpage calendar-settings-page');
+</fieldset>`, 'settingpage calendar-settings-page', 'calsettings');
 let calendarWeekSaving=false;
 document.addEventListener('change',async event=>{
   const input=event.target.closest('input[name="calendar-week-start"]');
@@ -72,6 +77,7 @@ Object.assign(actions, {
   notisettings: () => go('notiset'),
   savesheet: () => go('saveset'),
   calsettings: () => go('calsettings'),
+  calweek: () => go('calweek'),
   appinfo: () => go('appinfo'),
   account: () => go('account'),
   guide: () => go('guide'),
@@ -124,9 +130,9 @@ pages.favorites = () => {
   const posts=list.filter(entry=>entry.kind==='post'),places=list.filter(entry=>entry.kind==='place');
   return myPage('즐겨찾기', list.length
     ? `<div class="fav-header"><p class="fav-count">${list.length}개</p><button type="button" class="cf-textbtn" data-action="${favSel?'favselectoff':'favselect'}">${favSel?'취소':'선택'}</button></div>
-      <div class="fav-items">${posts.length?`<section class="fav-group"><h2 class="fav-group-title">게시물 좋아요</h2>${posts.map(row).join('')}</section>`:''}${places.length?`<section class="fav-group"><h2 class="fav-group-title">장소 좋아요</h2>${places.map(row).join('')}</section>`:''}</div>
+      <div class="fav-items">${posts.length?`<section class="fav-group"><h2 class="fav-group-title">게시물</h2>${posts.map(row).join('')}</section>`:''}${places.length?`<section class="fav-group"><h2 class="fav-group-title">장소</h2>${places.map(row).join('')}</section>`:''}</div>
       ${favSel?`<div class="cf-selbar" role="toolbar" aria-label="선택한 즐겨찾기"><button type="button" class="cf-selall fav-selall" data-action="favselall">${list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택'}</button><span class="cf-selcount fav-selcount" aria-live="polite">${count?`${count}개 선택`:'게시물이나 장소를 골라 주세요'}</span><button type="button" class="cf-seldel fav-remove" data-action="favremove" ${count&&!favRemoving?'':'disabled'}>${likeHeartIcon()}좋아요 취소</button></div>`:''}`
-    : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 좋아요한 게시물이나 장소가 없어요</h3><p class="muted">게시물 상세나 지도에서 하트를 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="map">지도로 가기</button></div>`, `favpage${favSel?' cf-selecting':''}`);
+    : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 게시물이나 장소가 없어요</h3><p class="muted">게시물 상세나 지도에서 별를 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="map">지도로 가기</button></div>`, `favpage${favSel?' cf-selecting':''}`);
 };
 actions.favselect=()=>{favSel=new Set();render();};
 actions.favselectoff=()=>{favSel=null;render();};
@@ -142,8 +148,8 @@ actions.favremove=async()=>{
   favRemoving=true;favSyncSelection();
   try{
     const count=await PinmapFavorites.removeMany(selected);
-    favSel=null;render();toast(`${count}개의 좋아요를 취소했어요.`);
-  }catch(error){toast(error.message||'좋아요를 취소하지 못했어요.');}
+    favSel=null;render();toast(`${count}개를 즐겨찾기에서 뺐어요.`);
+  }catch(error){toast(error.message||'즐겨찾기에서 빼지 못했어요.');}
   finally{favRemoving=false;favSyncSelection();}
 };
 document.addEventListener('click',event=>{
@@ -283,7 +289,6 @@ Object.assign(actions, { faq: () => go('faq'), notice: () => go('notice'), terms
 pages.guide = () => myPage('이용 가이드', `<p class="muted mpdesc">핀맵 사용 방법을 언제든 다시 확인해 보세요.</p>
   <section class="mgroup" aria-label="다시 보기 안내">
     ${myRow('howto','📲','저장하는 방법 다시 보기')}
-    ${myRow('coachagain','👆','홈 화면 튜토리얼 다시 보기')}
     ${myRow('intro','👋','온보딩 다시 보기')}
   </section>`);
 
@@ -395,16 +400,16 @@ let calxPick = null;
 const calxSelected = () => { const list = calExportList(); if (!calxPick) calxPick = new Set(list.map(x => String(x.id))); return list.filter(x => calxPick.has(String(x.id))); };
 pages.calexport = () => {
   const list = calExportList(), picked = calxSelected(), n = picked.length, all = list.length && n === list.length;
-  return myPage('캘린더로 내보내기', `<p class="mpdesc calx-desc">내 캘린더에 넣을 마감 일정을 골라 주세요.<br>Google 캘린더와 Apple 캘린더 모두 같은 파일로 가져올 수 있어요.</p>
+  return myPage('캘린더로 내보내기', `<p class="mpdesc calx-desc">내 캘린더에 넣을 마감 일정을 골라 주세요.</p>
   <section class="mycard calx-list" aria-label="내보낼 마감 일정">
-    <div class="calx-head"><h2>내보낼 마감 일정 <span>${list.length ? `${list.length}개 중 ${n}개 선택` : '0개'}</span></h2>${list.length ? `<button type="button" class="textbtn calx-all" data-action="calxall">${all ? '모두 해제' : '모두 선택'}</button>` : ''}</div>
-    ${list.length ? list.map(x => { const on = calxPick.has(String(x.id)); return `<button type="button" class="calx-row calx-pick ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" data-calx-pick="${esc(String(x.id))}"><span class="calx-check" aria-hidden="true">${on ? icon('check') : ''}</span><span class="calx-date">${esc(fmtDay(calDue(x)))}</span><b>${esc(x.title)}</b></button>`; }).join('') : '<p class="muted">다가오는 마감 일정이 없어요.</p>'}
+    <div class="calx-head"><h2>마감 일정 <span>${list.length ? `${n}/${list.length}` : '0'}</span></h2>${list.length ? `<button type="button" class="textbtn calx-all" data-action="calxall">${all ? '모두 해제' : '모두 선택'}</button>` : ''}</div>
+    ${list.length ? list.map(x => { const on = calxPick.has(String(x.id)); return `<button type="button" class="calx-row calx-pick ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" data-calx-pick="${esc(String(x.id))}"><span class="calx-check" aria-hidden="true">${on ? icon('check') : ''}</span><span class="calx-text"><b>${esc(x.title)}</b><span class="calx-date">${esc(fmtDay(calDue(x)))} · ${esc(x.dueLabel || '마감')}</span></span></button>`; }).join('') : '<p class="muted">다가오는 마감 일정이 없어요.</p>'}
   </section>
   <div class="calx-actions">
     <button type="button" class="filled calx-btn" data-action="calexportapple" ${n ? '' : 'disabled'}>${icon('calendar')}Apple 캘린더로 내보내기</button>
     <button type="button" class="calx-btn calx-secondary" data-action="calexportgoogle" ${n ? '' : 'disabled'}>${icon('calendar')}Google 캘린더로 내보내기</button>
   </div>
-  <p class="hint calx-hint">${list.length && !n ? '내보낼 일정을 하나 이상 골라 주세요. ' : ''}지금은 한 번 내보내기만 할 수 있어요. 핀맵에서 바꾼 내용이 캘린더에 자동으로 반영되지는 않아요.</p>`, 'calxpage');
+  <p class="hint calx-hint">${list.length && !n ? '내보낼 일정을 하나 이상 골라 주세요.<br>' : ''}두 캘린더 모두 같은 파일로 가져와요. 핀맵에서 바꾼 내용은 자동으로 반영되지 않아요.</p>`, 'calxpage');
 };
 document.addEventListener('click', e => {
   const row = e.target.closest('[data-calx-pick]'); if (!row || page !== 'calexport') return;

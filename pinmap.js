@@ -170,6 +170,19 @@ function obSlideNext(){
   return true;
 }
 document.addEventListener('scroll', e => { if (e.target?.classList?.contains('ob-slides')) obSyncDots(e.target); }, true);
+// 2026-11-23: 저장 방법 세 장면은 저절로 넘어가며 보여줘요. 손으로 넘기면 6초 동안 멈추고, '다음'은 바로 2/2로 가요.
+let obAuto = null, obHoldUntil = 0;
+function obAutoplay(){
+  clearInterval(obAuto); obAuto = null;
+  if (!document.querySelector('#onboarding .ob-slides')) return;
+  obAuto = setInterval(() => {
+    const list = document.querySelector('#onboarding .ob-slides');
+    if (!list) { clearInterval(obAuto); obAuto = null; return; }
+    if (Date.now() < obHoldUntil || document.hidden) return;
+    if (!obSlideNext()) list.scrollTo({left: 0, behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+  }, 2800);
+}
+document.addEventListener('pointerdown', e => { if (e.target.closest?.('#onboarding .ob-slides')) obHoldUntil = Date.now() + 6000; }, true);
 function onboardScreen() {
   const s = onboardStep;
   // 2026-11-04: 세 단계를 세로 카드 대신 가로로 넘기는 큰 카드(레퍼런스: 라벨 칩 + 큰 이미지 + 점 표시)로 보여줘요.
@@ -188,7 +201,7 @@ function onboardScreen() {
     <div class="ob-actions"><button class="filled ob-next" data-ob="next">다음</button></div>`;
   if (s === 2) return `
     <h1 class="ob-title ob-mixtitle" tabindex="-1"><b>저장한 콘텐츠</b>를<br>언제 다시 찾아보나요?</h1>
-    <p class="ob-desc">여러 개를 골라도 돼요<span class="ob-pickcount" aria-live="polite">${onboardDraft.length ? `${onboardDraft.length}개 선택했어요` : ''}</span></p>
+    <p class="ob-desc">고른 키워드의 콘텐츠를 홈에서 먼저 보여 드려요.<br>여러 개를 골라도 돼요<span class="ob-pickcount" aria-live="polite">${onboardDraft.length ? `${onboardDraft.length}개 선택했어요` : ''}</span></p>
     <div class="ob-options" role="group" aria-label="관심사, 활용 목적">
       ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${PinmapCategories.icon(o.id,on)}</span><span class="ob-label">${o.label}</span></button>`; }).join('')}
     </div>
@@ -229,6 +242,7 @@ function drawOnboarding() {
     ${onboardScreen()}
   </div>`;
   fitOnboardingViewport();
+  obAutoplay();
   el.scrollTop = 0;
   el.querySelector('.ob-title')?.focus?.();
 }
@@ -268,10 +282,8 @@ async function finishOnboarding() {
   if (!saved) { onboardDone = false; onboardFinishing = false; return; }
   closeOnboarding();
   go('home');
-  // 온보딩이 끝나면 홈 화면 사용법을 코치마크로 간단히 안내해요 (coach.js)
-  // 코치마크 1단계는 홈 카드를 가리켜요: 350ms 뒤에도 홈 화면이 열려 있을 때만 시작해요.
-  if (onboardFull) setTimeout(() => { if (page === 'home' && !detailId) startCoach(); }, 350);
-  else if (preferences.length) toast('관심사 기본값을 바꿨어요.');
+  // 2026-11-23: 온보딩이 끝나도 코치마크는 띄우지 않아요.
+  if (!onboardFull && preferences.length) toast('관심사 기본값을 바꿨어요.');
 }
 intro = function() { openOnboarding(1); };
 // 온보딩 다시 보기 (처음 온보딩과 같은 화면이지만 연습용: 관심사 저장 안 함 · 끝나면 이용 가이드)
@@ -301,7 +313,6 @@ document.addEventListener('click',e=>{
   if(v==='skip'){if(onboardFull&&!onboardPreview)preferences=[...onboardDraft];homeViewIds=null;void finishOnboarding();return;}
   if(v==='back'){onboardStep=Math.max(1,onboardStep-1);drawOnboarding();return;}
   if(v==='next'){
-    if(onboardStep===1&&obSlideNext())return;
     if(onboardStep===2){if(!onboardPreview){preferences=[...onboardDraft];homeViewIds=null;}void finishOnboarding();return;}
     onboardStep=Math.min(2,onboardStep+1);drawOnboarding();
   }

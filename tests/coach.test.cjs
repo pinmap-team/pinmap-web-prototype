@@ -7,11 +7,10 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const read=file=>fs.readFileSync(file,'utf8');
 
-test('the home coach starts only while the home screen is open',()=>{
-  const call=read('pinmap.js').match(/if \(onboardFull\) setTimeout\(([^;]*)\);/);
-  assert(call,'finishOnboarding schedules startCoach on a timer');
-  assert(call[1].includes("page === 'home'"),'the 350ms callback re-checks page === home before starting the coach');
-  assert(call[1].includes('startCoach'),'the callback still starts the coach');
+// 2026-11-23: 코치마크는 쓰지 않아요. 온보딩이 끝나도, 이용 가이드에서도 시작하지 않아요.
+test('the home coach is no longer started after onboarding or from the guide',()=>{
+  assert(!/startCoach\(/.test(read('pinmap.js')),'finishOnboarding does not start the coach');
+  assert(!read('mypages.js').includes("myRow('coachagain'"),'the guide has no coach replay row');
 });
 
 test('coach step 1 points at a home screen element, not a global overlay',()=>{

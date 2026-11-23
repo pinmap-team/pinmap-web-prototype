@@ -3,3 +3,9 @@
 node_modules/
 .vercel
 .env*
+
+# 로컬 미리보기 (GitHub에 올리지 않음)
+로컬미리보기.command
+.local/
+.local-*
+.snap.tgz
