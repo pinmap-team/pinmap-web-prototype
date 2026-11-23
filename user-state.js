@@ -4,12 +4,13 @@
   const PinmapPlaces=root.PinmapPlaces||(typeof require==='function'?require('./place-state.js'):null);
   const text=(v,n=200)=>typeof v==='string'?v.slice(0,n):'';
   const list=(v,n=100)=>[...new Set((Array.isArray(v)?v:[]).filter(x=>typeof x==='string').map(x=>text(x)).filter(Boolean))].slice(0,n);
-  const defaults={notiDeadline:false,notiNearby:false,notiReminder:false,aiDefault:false,push:false,locPerm:'none',readNoti:[],places:[],recentPlaces:[],placeLabels:{},placeDetails:{},selectedPlace:null};
+  const defaults={notiDeadline:false,notiNearby:false,notiReminder:false,aiDefault:false,push:false,locPerm:'none',readNoti:[],places:[],recentPlaces:[],placeLabels:{},placeDetails:{},selectedPlace:null,calendarWeekStart:'sunday'};
   function normalize(value){
     const v=value&&typeof value==='object'?value:{},s=v.settings||{};
     const settings={...defaults};
     for(const key of ['notiDeadline','notiNearby','notiReminder','aiDefault','push'])settings[key]=s[key]===true;
     settings.locPerm=['none','using','always'].includes(s.locPerm)?s.locPerm:'none';
+    settings.calendarWeekStart=s.calendarWeekStart==='monday'?'monday':'sunday';
     settings.places=list(s.places);settings.recentPlaces=list(s.recentPlaces,5);settings.readNoti=list(s.readNoti,500);
     settings.placeLabels=Object.create(null);settings.placeDetails=Object.create(null);
     for(const name of settings.places){

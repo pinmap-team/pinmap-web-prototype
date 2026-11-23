@@ -70,6 +70,11 @@ let calPick = false; // 월 선택 패널 열림
 let calMonth = new Date(calToday.getFullYear(), calToday.getMonth(), 1);
 let calSel = calKey(calToday);
 const calSelDate = () => { const [y, m, d] = calSel.split('-').map(Number); return new Date(y, m - 1, d); };
+const calWeekdays = ['일','월','화','수','목','금','토'];
+const calWeekFirstDay = () => settings.calendarWeekStart === 'monday' ? 1 : 0;
+const calWeekOffset = date => (date.getDay() - calWeekFirstDay() + 7) % 7;
+const calWeekStartDate = date => { const start = new Date(date); start.setDate(date.getDate() - calWeekOffset(date)); return start; };
+const calWeekLabels = () => calWeekdays.map((_,index) => calWeekdays[(index + calWeekFirstDay()) % 7]);
 
 function calRow(x){
   const d = calDue(x), n = calDays(x);
@@ -84,7 +89,7 @@ function calRow(x){
 
 pages.calendar = function(){
   const y = calMonth.getFullYear(), m = calMonth.getMonth();
-  const first = new Date(y, m, 1).getDay(), last = new Date(y, m + 1, 0).getDate();
+  const first = calWeekOffset(new Date(y, m, 1)), last = new Date(y, m + 1, 0).getDate();
   const dueByDay = {};
   calDueList().forEach(x => { const k = calKey(calDue(x)); (dueByDay[k] = dueByDay[k] || []).push(x); });
   const cells = [];
@@ -110,7 +115,7 @@ pages.calendar = function(){
         <button class="caltitle" data-calpick aria-expanded="${calPick}" aria-controls="cal-month-picker" aria-haspopup="dialog" aria-label="다른 달로 이동"><span>${y}년 ${m + 1}월${icon('chevron')}</span></button>
         ${`<div class="calnav"><button data-calnav="-1" aria-label="이전 달">${icon('chevleft')}</button><button data-calnav="1" aria-label="다음 달">${icon('chevright')}</button></div>`}
       </div>
-      <div class="calweek" aria-hidden="true">${['일','월','화','수','목','금','토'].map(w => `<span>${w}</span>`).join('')}</div>
+      <div class="calweek" aria-hidden="true">${calWeekLabels().map(w => `<span class="${w==='일'?'cal-sunday':''}">${w}</span>`).join('')}</div>
       <div class="calgrid">${cells.join('')}</div>
       ${calPick ? `<div class="cal-month-picker" id="cal-month-picker" role="dialog" aria-label="월 선택">
         <div class="cal-picker-head"><button type="button" data-calclose aria-label="월 선택 닫기">${icon('close')}</button></div>

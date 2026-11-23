@@ -2,7 +2,7 @@
 // 마이에서 누르는 기능은 아래에서 올라오는 시트 대신 새 페이지로 열리고, 왼쪽 위 ← 로 마이로 돌아가요.
 // 현재 위치 · 관심 키워드 · 알림 · 저장 · 위치/지도 · 저장하는 방법 · 앱 정보 · 핀맵 계정 설정
 
-const MY_PAGES = {calexport:'캘린더로 내보내기', favorites:'즐겨찾기', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리'};
+const MY_PAGES = {calexport:'캘린더로 내보내기', calsettings:'캘린더 설정', favorites:'즐겨찾기', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리'};
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
 const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
@@ -42,6 +42,28 @@ function pageFromModal(fn){ // my.js의 시트 내용을 그대로 페이지에 
 }
 pages.notiset = () => myPage('알림 설정', pageFromModal(notiSettings), 'settingpage');
 pages.saveset = () => myPage('저장 설정', pageFromModal(saveSettings), 'settingpage');
+pages.calsettings = () => myPage('캘린더 설정', `<fieldset class="calendar-week-settings" aria-describedby="calendar-week-hint">
+  <legend>한 주의 시작 요일</legend>
+  <p id="calendar-week-hint">홈의 주간 일정과 캘린더에 함께 적용돼요.</p>
+  ${[['sunday','일요일 시작'],['monday','월요일 시작']].map(([value,label])=>`<label class="calendar-week-option"><span>${label}</span><input type="radio" name="calendar-week-start" value="${value}" ${settings.calendarWeekStart===value||!settings.calendarWeekStart&&value==='sunday'?'checked':''}></label>`).join('')}
+</fieldset>`, 'settingpage calendar-settings-page');
+let calendarWeekSaving=false;
+document.addEventListener('change',async event=>{
+  const input=event.target.closest('input[name="calendar-week-start"]');
+  if(!input||calendarWeekSaving||!['sunday','monday'].includes(input.value))return;
+  const previous=settings.calendarWeekStart==='monday'?'monday':'sunday';
+  if(input.value===previous)return;
+  const owner=window.PinmapAccountState?.userId;
+  settings.calendarWeekStart=input.value;
+  calendarWeekSaving=true;
+  const group=input.closest('fieldset');
+  group.setAttribute('aria-busy','true');
+  group.querySelectorAll('input').forEach(node=>{node.disabled=true;});
+  const saved=await persist();
+  calendarWeekSaving=false;
+  if(!saved&&owner===window.PinmapAccountState?.userId&&settings.calendarWeekStart===input.value)settings.calendarWeekStart=previous;
+  render();
+});
 // 2026-11-04: 화면 모드도 아래 시트 대신 페이지로 (내용은 PinmapTheme.show()와 같음)
 pages.themeset = () => { PinmapTheme.beginPreview(); return myPage('화면 모드', pageFromModal(() => PinmapTheme.show()), 'settingpage themepage'); };
 actions.appearance = () => go('themeset');
@@ -49,6 +71,7 @@ Object.assign(actions, {
   notisheet: () => go('notiset'),
   notisettings: () => go('notiset'),
   savesheet: () => go('saveset'),
+  calsettings: () => go('calsettings'),
   appinfo: () => go('appinfo'),
   account: () => go('account'),
   guide: () => go('guide'),
