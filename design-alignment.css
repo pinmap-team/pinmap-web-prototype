@@ -1370,9 +1370,6 @@ html,body{overscroll-behavior-y:contain}
 /* Entry logo is a separate, passive screen before the login choices. */
 .auth-shell[data-screen="intro"] .auth-hero{display:flex;flex:1;min-height:100%;pointer-events:none}
 .auth-shell[data-screen="intro"] .auth-panel{display:none}
-.auth-shell[data-screen="welcome"] .auth-hero{display:none}
-.auth-shell[data-screen="welcome"] .auth-panel{display:flex;flex:1;flex-direction:column;justify-content:center;min-height:100%;border-radius:0;background:var(--color-neutral);padding:var(--space-2xl) var(--space-xl)}
-.auth-shell[data-screen="welcome"] #auth-content{width:100%;margin:auto}
 @media(prefers-reduced-motion:reduce){.pm-spinner,button[aria-busy="true"]::after{animation:none}}
 
 /* Current location: blue position and a compass cone only when heading is available. */

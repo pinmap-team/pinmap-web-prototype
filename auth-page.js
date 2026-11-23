@@ -83,7 +83,7 @@
     try {sessionStorage.removeItem(pendingKey);} catch {}
     resumeVerification = false;
     if (mode === 'welcome') {
-      content.innerHTML = `<header class="auth-heading"><h1>핀맵에 로그인</h1><p>저장한 취향을 다시 만나요.</p></header><div class="auth-social"><p>간편하게 시작하기</p><div class="auth-social-buttons">${kakao}${google}</div></div><nav class="auth-entry-links" aria-label="이메일 계정"><button type="button" data-auth="signin">이메일 로그인</button><span class="auth-entry-divider" aria-hidden="true"></span><button type="button" data-auth="signup">회원가입</button></nav>${testEntry()}<p class="auth-message" id="auth-message" role="status" aria-live="polite" aria-atomic="true"></p>`;
+      content.innerHTML = `<div class="auth-social"><p>간편하게 시작하기</p><div class="auth-social-buttons">${kakao}${google}</div></div><nav class="auth-entry-links" aria-label="이메일 계정"><button type="button" data-auth="signin">이메일 로그인</button><span class="auth-entry-divider" aria-hidden="true"></span><button type="button" data-auth="signup">회원가입</button></nav>${testEntry()}<p class="auth-message" id="auth-message" role="status" aria-live="polite" aria-atomic="true"></p>`;
       main.setAttribute('aria-busy','false'); return;
     }
     const title = {signin:'이메일 로그인',signup:'회원가입',reset:'비밀번호 재설정',password:'새 비밀번호 설정'}[mode];
