@@ -48,7 +48,7 @@ detail = function(){
     const index=photoIndexes[i],favorite=extractedPlaces[i],located=index>=0&&!favorite.unlocated;
     const address=String((index>=0?locations[index]?.address:'')||place.address||'').trim();
     const addressInfo=address ? `<div class="dt-extraction-address"><span>${esc(address)}</span><button type="button" class="dt-extraction-copy-button" data-dt-copy-place="${i}" aria-label="${esc(place.name || '장소')} 주소 복사" title="주소 복사">${icon('copy')}</button></div>${!located&&place.reason?`<p>${esc(place.reason)}</p>`:''}` : `<p>${esc(located?'지도 위치 확인됨':place.reason||'주소를 확인하지 못했어요.')}</p>`;
-    return `<li class="dt-extraction-place">${located?PinmapPlacePhotos.markup(x.backendId,index,PinmapPlacePhotos.preferredImage(locations[index],x.photo),'dt-extraction-photo'):''}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong>${located ? '' : '<span class="dt-extraction-pending">위치 확인 필요</span>'}</div>${addressInfo}</div><button type="button" class="dt-extraction-heart lm-heart-motion${favorite.favorite?' is-active':''}" data-fav-place-id="${esc(favorite.id)}" aria-pressed="${!!favorite.favorite}" aria-label="${esc(favorite.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button></li>`;
+    return `<li class="dt-extraction-place">${located?PinmapPlacePhotos.markup(x.backendId,index,PinmapPlacePhotos.preferredImage(locations[index],x.photo),'dt-extraction-photo'):''}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong>${located ? '' : '<span class="dt-extraction-pending">위치 확인 필요</span>'}</div>${addressInfo}</div><button type="button" class="dt-extraction-heart lm-heart-motion${favorite.favorite?' is-active':''}" data-fav-place-id="${esc(favorite.id)}" aria-pressed="${!!favorite.favorite}" aria-label="${esc(favorite.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon(!!favorite.favorite)}</span></button></li>`;
   }).join('')}</ul></section>` : '';
   const eventInfo=dtEventInfo(x.events);
   const analysisNotes = Array.isArray(x.extractionNotes) ? x.extractionNotes.filter(note => typeof note === 'string').slice(0, 8) : [];
@@ -79,7 +79,7 @@ detail = function(){
     <div class="dthero">${libThumb(x)}<div class="dtshade" aria-hidden="true"></div>
       <div class="dttop"><button class="dtbtn" data-action="back" aria-label="돌아가기">${icon('chevleft')}</button>
         <div class="dttopr">
-          <button type="button" class="dtbtn dtfavorite lm-heart-motion${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 게시물 즐겨찾기" title="즐겨찾기" aria-pressed="${!!x.favorite}"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>
+          <button type="button" class="dtbtn dtfavorite lm-heart-motion${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 게시물 즐겨찾기" title="즐겨찾기" aria-pressed="${!!x.favorite}"><span class="lm-heart-glyph">${likeHeartIcon(!!x.favorite)}</span></button>
           <button class="dtbtn dtmorebtn" data-action="dtmore" aria-label="더보기" aria-haspopup="menu" aria-expanded="false" aria-controls="dtmenu">${icon('more')}</button>
           <div class="dtmenu" id="dtmenu" role="menu" aria-label="콘텐츠 메뉴" hidden>
             <button type="button" role="menuitem" data-action="dtshare">${icon('share')}공유</button>

@@ -14,7 +14,7 @@
     document.querySelector('.pm-savefx')?.remove();
     const fx = document.createElement('div');
     fx.className = 'pm-savefx'; fx.setAttribute('aria-hidden', 'true');
-    fx.innerHTML = `${typeof PinmapSolar !== 'undefined' ? PinmapSolar.icon('check', 'pm-savefx-check') : icon('check')}<b>저장됨</b>${label ? `<span>${esc(label)}</span>` : ''}`;
+    fx.innerHTML = `${typeof PinmapSolar !== 'undefined' ? PinmapSolar.icon('check', 'pm-savefx-check', 'bold') : icon('check')}<b>저장됨</b>${label ? `<span>${esc(label)}</span>` : ''}`;
     document.body.append(fx);
     // 저장 진행 안내가 떠 있으면 그 위에 띄워 겹치지 않게 해요.
     const panel = document.getElementById('pinmap-save-status');

@@ -24,10 +24,10 @@ const paths = {
   route:'M7 5h8a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h8 M7 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0 M21 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0',
   question:'M9 9a3 3 0 1 1 5.1 2.1c-1.6 1-2.1 1.7-2.1 3.4 M12 18h.01 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0'
 };
-const icon = n => (typeof PinmapSolar !== 'undefined' && PinmapSolar.icon(n)) || `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n]||paths.bookmark}"/></svg>`;
+const icon = n => (typeof PinmapSolar !== 'undefined' && PinmapSolar.icon(n, 'icon', n === 'check' ? 'bold' : 'linear')) || `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n]||paths.bookmark}"/></svg>`;
 // Bencho Like's Lucide heart, without its pill and count.
 // 2026-11-23: 즐겨찾기는 하트 대신 별(Figma Pinmap / Companion / star, Outline·Fill)을 써요. 이름은 기존 호출을 위해 그대로 둬요.
-const likeHeartIcon = () => (typeof PinmapSolar !== 'undefined' && PinmapSolar.icon('heart', 'icon lm-like-heart')) || icon('heart');
+const likeHeartIcon = (active = false) => (typeof PinmapSolar !== 'undefined' && PinmapSolar.icon('heart', 'icon lm-like-heart', active ? 'bold' : 'linear')) || icon('heart');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ---------- 콘텐츠 유형 (저장 카테고리) ---------- */
