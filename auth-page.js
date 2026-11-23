@@ -1,17 +1,9 @@
 (() => {
   const content = document.getElementById('auth-content');
   const main = document.getElementById('auth-main');
+  try {sessionStorage.removeItem('pinmap.auth.pending-email');} catch {}
   let client, mode = 'welcome', busy = false, unsubscribe;
   let lastEmail = '', verificationPurpose = 'signup', resendAfter = 0, resendTimer;
-  const pendingKey = 'pinmap.auth.pending-email';
-  let resumeVerification = false;
-  try {
-    const pending = JSON.parse(sessionStorage.getItem(pendingKey));
-    if (pending && typeof pending.email === 'string' && pending.email.length <= 254 && ['signup','reset'].includes(pending.purpose) && Date.now() - pending.createdAt < 86400000) {
-      lastEmail = pending.email; verificationPurpose = pending.purpose;
-      resendAfter = Number(pending.resendAfter) || 0; resumeVerification = true;
-    }
-  } catch {}
   const recoveryKey = 'pinmap.auth.recovery';
   const fragment = new URLSearchParams(location.hash.slice(1));
   const params = new URLSearchParams(location.search);
@@ -57,7 +49,6 @@
     }).join('')}</ol>`;
   }
   function verificationScreen() {
-    try {sessionStorage.setItem(pendingKey,JSON.stringify({email:lastEmail,purpose:verificationPurpose,resendAfter,createdAt:Date.now()}));} catch {}
     const signup = verificationPurpose === 'signup';
     content.innerHTML = `<header class="auth-form-header"><button class="auth-back" type="button" data-auth="${signup ? 'signup' : 'reset'}" aria-label="이메일 입력으로 돌아가기"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><h1>${signup ? '이메일 인증' : '비밀번호 재설정'}</h1></header>
       ${signup ? signupProgress(2) : ''}
@@ -80,8 +71,6 @@
     clearInterval(resendTimer);
     mode = next; main.dataset.screen = mode;
     if (mode === 'verify') {verificationScreen(); main.setAttribute('aria-busy','false'); return;}
-    try {sessionStorage.removeItem(pendingKey);} catch {}
-    resumeVerification = false;
     if (mode === 'welcome') {
       content.innerHTML = `<div class="auth-social"><p>간편하게 시작하기</p><div class="auth-social-buttons">${kakao}${google}</div></div><nav class="auth-entry-links" aria-label="이메일 계정"><button type="button" data-auth="signin">이메일 로그인</button><span class="auth-entry-divider" aria-hidden="true"></span><button type="button" data-auth="signup">회원가입</button></nav>${testEntry()}<p class="auth-message" id="auth-message" role="status" aria-live="polite" aria-atomic="true"></p>`;
       main.setAttribute('aria-busy','false'); return;
@@ -99,7 +88,23 @@
     fillEmail();
     main.setAttribute('aria-busy','false');
   }
-  function enterApp() {try {sessionStorage.removeItem(pendingKey);} catch {} location.replace('index.html'); }
+  function enterApp() {
+    try {
+      for (const key of Object.keys(sessionStorage))
+        if (key.startsWith('pinmap.auth.tab.') && key.includes('code-verifier')) sessionStorage.removeItem(key);
+    } catch {}
+    if (document.getElementById('pinmap-app-frame')) return;
+    const frame = document.createElement('iframe');
+    frame.id = 'pinmap-app-frame';
+    frame.className = 'phone-frame';
+    frame.dataset.phoneViewport = '';
+    frame.title = '핀맵 앱';
+    frame.src = 'app.html?mode=development&auth=required';
+    document.body.append(frame);
+    document.body.classList.add('app-open');
+    history.replaceState(null,'',location.origin + '/');
+    window.dispatchEvent(new Event('resize'));
+  }
   function loading(value) {
     busy = value; main.setAttribute('aria-busy', String(value));
     main.querySelectorAll('button').forEach(button => {button.disabled = value;});
@@ -111,7 +116,7 @@
     content.innerHTML=`${retry?'<header class="auth-form-header"><a class="auth-back" href="index.html" aria-label="시작 화면으로 돌아가기"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></a><h1>연결 확인</h1></header>':''}<div class="auth-connection">${retry?'':'<span class="pm-spinner" aria-hidden="true"></span>'}<header class="auth-heading" role="status" aria-live="polite"><h1>${retry?'연결을 확인해 주세요':'잠시 연결을<br>기다려 주세요'}</h1></header>${retry?'<button class="filled auth-submit auth-submit-wide" data-auth="retry">다시 연결하기</button><a class="auth-home" href="index.html">시작 화면으로 돌아가기</a>':''}</div>`;
   }
   async function boot() {
-    const introEntry = !accountDeleted && !callbackError && !recovering && !resumeVerification && !params.has('code') && !fragment.has('access_token');
+    const introEntry = !accountDeleted && !callbackError && !recovering && !params.has('code') && !fragment.has('access_token');
     const introStartedAt = Date.now();
     if (introEntry) { main.dataset.screen = 'intro'; main.setAttribute('aria-busy','true'); }
     else connectionScreen();
@@ -122,7 +127,8 @@
         // Do not call async Supabase methods inside the SDK's auth lock.
         if (event === 'SIGNED_IN' && mode === 'verify' && verificationPurpose === 'signup' && session?.user?.email_confirmed_at && session.user.email?.toLowerCase() === lastEmail.toLowerCase()) setTimeout(enterApp,0);
         if (event === 'PASSWORD_RECOVERY') {
-          recovering = true; sessionStorage.setItem(recoveryKey,'1'); render('password');
+          recovering = true; sessionStorage.setItem(recoveryKey,'1');
+          if (mode !== 'password') render('password');
         }
       });
       unsubscribe = () => data.subscription.unsubscribe();
@@ -138,7 +144,7 @@
       history.replaceState(null,'',location.pathname + (showLoginChoice ? '?screen=welcome' : ''));
       if (callbackError) { recovering = false; sessionStorage.removeItem(recoveryKey); render(); notice('인증을 완료하지 못했어요. 다시 로그인하거나 새 인증 링크를 요청해 주세요.',true); return; }
       if (recovering) {
-        if (sessionData.session) { render('password'); return; }
+        if (sessionData.session) { if (mode !== 'password') render('password'); return; }
         recovering = false; sessionStorage.removeItem(recoveryKey); render('reset');
         notice('재설정 링크가 만료되었어요. 새 링크를 요청해 주세요.',true); return;
       }
@@ -148,7 +154,7 @@
         if (userData.user && !showLoginChoice) {enterApp(); return;}
       }
       if (params.has('code') || fragment.has('access_token')) {render('signin'); notice('인증 링크를 확인하지 못했어요. 이메일에서 인증을 마쳤다면 가입한 이메일과 비밀번호로 로그인해 주세요.',true);} else {
-        const next = accountDeleted ? 'welcome' : resumeVerification ? 'verify' : mode;
+        const next = accountDeleted ? 'welcome' : mode;
         if (next === 'welcome' && introEntry) await new Promise(resolve => setTimeout(resolve, Math.max(0, 1400 - (Date.now() - introStartedAt))));
         render(next);
         if (accountDeleted) notice('회원 탈퇴가 완료됐어요.');
@@ -196,7 +202,6 @@
             : await client.auth.resetPasswordForEmail(lastEmail,{redirectTo:PinmapAuth.callback()});
           if (result.error) throw result.error;
           resendAfter = Date.now() + 60000;
-          try {sessionStorage.setItem(pendingKey,JSON.stringify({email:lastEmail,purpose:verificationPurpose,resendAfter,createdAt:Date.now()}));} catch {}
           notice('메일을 다시 요청했어요. 받은 편지함과 스팸함을 확인해 주세요.');
         } catch (error) {notice(PinmapAuth.message(error),true);}
         finally {loading(false);}

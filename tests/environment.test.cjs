@@ -66,10 +66,11 @@ function route(search, navigationType='navigate') {
   });
   return {src:frame.src,replacements,redirects,removed};
 }
-test('root and signed-in links open only the account app',()=>{
-  assert.equal(route('').src,'app.html?mode=development&auth=required');
+test('fresh links always open the login page',()=>{
+  assert.deepEqual(route('').redirects,['auth.html?screen=welcome']);
   const result=route('?mode=development&auth=required');
-  assert.equal(result.src,'app.html?mode=development&auth=required');
+  assert.equal(result.src,'about:blank');
+  assert.deepEqual(result.redirects,['auth.html?screen=welcome']);
   assert.deepEqual(result.replacements,['/index.html']);
 });
 test('refresh clears the local session and opens login; legacy links return to login',()=>{
@@ -84,7 +85,7 @@ test('refresh clears the local session and opens login; legacy links return to l
 });
 test('old account link is normalized without discarding other query parameters',()=>{
   const result=route('?mode=development&auth=required');
-  assert.equal(result.src,'app.html?mode=development&auth=required');
+  assert.deepEqual(result.redirects,['auth.html?screen=welcome']);
   assert.deepEqual(result.replacements,['/index.html']);
   assert.deepEqual(route('?mode=development&auth=required&v=review','reload').redirects,['auth.html?screen=welcome']);
 });

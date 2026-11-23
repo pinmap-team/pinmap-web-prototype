@@ -1,8 +1,19 @@
-// Shared SDK client for the standalone login page and the real app mode.
-// The SDK owns session persistence/refresh; passwords are never saved by Pinmap.
+// The login page owns the session in memory while its app frame is open.
 (() => {
   let pending;
   let verifiedClient, verifiedPending;
+  const memory = new Map();
+  const storage = {
+    getItem(key) {return key.includes('code-verifier') ? sessionStorage.getItem(key) : memory.get(key) ?? null;},
+    setItem(key, value) {if (key.includes('code-verifier')) sessionStorage.setItem(key,value); else memory.set(key,value);},
+    removeItem(key) {if (key.includes('code-verifier')) sessionStorage.removeItem(key); else memory.delete(key);}
+  };
+  function tabStorageKey() {
+    const name = 'pinmap.auth.tab-id';
+    let id = sessionStorage.getItem(name);
+    if (!id) {id = crypto.randomUUID(); sessionStorage.setItem(name,id);}
+    return 'pinmap.auth.tab.' + id;
+  }
   function verifiedUser(client) {
     if (verifiedClient !== client) {verifiedClient = client; verifiedPending = null;}
     if (!verifiedPending) verifiedPending = client.auth.getUser().finally(() => {verifiedPending = null;});
@@ -10,14 +21,22 @@
   }
   function ready() {
     if (location.protocol === 'file:') return Promise.reject(new Error('AUTH_LOCAL_FILE'));
+    if (window.top !== window) {
+      try {if (window.top.PinmapAuth?.ready) return window.top.PinmapAuth.ready();} catch {}
+    }
     if (!pending) pending = (async () => {
+      try {
+        localStorage.removeItem('pinmap.auth.v1');
+        for (const key of Object.keys(localStorage)) if (key.startsWith('pinmap.auth.v1')) localStorage.removeItem(key);
+      } catch {}
       const response = await fetch('/api/auth/config', {cache:'no-store', signal:AbortSignal.timeout(12000)});
       if (!response.ok) throw new Error('AUTH_CONFIG');
       const config = await response.json();
       window.PinmapAuth.testLoginAvailable = config.testLoginAvailable === true;
       if (!window.supabase?.createClient) throw new Error('AUTH_SDK');
       return window.supabase.createClient(config.url, config.publishableKey, {
-        auth:{storageKey:'pinmap.auth.v1', persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, flowType:'pkce'}
+        auth:{storageKey:tabStorageKey(), storage, persistSession:true,
+              autoRefreshToken:true, detectSessionInUrl:true, flowType:'pkce'}
       });
     })().catch(error => { pending = null; throw error; });
     return pending;
