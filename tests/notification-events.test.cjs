@@ -24,17 +24,24 @@ function reminderContext(endOffset){
     savedAgo:()=>'',fmtDay:date=>date.toISOString().slice(0,10)};
   vm.runInNewContext(fs.readFileSync('calendar.js','utf8'),context);
   vm.runInNewContext(fs.readFileSync('my.js','utf8').split('unreadCount =')[0],context);
+  const exportListSource=fs.readFileSync('mypages.js','utf8').match(/^const calExportList = .*;$/m)?.[0];
+  assert.ok(exportListSource);
+  vm.runInNewContext(exportListSource,context);
   return context;
 }
 
 test('an exhibition opening tomorrow and closing months later creates no deadline alert',()=>{
   const context=reminderContext(125);
-  assert.equal(vm.runInNewContext('calDueList().length',context),4);
+  assert.equal(vm.runInNewContext('calDueList().map(x=>x.dueLabel).join(",")',context),'행사 시작,행사 종료');
+  assert.equal(vm.runInNewContext('calExportList().length',context),1);
+  assert.equal(vm.runInNewContext('calExportList()[0].dueLabel',context),'행사 종료');
   assert.equal(vm.runInNewContext('notifications().length',context),0);
 });
 
 test('two saved posts about the same exhibition create one closing alert',()=>{
   const context=reminderContext(2);
+  assert.equal(vm.runInNewContext('calDueList().length',context),2);
+  assert.equal(vm.runInNewContext('calExportList().length',context),1);
   const alerts=vm.runInNewContext('notifications()',context);
   assert.equal(alerts.length,1);
   assert.match(alerts[0].title,/^마감 D-2 샤갈/);
