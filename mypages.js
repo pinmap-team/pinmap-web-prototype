@@ -302,21 +302,30 @@ document.addEventListener('click', e => {
 // An unverified extracted date stays visible as a candidate in Pinmap, but is
 // not exported into a personal calendar as a confirmed appointment.
 const calExportList = () => (typeof calDueList === 'function' ? calDueList().filter(x => calDue(x) >= calToday && !x.eventCandidate && x.dueLabel !== '행사 시작') : []);
+// 2026-11-23: 원하는 일정만 골라서 내보내요. 페이지에 들어올 때는 모두 선택된 상태로 시작해요.
+let calxPick = null;
+const calxSelected = () => { const list = calExportList(); if (!calxPick) calxPick = new Set(list.map(x => String(x.id))); return list.filter(x => calxPick.has(String(x.id))); };
 pages.calexport = () => {
-  const list = calExportList();
-  return myPage('캘린더로 내보내기', `<p class="mpdesc calx-desc">저장한 콘텐츠의 마감 일정을 내 캘린더에 한 번에 넣어요.<br>Google 캘린더와 Apple 캘린더 모두 같은 파일로 가져올 수 있어요.</p>
+  const list = calExportList(), picked = calxSelected(), n = picked.length, all = list.length && n === list.length;
+  return myPage('캘린더로 내보내기', `<p class="mpdesc calx-desc">내 캘린더에 넣을 마감 일정을 골라 주세요.<br>Google 캘린더와 Apple 캘린더 모두 같은 파일로 가져올 수 있어요.</p>
   <section class="mycard calx-list" aria-label="내보낼 마감 일정">
-    <h2>내보낼 마감 일정 <span>${list.length}개</span></h2>
-    ${list.length ? list.map(x => `<div class="calx-row"><span class="calx-date">${esc(fmtDay(calDue(x)))}</span><b>${esc(x.title)}</b></div>`).join('') : '<p class="muted">다가오는 마감 일정이 없어요.</p>'}
+    <div class="calx-head"><h2>내보낼 마감 일정 <span>${list.length ? `${list.length}개 중 ${n}개 선택` : '0개'}</span></h2>${list.length ? `<button type="button" class="textbtn calx-all" data-action="calxall">${all ? '모두 해제' : '모두 선택'}</button>` : ''}</div>
+    ${list.length ? list.map(x => { const on = calxPick.has(String(x.id)); return `<button type="button" class="calx-row calx-pick ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" data-calx-pick="${esc(String(x.id))}"><span class="calx-check" aria-hidden="true">${on ? icon('check') : ''}</span><span class="calx-date">${esc(fmtDay(calDue(x)))}</span><b>${esc(x.title)}</b></button>`; }).join('') : '<p class="muted">다가오는 마감 일정이 없어요.</p>'}
   </section>
   <div class="calx-actions">
-    <button type="button" class="filled calx-btn" data-action="calexportapple" ${list.length ? '' : 'disabled'}>${icon('calendar')}Apple 캘린더로 내보내기</button>
-    <button type="button" class="calx-btn calx-secondary" data-action="calexportgoogle" ${list.length ? '' : 'disabled'}>${icon('calendar')}Google 캘린더로 내보내기</button>
+    <button type="button" class="filled calx-btn" data-action="calexportapple" ${n ? '' : 'disabled'}>${icon('calendar')}Apple 캘린더로 내보내기</button>
+    <button type="button" class="calx-btn calx-secondary" data-action="calexportgoogle" ${n ? '' : 'disabled'}>${icon('calendar')}Google 캘린더로 내보내기</button>
   </div>
-  <p class="hint calx-hint">지금은 한 번 내보내기만 할 수 있어요. 핀맵에서 바꾼 내용이 캘린더에 자동으로 반영되지는 않아요.</p>`, 'calxpage');
+  <p class="hint calx-hint">${list.length && !n ? '내보낼 일정을 하나 이상 골라 주세요. ' : ''}지금은 한 번 내보내기만 할 수 있어요. 핀맵에서 바꾼 내용이 캘린더에 자동으로 반영되지는 않아요.</p>`, 'calxpage');
 };
+document.addEventListener('click', e => {
+  const row = e.target.closest('[data-calx-pick]'); if (!row || page !== 'calexport') return;
+  calxSelected(); const id = row.dataset.calxPick; calxPick.has(id) ? calxPick.delete(id) : calxPick.add(id);
+  const y = window.scrollY; render(); window.scrollTo(0, y);
+  document.querySelector(`[data-calx-pick="${CSS.escape(id)}"]`)?.focus({preventScroll: true});
+});
 function calExportFile(){
-  const list = calExportList(); if (!list.length) { toast('내보낼 마감 일정이 없어요.'); return false; }
+  const list = calxSelected(); if (!list.length) { toast('내보낼 일정을 골라 주세요.'); return false; }
   const d8 = d => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
   const safe = t => String(t || '').replace(/[\\;,]/g, m => '\\' + m).replace(/\n/g, ' ');
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
@@ -331,7 +340,8 @@ function calExportFile(){
   } catch { toast('캘린더 파일을 만들지 못했어요. 다시 시도해 주세요.'); return false; }
 }
 Object.assign(actions, {
-  calexport: () => go('calexport'),
-  calexportapple: () => { const n = calExportFile(); if (n) toast(`마감 일정 ${n}개를 캘린더 파일로 저장했어요.\n파일을 열면 Apple 캘린더에 추가돼요.`); },
-  calexportgoogle: () => { const n = calExportFile(); if (n) { toast(`마감 일정 ${n}개를 캘린더 파일로 저장했어요.\nGoogle 캘린더의 가져오기에서 이 파일을 선택해 주세요.`); try { window.open('https://calendar.google.com/calendar/r/settings/export', '_blank', 'noopener,noreferrer'); } catch {} } }
+  calexport: () => { calxPick = null; go('calexport'); },
+  calxall: () => { const list = calExportList(), all = calxSelected().length === list.length; calxPick = new Set(all ? [] : list.map(x => String(x.id))); const y = window.scrollY; render(); window.scrollTo(0, y); },
+  calexportapple: () => { const n = calExportFile(); if (n) toast(`고른 일정 ${n}개를 캘린더 파일로 저장했어요.\n파일을 열면 Apple 캘린더에 추가돼요.`); },
+  calexportgoogle: () => { const n = calExportFile(); if (n) { toast(`고른 일정 ${n}개를 캘린더 파일로 저장했어요.\nGoogle 캘린더의 가져오기에서 이 파일을 선택해 주세요.`); try { window.open('https://calendar.google.com/calendar/r/settings/export', '_blank', 'noopener,noreferrer'); } catch {} } }
 });

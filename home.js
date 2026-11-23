@@ -105,10 +105,24 @@ function homeCategoryChips(){
   return `<div class="chiprows homecategories" role="group" aria-label="저장한 카테고리 바로가기">${categories.map(category => `<button class="prefchip" data-homecategory="${esc(category.id)}">${PinmapCategories.icon(category.id, false)} ${esc(category.id)}</button>`).join('')}</div>`;
 }
 function layoutHomeCategories(){
+  // 2026-11-23: 한 줄에 다 들어가면 한 줄, 아니면 최대 2줄로 나누고 줄마다 옆으로 밀어서 봐요.
   const host = document.querySelector('.homecategories');
   if (!host) return;
-  const width = [...host.children].reduce((sum, chip) => sum + chip.getBoundingClientRect().width, 0) + Math.max(0, host.children.length - 1) * 8;
-  host.classList.toggle('two-rows', width > host.clientWidth + 1);
+  const chips = [...host.querySelectorAll('.prefchip')];
+  host.replaceChildren(...chips);
+  const gap = 8, widths = chips.map(chip => chip.getBoundingClientRect().width);
+  const total = widths.reduce((sum, w) => sum + w, 0) + Math.max(0, chips.length - 1) * gap;
+  const rows = [document.createElement('div')];
+  if (total > host.clientWidth + 1 && chips.length > 1) {
+    rows.push(document.createElement('div'));
+    let first = 0, used = 0;
+    while (first < chips.length - 1 && used + widths[first] / 2 < total / 2) { used += widths[first] + gap; first++; }
+    first = Math.max(1, first);
+    rows[0].append(...chips.slice(0, first)); rows[1].append(...chips.slice(first));
+  } else rows[0].append(...chips);
+  rows.forEach(row => { row.className = 'hc-row'; });
+  host.replaceChildren(...rows);
+  host.classList.toggle('two-rows', rows.length > 1);
 }
 window.addEventListener('resize', layoutHomeCategories);
 document.addEventListener('click', e => {
