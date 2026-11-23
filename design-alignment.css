@@ -1684,3 +1684,30 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 @keyframes cf-sort-items{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort::before{background:var(--color-surface)}}
 @media(prefers-reduced-motion:reduce){.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort::before{transition:none}.cfpage :is(.cf-folder-toolbar,.cf-tools) .pm-choice-collection-sort.is-open .pm-choice-options{animation:none!important}}
+
+/* 2026-11-23 온보딩: 제목 위 여백 2배(16→32px), 1/2 '다음' 버튼 화면 맨 아래, 2/2 선택지 세로 스크롤 · 아이콘과 문구 한 줄 */
+#onboarding .ob-screen:is(.step2,.step3) .ob-title{margin-top:calc(var(--space-2xl) - var(--space-md))!important}
+#onboarding:has(.step2){height:100%!important}
+#onboarding .ob-screen.step2 .ob-actions{margin-top:auto!important}
+#onboarding .ob-screen.step3 .ob-options{flex:1 1 auto!important;min-height:0;overflow-y:auto;overscroll-behavior:contain;align-content:start;grid-auto-rows:max-content;margin:var(--space-md) calc(-1 * var(--space-sm)) 0!important;padding:var(--space-xs) var(--space-sm) var(--space-md);scrollbar-width:none}
+#onboarding .ob-screen.step3 .ob-options::-webkit-scrollbar{display:none}
+#onboarding .ob-screen.step3 .ob-actions{flex:none}
+#onboarding .step3 .ob-option{flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;height:auto!important;min-height:64px!important;gap:var(--space-md)!important;padding:var(--space-md)!important}
+#onboarding .step3 .ob-option .ob-emoji{flex:none}
+#onboarding .step3 .ob-option .ob-label{min-width:0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-wrap:nowrap}
+
+/* 2026-11-23 홈 카테고리: 최대 2줄, 넘치면 줄마다 옆으로 밀어서 보기 */
+.homecategories,.homecategories.two-rows,.chiprows.homecategories{display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:0!important;row-gap:0!important;overflow:visible!important;grid-template-rows:none}
+.homecategories .hc-row{display:flex;flex-wrap:nowrap;align-items:center;gap:var(--space-sm);overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;margin-inline:calc(-1 * var(--gutter,var(--space-xl)));padding:6px var(--gutter,var(--space-xl))}
+.homecategories .hc-row::-webkit-scrollbar{display:none}
+.homecategories .hc-row .prefchip{flex:none}
+
+/* 2026-11-23 캘린더로 내보내기: 일정 골라서 내보내기 (체크 원 + 모두 선택/해제) */
+.calxpage .calx-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm);margin-bottom:var(--space-xs)}
+.calxpage .calx-head h2{margin:0}
+.calxpage .calx-all{min-height:44px;padding:0 var(--space-xs);font:var(--type-body-sm);color:var(--color-secondary);background:none}
+.calxpage .calx-pick{width:100%;padding:0;background:none;text-align:left;cursor:pointer}
+.calxpage .calx-check{display:grid;place-items:center;flex:none;width:22px;height:22px;border-radius:999px;border:1.5px solid var(--color-border);color:var(--color-neutral)}
+.calxpage .calx-check .icon{width:14px;height:14px}
+.calxpage .calx-pick.on .calx-check{background:var(--color-primary);border-color:var(--color-primary)}
+.calxpage .calx-pick:not(.on) b{color:var(--color-secondary)}

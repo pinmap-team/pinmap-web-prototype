@@ -200,7 +200,7 @@ function onboardScreen() {
 function fitOnboardingViewport(){
   const el = $('#onboarding'); if (!el) return;
   let height = window.innerHeight;
-  try { height = Math.min(height, window.parent.innerHeight); } catch {}
+  // 2026-11-23: 휴대폰 틀 iframe은 창 크기에 맞춰 통째로 축소되므로 바깥 창 높이와 비교하지 않아요 (버튼이 맨 아래에서 떠 보이던 문제).
   el.style.setProperty('--ob-viewport', `${height}px`);
   const stages = [...el.querySelectorAll('.ob-phone-stage')];
   const imageHeight = stages.length ? Math.min(...stages.map(stage => stage.clientHeight)) : 100;
@@ -287,7 +287,7 @@ document.addEventListener('click',e=>{
     onboardDraft=onboardDraft.includes(id)?onboardDraft.filter(v=>v!==id):[...onboardDraft,id];
     const on=onboardDraft.includes(id);
     choice.classList.toggle('on',on);choice.setAttribute('aria-checked',on);
-    const pictogram=choice.querySelector('.ob-emoji');if(pictogram&&window.obIcon)pictogram.innerHTML=obIcon(id,on);
+    const pictogram=choice.querySelector('.ob-emoji');if(pictogram)pictogram.innerHTML=typeof PinmapCategories!=='undefined'?PinmapCategories.icon(id,on):(window.obIcon?obIcon(id,on):'');
     const count=document.querySelector('#onboarding .ob-pickcount');if(count)count.textContent=onboardDraft.length?`${onboardDraft.length}개 선택했어요`:'';
     
     
