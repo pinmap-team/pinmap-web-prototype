@@ -2,16 +2,22 @@
 // interestOf, preferences, openOnboarding, STORAGE는 pinmap.js에 있고, 화면을 그릴 때 사용합니다.
 
 /* ---------- 알림 ---------- */
-// 설정에서 켠 알림만 만들어요. 시간과 내용은 예시입니다.
+// 설정에서 켠 알림만 만들어요.
 const dueNum = x => Number(String(x.deadline || '').replace(/\D/g, '')); // 'D-3' → 3 (calendar.js보다 먼저 쓰일 수 있어 따로 둬요)
 function notifications(){
   const list = [];
-  // 홈 띠배너의 마감 임박 콘텐츠는 앱 안 알림 목록에도 보여줘요.
-  const dates=typeof calDueList==='function'?calDueList().filter(x=>!x.eventCandidate&&calDue(x)>=calToday):items.filter(x=>x.deadline);
+  // 달력은 시작일과 종료일을 모두 표시하지만, 마감 알림은 종료일만 알립니다.
+  const dates=settings.notiDeadline
+    ? (typeof calDueList==='function'?calDueList().filter(x=>!x.eventCandidate&&calDue(x)>=calToday):items.filter(x=>x.deadline))
+    : [];
+  const seenEvents=new Set();
   dates.forEach(x=>{
     const source=items.find(item=>item.id===x.id)||x,days=typeof calDays==='function'?calDays(x):dueNum(x);
-    if(settings.notiDeadline&&days>3)return;
+    if(days>3 || x.dueLabel==='행사 시작')return;
     const dateKey=x.eventDate||x.deadline;
+    const eventKey=x.eventDate ? dateKey+'-'+String(x.title||'').normalize('NFKC').toLocaleLowerCase('ko').replace(/[^\p{L}\p{N}]/gu,'') : '';
+    if(eventKey&&seenEvents.has(eventKey))return;
+    if(eventKey)seenEvents.add(eventKey);
     list.push({id:'due-'+(source.backendId??source.id)+'-'+dateKey+'-'+(x.dueLabel||''),emoji:'⏰',
       title:['마감',days===0?'오늘':`D-${days}`,x.title].join(' '),body:(x.period?x.period+' 운영, ':'')+'끝나기 전에 확인해 보세요.',
       time:typeof calDue==='function'&&calDue(x)?fmtDay(calDue(x)):'다가오는 일정',detail:source.id});
