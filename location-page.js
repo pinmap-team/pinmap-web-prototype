@@ -28,7 +28,7 @@
         <span class="address-copy"><span class="address-name"><b>${esc(record.label)}</b></span><span class="address-detail">${esc(record.address)}</span>${record.memo?`<span class="address-memo">${esc(record.memo)}</span>`:''}</span>
         ${selected?'<span class="address-badge">현재 설정된 위치</span>':''}
       </button>
-      ${editing?`<div class="address-row-edit"><button type="button" data-address-edit="${esc(record.name)}" aria-label="${esc(record.label)} 위치 수정">${icon('edit')} 수정</button><button type="button" data-address-delete="${esc(record.name)}" aria-label="${esc(record.label)} 위치 삭제" ${all.length===1?'disabled':''}>${icon('trash')} 삭제</button></div>`:''}
+      ${editing?`<div class="address-row-edit"><button type="button" data-address-edit="${esc(record.name)}" aria-label="${esc(record.label)} 위치 수정">${icon('edit')} 수정</button><button type="button" data-address-delete="${esc(record.name)}" aria-label="${esc(record.label)} 위치 삭제">${icon('trash')} 삭제</button></div>`:''}
     </article>`;}).join('');
   }
   pages.addresses=()=>`<section class="address-page">
@@ -127,9 +127,9 @@
     addressadd:()=>{if(myPlaces().length>=MAX_PLACES){toast(`위치는 최대 ${MAX_PLACES}개까지 저장할 수 있어요.`);return;}draftAddress='';draftCoords=null;go(fromMy()?'myaddresssearch':'addresssearch');$('#address-new-query')?.focus();},
     addressclear:()=>{queryText='';const input=$('#address-search');if(input)input.value='';updateResults();input?.focus();},
     addressdeleteconfirm:async()=>{
-      const name=pendingDelete;if(!name||!myPlaces().includes(name)||myPlaces().length<=1)return;
+      const name=pendingDelete;if(!name||!myPlaces().includes(name))return;
       const labels={...settings.placeLabels},details={...settings.placeDetails};delete labels[name];delete details[name];
-      const next={...settings,places:myPlaces().filter(value=>value!==name),placeLabels:labels,placeDetails:details};
+      const next={...settings,places:myPlaces().filter(value=>value!==name),placeLabels:labels,placeDetails:details,selectedPlace:settings.selectedPlace===name?null:settings.selectedPlace};
       if(!await commit(next))return;
       window.PinmapLocation?.clear(name);pendingDelete=null;$('#sheet').close();showList();toast('저장한 위치를 삭제했어요.');
     }
