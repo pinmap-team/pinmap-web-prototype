@@ -1835,6 +1835,7 @@ body:has(.dt) .bottomnav .home-add-menu{display:none!important}
 [data-theme="dark"] #onboarding .step3 .ob-groupcard.on .ob-grouptext small{color:var(--color-neutral)}
 
 
+
 /* 2026-11-24 하단 메뉴·추가 버튼의 흰 테두리 선 제거(유리 바탕·그림자는 유지) */
 .bottomnav .pm-nav-main,.pm-nav-main{border:0!important;box-shadow:var(--shadow-sm)!important}
 .bottomnav .home-add-fab{border:0!important;outline:0}
@@ -2000,3 +2001,10 @@ html body .calspan.is-start{left:var(--space-xs);border-top-left-radius:var(--ro
 html body .calspan.is-end{right:var(--space-xs);border-top-right-radius:var(--rounded-sm);border-bottom-right-radius:var(--rounded-sm)}
 html body .calspan em{position:absolute;z-index:2;top:0;left:var(--space-xs);width:calc(var(--span,1) * 100% - var(--space-sm));overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:var(--type-body-sm);font-style:normal;color:var(--color-on-surface);text-align:left}
 html[data-theme="dark"] body .calspan em{color:var(--color-neutral)}
+
+/* Solar Icons Bold shapes provide their own fills; legacy SVG strokes must not outline them. */
+svg.solar-icon.icon,svg.solar-icon.ob-icon,svg.solar-icon.pm-category-icon,svg.solar-icon.lm-category-svg,svg.solar-icon.pm-solid{stroke:none!important;fill:none!important}
+.bottomnav .pm-nav-main .navitem .navicon svg.solar-icon.icon{stroke:none!important;fill:none!important}
+svg.solar-icon.ob-icon{width:24px!important;height:24px!important}
+svg.solar-icon{stroke:none!important;fill:none!important}
+

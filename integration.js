@@ -1,20 +1,7 @@
 /* Integration layer: keep collection/detail implementations untouched. */
 (() => {
-  // 2026-11-24: 선택 전·후 모양이 같은 내비 아이콘. 선택되면 같은 윤곽을 채우고 안쪽 선만 비워요(mask). 지도는 카테고리 '여행·명소'와 같은 아이콘.
-  const NAV_GLYPHS={
-    home:{outline:'M3 10 12 3l9 7v10H3z',detail:'M9 20v-7h6v7',cut:'M9 21.5V13h6v8.5z',cutFill:true},
-    map:{outline:'M3 5 9 3l6 2 6-2v16l-6 2-6-2-6 2z',detail:'M9 3v16 M15 5v16',cut:'M9 3v16 M15 5v16'},
-    bookmark:{outline:'M6 3h12v18l-6-4-6 4z'},
-    user:{outline:'M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M4 21a8 8 0 0 1 16 0',filled:'M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M4 21a8 8 0 0 1 16 0z'}
-  };
-  let navMaskSeq=0;
-  const navGlyph=(name,active)=>{
-    const g=NAV_GLYPHS[name];
-    if(!active)return `<svg class="icon pm-nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="${g.outline}${g.detail?' '+g.detail:''}"/></svg>`;
-    const id=`pm-nav-cut-${name}-${++navMaskSeq}`;
-    const mask=g.cut?`<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24"><rect width="24" height="24" style="fill:#fff;stroke:none"/><path d="${g.cut}" style="fill:${g.cutFill?'#000':'none'};stroke:#000"/></mask></defs>`:'';
-    return `<svg class="icon pm-nav-glyph is-selected" viewBox="0 0 24 24" aria-hidden="true">${mask}<path class="pm-nav-fill" d="${g.filled||g.outline}"${g.cut?` mask="url(#${id})"`:''}/></svg>`;
-  };
+  const navGlyph=(name,active)=>typeof PinmapSolar !== 'undefined' ? PinmapSolar.icon(name,'icon pm-nav-glyph'+(active?' is-selected':''),active?'bold':'linear') : icon(name);
+
   // Four equal tabs keep their labels below their icons.
   // 2026-11-23: 가운데(지도와 컬렉션 사이)에 '추가' 버튼 자리 64px을 비워요.
   const NAV_GAP=64;

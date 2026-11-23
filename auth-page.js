@@ -1,4 +1,5 @@
 (() => {
+  const authIcon = name => typeof PinmapSolar === 'undefined' ? '' : PinmapSolar.icon(name);
   const content = document.getElementById('auth-content');
   const main = document.getElementById('auth-main');
   let client, mode = 'welcome', busy = false, unsubscribe;
@@ -26,7 +27,7 @@
   let recovering = fragment.get('type') === 'recovery' || sessionStorage.getItem(recoveryKey) === '1';
   const fieldIcon = type => type === 'email'
     ? '<span class="auth-input-icon" aria-hidden="true">@</span>'
-    : '<span class="auth-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="6" y="10" width="12" height="10" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2"/></svg></span>';
+    : '<span class="auth-input-icon" aria-hidden="true">' + authIcon('lock') + '</span>';
   const emailField = `<label class="auth-field" for="auth-email"><span class="auth-field-label">이메일</span><span class="auth-input-shell">${fieldIcon('email')}<input id="auth-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="이메일 주소" maxlength="254" required></span></label>`;
   const passwordField = fresh => `<label class="auth-field" for="auth-password"><span class="auth-field-label">${mode === 'password' ? '새 비밀번호' : '비밀번호'}</span><span class="auth-input-shell auth-password">${fieldIcon('password')}<input id="auth-password" name="password" type="password" autocomplete="${fresh ? 'new-password' : 'current-password'}" ${fresh ? 'minlength="8"' : ''} aria-describedby="auth-password-help" maxlength="128" placeholder="${mode === 'password' ? '새 비밀번호 · 8자 이상' : fresh ? '8자 이상 입력해 주세요' : '비밀번호'}" required><button type="button" data-auth="reveal" aria-controls="auth-password" aria-label="비밀번호 표시" aria-pressed="false">보기</button></span></label>`;
   const confirmation = `<label class="auth-field" for="auth-confirm"><span class="auth-field-label">비밀번호 확인</span><span class="auth-input-shell">${fieldIcon('password')}<input id="auth-confirm" name="confirm" type="password" placeholder="비밀번호 확인" autocomplete="new-password" minlength="8" maxlength="128" aria-describedby="auth-confirm-help" required></span><small id="auth-confirm-help" class="auth-field-help" aria-live="polite"></small></label>`;
@@ -52,16 +53,16 @@
     return `<ol class="auth-progress" aria-label="회원가입 단계">${['정보 입력','이메일 인증','가입 완료'].map((label,index) => {
       const step = index + 1;
       const state = step < current ? 'done' : step === current ? 'current' : 'upcoming';
-      const symbol = state === 'done' ? '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 12 4 4 8-8"/></svg>' : step;
+      const symbol = state === 'done' ? authIcon('check') : step;
       return `<li class="auth-step is-${state}" ${state === 'current' ? 'aria-current="step"' : ''}><span class="auth-step-number" aria-hidden="true">${symbol}</span><span class="auth-step-label">${label}<span class="auth-sr-only"> · ${state === 'done' ? '완료' : state === 'current' ? '현재 단계' : '예정'}</span></span></li>`;
     }).join('')}</ol>`;
   }
   function verificationScreen() {
     try {sessionStorage.setItem(pendingKey,JSON.stringify({email:lastEmail,purpose:verificationPurpose,resendAfter,createdAt:Date.now()}));} catch {}
     const signup = verificationPurpose === 'signup';
-    content.innerHTML = `<header class="auth-form-header"><button class="auth-back" type="button" data-auth="${signup ? 'signup' : 'reset'}" aria-label="이메일 입력으로 돌아가기"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><h1>${signup ? '이메일 인증' : '비밀번호 재설정'}</h1></header>
+    content.innerHTML = `<header class="auth-form-header"><button class="auth-back" type="button" data-auth="${signup ? 'signup' : 'reset'}" aria-label="이메일 입력으로 돌아가기">${authIcon('back')}</button><h1>${signup ? '이메일 인증' : '비밀번호 재설정'}</h1></header>
       ${signup ? signupProgress(2) : ''}
-      <div class="auth-mail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg></div>
+      <div class="auth-mail-icon" aria-hidden="true">${authIcon('mail')}</div>
       <header class="auth-heading"><h1>${signup ? '인증 메일을<br>확인해 주세요' : '재설정 메일을<br>확인해 주세요'}</h1><p class="auth-verification-email" id="auth-sent-email"></p></header>
       <ol class="auth-mail-steps"><li>받은 메일에서 ${signup ? '이메일 인증' : '비밀번호 재설정'} 링크를 눌러 주세요.</li><li>${signup ? '인증을 마치면 이 화면으로 돌아와 로그인해 주세요.' : '메일에서 열린 화면에서 새 비밀번호를 설정해 주세요.'}</li></ol>
       <p class="auth-field-help">자동으로 연결되지 않아도 괜찮아요. 가입한 이메일과 비밀번호로 로그인할 수 있어요.</p>
@@ -89,7 +90,7 @@
     const title = {signin:'이메일 로그인',signup:'회원가입',reset:'비밀번호 재설정',password:'새 비밀번호 설정'}[mode];
     const description = {signin:'저장한 취향을 다시 만나요.',signup:'이메일로 나만의 핀맵을 시작해 보세요.',reset:'가입한 이메일로 링크를 보내드려요.',password:'앞으로 사용할 비밀번호를 입력해 주세요.'}[mode];
     const submit = {signin:'이메일로 로그인',signup:'가입하고 인증 메일 받기',reset:'재설정 링크 보내기',password:'비밀번호 변경'}[mode];
-    content.innerHTML = `<header class="auth-form-header"><button class="auth-back" type="button" data-auth="welcome" aria-label="로그인 방식 선택으로 돌아가기"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><h1>${title}</h1></header><p class="auth-form-description">${description}</p>
+    content.innerHTML = `<header class="auth-form-header"><button class="auth-back" type="button" data-auth="welcome" aria-label="로그인 방식 선택으로 돌아가기">${authIcon('back')}</button><h1>${title}</h1></header><p class="auth-form-description">${description}</p>
       ${mode === 'signup' ? signupProgress(1) : ''}
       <form id="auth-form">${mode !== 'password' ? emailField : ''}${mode !== 'reset' ? passwordField(mode !== 'signin') : ''}${mode !== 'reset' ? `<small id="auth-password-help" class="auth-field-help">${mode === 'signin' ? '가입할 때 설정한 비밀번호를 입력해 주세요.' : '8자 이상 입력해 주세요.'}</small>` : ''}${['signup','password'].includes(mode) ? confirmation : ''}
       ${mode === 'signin' ? '<button class="auth-forgot" type="button" data-auth="reset" aria-label="비밀번호 재설정">비밀번호를 잊으셨나요?</button>' : ''}
@@ -108,7 +109,7 @@
   function connectionScreen(retry=false) {
     main.dataset.screen=retry?'error':'connecting';
     main.setAttribute('aria-busy',String(!retry));
-    content.innerHTML=`${retry?'<header class="auth-form-header"><a class="auth-back" href="index.html" aria-label="시작 화면으로 돌아가기"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></a><h1>연결 확인</h1></header>':''}<div class="auth-connection">${retry?'':'<span class="pm-spinner" aria-hidden="true"></span>'}<header class="auth-heading" role="status" aria-live="polite"><h1>${retry?'연결을 확인해 주세요':'잠시 연결을<br>기다려 주세요'}</h1></header>${retry?'<button class="filled auth-submit auth-submit-wide" data-auth="retry">다시 연결하기</button><a class="auth-home" href="index.html">시작 화면으로 돌아가기</a>':''}</div>`;
+    content.innerHTML=`${retry?'<header class="auth-form-header"><a class="auth-back" href="index.html" aria-label="시작 화면으로 돌아가기">' + authIcon('back') + '</a><h1>연결 확인</h1></header>':''}<div class="auth-connection">${retry?'':'<span class="pm-spinner" aria-hidden="true"></span>'}<header class="auth-heading" role="status" aria-live="polite"><h1>${retry?'연결을 확인해 주세요':'잠시 연결을<br>기다려 주세요'}</h1></header>${retry?'<button class="filled auth-submit auth-submit-wide" data-auth="retry">다시 연결하기</button><a class="auth-home" href="index.html">시작 화면으로 돌아가기</a>':''}</div>`;
   }
   async function boot() {
     const introEntry = !accountDeleted && !callbackError && !recovering && !resumeVerification && !params.has('code') && !fragment.has('access_token');

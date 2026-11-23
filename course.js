@@ -70,8 +70,8 @@
     return `<section class="coursepage ${editing?'is-editing':''}">
       <header class="course-header">
         <div class="course-toolbar"><button class="course-close" data-page="${courseOrigin}" aria-label="${courseOrigin==='map'?'지도로 돌아가기':'저장한 코스로 돌아가기'}">${icon('back')}</button>
-          <div class="course-title-row"><div><input data-course-field="title" aria-label="코스 이름" maxlength="50" value="${esc(course.title)}" readonly><button class="course-title-edit" data-course-edit-title aria-label="코스 제목 수정" title="코스 제목 수정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l11-11-4-4L4 16v4Zm9-13 4 4"/></svg></button></div></div>
-          <div class="course-header-actions"><button class="course-share" data-course-share aria-label="코스 공유하기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 13v8h14v-8"/></svg></button><button class="course-save" data-course-save>저장</button></div>
+          <div class="course-title-row"><div><input data-course-field="title" aria-label="코스 이름" maxlength="50" value="${esc(course.title)}" readonly><button class="course-title-edit" data-course-edit-title aria-label="코스 제목 수정" title="코스 제목 수정">${icon('pen')}</button></div></div>
+          <div class="course-header-actions"><button class="course-share" data-course-share aria-label="코스 공유하기">${icon('share')}</button><button class="course-save" data-course-save>저장</button></div>
         </div>
         <label class="course-date-row"><span class="sr">코스 출발일</span><input data-course-field="date" type="date" aria-label="코스 출발일" value="${esc(course.date)}"></label>
       </header>
