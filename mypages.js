@@ -169,13 +169,114 @@ pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
 
 /* ---------- 자주 묻는 질문 · 공지사항 · 약관 및 정책 (2026-11-03, 마이 하단 도움말) ---------- */
 const infoRows = rows => `<div class="mycard settings">${rows.map(([t, d]) => `<div class="setrow"><div><b>${t}</b><small>${d}</small></div></div>`).join('')}</div>`;
-pages.faq = () => myPage('자주 묻는 질문', infoRows([
+const faqRows = [
   ['SNS 콘텐츠는 어떻게 저장하나요?', '홈 추가 메뉴에서 Instagram 링크·저장 ZIP·캡처 이미지를 선택해 주세요.'],
   ['저장한 콘텐츠는 어디에서 다시 보나요?', '홈에서 주변 저장 장소와 최근 저장을, 컬렉션에서 전체 목록을 볼 수 있어요.'],
   ['AI 자동 분류가 틀렸어요.', '콘텐츠 상세에서 카테고리를 직접 바꿀 수 있어요.<br>저장 설정에서 자동 분류를 끌 수도 있어요.'],
   ['원본 게시물이 삭제되면 어떻게 되나요?', '원본 링크가 열리지 않을 수 있어요. 핀맵에 저장된 장소 정보와 내 메모는 남지만, 원본 삭제 여부를 자동으로 확인하지는 않아요.'],
   ['위치 권한은 어디에서 바꾸나요?', '브라우저의 사이트 설정에서 위치 권한을 바꿀 수 있어요.']
-]), 'settingpage');
+];
+let faqOpen = 0;
+let faqMoveId = 0;
+const faqBox = (root, item) => {
+  const rootRect = root.getBoundingClientRect(), itemRect = item.getBoundingClientRect();
+  const scale = rootRect.width / root.offsetWidth || 1;
+  return {y:(itemRect.top-rootRect.top)/scale,h:itemRect.height/scale};
+};
+const faqSetPanel = (panel, box, opacity) => {
+  panel.style.transform = `translateY(${box.y}px)`;
+  panel.style.height = `${box.h}px`;
+  panel.style.opacity = String(opacity);
+};
+function faqInit(root){
+  if (!root || !root.isConnected) return;
+  root.style.minHeight = '';
+  const items = [...root.querySelectorAll('.faq-item')], answers = items.map(item => item.querySelector('.faq-answer'));
+  const openHeight = faqOpen === null ? 0 : answers[faqOpen].getBoundingClientRect().height;
+  const maxHeight = Math.max(...answers.map(answer => {
+    const hidden = answer.hidden; answer.hidden = false;
+    const height = answer.scrollHeight; answer.hidden = hidden;
+    return height;
+  }));
+  const scale = root.getBoundingClientRect().width / root.offsetWidth || 1;
+  const baseHeight = root.offsetHeight - openHeight / scale;
+  root.dataset.baseHeight = String(baseHeight);
+  root.dataset.maxAnswerHeight = String(maxHeight);
+  root.style.minHeight = `${baseHeight + (faqOpen === null ? 0 : maxHeight)}px`;
+  if (faqOpen !== null) faqSetPanel(root.querySelector('.faq-slide'),faqBox(root,items[faqOpen]),1);
+  root.dataset.ready = 'true';
+}
+function faqChoose(root, index){
+  const items = [...root.querySelectorAll('.faq-item')], answers = items.map(item => item.querySelector('.faq-answer'));
+  const panel = root.querySelector('.faq-slide'), next = faqOpen === index ? null : index;
+  const rootRect = root.getBoundingClientRect(), scale = rootRect.width / root.offsetWidth || 1;
+  const panelRect = panel.getBoundingClientRect();
+  const fromPanel = {y:(panelRect.top-rootRect.top)/scale,h:panelRect.height/scale};
+  const fromOpacity = Number(getComputedStyle(panel).opacity);
+  const fromHeights = answers.map(answer => answer.hidden ? 0 : answer.getBoundingClientRect().height / scale);
+  const moveId = ++faqMoveId;
+  panel.getAnimations().forEach(animation => animation.cancel());
+  answers.forEach(answer => {
+    answer.getAnimations().forEach(animation => animation.cancel());
+    answer.querySelector('.faq-text').getAnimations().forEach(animation => animation.cancel());
+  });
+  answers.forEach((answer,i) => {answer.hidden = false; answer.style.height = `${fromHeights[i]}px`;});
+  items.forEach((item,i) => item.querySelector('.faq-trigger').setAttribute('aria-expanded',String(i === next)));
+  const toHeights = answers.map((answer,i) => i === next ? answer.scrollHeight : 0);
+  answers.forEach((answer,i) => {answer.style.height = `${toHeights[i]}px`;});
+  const toPanel = faqBox(root,items[next ?? index]);
+  answers.forEach((answer,i) => {answer.style.height = `${fromHeights[i]}px`;});
+  faqSetPanel(panel,fromPanel,fromOpacity);
+  root.offsetHeight;
+  faqOpen = next;
+  root.style.minHeight = `${Number(root.dataset.baseHeight) + (next === null ? 0 : Number(root.dataset.maxAnswerHeight))}px`;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const settle = () => {
+    if (moveId !== faqMoveId) return;
+    answers.forEach((answer,i) => {answer.hidden = i !== next; answer.style.height = '';});
+    faqSetPanel(panel,toPanel,next === null ? 0 : 1);
+  };
+  if (reduced) {settle();return;}
+  const timing = {duration:300,easing:'cubic-bezier(.64,0,.2,1)',fill:'both'};
+  const motions = answers.map((answer,i) => {
+    answer.style.height = `${toHeights[i]}px`;
+    return answer.animate([{height:`${fromHeights[i]}px`},{height:`${toHeights[i]}px`}],timing);
+  });
+  faqSetPanel(panel,toPanel,next === null ? 0 : 1);
+  motions.push(panel.animate([
+    {transform:`translateY(${fromPanel.y}px)`,height:`${fromPanel.h}px`,opacity:fromOpacity},
+    {transform:`translateY(${toPanel.y}px)`,height:`${toPanel.h}px`,opacity:next === null ? 0 : 1}
+  ],timing));
+  if (next !== null) answers[next].querySelector('.faq-text').animate([
+    {opacity:0,transform:'translateY(6px)',filter:'blur(3px)'},
+    {opacity:1,transform:'translateY(0)',filter:'blur(0)'}
+  ],{duration:210,delay:90,easing:'cubic-bezier(.23,1,.32,1)',fill:'backwards'});
+  Promise.all(motions.map(motion => motion.finished.catch(() => {}))).then(settle);
+}
+pages.faq = () => {
+  requestAnimationFrame(() => faqInit(document.querySelector('.faq-panel-card')));
+  return myPage('자주 묻는 질문', `<section class="faq-panel-card" aria-label="자주 묻는 질문">
+    <span class="faq-slide" aria-hidden="true"></span>
+    ${faqRows.map(([question, answer],i) => `<div class="faq-item">
+      <h2><button type="button" class="faq-trigger" id="faq-question-${i}" aria-controls="faq-answer-${i}" aria-expanded="${i === faqOpen}"><span>${question}</span><svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></button></h2>
+      <div class="faq-answer" id="faq-answer-${i}" role="region" aria-labelledby="faq-question-${i}" ${i === faqOpen ? '' : 'hidden'}><p class="faq-text">${answer}</p></div>
+    </div>`).join('')}
+  </section>`, 'settingpage faqpage');
+};
+document.addEventListener('click', event => {
+  const button = event.target.closest('.faq-trigger'), root = button?.closest('.faq-panel-card');
+  if (!root) return;
+  faqChoose(root,[...root.querySelectorAll('.faq-trigger')].indexOf(button));
+});
+document.addEventListener('keydown', event => {
+  const button = event.target.closest?.('.faq-trigger'), root = button?.closest('.faq-panel-card');
+  if (!root || !['ArrowUp','ArrowDown','Home','End'].includes(event.key)) return;
+  event.preventDefault();
+  const buttons = [...root.querySelectorAll('.faq-trigger')], index = buttons.indexOf(button);
+  const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length;
+  buttons[next].focus();
+});
+window.addEventListener('resize', () => faqInit(document.querySelector('.faq-panel-card')));
 pages.notice = () => myPage('공지사항', infoRows([
   ['콘텐츠 추가 안내', 'Instagram 게시물·릴스 링크, 저장 게시물 ZIP 또는 캡처 이미지를 추가할 수 있어요.'],
   ['웹 공유받기 안내', '현재 웹에서는 다른 앱의 공유 메뉴에서 핀맵으로 바로 저장할 수 없어요. Instagram 링크를 복사해 추가창에 붙여넣거나 캡처 화면으로 추가해 주세요.']
