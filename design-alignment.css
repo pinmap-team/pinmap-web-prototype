@@ -1367,8 +1367,11 @@ button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto
 /* Disable browser pull-to-refresh while keeping normal vertical scrolling. */
 html,body{overscroll-behavior-y:contain}
 
-/* Entry logo is a separate, passive screen before the login choices. */
-.auth-shell[data-screen="intro"] .auth-hero{display:flex;flex:1;min-height:100%;pointer-events:none}
+/* Restore the centered wordmark while the login entry initializes. */
+.auth-shell[data-screen="intro"] .auth-hero{display:grid;place-items:center;flex:1;min-height:100%;padding:0;pointer-events:none}
+.auth-shell[data-screen="intro"] .auth-brand{align-self:center;min-height:0}
+.auth-shell[data-screen="intro"] .auth-brand-logo{width:280px;height:87px}
+.auth-shell[data-screen="intro"] :is(.auth-hero-copy,.auth-hero-art){display:none}
 .auth-shell[data-screen="intro"] .auth-panel{display:none}
 @media(prefers-reduced-motion:reduce){.pm-spinner,button[aria-busy="true"]::after{animation:none}}
 
