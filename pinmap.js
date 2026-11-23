@@ -289,6 +289,7 @@ document.addEventListener('click',e=>{
     choice.classList.toggle('on',on);choice.setAttribute('aria-checked',on);
     const pictogram=choice.querySelector('.ob-emoji');if(pictogram)pictogram.innerHTML=typeof PinmapCategories!=='undefined'?PinmapCategories.icon(id,on):(window.obIcon?obIcon(id,on):'');
     const count=document.querySelector('#onboarding .ob-pickcount');if(count)count.textContent=onboardDraft.length?`${onboardDraft.length}개 선택했어요`:'';
+    window.PinmapFx?.replay(choice,'pm-press');if(on)window.PinmapFx?.replay(pictogram,'pm-pop');window.PinmapFx?.replay(count,'pm-roll');
     
     
     return;

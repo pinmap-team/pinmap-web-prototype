@@ -164,7 +164,9 @@
   function placeRow(g){
     const rows=[...g.row.parentNode.querySelectorAll('.course-row')].filter(row=>row!==g.row);
     const next=rows.find(row=>{const rect=row.getBoundingClientRect();return g.y<rect.top+rect.height/2});
-    g.row.parentNode.insertBefore(g.row,next||null);
+    if(g.row.nextElementSibling===(next||null))return;
+    const move=()=>g.row.parentNode.insertBefore(g.row,next||null);
+    window.PinmapFx?window.PinmapFx.flipRows(rows,move):move();
   }
   function activateDrag(){
     if(!gesture||!gesture.row.isConnected)return;
