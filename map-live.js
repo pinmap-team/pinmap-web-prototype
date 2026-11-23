@@ -525,7 +525,7 @@
     selected:()=>mapLocationName,
     restore:name=>{mapLocationName=myPlaces().includes(name)?name:null;},
     choose:chooseAddressOnMap,
-    clear:name=>{if(mapLocationName===name){mapLocationName=null;settings.selectedPlace=null;afterChange();}}
+    clear:name=>{if(mapLocationName===name)mapLocationName=null;}
   };
   render();
 })();
