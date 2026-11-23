@@ -360,4 +360,10 @@ test('account category uses trusted Decisions result and keeps old records compa
   record.classification.confidence=.2;
   item=vm.runInNewContext(`${source}\npinmapAccountItem(record, 7)`,{record});
   assert.equal(item.category,'분류보류');assert.equal(item.aiClassified,false);
+  record.classification={source:'openai_decisions',model:'gpt-4.1-mini',status:'classified',kind:'place',category:'bar',confidence:.95};
+  item=vm.runInNewContext(`${source}\npinmapAccountItem(record, 7)`,{record});
+  assert.equal(item.category,'맛집');assert.equal(item.aiClassified,true);
+  record.classification.model='unexpected-model';
+  item=vm.runInNewContext(`${source}\npinmapAccountItem(record, 7)`,{record});
+  assert.equal(item.aiClassified,false);
 });
