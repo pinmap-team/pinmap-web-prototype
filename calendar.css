@@ -41,7 +41,7 @@
 .calnav button{width:36px;height:36px;background:var(--t-soft);color:var(--t-ink)}
 .calnav button:hover{background:var(--color-disabled)}
 .calweek span{padding:0 0 var(--space-md);font:var(--type-body-sm);color:var(--color-secondary)}
-.calweek span:first-child{color:var(--color-error);opacity:.7}
+.calweek .cal-sunday{color:var(--color-error);opacity:.7}
 .calgrid{row-gap:var(--space-sm)}
 .calcell{height:44px;font:var(--type-body-md);color:var(--t-ink)}
 .calcell span{position:relative;z-index:1;width:40px;height:40px;border-radius:50%}

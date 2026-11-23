@@ -59,7 +59,7 @@ function emptyPickCards(){
 /* ---------- 캘린더 위젯: 선택한 날짜의 일정만 표시 ---------- */
 function calWidget(){
   const selected = calSelDate();
-  const weekStart = new Date(selected); weekStart.setDate(selected.getDate() - selected.getDay());
+  const weekStart = calWeekStartDate(selected);
   const days = Array.from({length:7},(_,i)=>{const day=new Date(weekStart);day.setDate(weekStart.getDate()+i);return day;});
   const due = calDueList().filter(x => calKey(calDue(x)) === calSel);
   return `<section class="hwidget calw">

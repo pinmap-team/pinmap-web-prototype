@@ -413,6 +413,14 @@ button[aria-busy="true"]>*{visibility:hidden}
 .settingpage .setrow{padding:var(--space-lg) 0;gap:var(--space-md);border-color:var(--color-disabled)}
 .settingpage .setrow b{font:var(--type-label-md)}
 .settingpage .setrow small{font:var(--type-body-sm);margin-top:var(--space-xs)}
+.calendar-week-settings{min-width:0;margin:0;padding:0;border:0}
+.calendar-week-settings legend{padding:0;margin:0 0 var(--space-sm);font:var(--type-label-md);font-weight:var(--weight-semibold)}
+.calendar-week-settings>p{margin:0 0 var(--space-xl);font:var(--type-body-sm);color:var(--color-secondary)}
+.calendar-week-option{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);min-height:56px;padding:0 var(--space-sm);border-bottom:1px solid var(--color-disabled);font:var(--type-body-md);cursor:pointer}
+.calendar-week-option:last-child{border-bottom:0}
+.calendar-week-option input{width:20px;height:20px;flex:none;margin:0;accent-color:var(--color-primary)}
+.calendar-week-option:focus-within{outline:2px solid var(--color-primary);outline-offset:2px;border-radius:var(--rounded-sm)}
+.calendar-week-settings[aria-busy="true"] .calendar-week-option{opacity:.6;cursor:wait}
 .connectionpage .acchint{margin:0 0 var(--space-xl);font:var(--type-body-md);color:var(--color-secondary)}
 .connectionpage .mgroup{margin-top:var(--space-xl);padding:var(--space-lg);border-radius:var(--rounded-md);background:var(--color-surface);box-shadow:none}
 .connectionpage .mgroup>h2{margin:0 0 var(--space-sm);font:var(--type-label-md)}
@@ -1316,6 +1324,7 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .calbox .calnav button{width:44px;height:44px;background:color-mix(in srgb,var(--color-surface) 72%,transparent);border-radius:50%;box-shadow:none}
 .calbox .calnav .icon{width:20px;height:20px;stroke-width:1.6}
 .calbox .calweek span{padding:0 0 var(--space-sm);font:var(--type-body-sm);font-weight:var(--weight-regular);color:var(--color-secondary)}
+.calbox .calweek .cal-sunday{color:var(--color-error)}
 .calbox .calgrid{row-gap:var(--space-xs)}
 .calbox .calcell{height:44px;min-height:44px;padding:0;font:var(--type-label-md);font-weight:var(--weight-regular)}
 .calbox .calcell span{width:36px;height:36px}
