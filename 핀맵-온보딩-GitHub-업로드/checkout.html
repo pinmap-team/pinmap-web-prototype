@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>핀맵 · 결제</title>
+  <link rel="stylesheet" href="tokens.css?v=e068ba25dc57">
+  <link rel="stylesheet" href="design-alignment.css?v=f11b1a0d6db3">
+  <script src="https://cdn.paddle.com/paddle/v2/paddle.js" defer></script>
+  <script src="checkout.js?v=642874f412b5" defer></script>
+</head>
+<body class="billing-checkout-page">
+  <main class="billing-plan">
+    <span class="billing-tag" id="checkout-mode">결제 확인</span>
+    <h1>핀맵 결제</h1>
+    <div class="pm-loading" id="checkout-loading" aria-hidden="true"><span class="pm-spinner"></span></div>
+    <p id="checkout-status" role="status">결제 정보를 확인하고 있어요.</p>
+    <p class="billing-note" id="checkout-note">결제 환경을 확인하고 있어요. 이용권은 서버에서 결제를 확인한 뒤 계정에 반영돼요.</p>
+    <nav class="legal-nav" aria-label="요금제 및 정책"><a href="plans.html">요금제</a><a href="terms.html">이용약관</a><a href="privacy.html">개인정보</a><a href="refunds.html">환불·해지</a></nav><a href="auth.html">핀맵으로 돌아가기</a>
+  </main>
+</body>
+</html>
