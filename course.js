@@ -80,7 +80,7 @@
         ${courses.length?`<div class="cx-plan-list">${courses.map(saved=>{const places=saved.days.flat().map(stop=>findPlace(stop.id)).filter(Boolean);return `<button class="cx-plan" data-course-open="${esc(saved.id)}" aria-label="${esc(saved.title)}, 장소 ${places.length}곳 코스 열기">
           <span class="cx-plan-copy"><b>${esc(saved.title)}</b><span class="cx-meta"><span>${icon('map')}장소 ${places.length}곳</span>${routeMeta(places)}</span><span class="cx-chips">${places.length?chips(places):''}</span></span>
           ${places.some(place=>coordinates(place))?`<span class="cx-plan-map course-map-pattern"><span class="course-saved-map" data-course-map="${esc(saved.id)}" role="img" aria-label="${esc(saved.title)} 장소 순서 지도" inert></span></span>`:`<span class="cx-plan-map course-map-pattern is-empty">${icon('map')}</span>`}
-        </button>`}).join('')}</div><p class="cx-credit">지도 © Google</p>`:`<div class="course-list-empty">${typeof PinmapSolar !== 'undefined' ? PinmapSolar.icon('route', 'course-empty-icon') : icon('route')}<h2>아직 저장한 코스가 없어요.</h2><p>저장한 장소로 첫 코스를 만들어 보세요.</p></div>`}
+        </button>`}).join('')}</div><p class="cx-credit">지도 © Google</p>`:`<div class="course-list-empty">${icon('route')}<h2>아직 저장한 코스가 없어요.</h2><p>저장한 장소로 첫 코스를 만들어 보세요.</p></div>`}
       </div></section>`;
   };
   pages.course=function(){

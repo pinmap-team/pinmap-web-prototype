@@ -1156,7 +1156,7 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .connectionpage .acctext small{display:block}
 /* Figma Empty State / Type=Text Only (1398:434). */
 .course-list-page .course-list-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-sm);padding:var(--space-2xl) 0;text-align:center}
-.course-list-empty svg.course-empty-icon{display:block;flex:none;width:32px;height:32px;color:var(--color-secondary)}
+.course-list-empty .course-empty-icon{display:block;flex:none;width:32px;height:32px;background:var(--color-secondary);-webkit-mask:url("data:image/svg+xml,%3Csvg%20preserveAspectRatio%3D%22none%22%20overflow%3D%22visible%22%20style%3D%22display%3A%20block%3B%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20id%3D%22icon%2Froute%22%3E%0A%3Cpath%20id%3D%22Vector%22%20d%3D%22M8.4%205.6H20.6667C22.4701%205.6%2024.1997%206.31643%2025.475%207.59167C26.7502%208.86692%2027.4667%2010.5965%2027.4667%2012.4C27.4667%2014.2035%2026.7502%2015.9331%2025.475%2017.2083C24.1997%2018.4836%2022.4701%2019.2%2020.6667%2019.2H13.3333C12.2017%2019.2%2011.1165%2019.6495%2010.3163%2020.4497C9.51619%2021.2498%209.06667%2022.3351%209.06667%2023.4667C9.06667%2024.5983%209.51619%2025.6835%2010.3163%2026.4837C11.1165%2027.2838%2012.2017%2027.7333%2013.3333%2027.7333H23.6M8.4%205.6C8.4%205.9677%208.32758%206.3318%208.18686%206.67151C8.04615%207.01123%207.8399%207.31989%207.5799%207.5799C7.3199%207.8399%207.01123%208.04615%206.67151%208.18686C6.3318%208.32758%205.9677%208.4%205.6%208.4C5.2323%208.4%204.8682%208.32758%204.52849%208.18686C4.18877%208.04615%203.88011%207.8399%203.6201%207.5799C3.3601%207.31989%203.15385%207.01123%203.01314%206.67151C2.87242%206.3318%202.8%205.9677%202.8%205.6C2.8%204.85739%203.095%204.1452%203.6201%203.6201C4.1452%203.095%204.85739%202.8%205.6%202.8C6.34261%202.8%207.0548%203.095%207.5799%203.6201C8.105%204.1452%208.4%204.85739%208.4%205.6ZM23.6%2027.7333C23.6%2028.4759%2023.895%2029.1881%2024.4201%2029.7132C24.9452%2030.2383%2025.6574%2030.5333%2026.4%2030.5333C27.1426%2030.5333%2027.8548%2030.2383%2028.3799%2029.7132C28.905%2029.1881%2029.2%2028.4759%2029.2%2027.7333C29.2%2026.9907%2028.905%2026.2785%2028.3799%2025.7534C27.8548%2025.2283%2027.1426%2024.9333%2026.4%2024.9333C25.6574%2024.9333%2024.9452%2025.2283%2024.4201%2025.7534C23.895%2026.2785%2023.6%2026.9907%2023.6%2027.7333Z%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke%3D%22%236B6B70%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E") center / contain no-repeat;mask:url("data:image/svg+xml,%3Csvg%20preserveAspectRatio%3D%22none%22%20overflow%3D%22visible%22%20style%3D%22display%3A%20block%3B%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20id%3D%22icon%2Froute%22%3E%0A%3Cpath%20id%3D%22Vector%22%20d%3D%22M8.4%205.6H20.6667C22.4701%205.6%2024.1997%206.31643%2025.475%207.59167C26.7502%208.86692%2027.4667%2010.5965%2027.4667%2012.4C27.4667%2014.2035%2026.7502%2015.9331%2025.475%2017.2083C24.1997%2018.4836%2022.4701%2019.2%2020.6667%2019.2H13.3333C12.2017%2019.2%2011.1165%2019.6495%2010.3163%2020.4497C9.51619%2021.2498%209.06667%2022.3351%209.06667%2023.4667C9.06667%2024.5983%209.51619%2025.6835%2010.3163%2026.4837C11.1165%2027.2838%2012.2017%2027.7333%2013.3333%2027.7333H23.6M8.4%205.6C8.4%205.9677%208.32758%206.3318%208.18686%206.67151C8.04615%207.01123%207.8399%207.31989%207.5799%207.5799C7.3199%207.8399%207.01123%208.04615%206.67151%208.18686C6.3318%208.32758%205.9677%208.4%205.6%208.4C5.2323%208.4%204.8682%208.32758%204.52849%208.18686C4.18877%208.04615%203.88011%207.8399%203.6201%207.5799C3.3601%207.31989%203.15385%207.01123%203.01314%206.67151C2.87242%206.3318%202.8%205.9677%202.8%205.6C2.8%204.85739%203.095%204.1452%203.6201%203.6201C4.1452%203.095%204.85739%202.8%205.6%202.8C6.34261%202.8%207.0548%203.095%207.5799%203.6201C8.105%204.1452%208.4%204.85739%208.4%205.6ZM23.6%2027.7333C23.6%2028.4759%2023.895%2029.1881%2024.4201%2029.7132C24.9452%2030.2383%2025.6574%2030.5333%2026.4%2030.5333C27.1426%2030.5333%2027.8548%2030.2383%2028.3799%2029.7132C28.905%2029.1881%2029.2%2028.4759%2029.2%2027.7333C29.2%2026.9907%2028.905%2026.2785%2028.3799%2025.7534C27.8548%2025.2283%2027.1426%2024.9333%2026.4%2024.9333C25.6574%2024.9333%2024.9452%2025.2283%2024.4201%2025.7534C23.895%2026.2785%2023.6%2026.9907%2023.6%2027.7333Z%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke%3D%22%236B6B70%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E") center / contain no-repeat}
 .course-list-empty h2{margin:0;font:var(--type-label-md);color:var(--color-on-surface)}
 .course-list-empty p{margin:0;font:var(--type-body-sm);color:var(--color-secondary);word-break:keep-all}
 
@@ -1351,8 +1351,6 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .mainpick .pick:not(.pick-placeholder)[aria-hidden="false"]{box-shadow:var(--shadow-md)!important}
 .main:has(.homebrand)>.mainwrap:not(:has(.home-first-save)){margin-top:calc(var(--space-xl) - var(--space-xs))!important}
 .main>.topbar .bellbtn .icon{width:28px;height:28px}
-
-
 
 /* 2026-11-17 verified accessibility follow-up: preserve existing semantic tokens. */
 .strip-hide,.confirmpop .cfok{color:var(--color-on-surface)!important}
@@ -1855,9 +1853,6 @@ body:has(.dt) .bottomnav .home-add-menu{display:none!important}
 #onboarding .step3 .ob-groupcard.on .ob-grouptext small{color:var(--color-on-surface);opacity:.75}
 [data-theme="dark"] #onboarding .step3 .ob-groupcard.on .ob-grouptext small{color:var(--color-neutral)}
 
-
-
-
 /* 2026-11-24 하단 메뉴·추가 버튼의 흰 테두리 선 제거(유리 바탕·그림자는 유지) */
 .bottomnav .pm-nav-main,.pm-nav-main{border:0!important;box-shadow:var(--shadow-sm)!important}
 .bottomnav .home-add-fab{border:0!important;outline:0}
@@ -1971,10 +1966,9 @@ html body #onboarding .ob-screen.step3 .ob-groupcard{align-content:center!import
 html body .homecategories .prefchip img.pm-category-icon{width:20px!important;height:20px!important}
 /* 2026-11-24: 온보딩 2/2 설명과 카드 사이 space-2xl(32px) */
 html body #onboarding .ob-screen.step3 .ob-groupcards{padding-top:var(--space-2xl)!important}
-/* 홈 카테고리 칩은 캘린더 칩과 같은 32px 높이·20px Solar 아이콘을 사용하되 기존의 차분한 아이콘 색을 유지한다. */
-html body .homecategories .prefchip{box-shadow:none!important}
-html body .homecategories .prefchip :is(svg.pm-category-icon,img.pm-category-icon){display:block;flex:none;width:20px!important;height:20px!important;color:var(--color-icon-muted);transition:color .15s ease}
-html body .homecategories .prefchip:is(:hover,:focus-visible) svg.pm-category-icon{color:var(--color-icon-hover)}
+/* 2026-11-24: 홈 카테고리 칩 아이콘 — SVG를 mask로 써서 토큰 색으로 칠함(기본 icon-muted, 마우스 올림·포커스 icon-hover) */
+html body .homecategories .prefchip .pm-category-mask{display:inline-block;flex:none;width:20px;height:20px;vertical-align:middle;background-color:var(--color-icon-muted);-webkit-mask:var(--pm-cat-icon) center/contain no-repeat;mask:var(--pm-cat-icon) center/contain no-repeat;transition:background-color .15s ease}
+html body .homecategories .prefchip:is(:hover,:focus-visible) .pm-category-mask{background-color:var(--color-icon-hover)}
 /* 2026-11-24: 스낵바 — 화면 가운데, 좌우 여백 space-2xl */
 html body #snackbar{top:50%!important;bottom:auto!important;padding:var(--space-lg) var(--space-2xl)!important;transform:translate(-50%,-50%) scale(.96)!important;opacity:0;transition:opacity .2s ease,transform .2s ease,visibility .2s}
 html body #snackbar.show{transform:translate(-50%,-50%)!important;opacity:1}
@@ -2012,10 +2006,8 @@ html[data-theme="dark"] body .confirmpop .cfok.is-danger{background:var(--color-
 /* 2026-11-24: 캘린더 카테고리 버튼 + 카테고리 선택 시 시작일~마감일 막대 */
 html body .calcats{display:flex;gap:var(--space-sm);overflow-x:auto;margin:0 calc(-1 * var(--space-xl)) var(--space-md);padding:var(--space-xs) var(--space-xl);scrollbar-width:none}
 html body .calcats::-webkit-scrollbar{display:none}
-html body .calcat{flex:none;display:inline-flex;align-items:center;gap:var(--space-xs);height:32px;min-height:32px;padding:0 var(--space-md);border:0;border-radius:999px;background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md);box-shadow:none!important}
-html body .calcat :is(img.pm-category-icon,svg.pm-category-icon,svg.icon){display:block;flex:none;width:20px!important;height:20px!important}
-html body .calcat:not(.on) :is(svg.pm-category-icon,svg.icon){color:var(--color-icon-muted);transition:color .15s ease}
-html body .calcat:not(.on):is(:hover,:focus-visible) :is(svg.pm-category-icon,svg.icon){color:var(--color-icon-hover)}
+html body .calcat{flex:none;display:inline-flex;align-items:center;gap:var(--space-xs);min-height:32px;padding:0 var(--space-md);border:0;border-radius:999px;background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md);box-shadow:var(--shadow-sm)}
+html body .calcat :is(img.pm-category-icon,svg.icon){width:20px!important;height:20px!important}
 html body .calcat.on{background:var(--color-accent);color:var(--color-on-surface)}
 html[data-theme="dark"] body .calcat.on{color:var(--color-neutral)}
 html body .calgrid.is-range .calcell{height:calc(40px + var(--cal-lanes,0) * 18px + var(--space-xs));align-items:start;overflow:visible}
@@ -2026,25 +2018,6 @@ html body .calspan.is-start{left:var(--space-xs);border-top-left-radius:var(--ro
 html body .calspan.is-end{right:var(--space-xs);border-top-right-radius:var(--rounded-sm);border-bottom-right-radius:var(--rounded-sm)}
 html body .calspan em{position:absolute;z-index:2;top:0;left:var(--space-xs);width:calc(var(--span,1) * 100% - var(--space-sm));overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:var(--type-body-sm);font-style:normal;color:var(--color-on-surface);text-align:left}
 html[data-theme="dark"] body .calspan em{color:var(--color-neutral)}
-
-/* Solar Icons Bold shapes provide their own fills; legacy SVG strokes must not outline them. */
-
-/* Solar shapes provide their own fill or stroke; legacy SVG styles must not override them. */
-
-svg.solar-icon.icon,svg.solar-icon.ob-icon,svg.solar-icon.pm-category-icon,svg.solar-icon.lm-category-svg,svg.solar-icon.pm-solid{stroke:none!important;fill:none!important}
-.bottomnav .pm-nav-main .navitem .navicon svg.solar-icon.icon{stroke:none!important;fill:none!important}
-svg.solar-icon.ob-icon{width:24px!important;height:24px!important}
-svg.solar-icon{stroke:none!important;fill:none!important}
-
-svg.solar-icon.solar-linear{stroke-width:1.8!important}
-
-
-/* Matching icon canvases within each control role. */
-.mrow .mrico svg.solar-icon{display:block;width:20px!important;height:20px!important;flex:none}
-.course-drag-handle svg.solar-icon{width:20px;height:20px}
-.course-remove{display:grid;place-items:center}
-.course-remove svg.solar-icon{width:16px;height:16px;flex:none}
-.coursepage .course-steps li.done span svg.solar-icon{width:16px;height:16px}
 
 /* 2026-11-24: 폴더 안 콘텐츠 카드의 즐겨찾기 별 = 상세 상단 별과 같은 형태(44px 유리 원형)·같은 모션 */
 html body .cf-item .cf-fav.lm-heart-motion{position:absolute;top:var(--space-sm);right:var(--space-sm);z-index:2;isolation:isolate;display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid rgba(255,255,255,.2)!important;border-radius:50%;background:rgba(17,17,17,.22)!important;color:#fff!important;-webkit-backdrop-filter:blur(16px)!important;backdrop-filter:blur(16px)!important;box-shadow:none!important;-webkit-tap-highlight-color:transparent}
@@ -2206,3 +2179,31 @@ html body .coursepage .cx-timeline.course-drag-ghost .course-row::after{display:
 html body .coursepage .cx-timeline.course-drag-ghost .cx-stop{box-shadow:var(--shadow-md);transform:scale(1.02)}
 html body .coursepage .cx-timeline .course-drag-placeholder{opacity:.3}
 html body .coursepage .course-drag-placeholder .cx-grip{background:transparent}
+/* 2026-11-24 (보정): 홈 카테고리 칩 아이콘 광학 정렬 — 아이콘마다 그림이 차지하는 영역이 달라서(컵 손잡이·받침 등) 실제 그림의 가운데를 칩 세로 가운데에 맞추고, 그림 면적이 비슷해 보이게 크기를 보정. 레이아웃 칸은 20px 그대로 */
+html body .homecategories .prefchip .pm-category-mask{width:24px!important;height:24px!important;margin:-2px;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+html body .homecategories .pm-category-mask[data-cat="activity"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.77px,1.79px)}
+html body .homecategories .pm-category-mask[data-cat="beauty"]{-webkit-mask-size:20.90px;mask-size:20.90px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(1.51px,0.12px)}
+html body .homecategories .pm-category-mask[data-cat="cafe"]{-webkit-mask-size:18.76px;mask-size:18.76px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.82px,0.14px)}
+html body .homecategories .pm-category-mask[data-cat="career"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.80px)}
+html body .homecategories .pm-category-mask[data-cat="creative"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.09px,1.70px)}
+html body .homecategories .pm-category-mask[data-cat="exhibition"]{-webkit-mask-size:20.66px;mask-size:20.66px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(1.66px,0.22px)}
+html body .homecategories .pm-category-mask[data-cat="family"]{-webkit-mask-size:17.75px;mask-size:17.75px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(4.10px,0.95px)}
+html body .homecategories .pm-category-mask[data-cat="fashion"]{-webkit-mask-size:17.30px;mask-size:17.30px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.36px,2.28px)}
+html body .homecategories .pm-category-mask[data-cat="festival"]{-webkit-mask-size:17.30px;mask-size:17.30px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.36px,1.48px)}
+html body .homecategories .pm-category-mask[data-cat="finance"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.72px)}
+html body .homecategories .pm-category-mask[data-cat="fitness"]{-webkit-mask-size:19.00px;mask-size:19.00px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.51px,1.36px)}
+html body .homecategories .pm-category-mask[data-cat="food"]{-webkit-mask-size:17.75px;mask-size:17.75px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.92px,1.84px)}
+html body .homecategories .pm-category-mask[data-cat="humor"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.80px)}
+html body .homecategories .pm-category-mask[data-cat="interior"]{-webkit-mask-size:19.33px;mask-size:19.33px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.44px,1.17px)}
+html body .homecategories .pm-category-mask[data-cat="learning"]{-webkit-mask-size:18.54px;mask-size:18.54px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.74px,0.96px)}
+html body .homecategories .pm-category-mask[data-cat="life"]{-webkit-mask-size:19.60px;mask-size:19.60px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.21px,0.80px)}
+html body .homecategories .pm-category-mask[data-cat="media"]{-webkit-mask-size:17.30px;mask-size:17.30px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.36px,1.57px)}
+html body .homecategories .pm-category-mask[data-cat="nature"]{-webkit-mask-size:19.33px;mask-size:19.33px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.35px,1.33px)}
+html body .homecategories .pm-category-mask[data-cat="other"]{-webkit-mask-size:18.94px;mask-size:18.94px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.54px,1.68px)}
+html body .homecategories .pm-category-mask[data-cat="pets"]{-webkit-mask-size:17.51px;mask-size:17.51px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.95px,2.33px)}
+html body .homecategories .pm-category-mask[data-cat="recipe"]{-webkit-mask-size:17.28px;mask-size:17.28px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(4.21px,1.97px)}
+html body .homecategories .pm-category-mask[data-cat="stay"]{-webkit-mask-size:18.76px;mask-size:18.76px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.80px,0.94px)}
+html body .homecategories .pm-category-mask[data-cat="tech"]{-webkit-mask-size:20.90px;mask-size:20.90px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(1.56px,0.22px)}
+html body .homecategories .pm-category-mask[data-cat="travel"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.75px)}
+/* 한글 글자 획이 줄 상자 위쪽에 몰려 칩 가운데보다 약 2px 높게 보여서, 칩 안쪽 위 여백 space-xs로 글자와 아이콘을 함께 칩 세로 가운데로 */
+html body .homecategories .prefchip{padding-top:var(--space-xs)!important;padding-bottom:0!important}

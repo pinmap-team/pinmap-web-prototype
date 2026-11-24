@@ -32,8 +32,6 @@
   }
 };
   window.obIcon = (id, on) => {
-    const solar = typeof PinmapSolar === 'undefined' ? '' : PinmapSolar.icon(id, `ob-icon ob-icon-${id}${on ? ' is-filled' : ''}`, on ? 'bold' : 'linear');
-    if (solar) return solar;
     const style = on ? "fill" : "outline";
     const svg = assets[id]?.[style];
     return svg ? svg.replace("<svg ", `<svg class="ob-icon ob-icon-${id}${on ? " is-filled" : ""}" data-icon-style="${style}" aria-hidden="true" `) : "";

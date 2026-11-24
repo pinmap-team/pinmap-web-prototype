@@ -90,7 +90,7 @@ function pinmapAnalysisFailure(x){
   return kind?{kind,...ANALYSIS_FAILURE_STATES[kind]}:null;
 }
 function analysisFailureNotice(state,showAction=true){return `<section class="dtsec dt-restricted-notice dt-failure-notice" data-failure-kind="${state.kind}"><span class="dt-failure-label">${icon(state.icon)}${esc(state.label)}</span><h2>${esc(state.title)}</h2><p>${esc(state.description)}</p>${showAction?`<button type="button" class="outlined dt-failure-action" data-action="${state.action}">${esc(state.actionLabel)}</button>`:''}</section>`;}
-function restrictedCover(state=ANALYSIS_FAILURE_STATES.age){return `<span class="pm-restricted-cover"><span class="pm-restricted-symbol" aria-hidden="true">${state===ANALYSIS_FAILURE_STATES.age||state.kind==='age'?icon('lock'):icon(state.icon)}</span><b>${esc(state.label)}</b><span class="pm-restricted-hint">${esc(state.hint)}</span></span>`;}
+function restrictedCover(state=ANALYSIS_FAILURE_STATES.age){return `<span class="pm-restricted-cover"><span class="pm-restricted-symbol" aria-hidden="true">${state===ANALYSIS_FAILURE_STATES.age||state.kind==='age'?'<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>':icon(state.icon)}</span><b>${esc(state.label)}</b><span class="pm-restricted-hint">${esc(state.hint)}</span></span>`;}
 const MISSING_COVER_STATE={kind:'missing-cover',label:'이미지를 불러오지 못했어요',hint:'원본에서 이미지를 확인해 주세요',icon:'image'};
 const libPhoto = x => pinmapAnalysisFailure(x) ? '' : x.photo || (PM_ENV.development ? '' : LIB_PHOTOS_BY_ID[x.id] || LIB_PHOTOS[x.art]);
 const libThumb = x => {

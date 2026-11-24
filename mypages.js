@@ -169,7 +169,6 @@ document.addEventListener('click',event=>{
 pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
     <div class="setrow"><div><b>핀맵</b><small>저장을 다시, 일상으로</small></div></div>
     <div class="setrow"><div><b>이용 환경</b><small>로그인 서비스</small></div></div>
-    <div class="setrow"><div><b>아이콘</b><small><a href="https://solar-icons.dev/" target="_blank" rel="noopener noreferrer">Solar Icons</a> · 480 Design (CC BY 4.0)</small></div></div>
     <div class="setrow"><div><b>데이터 보관</b><small>저장한 콘텐츠와 설정은 로그인한 계정에서 다시 볼 수 있어요.</small></div></div>
   </div>`);
 

@@ -25,15 +25,7 @@ const EMOJI_ICONS = {
 };
 const EMOJI_RE = new RegExp(`(${Object.keys(EMOJI_ICONS).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\uFE0F?`, 'g');
 const EMOJI_TEST = new RegExp(EMOJI_RE.source); // 검사용 (전역 플래그 없음)
-const EMOJI_SOLAR = {
-  '📍':'pin','✨':'spark','☕':'coffee','🔖':'bookmark','🗓':'calendar',
-  '⏰':'clock','🖼':'image','📁':'folder','🔎':'search','🔔':'bell',
-  '🗺':'map','🏠':'home','💡':'lightbulb','📲':'upload','🛍':'shop',
-  '✈':'plane','🍳':'cook','💳':'credit','⏱':'timer','👆':'tap',
-  '👋':'play','ℹ':'info','⚠':'warning','🍴':'eat','📚':'book',
-  '📸':'camera','🌳':'walk','🌊':'wave','▶':'play','🔗':'link'
-};
-const emojiIcon = e => (typeof PinmapSolar !== 'undefined' && PinmapSolar.icon(EMOJI_SOLAR[e], 'icon emo')) || `<svg class="icon emo" viewBox="0 0 24 24" aria-hidden="true"><path d="${EMOJI_ICONS[e]}"/></svg>`;
+const emojiIcon = e => `<svg class="icon emo" viewBox="0 0 24 24" aria-hidden="true"><path d="${EMOJI_ICONS[e]}"/></svg>`;
 const SKIP = new Set(['SCRIPT','STYLE','TEXTAREA','INPUT','OPTION','TITLE','text','tspan']);
 function swapEmoji(root){
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode: n =>

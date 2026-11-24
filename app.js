@@ -10,7 +10,7 @@ const paths = {
   external:'M14 3h7v7 M21 3 10 14 M11 3H3v18h18v-8', spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3z',
   target:'M12 2v4 M12 18v4 M2 12h4 M18 12h4 M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0 M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0',
   clock:'M12 7v5l3 2 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0', calendar:'M4 5h16v15H4z M4 10h16 M9 3v4 M15 3v4',
-  heart:'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z', star:'M12 3.5l2.5 5.1 5.6.8-4 3.9.9 5.6-5-2.6-5 2.6.9-5.6-4-3.9 5.6-.8z', comment:'M4 5h16v11H9l-5 4z',
+  heart:'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z', comment:'M4 5h16v11H9l-5 4z',
   send:'M21 3 3 10l7 3 3 7z M10 13 21 3',
   link:'M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1 M14 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1',
   share:'M12 15V3 M7 8l5-5 5 5 M5 13v7h14v-7', story:'M12 3a9 9 0 1 0 9 9 M12 8v4l3 2',
@@ -24,11 +24,10 @@ const paths = {
   route:'M7 5h8a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h8 M7 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0 M21 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0',
   question:'M9 9a3 3 0 1 1 5.1 2.1c-1.6 1-2.1 1.7-2.1 3.4 M12 18h.01 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0'
 };
-const icon = n => (typeof PinmapSolar !== 'undefined' && PinmapSolar.icon(n, 'icon', n === 'check' ? 'bold' : 'linear')) || `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n]||paths.bookmark}"/></svg>`;
+const icon = n => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n]||paths.bookmark}"/></svg>`;
 // Bencho Like's Lucide heart, without its pill and count.
 // 2026-11-23: 즐겨찾기는 하트 대신 별(Figma Pinmap / Companion / star, Outline·Fill)을 써요. 이름은 기존 호출을 위해 그대로 둬요.
-// 2026-11-24: Solar 아이콘 교체 때 하트로 돌아간 것을 모서리가 둥근 Solar 별(Linear·Bold)로 되돌려요. 모션은 그대로예요.
-const likeHeartIcon = (active = false) => (typeof PinmapSolar !== 'undefined' && PinmapSolar.icon('star', 'icon lm-like-heart', active ? 'bold' : 'linear')) || icon('star');
+const likeHeartIcon = () => '<svg class="icon lm-like-heart pm-star" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path class="pm-star-line" transform="translate(0.5 -0.5)" d="M7.76408 9.07742L5.02401 9.47177C3.79061 9.64928 3.29891 11.1661 4.19363 12.0335L6.18779 13.9666C6.54004 14.3081 6.70305 14.8003 6.62427 15.2845L6.17584 18.0409C5.97742 19.2606 7.2562 20.1836 8.35129 19.6111L10.8051 18.3284C11.2404 18.1008 11.7596 18.1008 12.1949 18.3284L14.6487 19.6111C15.7438 20.1836 17.0226 19.2606 16.8242 18.0409L16.3757 15.2845C16.297 14.8003 16.46 14.3081 16.8122 13.9666L18.8064 12.0335C19.7011 11.1661 19.2094 9.64928 17.976 9.47177L15.2359 9.07742C14.7474 9.00711 14.3247 8.70095 14.1055 8.25867L12.8441 5.71269C12.2931 4.60062 10.7069 4.60062 10.1559 5.71269L8.89447 8.25867C8.67533 8.70095 8.25264 9.00711 7.76408 9.07742Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path class="pm-star-fill" transform="translate(0 -0.2)" d="M10.6537 5.74075C11.203 4.62255 12.797 4.62255 13.3463 5.74075L14.4515 7.99047C14.6696 8.43454 15.0927 8.74249 15.5823 8.81356L17.9975 9.16415C19.2269 9.34261 19.7189 10.8526 18.8307 11.7211L17.056 13.4563C16.7074 13.7972 16.5462 14.2863 16.6238 14.7677L17.0213 17.2322C17.2183 18.4536 15.9352 19.3749 14.8408 18.7979L12.6996 17.6689C12.2618 17.438 11.7382 17.438 11.3004 17.6689L9.15915 18.7979C8.06477 19.3749 6.78168 18.4536 6.97868 17.2322L7.37618 14.7677C7.45382 14.2863 7.29263 13.7972 6.94399 13.4563L5.16931 11.7211C4.28107 10.8526 4.77311 9.34261 6.0025 9.16415L8.41769 8.81356C8.90731 8.74249 9.3304 8.43455 9.54854 7.99048L10.6537 5.74075Z" fill="currentColor" stroke="currentColor" fill-rule="evenodd" clip-rule="evenodd"/></svg>';
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ---------- 콘텐츠 유형 (저장 카테고리) ---------- */

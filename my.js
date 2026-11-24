@@ -82,15 +82,15 @@ pages.my = function(){
   <section class="mgroup my-section" aria-label="앱 설정">
     ${myRow('billing',icon('bookmark'),'요금제 및 결제','월 5,000원')}
     ${myRow('savesheet','✨','저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
-    ${myRow('appearance',icon('appearance'),'화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
+    ${myRow('appearance','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>','화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
     ${myRow('notisheet','🔔','알림 설정', notiOn ? `${notiOn}개 켜짐` : '꺼짐')}
     ${myRow('calsettings',icon('calendar'),'캘린더 설정')}
   </section>
   <section class="mgroup my-section" aria-label="도움말">
     ${myRow('guide','📚','이용 가이드')}
-    ${myRow('faq',icon('question'),'자주 묻는 질문')}
-    ${myRow('notice',icon('notice'),'공지사항')}
-    ${myRow('terms',icon('terms'),'약관 및 정책')}
+    ${myRow('faq','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7 M12 17h.01"/></svg>','자주 묻는 질문')}
+    ${myRow('notice','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l7 4V6l-7 4z M17 9.5a4 4 0 0 1 0 5"/></svg>','공지사항')}
+    ${myRow('terms','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z M14 3v5h5 M9 12h7 M9 16h7"/></svg>','약관 및 정책')}
     ${myRow('appinfo','ℹ️','앱 정보','로그인 서비스')}
   </section>`;
 };
