@@ -21,8 +21,9 @@
   --weight-regular:400;--weight-semibold:600;--weight-bold:700;
   --space-xs:4px;--space-sm:8px;--space-md:12px;--space-lg:16px;--space-xl:24px;--space-2xl:32px;
   --rounded-sm:8px;--rounded-md:12px;--rounded-lg:16px;
-  --shadow-sm:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
-  --shadow-md:0 12px 40px rgba(0,0,0,.12);
+  /* 2026-11-24: 그림자를 더 은은하게 (sm .04/.06→.03/.045, md .12→.08) */
+  --shadow-sm:0 1px 2px rgba(0,0,0,.03),0 6px 20px rgba(0,0,0,.045);
+  --shadow-md:0 10px 32px rgba(0,0,0,.08);
 }
 [data-theme="dark"]{
   /* 2026-11-24: 다크 바탕도 순검정에서 한 단계 부드럽게 (#111111→#1E1E1E, surface #1B1B1B→#2A2A2A, disabled #333333→#3D3D3D) */
@@ -30,6 +31,6 @@
   --color-secondary:#B4B4B4;--color-border:#8A8A8A;--color-primary:#F4F4F4;
   --color-primary-pressed:#D4D4D4;--color-disabled:#3D3D3D;--color-error:#D73535;--color-accent:#C6F5E1;
   --color-icon-muted:#8A8A8A;--color-icon-hover:#D4D4D4;
-  --shadow-sm:0 1px 2px rgba(0,0,0,.24),0 8px 24px rgba(0,0,0,.36);
-  --shadow-md:0 12px 40px rgba(0,0,0,.48);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.18),0 6px 20px rgba(0,0,0,.26);
+  --shadow-md:0 10px 32px rgba(0,0,0,.34);
 }

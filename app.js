@@ -10,7 +10,7 @@ const paths = {
   external:'M14 3h7v7 M21 3 10 14 M11 3H3v18h18v-8', spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3z',
   target:'M12 2v4 M12 18v4 M2 12h4 M18 12h4 M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0 M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0',
   clock:'M12 7v5l3 2 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0', calendar:'M4 5h16v15H4z M4 10h16 M9 3v4 M15 3v4',
-  heart:'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z', comment:'M4 5h16v11H9l-5 4z',
+  heart:'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z', star:'M12 3.5l2.5 5.1 5.6.8-4 3.9.9 5.6-5-2.6-5 2.6.9-5.6-4-3.9 5.6-.8z', comment:'M4 5h16v11H9l-5 4z',
   send:'M21 3 3 10l7 3 3 7z M10 13 21 3',
   link:'M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1 M14 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1',
   share:'M12 15V3 M7 8l5-5 5 5 M5 13v7h14v-7', story:'M12 3a9 9 0 1 0 9 9 M12 8v4l3 2',
@@ -27,7 +27,8 @@ const paths = {
 const icon = n => (typeof PinmapSolar !== 'undefined' && PinmapSolar.icon(n, 'icon', n === 'check' ? 'bold' : 'linear')) || `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n]||paths.bookmark}"/></svg>`;
 // Bencho Like's Lucide heart, without its pill and count.
 // 2026-11-23: 즐겨찾기는 하트 대신 별(Figma Pinmap / Companion / star, Outline·Fill)을 써요. 이름은 기존 호출을 위해 그대로 둬요.
-const likeHeartIcon = (active = false) => (typeof PinmapSolar !== 'undefined' && PinmapSolar.icon('heart', 'icon lm-like-heart', active ? 'bold' : 'linear')) || icon('heart');
+// 2026-11-24: Solar 아이콘 교체 때 하트로 돌아간 것을 모서리가 둥근 Solar 별(Linear·Bold)로 되돌려요. 모션은 그대로예요.
+const likeHeartIcon = (active = false) => (typeof PinmapSolar !== 'undefined' && PinmapSolar.icon('star', 'icon lm-like-heart', active ? 'bold' : 'linear')) || icon('star');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ---------- 콘텐츠 유형 (저장 카테고리) ---------- */

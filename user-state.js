@@ -4,7 +4,7 @@
   const PinmapPlaces=root.PinmapPlaces||(typeof require==='function'?require('./place-state.js'):null);
   const text=(v,n=200)=>typeof v==='string'?v.slice(0,n):'';
   const list=(v,n=100)=>[...new Set((Array.isArray(v)?v:[]).filter(x=>typeof x==='string').map(x=>text(x)).filter(Boolean))].slice(0,n);
-  const defaults={notiDeadline:false,notiNearby:false,notiReminder:false,aiDefault:false,push:false,locPerm:'none',readNoti:[],places:[],recentPlaces:[],placeLabels:{},placeDetails:{},selectedPlace:null,calendarWeekStart:'sunday'};
+  const defaults={notiDeadline:false,notiNearby:false,notiReminder:false,aiDefault:false,push:false,locPerm:'none',readNoti:[],places:[],recentPlaces:[],placeLabels:{},placeDetails:{},selectedPlace:null,calendarWeekStart:'sunday',pinnedFolders:[]};
   function normalize(value){
     const v=value&&typeof value==='object'?value:{},s=v.settings||{};
     const settings={...defaults};
@@ -22,6 +22,7 @@
       }
     }
     settings.selectedPlace=settings.places.includes(s.selectedPlace)?s.selectedPlace:null;
+    settings.pinnedFolders=list(s.pinnedFolders,50);
     return {settings,preferences:list(v.preferences,24),appearance:['light','dark','system'].includes(v.appearance)?v.appearance:'system',onboardingDone:v.onboardingDone===true};
   }
   function encodeCourses(courses,items){

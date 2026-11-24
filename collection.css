@@ -381,3 +381,12 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.cf-saved-time{background:rgba(255,255,255,.3)}}
 
 .cf-saved-time{text-shadow:none}
+/* 2026-11-24: 폴더 꾹 누르기 메뉴(상단 고정 · 삭제) + 고정 표시 */
+.cf-meta .cf-pinmark{display:inline-grid;place-items:center;flex:none;width:16px;height:16px;margin-right:2px;color:var(--color-on-surface)}
+.cf-meta .cf-pinmark svg.icon{width:16px!important;height:16px!important;stroke-width:1.9}
+.cf-holdmenu{display:grid;gap:var(--space-sm);padding:var(--space-md) var(--space-xl) max(var(--space-xl),env(safe-area-inset-bottom))}
+.cf-holditem{display:flex;align-items:center;gap:var(--space-md);width:100%;min-height:52px;padding:0 var(--space-lg);border-radius:var(--rounded-md);background:var(--color-neutral);color:var(--color-on-surface);font:var(--type-label-md);text-align:left}
+.cf-holditem svg.icon{width:22px;height:22px}
+.cf-holditem.is-danger{color:var(--color-error)}
+.cf-holditem:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+.cf-folder:not(.cf-add){-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}

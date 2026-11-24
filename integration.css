@@ -1,5 +1,5 @@
 /* Shared glass controls; teammate collection/detail content remains unchanged. */
-:root{--pm-glass:rgba(255,255,255,.62);--pm-glass-border:rgba(255,255,255,.88);--pm-glass-shadow:0 8px 28px #20202022,inset 0 1px 0 #ffffffe6}
+:root{--pm-glass:rgba(255,255,255,.62);--pm-glass-border:rgba(255,255,255,.88);--pm-glass-shadow:0 4px 16px rgba(0,0,0,.05),inset 0 1px 0 #ffffffe6}
 .bottomnav .pm-nav-main,.bottomnav .pm-nav-add,
 .live-map button:not(.navitem):where(:not(.libgo)),.live-map .leaflet-control-zoom a,.live-map .lm-search{
  background:var(--pm-glass)!important;border:1px solid var(--pm-glass-border)!important;box-shadow:var(--pm-glass-shadow)!important;

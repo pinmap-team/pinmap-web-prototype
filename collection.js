@@ -10,6 +10,7 @@ Object.assign(paths, {
   plane:'M3 13.5 21 6l-4 14-5-5-3 4v-6z M12 15l9-9',
   bag:paths.shop,
   folderplus:'M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2h8.5A1.5 1.5 0 0 1 21 8.5v10a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z M12 10.5v6 M9 13.5h6',
+  pushpin:'M14.5 3.5l6 6 M16 5l-4.5 4.5-4 .5L6 11.5l6.5 6.5 1.5-1.5.5-4L19 8 M9.25 14.75 4 20',
   chef:'M7 14a4 4 0 0 1-.7-7.9 5 5 0 0 1 11.4 0A4 4 0 0 1 17 14 M7 14v6h10v-6 M7 17h10'
 });
 // 칩과 폴더에 쓰는 카테고리 (순서 = 화면 순서)
@@ -47,7 +48,7 @@ function cfFolderData(list){
 // 사진 슬롯 3개는 모든 폴더에서 같은 자리 · 같은 각도 (collection.css의 .cf-slot0~2)
 // thumbnails[0] = 가장 최근 → 가운데 맨 앞
 const CF_EDGE = 'M0 40.16Q0 32 9 32L30 32C39 32 41 41.6 50 41.6L91 41.6Q100 41.6 100 49.76'; // 앞판 top 40% · cfFrontClip과 같은 가장자리
-function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected = false, attr}){
+function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected = false, attr, pinned = false}){
   // 있는 사진만 보여줘요 (사진이 없으면 가운데 자리표시 1장)
   const shown = Math.max(1, Math.min(3, thumbnails.length));
   const slot = i => {
@@ -56,14 +57,14 @@ function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected 
     return `<span class="cf-photo cf-slot${i}${src ? '' : ' cf-empty'}">${src
       ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=PM_ENV.placeholderImage">` : ''}</span>`;
   };
-  return `<button type="button" class="cf-folder${selected ? ' on' : ''}" ${attr || `data-cffolder="${esc(id)}"`}>
+  return `<button type="button" class="cf-folder${selected ? ' on' : ''}${pinned ? ' is-pinned' : ''}" ${attr || `data-cffolder="${esc(id)}"`}>
     <span class="cf-shell">
       <span class="cf-back"><span class="cf-backshape"></span></span>
       ${[2, 1, 0].map(slot).join('')}
       <svg class="cf-shade" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
       <span class="cf-front"></span>
       <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
-      <span class="cf-meta"><span class="cf-title">${esc(title)}</span><span class="cf-count">${count}<span class="sr">개 저장된 폴더</span></span></span>
+      <span class="cf-meta">${pinned ? `<span class="cf-pinmark" aria-hidden="true">${icon('pushpin')}</span>` : ''}<span class="cf-title">${esc(title)}</span><span class="cf-count">${count}<span class="sr">개 저장된 폴더${pinned ? ', 상단 고정됨' : ''}</span></span></span>
     </span>
   </button>`;
 }
@@ -77,6 +78,13 @@ const CF_DEFS = `<svg class="cf-defs" width="0" height="0" aria-hidden="true" fo
 /* ---------- 내가 만든 폴더 (모음과 같은 데이터: item.collection) ---------- */
 // 새 폴더 이름은 settings.customFolders에 저장돼요 (pinmap.js가 브라우저에 보관)
 const cfCustom = () => Array.isArray(settings.customFolders) ? settings.customFolders : [];
+/* 상단 고정 폴더: 'c:이름'(내가 만든 폴더) · 'k:카테고리'. 마지막에 고정한 폴더가 새 폴더 바로 옆에 와요. */
+const cfPinned = () => Array.isArray(settings.pinnedFolders) ? settings.pinnedFolders.filter(k => typeof k === 'string') : [];
+const cfFolderKey = f => (f.attr ? 'c:' : 'k:') + f.id;
+const cfTileKey = tile => tile?.dataset.collection != null ? 'c:' + tile.dataset.collection : tile?.dataset.cffolder != null && tile.dataset.cffolder !== CF_ALL_FOLDER.id ? 'k:' + tile.dataset.cffolder : null;
+function cfSetPinned(key, on){
+  settings.pinnedFolders = [...(on ? [key] : []), ...cfPinned().filter(k => k !== key)].slice(0, 50);
+}
 // 저장 · 수정 대화상자의 ‘모음’ 목록에도 새 폴더가 나오도록
 function cfSyncCollections(){
   cfCustom().forEach(n => { if (!COLLECTIONS.some(c => c[0] === n)) COLLECTIONS.push([n, 'folder', '내가 만든 폴더']); });
@@ -159,7 +167,7 @@ function cfItem(x){
   const on = cfSel?.has(x.id);
   const role = cfSel ? `role="checkbox" aria-checked="${!!on}"` : `role="button" data-detail="${x.id}"`;
   return `<div class="cf-item${on ? ' on' : ''}" tabindex="0" ${role} data-cfitem="${x.id}" aria-label="${esc(x.title)}${cfSel ? '' : ' 상세 보기'}">
-    <div class="cf-itemimg">${libPhoto(x) ? `<span class="cf-itemback" aria-hidden="true"><img src="${esc(libPhoto(x))}" alt="" loading="lazy"></span>` : ''}${libThumb(x)}${cfSel ? `<span class="cf-check cf-glass" aria-hidden="true">${icon('check')}</span>` : `<button type="button" class="cf-fav lm-heart-motion${x.favorite ? ' is-active' : ''}" data-cf-fav="${x.id}" aria-pressed="${!!x.favorite}" aria-label="${esc(x.title)} 즐겨찾기">${likeHeartIcon()}</button>`}</div>
+    <div class="cf-itemimg">${libPhoto(x) ? `<span class="cf-itemback" aria-hidden="true"><img src="${esc(libPhoto(x))}" alt="" loading="lazy"></span>` : ''}${libThumb(x)}${cfSel ? `<span class="cf-check cf-glass" aria-hidden="true">${icon('check')}</span>` : `<button type="button" class="cf-fav lm-heart-motion${x.favorite ? ' is-active' : ''}" data-cf-fav="${x.id}" aria-pressed="${!!x.favorite}" aria-label="${esc(x.title)} 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon(!!x.favorite)}</span></button>`}</div>
     <div class="cf-itembody">
       <div class="cf-itemtext"><h3>${esc(x.title)}</h3><p class="cf-itemdesc">${esc(x.desc || x.memo || '')}</p>${cfMetaLine(x)}</div>
     </div>
@@ -214,7 +222,11 @@ resultCards = function(){
     </span>
   </button>`];
   const allFolder = q ? [] : [CollectionFolder({...CF_ALL_FOLDER,count:items.length,thumbnails:cfThumbs(items)})];
-  const folders = [...addTile, ...allFolder, ...cfOrderFolders([...mine.filter(f => f.count > 0), ...cfFolderData(list)]).map(CollectionFolder)];
+  const ordered = cfOrderFolders([...mine.filter(f => f.count > 0), ...cfFolderData(list)]);
+  // 상단 고정 폴더는 정렬과 상관없이 새 폴더 타일 바로 옆(전체 폴더 앞)에, 마지막에 고정한 순서대로
+  const pins = q ? [] : cfPinned(), pinned = pins.map(k => ordered.find(f => cfFolderKey(f) === k)).filter(Boolean);
+  const rest = ordered.filter(f => !pinned.includes(f));
+  const folders = [...addTile, ...pinned.map(f => CollectionFolder({...f, pinned:true})), ...allFolder, ...rest.map(CollectionFolder)];
   const grid = folders.length ? `<div class="cf-grid">${folders.join('')}</div>` : '';
   if (!q) return cfFolderToolbar() + grid;
   if (!list.length) return cfEmpty('search', '찾는 콘텐츠가 없어요', '다른 키워드나 카테고리로 다시 찾아 보세요.', `<button class="tonal" data-action="resetfilter">전체 컬렉션 보기</button>`);
@@ -487,6 +499,7 @@ actions.cfdelfolderok = () => {
   const name = cfFolderToDelete; if (!name || !cfCustom().includes(name)) return;
   cfFolderToDelete=null;
   settings.customFolders = cfCustom().filter(n => n !== name);
+  if (Array.isArray(settings.pinnedFolders)) settings.pinnedFolders = settings.pinnedFolders.filter(k => k !== 'c:' + name);
   items.forEach(x => { if (x.collection === name) x.collection = ''; });
   const i = COLLECTIONS.findIndex(c => c[0] === name); if (i >= 0) COLLECTIONS.splice(i, 1);
   afterChange(); $('#sheet').close();
@@ -494,16 +507,76 @@ actions.cfdelfolderok = () => {
   toast(`‘${name}’ 폴더를 삭제했어요.`);
 };
 
-/* Long press opens confirmation. Scrolling and ordinary taps retain navigation. */
+/* 폴더를 꾹 누르면(또는 우클릭) 메뉴: 상단 고정/해제 · 내가 만든 폴더는 삭제도. 스크롤과 일반 탭은 그대로예요. */
+let cfMenuKey=null;
+function cfOpenFolderMenu(tile){
+  const key=cfTileKey(tile);if(!key)return;
+  const custom=key.startsWith('c:'),name=key.slice(2);
+  if(custom&&!cfCustom().includes(name))return;
+  cfMenuKey=key;
+  const pinned=cfPinned().includes(key);
+  modal('', `<div class="esform cf-holdsheet">
+    <div class="nthead"><div><h2>‘${esc(name)}’ 폴더</h2><p>${custom ? '내가 만든 폴더예요.' : '카테고리 폴더예요.'}</p></div><button type="button" class="ntclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
+    <div class="cf-holdmenu" role="menu" aria-label="‘${esc(name)}’ 폴더 메뉴">
+      <button type="button" role="menuitem" class="cf-holditem" data-action="cfpintoggle">${icon('pushpin')}<span>${pinned ? '상단 고정 해제' : '상단에 고정'}</span></button>
+      <button type="button" role="menuitem" class="cf-holditem is-danger" data-action="cfmenudelete">${icon('trash')}<span>폴더 삭제</span></button>
+    </div>
+  </div>`);
+  $('#sheet').classList.add('editsheet');
+  requestAnimationFrame(()=>document.querySelector('.cf-holditem')?.focus());
+}
+actions.cfpintoggle = () => {
+  const key=cfMenuKey;if(!key)return;cfMenuKey=null;
+  const on=!cfPinned().includes(key);cfSetPinned(key,on);
+  afterChange();$('#sheet').close();render();
+  toast(on?`‘${key.slice(2)}’ 폴더를 상단에 고정했어요.`:`‘${key.slice(2)}’ 폴더 고정을 해제했어요.`);
+};
+actions.cfmenudelete = () => {
+  const key=cfMenuKey;cfMenuKey=null;if(!key)return;
+  // 메뉴 시트가 완전히 닫힌 다음 확인창을 열어요 (닫힘 정리가 확인창 스타일을 지우지 않게)
+  const sheet=$('#sheet');
+  sheet.addEventListener('close',()=>key.startsWith('c:') ? cfAskDeleteFolder(key.slice(2)) : cfAskDeleteCategory(key.slice(2)),{once:true});
+  sheet.close();
+};
+/* 카테고리 폴더 삭제 = 그 카테고리로 저장된 콘텐츠를 모두 삭제. 기존 선택 삭제(cfdelconfirm)를 그대로 써서
+   계정 모드에서는 백엔드에서도 지워요. 확인창을 닫으면 임시 선택은 풀어요. */
+let cfCatDeleting=false;
+function cfAskDeleteCategory(id){
+  const list=items.filter(x=>folderOf(x)===id);if(!list.length)return;
+  cfSel=new Set(list.map(x=>x.id));cfCatDeleting=true;
+  const inMine=list.filter(x=>x.collection).length;
+  modal('', `<div class="esform delsheet cf-catdel">
+    <div class="nthead"><div><h2>‘${esc(id)}’ 폴더를 삭제할까요?</h2><p>폴더 안의 콘텐츠 ${list.length}개가 모두 함께 삭제돼요.</p></div><button type="button" class="ntclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
+    <div class="esbody"><section class="cf-catwarn" role="note" aria-label="삭제 전 확인">
+      <h3>${icon('warning')}<span>삭제한 콘텐츠는 되돌릴 수 없어요</span></h3>
+      <ul>
+        <li>메모, 즐겨찾기, 추출한 장소·일정도 함께 지워져요.</li>
+        ${inMine ? `<li>내가 만든 폴더에 담긴 ${inMine}개도 그 폴더에서 빠져요.</li>` : ''}
+        <li>원본 SNS 게시물은 그대로 남아 있어요.</li>
+      </ul>
+    </section></div>
+    <div class="esfoot"><button type="button" class="escancel" data-action="close">취소</button><button type="button" class="essubmit deldanger" data-action="cfdelconfirm" data-cat-delete="${esc(id)}">${list.length}개 모두 삭제</button></div>
+  </div>`);
+  $('#sheet').classList.add('editsheet');
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-cat-delete]');if(!b||b.disabled)return;
+  if(Array.isArray(settings.pinnedFolders))settings.pinnedFolders=settings.pinnedFolders.filter(k=>k!=='k:'+b.dataset.catDelete);
+},true);
+document.getElementById('sheet')?.addEventListener('close',e=>{
+  // 메뉴 → 확인창으로 넘어갈 때의 close는 무시해요 (확인창이 이미 다시 열려 있어요)
+  if(!cfCatDeleting||e.currentTarget.open)return;cfCatDeleting=false;
+  if(cfSel){cfSel=null;render();}
+});
 let cfHoldTimer=null,cfHoldStart=null,cfBlockClick=null;
 function cfCancelHold(){clearTimeout(cfHoldTimer);cfHoldTimer=null;cfHoldStart=null;}
+const cfHoldTile=target=>{const tile=target.closest?.('.cf-folder:not(.cf-add)');return tile&&cfTileKey(tile)?tile:null;};
 document.addEventListener('pointerdown',e=>{
   cfCancelHold();if(e.button!==0)return;
-  const tile=e.target.closest('.cf-folder[data-collection]');
-  if(!tile || !cfCustom().includes(tile.dataset.collection))return;
+  const tile=cfHoldTile(e.target);if(!tile)return;
   cfHoldStart={x:e.clientX,y:e.clientY};
   cfHoldTimer=setTimeout(()=>{
-    cfBlockClick={tile,until:Date.now()+1200};cfAskDeleteFolder(tile.dataset.collection);cfCancelHold();
+    cfBlockClick={tile,until:Date.now()+1200};navigator.vibrate?.(12);cfOpenFolderMenu(tile);cfCancelHold();
   },550);
 });
 document.addEventListener('pointermove',e=>{if(cfHoldStart&&Math.hypot(e.clientX-cfHoldStart.x,e.clientY-cfHoldStart.y)>10)cfCancelHold();},{passive:true});
@@ -514,8 +587,14 @@ document.addEventListener('click',e=>{
   }
 },true);
 document.addEventListener('contextmenu',e=>{
-  const tile=e.target.closest('.cf-folder[data-collection]');if(!tile)return;
-  e.preventDefault();cfCancelHold();cfAskDeleteFolder(tile.dataset.collection);
+  const tile=cfHoldTile(e.target);if(!tile)return;
+  e.preventDefault();cfCancelHold();cfOpenFolderMenu(tile);
+});
+// 키보드: 폴더에 초점을 두고 Shift+F10 또는 메뉴 키로 같은 메뉴를 열어요
+document.addEventListener('keydown',e=>{
+  if(!(e.key==='ContextMenu'||(e.shiftKey&&e.key==='F10')))return;
+  const tile=cfHoldTile(e.target);if(!tile)return;
+  e.preventDefault();cfOpenFolderMenu(tile);
 });
 
 // 2026-11-24 폴더 안 콘텐츠 카드: 저장 시점 대신 즐겨찾기(별). 카드 열기와 따로 동작해요.
