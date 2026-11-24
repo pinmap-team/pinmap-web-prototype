@@ -50,10 +50,10 @@ test('every partially analyzed post retains its result screen even with failure 
   assert.equal(a.failure({analysisFailureCode:'analysis_failed',extractionNotes:['미디어 수집 실패'],...patch}),null);
  }
 });
-test('retry action only prepares the existing link form without submitting an analysis',()=>{
+test('retry action opens the shared link input with the existing URL without submitting an analysis',()=>{
  const src=fs.readFileSync('add-choice.js','utf8').match(/actions\.analysisretry=\(\)=>\{[\s\S]*?\n  \};/)[0];
- const input={value:'',focus(){this.focused=true;}};let opened=0;
- const context={actions:{linkimport:()=>opened++},items:[{id:7,url:'https://www.instagram.com/p/example/'}],detailId:7,document:{getElementById:()=>input}};
+ const opened=[];
+ const context={actions:{linkimport:url=>opened.push(url)},items:[{id:7,url:'https://www.instagram.com/p/example/'}],detailId:7};
  vm.runInNewContext(src,context);context.actions.analysisretry();
- assert.equal(opened,1);assert.equal(input.value,context.items[0].url);assert.equal(input.focused,true);
+ assert.deepEqual(opened,[context.items[0].url]);
 });

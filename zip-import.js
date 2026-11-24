@@ -26,9 +26,18 @@
   const MAX_POSTS = 10000;
   function createQueue({storage, account, canonical, publish = () => {}, finish = () => {}}) {
     let userId = null, job = null, running = false, pauseRequested = false, pendingAttach = null;
-    const state = () => job && ({phase:job.phase, name:job.name, source:job.source || 'zip', total:job.urls.length,
-      processed:job.index, saved:job.saved, skipped:job.skipped, review:job.review,
-      error:job.error || ''});
+    const state = () => {
+      if (!job) return null;
+      const first = Math.min(Math.max(0, job.index - 2), Math.max(0, job.urls.length - 4));
+      return {phase:job.phase, name:job.name, source:job.source || 'zip', total:job.urls.length,
+        processed:job.index, saved:job.saved, skipped:job.skipped, review:job.review,
+        error:job.error || '', entries:job.urls.slice(first,first + 4).map((url,offset) => {
+          const index = first + offset;
+          return {index,url,status:index < job.index ? job.results?.[index] || 'processed'
+            : index === job.index && job.phase === 'running' ? 'running'
+            : index === job.index && job.phase === 'paused' ? 'paused' : 'queued'};
+        })};
+    };
     function notify() { publish(state()); }
     function persist() { storage.setItem(KEY + userId, JSON.stringify(job)); notify(); }
     function attach(id) {
@@ -54,7 +63,7 @@
       userId = id;
       job = {phase:'running', name:String(name || 'Instagram ZIP').slice(0, 120),
           source:/\.zip$/i.test(String(name || '')) ? 'zip' : 'links',
-          urls:[...new Set(urls)], index:0, saved:0, skipped:0, review:0, error:''};
+          urls:[...new Set(urls)], index:0, saved:0, skipped:0, review:0, error:'', results:[]};
       pauseRequested = false;
       persist();
       return run();
@@ -72,13 +81,16 @@
         while (job === activeJob && job.index < job.urls.length && !pauseRequested && account.userId() === userId) {
           const url = job.urls[job.index];
           try {
-            if (known.has(url)) job.skipped++;
+            if (known.has(url)) { job.skipped++; job.results ||= []; job.results[job.index] = 'skipped'; }
             else {
               const item = await account.importLink(url, userId);
               if (job !== activeJob) break;
               known.add(url);
               job.saved++;
-              if (item.contentKind === 'unknown' || !['extracted','needs_review'].includes(item.status)) job.review++;
+              const needsReview = item.contentKind === 'unknown' || !['extracted','needs_review'].includes(item.status);
+              if (needsReview) job.review++;
+              job.results ||= [];
+              job.results[job.index] = needsReview ? 'review' : 'saved';
             }
             job.index++;
             persist();

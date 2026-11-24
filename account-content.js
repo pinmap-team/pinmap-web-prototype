@@ -368,11 +368,12 @@ if (PM_ENV.requiresAuth) (() => {
       }
     }
   }
-  const originalSave = actions.save;
   window.PinmapCaptureSave = async (image, id) => {
     if (PinmapSaveProgress.isRunning() || contentSaving || window.PinmapZipImport?.isRunning())
       throw Error('다른 저장 작업이 진행 중이에요.');
     contentSaving = true;
+    PinmapSaveProgress.start('capture');
+    document.getElementById('sheet')?.close();
     const userId = currentUserId;
     try {
       let result;
@@ -388,6 +389,7 @@ if (PM_ENV.requiresAuth) (() => {
       loadVersion++;
       const item = accountItem(result.item);
       items = [item, ...items.filter(x => x.url !== item.url)];
+      PinmapSaveProgress.finish('', {category:item.category});
       document.getElementById('sheet')?.close();
       closeOnboarding();
       if (item.mapLocations.length && !item.events.length) { window.pmMapFocus = item.id; go('map'); }
@@ -397,6 +399,9 @@ if (PM_ENV.requiresAuth) (() => {
         : '캡처를 저장했지만 분석을 마치지 못했어요. 상세에서 확인해 주세요.');
       if (wasLoading) void loadAccount();
       return item;
+    } catch (error) {
+      PinmapSaveProgress.finish(error.message || '캡처를 저장하지 못했어요.');
+      throw error;
     } finally { contentSaving = false; }
   };
   async function importZipLink(url, expectedUserId) {
@@ -415,70 +420,32 @@ if (PM_ENV.requiresAuth) (() => {
     } finally { contentSaving = false; }
   }
   actions.accountretry = () => loadAccount();
-  actions.save = () => {
-    originalSave();
-    const form = document.getElementById('saveform');
-    if (!form) return;
-    PinmapSaveProgress.render();
-    const header = form.querySelector('.eshead p');
-    if (header) header.textContent = 'Instagram 게시물에서 장소와 행사 일정을 찾아 저장해요.';
-    for (const selector of ['.esshare','.esdivider','.essample']) {
-      const node = form.querySelector(selector);
-      if (node) node.style.display = 'none';
-    }
-    for (const name of ['title','type','collection','memo']) {
-      const node = form.elements.namedItem(name)?.closest('.esfield');
-      if (node) node.style.display = 'none';
-    }
-    const hint = form.querySelector('.eshint');
-    if (hint) hint.textContent = '결과는 로그인한 계정에 저장돼요. 지도 위치와 행사 일정은 각각 확인할 수 있어요.';
-  };
-  document.addEventListener('submit', async event => {
-    if (event.target.id !== 'saveform') return;
-    event.preventDefault(); event.stopImmediatePropagation();
-    const form = event.target;
-    if (PinmapSaveProgress.isRunning() || contentSaving || window.PinmapZipImport?.isRunning()) {
-      const errorNode = form.querySelector('#saveerror');
-      if (errorNode) errorNode.textContent = '다른 링크를 저장 중이에요. 완료될 때까지 기다려 주세요.';
-      return;
-    }
-    const errorNode = form.querySelector('#saveerror');
-    const entered = form.elements.namedItem('url').value.trim().split(/\s+/).filter(Boolean);
+  actions.save = () => window.PinmapLinkProgress?.open('links');
+  async function submitLinks(text) {
+    if (PinmapSaveProgress.isRunning() || contentSaving || window.PinmapZipImport?.isRunning())
+      throw Error('다른 저장 작업이 진행 중이에요. 완료될 때까지 기다려 주세요.');
+    const entered = String(text || '').trim().split(/\s+/).filter(Boolean);
     const urls = entered.map(value => window.PinmapZipParser?.canonical(value));
-    if (!urls.length || urls.some(value => !value)) {
-      if (errorNode) errorNode.textContent = 'Instagram 게시물 또는 릴스 링크를 입력해 주세요.';
-      return;
-    }
+    if (!urls.length || urls.some(value => !value))
+      throw Error('Instagram 게시물 또는 릴스 링크를 입력해 주세요.');
     if (urls.length > 1) {
-      if (!window.PinmapZipImport) {
-        if (errorNode) errorNode.textContent = '여러 링크 저장 기능을 불러오지 못했어요. 새로고침 후 다시 시도해 주세요.';
-        return;
-      }
-      if (errorNode) errorNode.textContent = '';
-      window.PinmapBatchStatus?.reset();
-      void window.PinmapZipImport.start(urls, `링크 ${new Set(urls).size}개`).catch(error => {
-        const currentError = document.querySelector('#saveform #saveerror');
-        if (document.getElementById('sheet')?.open && currentError) currentError.textContent = error.message;
-        else toast(error.message);
-      });
-      if (window.PinmapZipImport.state()?.phase === 'running') document.getElementById('sheet')?.close();
+      if (!window.PinmapZipImport) throw Error('여러 링크 저장 기능을 불러오지 못했어요. 새로고침 후 다시 시도해 주세요.');
+      await window.PinmapZipImport.start(urls, `링크 ${new Set(urls).size}개`);
       return;
     }
-    const url = entered[0];
-    if (errorNode) errorNode.textContent = '';
-    if (!PinmapSaveProgress.start()) return;
+    if (!PinmapSaveProgress.start()) throw Error('다른 저장 작업이 진행 중이에요.');
+    document.getElementById('sheet')?.close();
     const userId = currentUserId;
     try {
-      const result = await accountRequest('POST', {url,content_types:['place','event']}, '', userId);
+      const result = await accountRequest('POST', {url:entered[0],content_types:['place','event']}, '', userId);
       if (!result.item || typeof result.item !== 'object') throw Error('저장 결과를 확인하지 못했어요.');
       if (currentUserId !== userId) { PinmapSaveProgress.clear(); return; }
       const wasLoading = !window.PinmapAccountLoaded;
-      loadVersion++; // A response based on the old offset must not overwrite this save.
+      loadVersion++;
       const item = accountItem(result.item);
       items = [item, ...items.filter(x => x.url !== item.url)];
       void window.PinmapBilling?.refresh();
       PinmapSaveProgress.finish('', {category:item.contentKind === 'unknown' && item.status !== 'extracted' ? '' : item.category});
-      document.getElementById('sheet')?.close();
       closeOnboarding();
       if (item.mapLocations.length && !item.events.length) {window.pmMapFocus = item.id; go('map');}
       else {go('library'); openDetail(item.id);}
@@ -489,12 +456,20 @@ if (PM_ENV.requiresAuth) (() => {
         : `저장했어요 · 장소 ${item.extractedPlaceCount}곳 · 행사 ${item.events.length}건`);
       if (wasLoading) void loadAccount();
     } catch (error) {
-      const message = error.message || '저장하지 못했어요. 다시 시도해 주세요.';
-      PinmapSaveProgress.finish(message);
-      const currentError = document.querySelector('#saveform #saveerror');
-      if (currentError) currentError.textContent = message;
-      else toast(message);
+      PinmapSaveProgress.finish(error.message || '저장하지 못했어요. 다시 시도해 주세요.');
+      throw error;
     }
+  }
+  window.PinmapSubmitLinks = submitLinks;
+  document.addEventListener('submit', event => {
+    if (event.target.id !== 'saveform') return;
+    event.preventDefault(); event.stopImmediatePropagation();
+    const form = event.target;
+    void submitLinks(form.elements.namedItem('url').value).catch(error => {
+      const node = form.querySelector('#saveerror');
+      if (node) node.textContent = error.message;
+      else toast(error.message);
+    });
   }, true);
   async function verifiedMetadata(expected){
     const {data,error}=await client.auth.getUser();

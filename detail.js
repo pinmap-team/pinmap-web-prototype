@@ -356,7 +356,7 @@ function saveSheet(){
         <input type="hidden" name="collection" value="">
         <input type="hidden" name="memo" value="">
         <p class="eshint">이 브라우저에 저장돼요. 장소·일정 자동 추출은 로그인 화면에서 이용할 수 있어요.</p>
-        <div class="esprogress" id="saveprogress" role="status" aria-live="polite" hidden></div><p class="eserror" id="saveerror" role="alert"></p>
+        <p class="eserror" id="saveerror" role="alert"></p>
       </div>
       <div class="esfoot"><button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
     </form>`);
