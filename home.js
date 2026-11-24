@@ -1,5 +1,5 @@
 // 홈 화면 (레이아웃 개편) · calendar.js 다음에 불러와요
-// 구성: 마감 임박 띠배너(맨 위 고정) → 최근 저장 카드 → 캘린더 위젯 → 카테고리 · 최근 저장
+// 구성: 최근 저장 카드 → 지도·일정 카드 → 마감 임박 배너 → 카테고리 · 최근 저장
 
 /* ---------- 홈 관심 키워드 추가 (온보딩 선택지에는 나오지 않아요) ---------- */
 PinmapCategories.all.forEach(c=>{homeSections[c.id]=()=>({list:items.filter(x=>PinmapCategories.of(x).id===c.id)});});
@@ -67,6 +67,48 @@ function calWidget(){
     <div class="calw-days" role="group" aria-label="날짜 선택">${days.map(day=>`<button type="button" data-calday="${calKey(day)}" aria-pressed="${calKey(day)===calSel}" aria-label="${day.getMonth()+1}월 ${day.getDate()}일"><span>${['일','월','화','수','목','금','토'][day.getDay()]}</span><b>${day.getDate()}</b></button>`).join('')}</div>
     ${due.length ? `<div class="calnext">${due.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cncontent"><span class="cntext">${esc(x.title)}</span></span><span class="cnbadge ${dueSoon(x) ? 'soon' : ''}">${dLabel(x)}</span></button>`).join('')}</div>` : '<p class="hint calnone">이 날짜에 등록된 일정이 없어요.</p>'}
   </section>`;
+}
+
+/* ---------- B안 홈 지도 · 일정 카드 ---------- */
+const homeStudyMapBounds = {south:37.531, north:37.559, west:127.031, east:127.067};
+function homeStudyMapPosition(lat, lng){
+  const {south,north,west,east} = homeStudyMapBounds;
+  return {x:100 * (lng - west) / (east - west),y:100 * (north - lat) / (north - south)};
+}
+function homeStudyWidgets(){
+  const pins = items.flatMap(item => (item.mapLocations || []).slice(0, 1).flatMap(location => {
+    const lat = Number(location?.coordinates?.lat), lng = Number(location?.coordinates?.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return [];
+    return [{item,name:location.name,...homeStudyMapPosition(lat,lng)}];
+  })).filter(({x,y}) => x >= 12 && x <= 88 && y >= 12 && y <= 88).slice(0, 4);
+  const schedule = calDueList().filter(entry => calDue(entry) >= calToday);
+  return `<div class="home-study-widgets">
+    <section class="home-study-map ${pins.length ? '' : 'home-study-map-empty'}" aria-label="저장한 장소 지도">
+      <button type="button" class="home-study-map-open" data-page="map" aria-label="저장한 장소 지도 열기"></button>
+      <span class="home-study-map-label seongsu" aria-hidden="true">성수동</span>
+      <span class="home-study-map-label forest" aria-hidden="true">서울숲</span>
+      <span class="home-study-map-label river" aria-hidden="true">한강</span>
+      ${pins.map(({item,name,x,y}) => `<button type="button" class="home-study-pin" data-detail="${item.id}"
+          aria-label="${esc(name || item.title)} 게시물 열기" title="${esc(name || item.title)}"
+          style="left:${x}%;top:${y}%">${icon('bookmark')}</button>`).join('')}
+      ${pins.length ? '' : '<p class="home-study-map-status">저장한 장소가 없어요</p>'}
+      <span class="home-study-map-caption" aria-hidden="true">${icon('map')} 저장한 장소</span>
+      <a class="home-study-map-credit" href="https://www.openstreetmap.org/copyright"
+        target="_blank" rel="noopener noreferrer" aria-label="OpenStreetMap 지도 데이터 출처">© OpenStreetMap</a>
+    </section>
+    <section class="home-study-calendar" aria-label="다가오는 일정">
+      <h2><button type="button" data-action="gocal">다가오는 일정</button>
+        <span class="home-study-count" aria-label="다가오는 일정 ${schedule.length}개">${schedule.length}</span>
+      </h2>
+      ${schedule.length ? `<ul class="home-study-notepad">${schedule.slice(0, 2).map(entry => {
+        const date = calDue(entry);
+        return `<li><button type="button" data-detail="${entry.id}">
+          <span class="home-study-note-title">${esc(entry.title)}</span>
+          <time datetime="${calKey(date)}">${date.getMonth()+1}.${date.getDate()} ${calWeekdays[date.getDay()]}</time>
+        </button></li>`;
+      }).join('')}</ul>` : '<p class="home-study-note-empty">예정된 일정이 없어요</p>'}
+    </section>
+  </div>`;
 }
 
 /* ---------- 작은 위젯 · 최근 저장 ---------- */
@@ -177,8 +219,7 @@ pages.home = function(){
     ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'role="group" aria-label="최근 저장한 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${emptyHome ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
     : `<div class="empty small"><p class="muted">아직 저장한 콘텐츠가 없어요.</p></div>`;
   const brand = '<div class="homebrand" aria-label="Pinmap"><img class="homebrand-symbol" src="img/pinmap-symbol-splash.svg" alt=""><span class="homebrand-name" aria-hidden="true">Pinmap</span></div>';
-  // 2026-11-23: 마감 임박 배너는 맨 위 고정 대신 캘린더 위젯 바로 아래에 보여줘요.
-  return brand + main + (accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + stripBar() + chips + (emptyHome || accountError ? '' : subWidgets());
+  return brand + main + (accountError ? '' : homeStudyWidgets()) + stripBar() + chips + (accountError ? '' : subWidgets());
 };
 
 // Android 공유 안내: 실제 설치나 공유 수신이 연결된 것으로 표시하지 않아요.

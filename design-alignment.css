@@ -2662,3 +2662,76 @@ html body .calcat img.pm-category-icon[src*="/humor-active.svg"]{transform:trans
 html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:translate(-0.00px,-0.90px) scale(0.919)!important}
 
 [data-theme="dark"] :is(.lm-categories,.calcats) img.pm-category-icon[src*="/all-active.svg"]{content:url("img/category/all-active-dark.svg")}
+
+/* Pinmap B안 · 홈 위젯 사용성 테스트 */
+.home-study-widgets{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-md);
+  margin-top:var(--space-xl);
+}
+.home-study-map,.home-study-calendar{
+  position:relative;min-width:0;aspect-ratio:1;margin:0;border-radius:var(--rounded-lg);
+  background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.home-study-map{
+  isolation:isolate;background:var(--color-neutral) url("img/seongsu-study-map.png") center / 100% 100% no-repeat;
+}
+.home-study-map-open{
+  position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;cursor:pointer;
+}
+.home-study-map-label{
+  position:absolute;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;
+  color:#36414b;font:var(--type-body-sm);font-weight:var(--weight-bold);
+  text-shadow:0 1px #fff,0 -1px #fff,1px 0 #fff,-1px 0 #fff;
+}
+.home-study-map-label.seongsu{left:67%;top:28%}
+.home-study-map-label.forest{left:22%;top:70%}
+.home-study-map-label.river{left:42%;top:85%;color:#36597c}
+.home-study-map-caption,.home-study-map-credit{
+  position:absolute;bottom:var(--space-xs);padding:0 var(--space-xs);border-radius:var(--rounded-sm);
+  background:var(--color-surface);color:var(--color-on-surface);
+}
+.home-study-map-caption{
+  bottom:calc(var(--space-lg) + var(--space-xs));left:var(--space-xs);display:inline-flex;align-items:center;
+  gap:var(--space-xs);font:var(--type-body-sm);font-weight:var(--weight-semibold);pointer-events:none;
+}
+.home-study-map-caption .icon{width:12px;height:12px}
+.home-study-map-credit{right:var(--space-xs);font:400 10px/14px var(--font-family)}
+.home-study-map-status{
+  position:absolute;left:50%;top:50%;margin:0;transform:translate(-50%,-50%);white-space:nowrap;
+  padding:var(--space-xs) var(--space-sm);border-radius:var(--rounded-sm);background:var(--color-surface);
+  color:var(--color-on-surface);font:var(--type-body-sm);pointer-events:none;
+}
+.home-study-pin{
+  position:absolute;display:grid;place-items:center;width:44px;height:44px;padding:0;
+  transform:translate(-50%,-50%);border:0;background:transparent;color:#fff;
+}
+.home-study-pin .icon{
+  box-sizing:content-box;width:12px;height:12px;padding:5px;border-radius:50%;
+  border:2px solid #fff;background:#386dd1;box-shadow:var(--shadow-md);stroke-width:2;
+}
+.home-study-map button:focus-visible,.home-study-map-credit:focus-visible,.home-study-calendar button:focus-visible{
+  z-index:2;outline:2px solid var(--color-on-surface);outline-offset:-2px;border-radius:var(--rounded-sm);
+}
+.home-study-calendar{padding:var(--space-sm) var(--space-md);color:var(--color-on-surface)}
+.home-study-calendar h2{display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm);margin:0}
+.home-study-calendar h2 button{
+  min-width:0;min-height:44px;padding:0;border:0;background:transparent;text-align:left;
+  color:var(--color-on-surface);font:var(--type-body-md);font-weight:var(--weight-bold);
+}
+.home-study-count{font:var(--type-headline-lg);line-height:1}
+.home-study-notepad{padding:0;margin:0;list-style:none}
+.home-study-notepad li+li{border-top:1px solid var(--color-disabled)}
+.home-study-notepad button{
+  position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+  width:100%;min-height:46px;padding:var(--space-xs) 0 var(--space-xs) var(--space-xl);
+  border:0;background:transparent;color:var(--color-on-surface);text-align:left;
+}
+.home-study-notepad button::before{
+  content:"";position:absolute;top:12px;left:0;width:14px;height:14px;border-radius:50%;
+  border:1.5px solid var(--color-icon-muted);pointer-events:none;
+}
+.home-study-note-title{
+  width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-label-md);
+}
+.home-study-notepad time,.home-study-note-empty{font:var(--type-body-sm);color:var(--color-secondary)}
+.home-study-note-empty{margin:var(--space-xs) 0 0}
