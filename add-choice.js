@@ -49,14 +49,25 @@
     setAddMenuOpen(false);
     window.PinmapLinkProgress?.open('zip');
   };
-  window.PinmapStartZipFile = async file => {
+  window.PinmapStartZipFile = async (file, signal) => {
     if (!file || !/\.zip$/i.test(file.name) || file.size > 40 * 1024 * 1024)
       throw Error('40MB 이하의 Instagram 내보내기 ZIP 파일을 선택해 주세요.');
     if (!window.PinmapZipImport) throw Error('ZIP 분석·저장은 로그인 후 사용할 수 있어요.');
-    const bytes = new Uint8Array(await file.arrayBuffer());
+    signal?.throwIfAborted();
+    const bytes = new Uint8Array(await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      const abort = () => reader.abort();
+      signal?.addEventListener('abort', abort, {once:true});
+      reader.onload = () => { signal?.removeEventListener('abort', abort); resolve(reader.result); };
+      reader.onerror = () => { signal?.removeEventListener('abort', abort); reject(reader.error); };
+      reader.onabort = () => { signal?.removeEventListener('abort', abort); reject(signal?.reason || new DOMException('ZIP 읽기가 중단됐어요.', 'AbortError')); };
+      reader.readAsArrayBuffer(file);
+    }));
+    signal?.throwIfAborted();
     if (bytes[0] !== 0x50 || bytes[1] !== 0x4b || bytes[2] !== 0x03 || bytes[3] !== 0x04)
       throw Error('ZIP 파일 형식을 확인해 주세요.');
     const parsed = window.PinmapZipParser.parseBytes(bytes);
+    signal?.throwIfAborted();
     await window.PinmapZipImport.start(parsed.urls, file.name);
   };
   actions.screenshotimport = () => {
