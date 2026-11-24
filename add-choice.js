@@ -4,6 +4,99 @@
   let openTimer;
   let screenshotPreviewUrl;
   let captureId;
+  let uploadCloseTimer;
+  let uploadReader;
+  const uploadSwapTimers = new WeakMap();
+  const uploadReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function swapUploadText(node, value) {
+    if (!node || node.textContent === value) return;
+    clearTimeout(uploadSwapTimers.get(node));
+    node.classList.remove('is-exit', 'is-enter-start');
+    if (uploadReducedMotion()) { node.textContent = value; return; }
+    node.classList.add('is-exit');
+    uploadSwapTimers.set(node, setTimeout(() => {
+      if (!node.isConnected) return;
+      node.textContent = value;
+      node.classList.remove('is-exit');
+      node.classList.add('is-enter-start');
+      void node.offsetHeight;
+      node.classList.remove('is-enter-start');
+    }, 150));
+  }
+  function uploadProgress(form, percent) {
+    const value = Math.max(0, Math.min(100, Math.round(percent)));
+    const bar = form.querySelector('.pm-upload-bar');
+    if (bar) { bar.setAttribute('aria-valuenow', String(value)); bar.querySelector('span').style.transform = `scaleX(${value / 100})`; }
+    const count = form.querySelector('.pm-upload-percent');
+    if (count) count.textContent = `${value}%`;
+  }
+  function uploadPhase(form, phase, status) {
+    const zone = form.querySelector('.pm-upload-zone');
+    if (!zone) return;
+    zone.dataset.phase = phase;
+    zone.querySelector('.pm-upload-drop').setAttribute('aria-hidden', String(phase !== 'idle'));
+    zone.querySelector('.pm-upload-file').setAttribute('aria-hidden', String(phase === 'idle'));
+    zone.querySelector('.pm-upload-icon-swap').dataset.state = phase === 'done' || phase === 'analyzing' ? 'b' : 'a';
+    zone.querySelector('input[type="file"]').disabled = phase === 'reading' || phase === 'analyzing';
+    swapUploadText(form.querySelector('.pm-upload-file-status'), status || (phase === 'done' ? '파일 준비 완료' : phase === 'reading' ? '파일 읽는 중' : '선택됨'));
+    const button = form.querySelector('.pm-upload-submit');
+    if (button) {
+      button.disabled = phase !== 'selected';
+      swapUploadText(button.querySelector('.pm-upload-button-label'), phase === 'reading' ? '파일 읽는 중' : phase === 'analyzing' ? '분석 중' : phase === 'done' ? '준비 완료' : '분석하고 저장');
+    }
+  }
+  function selectedUploadFile(form, file) {
+    if (!form || !file) return;
+    form.querySelector('.pm-upload-name').textContent = file.name;
+    form.querySelector('.pm-upload-size').textContent = file.size < 1024 * 1024
+      ? `${Math.max(1, Math.round(file.size / 1024))} KB` : `${(file.size / 1024 / 1024).toFixed(1)} MB`;
+    uploadProgress(form, 0);
+    uploadPhase(form, 'selected', '선택됨');
+  }
+  function readUploadFile(file, form) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      uploadReader = reader;
+      reader.onprogress = event => { if (event.lengthComputable) uploadProgress(form, 100 * event.loaded / event.total); };
+      reader.onload = () => { if (uploadReader === reader) uploadReader = null; resolve(new Uint8Array(reader.result)); };
+      reader.onerror = () => { if (uploadReader === reader) uploadReader = null; reject(Error('파일을 읽지 못했어요. 다시 선택해 주세요.')); };
+      reader.onabort = () => { if (uploadReader === reader) uploadReader = null; reject(Error('파일 읽기를 취소했어요.')); };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+  function uploadMarkup(kind) {
+    const zip = kind === 'zip';
+    const inputName = zip ? 'archive' : 'screenshot';
+    const fileLabel = zip ? 'Instagram 내보내기 ZIP 파일' : '캡처 이미지 파일';
+    return `<form id="${zip ? 'zipimportform' : 'screenshotimportform'}" class="pm-upload-form">
+      <p class="pm-upload-meta">${zip ? 'Instagram ZIP · 최대 40MB' : 'PNG, JPG, WebP · 최대 10MB'}</p>
+      <label class="pm-upload-zone" data-phase="idle">
+        <input type="file" name="${inputName}" accept="${zip ? '.zip,application/zip' : 'image/png,image/jpeg,image/webp'}" aria-label="${fileLabel}" required>
+        <span class="pm-upload-drop" aria-hidden="false">${icon(zip ? 'folder' : 'image')}<strong>파일을 여기에 놓거나 선택</strong></span>
+        <span class="pm-upload-file" aria-hidden="true"><span class="pm-upload-row"><span class="pm-upload-file-icon"><span class="pm-upload-icon-swap" data-state="a"><span class="pm-upload-icon" data-icon="a">${icon(zip ? 'folder' : 'image')}</span><span class="pm-upload-icon" data-icon="b">${icon('check')}</span></span></span><span class="pm-upload-file-copy"><strong class="pm-upload-name" id="${zip ? 'zip-file-name' : 'screenshot-file-name'}"></strong><small><span class="pm-upload-file-status">선택됨</span> · <span class="pm-upload-size"></span></small></span><span class="pm-upload-percent">0%</span></span><span class="pm-upload-bar" role="progressbar" aria-label="파일 읽기 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></span></span>
+      </label>
+      ${zip ? '<p class="pm-upload-note">ZIP은 기기에서 읽고 게시물 링크만 전송해요. 중복은 건너뜁니다.</p>' : '<img id="screenshot-preview" class="pm-upload-hidden-preview" alt="" hidden><p class="pm-upload-note">이미지에서 장소와 일정, 설명을 찾아 저장해요.</p>'}
+      <p id="${zip ? 'zip-import-error' : 'screenshot-import-error'}" class="eserror pm-upload-error" role="alert"></p>
+      <div class="pm-upload-foot"><button type="button" class="pm-upload-button is-secondary" data-upload-close>취소</button><button type="button" class="pm-upload-button pm-upload-submit" id="${zip ? 'zip-import-start' : 'screenshot-analysis-button'}"><span class="pm-upload-button-label">분석하고 저장</span></button></div>
+    </form>`;
+  }
+  function openUpload(kind) {
+    clearTimeout(uploadCloseTimer);
+    sheet.className = 'pm-upload-modal';
+    modal(kind === 'zip' ? 'ZIP 파일 업로드' : '캡처 이미지 업로드', uploadMarkup(kind));
+    const close = sheet.querySelector('.dialoghead [data-action="close"]');
+    close?.removeAttribute('data-action');
+    close?.setAttribute('data-upload-close', '');
+    uploadPhase(sheet.querySelector('.pm-upload-form'), 'idle');
+    requestAnimationFrame(() => { if (sheet.open && sheet.classList.contains('pm-upload-modal')) sheet.classList.add('is-open'); });
+  }
+  function closeUpload() {
+    if (!sheet.open || !sheet.classList.contains('pm-upload-modal') || sheet.classList.contains('is-closing')) return;
+    sheet.classList.remove('is-open');
+    sheet.classList.add('is-closing');
+    if (uploadReader) uploadReader.abort();
+    uploadCloseTimer = setTimeout(() => { if (sheet.open) sheet.close(); }, uploadReducedMotion() ? 0 : 150);
+  }
   let batchExpanded = false;
   const batchFloating = document.createElement('div');
   batchFloating.className = 'batch-save-floating';
@@ -33,7 +126,7 @@
   function renderZipStatus() {
     const state = window.PinmapZipImport?.state();
     const start = document.querySelector('#zipimportform #zip-import-start');
-    if (start) start.disabled = state?.phase === 'running' || state?.phase === 'paused';
+    if (start) start.disabled = start.closest('.pm-upload-form')?.querySelector('.pm-upload-zone')?.dataset.phase !== 'selected' || state?.phase === 'running' || state?.phase === 'paused';
     const linkSubmit = document.querySelector('#saveform button[type="submit"]');
     if (linkSubmit) linkSubmit.disabled = state?.source === 'links' && state.phase !== 'done';
     batchFloating.hidden = !state;
@@ -119,16 +212,7 @@
   };
   actions.zipimport = () => {
     setAddMenuOpen(false);
-    sheet.className = 'zip-import-sheet add-import-sheet';
-    modal('Instagram ZIP 가져오기', `<form id="zipimportform" class="zip-import-form">
-      <p class="add-import-intro">Instagram에서 내보낸 저장 게시물 ZIP 파일을 선택해 주세요.</p>
-      <label class="zip-import-picker"><span>ZIP 파일 선택</span><input type="file" name="archive" accept=".zip,application/zip" aria-label="Instagram 내보내기 ZIP 파일" required></label>
-      <p id="zip-file-name" class="zip-import-filename" role="status">선택한 파일 없음</p>
-      <p class="zip-import-note">ZIP은 기기에서 읽고 게시물 링크만 전송해요. 중복은 건너뛰며, 월간 분석 한도나 계정 저장 100개 한도에 닿으면 남은 목록을 일시정지해요.</p>
-      ${PM_ENV.requiresAuth ? '' : '<a class="textbtn" href="auth.html?screen=welcome" target="_top">로그인하고 가져오기</a>'}
-      <p id="zip-import-error" class="eserror" role="alert"></p>
-      <div class="dialogactions"><button type="button" class="textbtn" data-action="zipback">뒤로</button><button type="button" class="filled" id="zip-import-start">분석하고 저장</button></div>
-    </form>`);
+    openUpload('zip');
     document.getElementById('zip-import-start').addEventListener('click', () => actions.zipstart());
     renderZipStatus();
   };
@@ -137,30 +221,49 @@
     setAddMenuOpen(false);
     clearScreenshotPreview();
     captureId = crypto.randomUUID();
-    sheet.className = 'zip-import-sheet screenshot-import-sheet add-import-sheet';
-    modal('캡처 화면으로 추가', `<form class="zip-import-form" id="screenshotimportform">
-      <p class="add-import-intro">저장할 콘텐츠의 캡처 이미지를 선택해 주세요.</p>
-      <label class="zip-import-picker"><span>캡처 이미지 선택</span><input type="file" name="screenshot" accept="image/png,image/jpeg,image/webp" aria-label="캡처 이미지 파일" required></label>
-      <p id="screenshot-file-name" class="zip-import-filename" role="status">선택한 파일 없음</p>
-      <img id="screenshot-preview" class="screenshot-import-preview" alt="선택한 캡처 이미지 미리보기" hidden>
-      <p class="zip-import-note">이미지에서 장소와 일정, 콘텐츠 설명을 찾아 로그인한 계정에 저장해요.</p>
-      ${PM_ENV.requiresAuth ? '' : '<a class="textbtn" href="auth.html?screen=welcome" target="_top">로그인하고 저장하기</a>'}
-      <p id="screenshot-import-error" class="eserror" role="alert"></p>
-      <div class="dialogactions"><button type="button" class="textbtn" data-action="screenshotback">뒤로</button><button type="button" class="filled" id="screenshot-analysis-button">분석하고 저장</button></div>
-    </form>`);
+    openUpload('screenshot');
     document.getElementById('screenshot-analysis-button').addEventListener('click', () => actions.screenshotanalysis());
   };
-  actions.screenshotback = () => {
-    sheet.close();
-    actions.addoptions();
-  };
-  actions.zipback = () => {
-    sheet.close();
-    actions.addoptions();
-  };
+  actions.screenshotback = closeUpload;
+  actions.zipback = closeUpload;
+  sheet.addEventListener('click', event => {
+    if (sheet.classList.contains('pm-upload-modal') && event.target === sheet) {
+      const rect = sheet.getBoundingClientRect();
+      if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
+        event.stopImmediatePropagation(); closeUpload();
+      }
+    }
+  }, true);
+  sheet.addEventListener('cancel', event => {
+    if (sheet.classList.contains('pm-upload-modal')) { event.preventDefault(); closeUpload(); }
+  });
+  sheet.addEventListener('click', event => {
+    if (event.target.closest('[data-upload-close]')) closeUpload();
+  });
+  sheet.addEventListener('dragover', event => {
+    const zone = event.target.closest('.pm-upload-zone');
+    if (!zone || zone.querySelector('input').disabled) return;
+    event.preventDefault(); zone.classList.add('is-dragover');
+  });
+  sheet.addEventListener('dragleave', event => {
+    const zone = event.target.closest('.pm-upload-zone');
+    if (zone && !zone.contains(event.relatedTarget)) zone.classList.remove('is-dragover');
+  });
+  sheet.addEventListener('drop', event => {
+    const zone = event.target.closest('.pm-upload-zone');
+    if (!zone || zone.querySelector('input').disabled) return;
+    event.preventDefault(); zone.classList.remove('is-dragover');
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) return;
+    const transfer = new DataTransfer(); transfer.items.add(file);
+    const input = zone.querySelector('input'); input.files = transfer.files;
+    input.dispatchEvent(new Event('change', {bubbles:true}));
+  });
   sheet.addEventListener('close', () => {
     clearScreenshotPreview();
-    sheet.classList.remove('zip-import-sheet', 'screenshot-import-sheet', 'add-import-sheet');
+    if (uploadReader) uploadReader.abort();
+    clearTimeout(uploadCloseTimer);
+    sheet.classList.remove('pm-upload-modal', 'is-open', 'is-closing', 'zip-import-sheet', 'screenshot-import-sheet', 'add-import-sheet');
     renderZipStatus();
   });
   document.addEventListener('pointerdown', event => {
@@ -184,33 +287,42 @@
   document.addEventListener('change', event => {
     if (!event.target.matches('#zipimportform input[name="archive"]')) return;
     const file = event.target.files?.[0];
-    document.getElementById('zip-file-name').textContent = file ? file.name : '선택한 파일 없음';
-    document.getElementById('zip-import-error').textContent = '';
+    const form = event.target.form;
+    const error = form.querySelector('#zip-import-error');
+    error.textContent = '';
+    if (!file || !/\.zip$/i.test(file.name) || file.size > 40 * 1024 * 1024) {
+      if (file) error.textContent = '40MB 이하의 ZIP 파일을 선택해 주세요.';
+      event.target.value = ''; uploadPhase(form, 'idle'); return;
+    }
+    selectedUploadFile(form, file);
   });
   document.addEventListener('change', event => {
     if (!event.target.matches('#screenshotimportform input[name="screenshot"]')) return;
     const file = event.target.files?.[0];
-    const name = document.getElementById('screenshot-file-name');
+    const form = event.target.form;
     const preview = document.getElementById('screenshot-preview');
     const error = document.getElementById('screenshot-import-error');
     clearScreenshotPreview();
     preview.hidden = true;
     preview.removeAttribute('src');
     error.textContent = '';
-    name.textContent = file?.name || '선택한 파일 없음';
-    if (!file) return;
+    if (!file) { uploadPhase(form, 'idle'); return; }
     if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 10 * 1024 * 1024) {
       error.textContent = 'PNG, JPG, WebP 이미지(10MB 이하)를 선택해 주세요.';
       event.target.value = '';
+      uploadPhase(form, 'idle');
       return;
     }
+    selectedUploadFile(form, file);
+    form.querySelector('.pm-upload-submit').disabled = true;
     screenshotPreviewUrl = URL.createObjectURL(file);
-    preview.onload = () => { preview.hidden = false; name.textContent = `${file.name} · 이미지 선택 완료`; };
+    preview.onload = () => { if (form.isConnected) form.querySelector('.pm-upload-submit').disabled = false; };
     preview.onerror = () => {
       preview.hidden = true;
       error.textContent = '이미지 파일을 열 수 없어요. 다른 캡처를 선택해 주세요.';
       clearScreenshotPreview();
       event.target.value = '';
+      uploadPhase(form, 'idle');
     };
     preview.src = screenshotPreviewUrl;
   });
@@ -224,7 +336,7 @@
       error.textContent = '캡처 분석·저장은 로그인 후 사용할 수 있어요.';
       return;
     }
-    if (preview.hidden || !preview.naturalWidth) {
+    if (!preview.naturalWidth) {
       error.textContent = '먼저 열 수 있는 캡처 이미지를 선택해 주세요.';
       return;
     }
@@ -243,16 +355,23 @@
       return;
     }
     error.textContent = '';
-    button.disabled = true;
     button.setAttribute('aria-busy', 'true');
-    button.textContent = '분석 중…';
-    try { await window.PinmapCaptureSave(image, captureId); }
-    catch (reason) { error.textContent = reason.message || '캡처를 저장하지 못했어요.'; }
+    uploadPhase(form, 'reading');
+    try {
+      await readUploadFile(form.elements.namedItem('screenshot').files[0], form);
+      if (!form.isConnected) return;
+      uploadProgress(form, 100);
+      uploadPhase(form, 'done');
+      await new Promise(resolve => setTimeout(resolve, uploadReducedMotion() ? 0 : 200));
+      if (!form.isConnected) return;
+      uploadPhase(form, 'analyzing');
+      await window.PinmapCaptureSave(image, captureId);
+    }
+    catch (reason) { if (form.isConnected) error.textContent = reason.message || '캡처를 저장하지 못했어요.'; }
     finally {
       if (form.isConnected) {
-        button.disabled = false;
         button.removeAttribute('aria-busy');
-        button.textContent = '분석하고 저장';
+        uploadPhase(form, 'selected');
       }
     }
   };
@@ -269,23 +388,29 @@
     error.textContent = '';
     window.PinmapBatchStatus?.reset();
     const button = form.querySelector('#zip-import-start');
-    button.disabled = true;
     button.setAttribute('aria-busy', 'true');
-    button.textContent = 'ZIP 읽는 중…';
+    uploadPhase(form, 'reading');
     try {
       await new Promise(resolve => requestAnimationFrame(resolve));
-      const parsed = await window.PinmapZipParser.parseFile(file);
-      form.querySelector('#zip-file-name').textContent = `${file.name} · 게시물 ${parsed.urls.length}건 확인`;
+      const bytes = await readUploadFile(file, form);
+      if (!form.isConnected) return;
+      if (bytes[0] !== 0x50 || bytes[1] !== 0x4b || bytes[2] !== 0x03 || bytes[3] !== 0x04)
+        throw Error('ZIP 파일 형식을 확인해 주세요.');
+      const parsed = window.PinmapZipParser.parseBytes(bytes);
+      uploadProgress(form, 100);
+      uploadPhase(form, 'done', `게시물 ${parsed.urls.length}건 확인`);
+      await new Promise(resolve => setTimeout(resolve, uploadReducedMotion() ? 0 : 200));
+      if (!form.isConnected) return;
       void window.PinmapZipImport.start(parsed.urls, file.name).catch(reason => {
         if (sheet.open && form.isConnected) error.textContent = reason.message || 'ZIP 가져오기를 시작하지 못했어요.';
         else toast(reason.message || 'ZIP 가져오기를 시작하지 못했어요.');
       });
-      if (window.PinmapZipImport.state()?.phase === 'running') sheet.close();
-    } catch (reason) { error.textContent = reason.message || 'ZIP 파일을 읽지 못했어요.'; }
+      if (window.PinmapZipImport.state()?.phase === 'running') closeUpload();
+    } catch (reason) { if (form.isConnected) error.textContent = reason.message || 'ZIP 파일을 읽지 못했어요.'; }
     finally {
       if (form.isConnected) {
         button.removeAttribute('aria-busy');
-        button.textContent = '분석하고 저장';
+        if (!sheet.classList.contains('is-closing')) uploadPhase(form, 'selected');
         renderZipStatus();
       }
     }

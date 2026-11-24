@@ -2480,3 +2480,54 @@ html body .setrow .sw.t-toggle[data-on="true"]{background:rgba(0,60,255,.8)!impo
   100%{translate:0 0}
 }
 @media(prefers-reduced-motion:reduce){.t-toggle{transition:none!important}.t-toggle-thumb{animation:none!important}}
+/* Shared ZIP and screenshot upload modal, adapted from the supplied Upload modal. */
+#sheet.pm-upload-modal{position:fixed;inset:0;margin:auto;width:min(300px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 32px);box-sizing:border-box;padding:16px!important;overflow:visible;border:1px solid var(--color-border);border-radius:24px!important;background:var(--color-surface);color:var(--color-on-surface);box-shadow:var(--shadow-md);opacity:0;transform:scale(.96);transition:opacity 250ms cubic-bezier(.22,1,.36,1),transform 250ms cubic-bezier(.22,1,.36,1)}
+#sheet.pm-upload-modal.is-open{opacity:1;transform:scale(1)}
+#sheet.pm-upload-modal.is-closing{opacity:0;transform:scale(.96);transition-duration:150ms}
+#sheet.pm-upload-modal::backdrop{background:rgb(0 0 0 / .3)}
+#sheet.pm-upload-modal .handle{display:none}
+#sheet.pm-upload-modal .dialoghead{display:flex;align-items:start;gap:8px;margin:0 0 4px;padding:0}
+#sheet.pm-upload-modal .dialoghead h2{flex:1;margin:0;font:var(--type-headline-md);color:var(--color-on-surface)}
+#sheet.pm-upload-modal .dialoghead .iconbtn{display:grid;place-items:center;flex:none;width:32px;height:32px;margin:-4px -4px 0 0;padding:0;border:0;border-radius:8px;background:transparent;color:var(--color-secondary);box-shadow:none}
+#sheet.pm-upload-modal .dialoghead .iconbtn .icon{width:16px;height:16px}
+#sheet.pm-upload-modal .pm-upload-form{margin:0}
+#sheet.pm-upload-modal .pm-upload-meta{margin:0 0 16px;font:var(--type-body-sm);color:var(--color-secondary)}
+#sheet.pm-upload-modal .pm-upload-zone{position:relative;display:grid;align-items:center;min-height:112px;box-sizing:border-box;border:1px dashed var(--color-border);border-radius:12px;background:var(--color-neutral);cursor:pointer;transition:border-color 150ms,background 150ms}
+#sheet.pm-upload-modal .pm-upload-zone:hover,#sheet.pm-upload-modal .pm-upload-zone.is-dragover{border-color:var(--color-primary);background:var(--color-surface)}
+#sheet.pm-upload-modal .pm-upload-zone>input{position:absolute;inset:0;z-index:2;width:100%;height:100%;opacity:0;cursor:pointer}
+#sheet.pm-upload-modal .pm-upload-zone>input:disabled{cursor:wait}
+#sheet.pm-upload-modal .pm-upload-zone:focus-within{outline:2px solid var(--color-primary);outline-offset:2px}
+#sheet.pm-upload-modal .pm-upload-drop,#sheet.pm-upload-modal .pm-upload-file{grid-area:1/1;min-width:0;transition:opacity 250ms ease-in-out,transform 250ms ease-in-out,filter 250ms ease-in-out}
+#sheet.pm-upload-modal .pm-upload-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--color-secondary);text-align:center}
+#sheet.pm-upload-modal .pm-upload-drop .icon{width:32px;height:32px}
+#sheet.pm-upload-modal .pm-upload-drop strong{font:var(--type-label-md)}
+#sheet.pm-upload-modal .pm-upload-file{padding:12px;opacity:0;transform:translateY(4px);filter:blur(2px);pointer-events:none}
+#sheet.pm-upload-modal .pm-upload-zone[data-phase]:not([data-phase="idle"]) .pm-upload-drop{opacity:0;transform:translateY(-4px);filter:blur(2px)}
+#sheet.pm-upload-modal .pm-upload-zone[data-phase]:not([data-phase="idle"]) .pm-upload-file{opacity:1;transform:none;filter:none}
+#sheet.pm-upload-modal .pm-upload-row{display:flex;align-items:center;gap:8px;min-width:0}
+#sheet.pm-upload-modal .pm-upload-file-icon{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:8px;background:var(--color-surface)}
+#sheet.pm-upload-modal .pm-upload-icon-swap{display:grid;place-items:center}
+#sheet.pm-upload-modal .pm-upload-icon{grid-area:1/1;display:grid;place-items:center;transition:opacity 250ms ease-in-out,transform 250ms ease-in-out,filter 250ms ease-in-out}
+#sheet.pm-upload-modal .pm-upload-icon .icon{width:16px;height:16px}
+#sheet.pm-upload-modal .pm-upload-icon[data-icon="b"]{opacity:0;transform:scale(.25);filter:blur(2px)}
+#sheet.pm-upload-modal .pm-upload-icon-swap[data-state="b"] .pm-upload-icon[data-icon="a"]{opacity:0;transform:scale(.25);filter:blur(2px)}
+#sheet.pm-upload-modal .pm-upload-icon-swap[data-state="b"] .pm-upload-icon[data-icon="b"]{opacity:1;transform:scale(1);filter:none}
+#sheet.pm-upload-modal .pm-upload-file-copy{display:flex;flex:1;flex-direction:column;min-width:0}
+#sheet.pm-upload-modal .pm-upload-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-label-md)}
+#sheet.pm-upload-modal .pm-upload-file-copy small,#sheet.pm-upload-modal .pm-upload-percent{font:var(--type-body-sm);color:var(--color-secondary)}
+#sheet.pm-upload-modal .pm-upload-percent{flex:none}
+#sheet.pm-upload-modal .pm-upload-bar{display:block;height:4px;margin-top:12px;overflow:hidden;border-radius:999px;background:var(--color-disabled)}
+#sheet.pm-upload-modal .pm-upload-bar span{display:block;width:100%;height:100%;background:var(--color-primary);transform:scaleX(0);transform-origin:left;transition:transform 150ms cubic-bezier(.22,1,.36,1)}
+#sheet.pm-upload-modal .pm-upload-note{margin:12px 0 0;font:var(--type-body-sm);color:var(--color-secondary)}
+#sheet.pm-upload-modal .pm-upload-error:empty{display:none}
+#sheet.pm-upload-modal .pm-upload-error{margin:8px 0 0;font:var(--type-body-sm);color:var(--color-error)}
+#sheet.pm-upload-modal .pm-upload-hidden-preview{display:none!important}
+#sheet.pm-upload-modal .pm-upload-foot{display:flex;gap:8px;margin-top:16px}
+#sheet.pm-upload-modal .pm-upload-button{flex:1;min-height:44px;border:1px solid var(--color-primary);border-radius:10px;background:var(--color-primary);color:var(--color-surface);font:var(--type-label-md);cursor:pointer;transition:transform 150ms,opacity 150ms}
+#sheet.pm-upload-modal .pm-upload-button:active{transform:scale(.97)}
+#sheet.pm-upload-modal .pm-upload-button.is-secondary{border-color:var(--color-border);background:var(--color-surface);color:var(--color-on-surface)}
+#sheet.pm-upload-modal .pm-upload-button:disabled{opacity:.5;cursor:default}
+#sheet.pm-upload-modal .pm-upload-button-label,#sheet.pm-upload-modal .pm-upload-file-status{display:inline-block;transition:opacity 150ms ease-in-out,transform 150ms ease-in-out,filter 150ms ease-in-out}
+#sheet.pm-upload-modal .is-exit{opacity:0;transform:translateY(-4px);filter:blur(2px)}
+#sheet.pm-upload-modal .is-enter-start{opacity:0;transform:translateY(4px);filter:blur(2px)}
+@media(prefers-reduced-motion:reduce){#sheet.pm-upload-modal,#sheet.pm-upload-modal *{transition:none!important;animation:none!important}}
