@@ -96,7 +96,7 @@ detail = function(){
       ${author ? `<div class="dt-author">${authorPhoto ? `<img src="${esc(authorPhoto)}" alt="">` : `<span class="dt-author-fallback" aria-hidden="true">@</span>`}<span>게시물 작성자 <b>@${esc(author)}</b></span></div>` : ''}
       ${x.desc ? x.source === '직접 추가' || x.aiSummary === false
         ? `<section class="dtsum" data-dtsum><h2>${icon('spark')}장소 설명</h2>${dtSummaryBody(x.desc)}</section>`
-        : `<section class="dtsum dtai-review"><h2 class="dtai">${dtAiSparkIcon()}<span>AI 컨텐츠 요약</span><button type="button" class="dtai-info-button" data-dtai-info aria-label="AI 컨텐츠 요약 안내"><span aria-hidden="true">i</span></button></h2>${dtAiSummaryBody(x)}</section>` : ''}
+        : `<section class="dtsum dtai-review"><h2 class="dtai">${icon('spark')}<span>AI 컨텐츠 요약</span><button type="button" class="dtai-info-button" data-dtai-info aria-label="AI 컨텐츠 요약 안내"><span aria-hidden="true">i</span></button></h2>${dtAiSummaryBody(x)}</section>` : ''}
       ${extractionInfo}
       ${eventInfo}
       ${memoInfo}
@@ -404,10 +404,6 @@ document.addEventListener('click', async event => {
 });
 
 /* 직접 추가한 장소 설명은 첫 문장을 접힌 상태로 보여 줍니다. */
-// 2026-11-24: AI 컨텐츠 요약 아이콘은 디자인 시스템 gradient(#C6F5E1→#AFF3E4)로 채워요(Figma Icon / spark / gradient).
-function dtAiSparkIcon(){
-  return `<svg class="icon dtai-spark" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="dtai-spark-gradient" x1="2" y1="12" x2="22" y2="12" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#C6F5E1"/><stop offset="1" stop-color="#AFF3E4"/></linearGradient></defs><path d="${paths.spark}"/></svg>`;
-}
 function dtSummaryBody(text){
   const all = String(text || '').trim();
   const parts = all.split(/(?<=[.!?。])\s+/);

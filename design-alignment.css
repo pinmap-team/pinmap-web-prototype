@@ -609,7 +609,7 @@ button[aria-busy="true"]>*{visibility:hidden}
 /* 홈: 오른쪽 위 검색·알림 아이콘 뒤 흰 원 없앰 (유리 재질 대체 배경 포함) */
 .main>.topbar .bellbtn{background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:0}
 /* 2026-11-14: reference dock, expanded active capsule and outline icons. */
-.bottomnav,.live-map .bottomnav{width:calc(min(100%,480px) - 2 * var(--gutter))!important;max-width:calc(480px - 2 * var(--gutter))!important;height:72px!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.bottomnav{width:calc(min(100%,480px) - 2 * var(--gutter))!important;max-width:calc(480px - 2 * var(--gutter))!important;height:72px!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important}
 .bottomnav .pm-nav-main{isolation:isolate;display:flex;align-items:center;box-sizing:border-box;width:100%;height:64px;padding:var(--space-xs);border-radius:999px;border:1px solid color-mix(in srgb,var(--color-surface) 88%,transparent)!important;box-shadow:var(--shadow-sm)!important}
 .bottomnav .pm-nav-main::before{background:color-mix(in srgb,var(--color-surface) 94%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6)}
 .bottomnav .pm-nav-main::after{content:none}
@@ -1388,9 +1388,9 @@ html,body{overscroll-behavior-y:contain}
 .lm-heading-cone{background:conic-gradient(from -35deg at 50% 50%,#2789efad 0deg,#2789ef20 70deg,transparent 70deg);transition:transform .22s ease-out}
 
 /* Glass navigation: layered refraction, a brighter rim and no selected-pill shadow. */
-.bottomnav .pm-nav-main{border-color:#ffffffbd!important;box-shadow:0 12px 32px #33333329,0 2px 8px #33333318,inset 0 1px 0 #ffffffdd!important}
-.bottomnav .pm-nav-main::before,.bottomnav .pm-nav-main[data-refraction="true"]::before{background:radial-gradient(ellipse 48% 90% at var(--nav-light) 0%,#ffffffb8,transparent 85%),linear-gradient(150deg,#ffffffbd 0%,#ffffff70 49%,#f0f0f09e 100%);-webkit-backdrop-filter:blur(26px);backdrop-filter:blur(26px)}
-.bottomnav .pm-nav-main::after{content:'';background:conic-gradient(from 115deg,#ffffffeb,#ffffff38 15%,#d4d4d48c 29%,#ffffffec 43%,#ffffff69 65%,#d6d6d671 80%,#ffffffeb)}
+.bottomnav .pm-nav-main{border-color:#ffffffbd!important;box-shadow:0 12px 32px #26334c29,0 2px 8px #26334c18,inset 0 1px 0 #ffffffdd!important}
+.bottomnav .pm-nav-main::before,.bottomnav .pm-nav-main[data-refraction="true"]::before{background:radial-gradient(ellipse 48% 90% at var(--nav-light) 0%,#ffffffb8,transparent 85%),linear-gradient(150deg,#ffffffbd 0%,#ffffff70 49%,#e9f0ff9e 100%);-webkit-backdrop-filter:blur(26px) saturate(1.95);backdrop-filter:blur(26px) saturate(1.95)}
+.bottomnav .pm-nav-main::after{content:'';background:conic-gradient(from 115deg,#ffffffeb,#ffffff38 15%,#c5d3f58c 29%,#ffffffec 43%,#ffffff69 65%,#cbd7f371 80%,#ffffffeb)}
 .bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffffed,#f3f3f3af 68%,#ffffffc4)!important;border-color:#ffffffdf!important;box-shadow:none!important;transition:left .34s cubic-bezier(.2,.9,.25,1.2)}
 [data-theme="dark"] .bottomnav .pm-nav-main::before,[data-theme="dark"] .bottomnav .pm-nav-main[data-refraction="true"]::before{background:linear-gradient(145deg,#474747b8,#2b2b2ba8 60%,#434343a8)}
 [data-theme="dark"] .bottomnav .pm-nav-main .pm-nav-indicator{background:linear-gradient(145deg,#ffffff42,#ffffff13)!important;border-color:#ffffff52!important;box-shadow:none!important}
@@ -1453,29 +1453,6 @@ html,body{overscroll-behavior-y:contain}
 @keyframes pinmap-heart-dot{0%{translate:12px var(--side);opacity:0;scale:1}12%{opacity:1}100%{translate:calc(25px + var(--far)) calc(var(--side)*1.6);opacity:1;scale:0}}
 @media(prefers-reduced-motion:reduce){:is(.live-map,.dt-photo) .lm-heart-motion:active{scale:1;transition:none}:is(.live-map,.dt-photo) .lm-heart-motion.is-bursting .lm-heart-glyph,:is(.live-map,.dt-photo) .lm-heart-bloom,:is(.live-map,.dt-photo) .lm-heart-spoke i{animation:none}:is(.live-map,.dt-photo) .lm-heart-burst{display:none}}
 .cfpage .cf-itemtext h3,.cfpage .cf-itemdesc,.cfpage .cf-itemmeta{color:#fff!important;text-shadow:0 1px 5px #0009}
-
-/* The home pill is the menu surface: one shape expands upward from the add action. */
-.home-add-menu{position:fixed;right:calc((100vw - min(100vw,480px)) / 2 + var(--gutter));bottom:calc(104px + env(safe-area-inset-bottom));z-index:4;width:246px;height:116px;pointer-events:none}
-.home-add-body{box-sizing:border-box;position:absolute;right:0;bottom:0;width:90px;height:44px;border:1px solid rgba(255,255,255,.26);border-radius:22px;background:linear-gradient(155deg,rgba(255,255,255,.18),rgba(255,255,255,.03) 48%,rgba(0,0,0,.12)),rgba(17,17,17,.78);-webkit-backdrop-filter:blur(22px) saturate(1.45);backdrop-filter:blur(22px) saturate(1.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 12px 30px rgba(0,0,0,.22);transition:width .42s cubic-bezier(.22,1,.36,1),height .42s cubic-bezier(.22,1,.36,1),border-radius .42s cubic-bezier(.22,1,.36,1),scale .22s cubic-bezier(.22,1,.36,1)}
-.home-add-menu[data-open="true"] .home-add-body{width:246px;height:162px;border-radius:20px}
-.home-add-fab{position:absolute;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:var(--space-xs);width:90px;height:44px;min-height:44px;padding:0;border:0;border-radius:22px;background:transparent;color:#fff;font:var(--type-label-md);cursor:pointer;pointer-events:auto;transition:opacity .16s,scale .22s cubic-bezier(.22,1,.36,1)}
-.home-add-fab .icon{width:18px;height:18px;flex:none}
-.home-add-fab:focus-visible,.home-add-options button:focus-visible{outline:2px solid #fff;outline-offset:2px}
-.home-add-menu[data-sink="true"] :is(.home-add-body,.home-add-fab){scale:.94;transition:scale .16s cubic-bezier(.22,1,.36,1)}
-.home-add-menu[data-open="true"] .home-add-fab{opacity:0;pointer-events:none}
-.home-add-options{position:absolute;right:0;bottom:0;box-sizing:border-box;display:grid;align-content:center;gap:2px;width:246px;height:162px;padding:10px;visibility:hidden;pointer-events:none}
-.home-add-menu[data-open="true"] .home-add-options{visibility:visible;pointer-events:auto}
-.home-add-options button{display:flex;align-items:center;gap:var(--space-md);width:100%;height:46px;padding:0 var(--space-md);border:0;border-radius:var(--rounded-md);background:transparent;color:#fff;font:var(--type-label-md);text-align:left;white-space:nowrap;cursor:pointer;opacity:0;transform:translateY(6px);transition:background .16s,opacity .16s,transform .22s cubic-bezier(.22,1,.36,1)}
-.home-add-options button .icon{width:18px;height:18px;flex:none}
-.home-add-menu[data-open="true"] .home-add-options button{opacity:1;transform:none;transition-delay:30ms}
-.home-add-menu[data-open="true"] .home-add-options button:nth-child(2){transition-delay:52ms}
-.home-add-menu[data-open="true"] .home-add-options button:nth-child(3){transition-delay:74ms}
-.home-add-options button:hover,.home-add-options button:focus-visible{background:rgba(255,255,255,.14)}
-/* 지도 유리 버튼 규칙이 하단 추가 메뉴의 선택 버튼까지 덮지 않도록 메뉴 표면을 분리한다. */
-html body .live-map .bottomnav .home-add-options button{background:transparent!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-html body .live-map .bottomnav .home-add-options button:is(:hover,:focus-visible){background:rgba(255,255,255,.14)!important}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.home-add-body{background:#1b1b1b}}
-@media(prefers-reduced-motion:reduce){.home-add-body,.home-add-fab,.home-add-options button{transition-duration:0s!important}.home-add-menu[data-sink="true"] :is(.home-add-body,.home-add-fab){scale:1}}
 
 /* FAQ: 한 장의 패널이 열린 질문으로 이동하고 답변 높이에 맞춰집니다. */
 .faq-panel-card{position:relative;padding:var(--space-xs);border:1px solid var(--color-disabled);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:none;overflow:hidden}
@@ -1860,20 +1837,10 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 :is(.live-map,.dt-photo) .lm-heart-bloom{border-color:var(--color-accent)}
 @keyframes pinmap-heart-bloom{0%{border-width:17px;border-color:var(--color-accent);scale:.15}40%{border-width:17px;border-color:var(--color-accent);scale:1}75%{opacity:1;border-width:2px}100%{opacity:0;border-width:0;scale:1.12}}
 
-/* 2026-11-23 추가 버튼: 하단 메뉴 가운데(지도와 컬렉션 사이 64px 자리), 살짝 튀어나온 검정 원. 누르면 메뉴 위로 추가 방법이 열려요. */
+/* 하단 네비 가운데 추가 버튼 자리 */
 .bottomnav{overflow:visible!important}
 .bottomnav .pm-nav-main .pm-nav-gap{flex:0 0 64px;height:54px}
 .bottomnav .pm-nav-main .pm-nav-indicator{left:calc(4px + var(--nav-index,0) * (100% - 72px) / 4 + var(--nav-shift,0) * 64px)!important;width:calc((100% - 72px) / 4)!important}
-.bottomnav .home-add-menu{position:absolute!important;left:50%!important;right:auto!important;top:0!important;bottom:auto!important;width:64px!important;height:100%!important;translate:-50% 0;z-index:3;pointer-events:none}
-.bottomnav .home-add-fab{position:absolute!important;left:50%!important;right:auto!important;top:-20px!important;bottom:auto!important;width:60px!important;height:60px!important;min-height:60px;border-radius:50%!important;background:var(--color-primary)!important;color:var(--color-neutral)!important;box-shadow:var(--shadow-md)!important;transform:translateX(-50%);pointer-events:auto;transition:transform .2s cubic-bezier(.3,1.4,.5,1)}
-.bottomnav .home-add-fab .icon{width:26px!important;height:26px!important;stroke-width:2.2}
-.bottomnav .home-add-fab>span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.bottomnav .home-add-fab:active{transform:translateX(-50%) scale(.94)}
-.bottomnav .home-add-menu[data-open="true"] .home-add-fab{opacity:1!important;pointer-events:auto;transform:translateX(-50%) rotate(45deg)}
-.bottomnav .home-add-body,.bottomnav .home-add-options{left:50%!important;right:auto!important;bottom:calc(100% + 32px)!important;translate:-50% 0}
-.bottomnav .home-add-body{width:246px!important;height:162px!important;border-radius:20px!important;opacity:0;scale:.9;transform-origin:50% 100%;transition:opacity .18s,scale .22s cubic-bezier(.3,1.3,.5,1)}
-.bottomnav .home-add-menu[data-open="true"] .home-add-body{opacity:1;scale:1}
-@media(prefers-reduced-motion:reduce){.bottomnav .home-add-fab,.bottomnav .home-add-body{transition:none!important}}
 
 /* 2026-11-23 상단 그리드 통일: 홈·컬렉션·마이 모두 제목 줄 32~88px(가운데 60px), 첫 콘텐츠는 그 아래 12px(space-md)에서 시작 */
 .layout .main:has(.myprofile)>.topbar{margin-bottom:var(--space-md)!important}
@@ -1933,7 +1900,6 @@ body:has(.dt) .bottomnav .home-add-menu{display:none!important}
 
 /* 2026-11-24 하단 메뉴·추가 버튼의 흰 테두리 선 제거(유리 바탕·그림자는 유지) */
 .bottomnav .pm-nav-main,.pm-nav-main{border:0!important;box-shadow:var(--shadow-sm)!important}
-.bottomnav .home-add-fab{border:0!important;outline:0}
 
 /* 2026-11-24 온보딩 2/2 묶음 카드 높이 축소: 고정 높이 없이 내용 + 위아래 space-sm, 아이콘 원 32px */
 #onboarding .ob-screen.step3 .ob-groupcards{grid-auto-rows:auto!important}
@@ -1964,7 +1930,6 @@ body:has(.dt) .bottomnav .home-add-menu{display:none!important}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/nature-active.svg"]{content:url("img/category/nature-active-dark.svg")}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/other-active.svg"]{content:url("img/category/other-active-dark.svg")}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/pets-active.svg"]{content:url("img/category/pets-active-dark.svg")}
-[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/all-active.svg"]{content:url("img/category/all-active-dark.svg")}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/recipe-active.svg"]{content:url("img/category/recipe-active-dark.svg")}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/stay-active.svg"]{content:url("img/category/stay-active-dark.svg")}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/tech-active.svg"]{content:url("img/category/tech-active-dark.svg")}
@@ -2008,9 +1973,7 @@ html body #onboarding .ob-screen.step3 .ob-groupcard{align-content:space-between
 /* 2026-11-24: 프로필 사진 변경 갤러리 아이콘(16~18px)은 작아서 선을 1.3px로 얇게 */
 html body :is(.account-photo-edit,.pfchange) svg.icon :is(path,circle,rect){stroke-width:1.3px!important}
 /* 2026-11-24: 하단 내비 가운데 + 추가 버튼 — 검정 원 위 26px +가 얇아 보여 선 2.2px(예외) */
-html body .bottomnav .home-add-fab svg.icon :is(path,line){stroke-width:2.2px!important}
 /* 2026-11-24: 지도 화면에서도 + 추가 버튼은 홈과 같은 primary 원(지도용 반투명 흰 버튼 스타일이 덮어써 +가 안 보이던 것) */
-html body .bottomnav .home-add-menu .home-add-fab{background:var(--color-primary)!important;color:var(--color-neutral)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 /* 2026-11-24: 작게(12~18px) 쓰는 아이콘은 선 1.3px — 카드 메타(시계·핀), 추가 메뉴, 휴대폰 모형, 코스 장소 추가·제목 편집, AI 설명, 프로필 사진 변경. 펼침·오른쪽 화살표와 체크는 1.7px 유지 */
 html body :is(.cf-itemmeta,.home-add-options,.ob-phone,.course-add-place,.dtai,.account-photo-edit,.pfchange) svg.icon :is(path,circle,rect,line),html body .course-title-edit svg :is(path,circle,rect,line){stroke-width:1.3px!important}
 /* 지도 사진 배지(16px) 카테고리 아이콘은 선 1.3px 전용 파일 */
@@ -2059,7 +2022,7 @@ html body .dtsum,html body [data-theme="dark"] .dtsum,html body .dt.dt-photo .dt
 html body .dtsum h2.dtai{background:transparent!important}
 html[data-theme="dark"] body .dt.dt-photo .dtsheet>.dtsum,html[data-theme="dark"] body .dtsum{background:var(--gradient-accent)!important}
 /* AI 컨텐츠 요약은 참고 화면처럼 회색 카드와 칩을 사용한다. 직접 추가한 장소 설명은 기존 배경을 유지한다. */
-html body .dtsum:has(>h2.dtai),html body .dt.dt-photo .dtsheet>.dtsum:has(>h2.dtai){background:#F4F4F4!important;box-shadow:none!important}
+html body .dtsum:has(>h2.dtai),html body .dt.dt-photo .dtsheet>.dtsum:has(>h2.dtai){background:#F4F4F6!important;box-shadow:none!important}
 html[data-theme="dark"] body .dtsum:has(>h2.dtai),html[data-theme="dark"] body .dt.dt-photo .dtsheet>.dtsum:has(>h2.dtai){background:var(--color-surface)!important}
 html body .dtsum.dtai-review h2.dtai{display:flex;align-items:center;gap:var(--space-sm);width:100%;margin:0 0 var(--space-lg);padding:0;font:var(--type-headline-md);color:#333!important}
 html[data-theme="dark"] body .dtsum.dtai-review h2.dtai{color:var(--color-on-surface)!important}
@@ -2308,92 +2271,263 @@ html body .homecategories .pm-category-mask[data-cat="travel"]{-webkit-mask-size
 /* 한글 글자 획이 줄 상자 위쪽에 몰려 칩 가운데보다 약 2px 높게 보여서, 칩 안쪽 위 여백 space-xs로 글자와 아이콘을 함께 칩 세로 가운데로 */
 html body .homecategories .prefchip{padding-top:var(--space-xs)!important;padding-bottom:0!important}
 
-
-/* 2026-11-24 마이 레이아웃 정리 — 카드 안쪽 여백 16, 카드 사이 12, 모서리 16, 그림자 shadow-sm로 통일.
-   메뉴 줄은 아이콘·화살표를 카드 바깥선(좌우 24px 여백)에 맞춰요. */
-html body .myprofile.profilecard{min-height:0!important;padding:var(--space-lg)!important;margin:0 0 var(--space-md)!important;gap:var(--space-lg)!important;border:0!important;border-radius:var(--rounded-lg)!important;background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important}
-html body .myprofile .myprofile-go{justify-items:end!important;margin-right:0!important}
-html body .my-quick{gap:var(--space-md)!important;margin:0 0 var(--space-md)!important}
-html body .my-quick .myq-card{padding:var(--space-lg)!important;gap:var(--space-sm)!important;border:0!important;border-radius:var(--rounded-lg)!important;background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important}
-html body .my-quick .myq-card .myq-ico{margin:0!important}
-html body .mgroup.my-section:not(.my-quota) .mrow{padding:0!important}
-
-/* 2026-11-24: 지도 목록 아이콘의 점은 칠한 원 */
-html body .live-map .lm-list-tab svg.pm-list-icon circle.pm-list-dot{fill:currentColor!important;stroke:none!important;stroke-width:0!important}
-/* 2026-11-24: AI 컨텐츠 요약 아이콘 — gradient 채움·선 */
-html body .dtsum h2.dtai svg.dtai-spark path{fill:url(#dtai-spark-gradient)!important;stroke:url(#dtai-spark-gradient)!important}
-/* 2026-11-24: 하단 메뉴 호버 — 흰 글씨 대신 진한 글씨 + 옅은 회색 둥근 배경 */
-@media(hover:hover){
-  html body .bottomnav .pm-nav-main .navitem:not(.active):hover,html body .bottomnav .pm-nav-main .navitem:not(.active):hover *{color:var(--color-on-surface)!important}
-  html body .bottomnav .pm-nav-main .navitem:not(.active):hover svg.icon{stroke:var(--color-on-surface)!important}
-  html body .bottomnav .pm-nav-main .navitem:not(.active):hover{background:color-mix(in srgb,var(--color-on-surface) 7%,transparent)!important;border-radius:999px!important}
-  html[data-theme="dark"] body .bottomnav .pm-nav-main .navitem:not(.active):hover{background:color-mix(in srgb,var(--color-on-surface) 10%,transparent)!important}
+/* transitions.dev Pro Gooey plus menu: source motion and SVG geometry, anchored to Pinmap's centre nav action. */
+.t-goo-anchor{
+  --goo-open-dur:350ms;--goo-open-ease:cubic-bezier(0.34,1.56,0.64,1);
+  --goo-close-dur:250ms;--goo-close-ease:cubic-bezier(0.22,1,0.36,1);
+  --goo-stagger:40ms;--goo-spread:1;--goo-blur:6;--goo-contrast:18;
+  --goo-icon-dur:250ms;--goo-icon-rotate:45deg;--goo-icon-ease:ease-in-out;
+  --goo-anticip:5px;--goo-anticip-dur:700ms;--goo-anticip-ease:cubic-bezier(0.22,1,0.36,1);
+  --goo-surface:var(--color-primary);--goo-icon-color:var(--color-neutral);
 }
-/* 2026-11-24: 캘린더 위 카테고리 버튼 — 아이콘 20px·글자 높이 통일 */
-html body .calcat{height:36px;min-height:36px;gap:6px;padding:0 var(--space-md) 0 10px;line-height:1}
-html body .calcat :is(img.pm-category-icon,svg.icon){display:block;flex:none;width:20px!important;height:20px!important;margin:0!important;transform-origin:50% 50%}
-html body .calcat span{display:block;line-height:20px}
-/* 2026-11-24: 캘린더 기간 막대 — 일정마다 진하기를 달리해 구분 */
-html body .calspan.tone-0{background:var(--color-accent)}
-html body .calspan.tone-1{background:color-mix(in srgb,var(--color-accent) 60%,transparent)}
-html body .calspan.tone-2{background:color-mix(in srgb,var(--color-accent) 36%,transparent)}
-html body .calspan.tone-3{background:color-mix(in srgb,var(--color-accent) 20%,transparent)}
 
-/* 2026-11-24: 홈 카테고리 칩 — 글자도 아이콘과 같은 색(기본 icon-muted, 마우스 올림·포커스 icon-hover) */
-html body .homecategories .prefchip{color:var(--color-icon-muted)!important;transition:color .15s}
-html body .homecategories .prefchip .pm-category-mask{transition:background-color .15s}
-html body .homecategories .prefchip:is(:hover,:focus-visible){color:var(--color-icon-hover)!important}
-html body .homecategories .prefchip:is(:hover,:focus-visible) *{color:inherit!important}
+/* Anchor reserves the OPEN fan's footprint so nothing reflows when
+   the menu opens. */
+.t-goo-anchor {
+  position: relative;
+  width: 200px;
+  height: 140px;
+}
 
-/* 2026-11-24: 캘린더 위 카테고리 버튼 아이콘 — 실제 화면(402×874, 4배 캡처)에서 그려진 모양을 재서 맞춤.
-   그려진 모양의 긴 변을 17px로 통일하고, 모양 중심을 20px 칸 가운데·글자 세로 중심(1.25px 위)에 맞춰요. */
-html body .calcat img.pm-category-icon[src*="/all-inactive.svg"]{transform:translate(-0.00px,-1.25px) scale(1.094)!important}
-html body .calcat img.pm-category-icon[src*="/food-inactive.svg"]{transform:translate(-0.59px,-1.25px) scale(0.958)!important}
-html body .calcat img.pm-category-icon[src*="/cafe-inactive.svg"]{transform:translate(-1.00px,-2.50px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/exhibition-inactive.svg"]{transform:translate(-0.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/festival-inactive.svg"]{transform:translate(-0.00px,-2.06px) scale(0.919)!important}
-html body .calcat img.pm-category-icon[src*="/nature-inactive.svg"]{transform:translate(-1.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/travel-inactive.svg"]{transform:translate(-1.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/stay-inactive.svg"]{transform:translate(-0.00px,-1.75px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/activity-inactive.svg"]{transform:translate(0.88px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/fashion-inactive.svg"]{transform:translate(-0.82px,-1.25px) scale(0.932)!important}
-html body .calcat img.pm-category-icon[src*="/beauty-inactive.svg"]{transform:translate(-0.92px,-1.25px) scale(0.919)!important}
-html body .calcat img.pm-category-icon[src*="/interior-inactive.svg"]{transform:translate(-0.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/tech-inactive.svg"]{transform:translate(-0.00px,-1.25px) scale(0.919)!important}
-html body .calcat img.pm-category-icon[src*="/recipe-inactive.svg"]{transform:translate(-0.59px,-1.61px) scale(0.958)!important}
-html body .calcat img.pm-category-icon[src*="/fitness-inactive.svg"]{transform:translate(-0.93px,-1.25px) scale(0.845)!important}
-html body .calcat img.pm-category-icon[src*="/pets-inactive.svg"]{transform:translate(-0.00px,-0.79px) scale(0.919)!important}
-html body .calcat img.pm-category-icon[src*="/family-inactive.svg"]{transform:translate(1.21px,-2.10px) scale(0.971)!important}
-html body .calcat img.pm-category-icon[src*="/learning-inactive.svg"]{transform:translate(-1.00px,-1.50px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/career-inactive.svg"]{transform:translate(-1.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/finance-inactive.svg"]{transform:translate(-0.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/life-inactive.svg"]{transform:translate(-0.00px,-1.25px) scale(0.919)!important}
-html body .calcat img.pm-category-icon[src*="/creative-inactive.svg"]{transform:translate(-1.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/media-inactive.svg"]{transform:translate(-0.82px,-2.07px) scale(0.932)!important}
-html body .calcat img.pm-category-icon[src*="/humor-inactive.svg"]{transform:translate(-0.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/other-inactive.svg"]{transform:translate(-0.00px,-0.90px) scale(0.919)!important}
-html body .calcat img.pm-category-icon[src*="/all-active.svg"]{transform:translate(-0.00px,-1.25px) scale(1.094)!important}
-html body .calcat img.pm-category-icon[src*="/food-active.svg"]{transform:translate(-0.59px,-1.25px) scale(0.958)!important}
-html body .calcat img.pm-category-icon[src*="/cafe-active.svg"]{transform:translate(-1.00px,-2.50px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/exhibition-active.svg"]{transform:translate(-0.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/festival-active.svg"]{transform:translate(-0.00px,-2.06px) scale(0.919)!important}
-html body .calcat img.pm-category-icon[src*="/nature-active.svg"]{transform:translate(-1.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/travel-active.svg"]{transform:translate(-1.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/stay-active.svg"]{transform:translate(-0.00px,-1.75px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/activity-active.svg"]{transform:translate(0.88px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/fashion-active.svg"]{transform:translate(-0.82px,-1.25px) scale(0.932)!important}
-html body .calcat img.pm-category-icon[src*="/beauty-active.svg"]{transform:translate(-0.92px,-1.25px) scale(0.919)!important}
-html body .calcat img.pm-category-icon[src*="/interior-active.svg"]{transform:translate(-0.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/tech-active.svg"]{transform:translate(-0.00px,-1.25px) scale(0.919)!important}
-html body .calcat img.pm-category-icon[src*="/recipe-active.svg"]{transform:translate(-0.59px,-1.61px) scale(0.958)!important}
-html body .calcat img.pm-category-icon[src*="/fitness-active.svg"]{transform:translate(-0.93px,-1.25px) scale(0.845)!important}
-html body .calcat img.pm-category-icon[src*="/pets-active.svg"]{transform:translate(-0.00px,-1.00px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/family-active.svg"]{transform:translate(1.21px,-2.10px) scale(0.971)!important}
-html body .calcat img.pm-category-icon[src*="/learning-active.svg"]{transform:translate(-1.00px,-1.37px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/career-active.svg"]{transform:translate(-1.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/finance-active.svg"]{transform:translate(-0.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/life-active.svg"]{transform:translate(-0.00px,-1.25px) scale(0.919)!important}
-html body .calcat img.pm-category-icon[src*="/creative-active.svg"]{transform:translate(-1.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/media-active.svg"]{transform:translate(-0.82px,-2.07px) scale(0.932)!important}
-html body .calcat img.pm-category-icon[src*="/humor-active.svg"]{transform:translate(-0.00px,-1.25px) scale(1.000)!important}
-html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:translate(-0.00px,-0.90px) scale(0.919)!important}
+/* Blob layer — carries the goo AND the shadow. Plain filled circles
+   mirroring the button geometry 1:1; the filter runs goo FIRST, then
+   shadows the merged silhouette, so one consistent shadow hugs the
+   liquid through every state. */
+.t-goo-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  /* Promote the filtered layer: WebKit otherwise repaints the goo a
+     frame or two behind the plain-DOM buttons, which reads as the
+     icons running ahead of their surface. */
+  will-change: filter, transform;
+}
+
+/* transform, NOT the individual `translate:` property — WebKit's
+   support for individual transform properties on SVG elements (and
+   inside keyframes) is what breaks the fan sync, the anticipation and
+   the easings in Safari. Classic transform is solid everywhere. */
+.t-goo-blob {
+  fill: var(--goo-surface, #ffffff);
+  transform: translate(0, 0);
+  transform-box: fill-box;
+  transition: transform var(--goo-close-dur) var(--goo-close-ease);
+  will-change: transform;
+}
+.t-goo-anchor[data-open="true"] .t-goo-blob {
+  transform: translate(calc(var(--fx, 0px) * var(--goo-spread)),
+                       calc(var(--fy, 0px) * var(--goo-spread)));
+  transition: transform var(--goo-open-dur) var(--goo-open-ease);
+  transition-delay: calc(var(--i, 0) * var(--goo-stagger));
+}
+
+/* UI layer — transparent hit targets + crisp icons only; the goo
+   liquid below is the visible surface (and its filter derives the
+   shadow from the merged silhouette). */
+.t-goo-item,
+.t-goo-main {
+  position: absolute;
+  left: 80px;
+  top: 80px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--goo-icon-color, #17181c);
+  -webkit-tap-highlight-color: transparent;
+  transform: translate(0, 0);
+  transition: transform var(--goo-close-dur) var(--goo-close-ease),
+              background-color 120ms ease;
+  will-change: transform;
+}
+/* Satellites are inert while closed — they're stacked under the main
+   button and must not swallow its clicks. */
+.t-goo-item { pointer-events: none; }
+.t-goo-anchor[data-open="true"] .t-goo-item {
+  pointer-events: auto;
+  transform: translate(calc(var(--fx, 0px) * var(--goo-spread)),
+                       calc(var(--fy, 0px) * var(--goo-spread)));
+  transition: transform var(--goo-open-dur) var(--goo-open-ease),
+              background-color 120ms ease;
+  transition-delay: calc(var(--i, 0) * var(--goo-stagger)), 0ms;
+}
+.t-goo-anchor[data-open="true"] .t-goo-item:hover { background: rgba(0, 0, 0, 0.04); }
+.t-goo-main:focus-visible,
+.t-goo-item:focus-visible {
+  outline: 2px solid #17181c;
+  outline-offset: 2px;
+}
+
+/* Satellite icons hold back while the blob is still merged with the
+   main button, then cross-blur in as it pulls clear — icons floating
+   free of any surface breaks the liquid illusion. On close they clear
+   out inside the first stretch of the retraction, mirroring how they
+   arrive a third of the way into the open; lingering icons read as
+   detached the moment the goo layer repaints even a frame late. */
+.t-goo-item svg {
+  display: block;
+  opacity: 0;
+  filter: blur(2px);
+  transition: opacity 120ms ease, filter 120ms ease;
+}
+/* Icons materialise with a 2px cross-blur early in the flight (a short
+   fixed head start per satellite), so they ride the button into place
+   instead of popping after it lands. */
+.t-goo-anchor[data-open="true"] .t-goo-item svg {
+  opacity: 1;
+  filter: blur(0);
+  transition: opacity 180ms ease, filter 180ms ease;
+  transition-delay: calc(var(--i, 0) * var(--goo-stagger) + 120ms),
+                    calc(var(--i, 0) * var(--goo-stagger) + 120ms);
+}
+
+/* Close anticipation — the button (and its blob, so the goo follows)
+   nudges down into the returning satellites' momentum and settles
+   back. The driver adds .is-anticipating for the keyframes' duration
+   on close. */
+@keyframes t-goo-anticipate {
+  0%   { transform: translateY(0); }
+  30%  { transform: translateY(var(--goo-anticip)); }
+  100% { transform: translateY(0); }
+}
+/* The nudge rides the WHOLE goo layer, not just the main blob: with
+   every blob stacked at the centre when closed, moving one circle
+   inside the union merely stretches the silhouette vertically — the
+   layer moving as one is what reads as the button physically dipping.
+   Satellites still mid-flight keep their own return transitions
+   relative to the moving layer. */
+.t-goo-anchor.is-anticipating .t-goo-layer,
+.t-goo-anchor.is-anticipating .t-goo-main {
+  /* Longhands, not the `animation` shorthand: WebKit mis-parses var()
+     inside the shorthand and falls back to 0s / defaults. */
+  animation-name: t-goo-anticipate;
+  animation-duration: var(--goo-anticip-dur);
+  animation-timing-function: var(--goo-anticip-ease);
+  animation-fill-mode: both;
+}
+
+/* Plus → X: pure rotation — the plus glyph spun 45° IS the X, so one
+   icon covers both states with a single tween. */
+.t-goo-swap {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  transform: rotate(0deg);
+  transition: transform var(--goo-icon-dur) var(--goo-icon-ease);
+}
+.t-goo-anchor[data-open="true"] .t-goo-swap { transform: rotate(var(--goo-icon-rotate)); }
+.t-goo-icon {
+  grid-area: 1 / 1;
+  display: inline-flex;
+}
+.t-goo-icon svg { display: block; }
+
+@media (prefers-reduced-motion: reduce) {
+  .t-goo-blob,
+  .t-goo-item,
+  .t-goo-item svg,
+  .t-goo-swap,
+  .t-goo-icon { transition: none !important; }
+  .t-goo-anchor.is-anticipating .t-goo-layer,
+  .t-goo-anchor.is-anticipating .t-goo-main { animation: none !important; }
+}
+
+/* Keep the existing 60px nav affordance visually sized through an enlarged source fan. */
+.bottomnav .home-add-menu.t-goo-anchor{position:absolute;left:50%;top:-76px;z-index:3;transform:translateX(-50%) scale(1.35);transform-origin:50% 100%;pointer-events:none}
+.bottomnav .home-add-options{display:contents}
+.bottomnav .t-goo-main,.bottomnav .t-goo-item{left:78px;top:78px;min-width:44px;min-height:44px;width:44px;height:44px;background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.bottomnav .t-goo-main{pointer-events:auto}
+.bottomnav .t-goo-main .icon{width:20px;height:20px;stroke-width:2.2}
+.bottomnav .t-goo-item .icon{width:16px;height:16px;stroke-width:1.7}
+.bottomnav .t-goo-item:focus-visible,.bottomnav .t-goo-main:focus-visible{outline:2px solid var(--color-neutral);outline-offset:2px}
+.bottomnav .t-goo-item:hover{background:color-mix(in srgb,var(--color-neutral) 12%,transparent)!important}
+
+/* transitions.dev Toggle: original 44×22 track, pill thumb, colors and bounce. */
+.t-toggle{
+  --toggle-dur:350ms;
+  --toggle-travel:14.66px;
+  --toggle-ov1:1px;
+  --toggle-ov2:0px;
+  --toggle-track:0ms;
+  --toggle-ease:cubic-bezier(0.34,1.35,0.64,1);
+  transition:background var(--toggle-track) var(--toggle-ease);
+}
+html body .setrow .sw.t-toggle{background:rgba(0,0,0,.12)!important}
+html[data-theme="dark"] body .setrow .sw.t-toggle{background:rgba(255,255,255,.15)!important}
+html body .setrow .sw.t-toggle[data-on="true"]{background:rgba(0,60,255,.8)!important}
+.t-toggle-thumb{position:absolute;top:3.67px;left:3.67px;width:22px;height:14.67px;border-radius:122px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.05),0 4px 42px rgba(0,0,0,.06);translate:0 0;will-change:translate}
+.t-toggle[data-on="true"] .t-toggle-thumb{translate:var(--toggle-travel) 0}
+.t-toggle.is-init[data-on="true"] .t-toggle-thumb{animation:t-toggle-on var(--toggle-dur) var(--toggle-ease) both}
+.t-toggle.is-init[data-on="false"] .t-toggle-thumb{animation:t-toggle-off var(--toggle-dur) var(--toggle-ease) both}
+@keyframes t-toggle-on{
+  0%{translate:0 0}
+  55%{translate:calc(var(--toggle-travel) + var(--toggle-ov1)) 0}
+  80%{translate:calc(var(--toggle-travel) - var(--toggle-ov2)) 0}
+  100%{translate:var(--toggle-travel) 0}
+}
+@keyframes t-toggle-off{
+  0%{translate:var(--toggle-travel) 0}
+  55%{translate:calc(0px - var(--toggle-ov1)) 0}
+  80%{translate:var(--toggle-ov2) 0}
+  100%{translate:0 0}
+}
+@media(prefers-reduced-motion:reduce){.t-toggle{transition:none!important}.t-toggle-thumb{animation:none!important}}
+/* Shared ZIP and screenshot upload modal, adapted from the supplied Upload modal. */
+#sheet.pm-upload-modal{position:fixed;inset:0;margin:auto;width:min(300px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 32px);box-sizing:border-box;padding:16px!important;overflow:visible;border:1px solid var(--color-border);border-radius:24px!important;background:var(--color-surface);color:var(--color-on-surface);box-shadow:var(--shadow-md);opacity:0;transform:scale(.96);transition:opacity 250ms cubic-bezier(.22,1,.36,1),transform 250ms cubic-bezier(.22,1,.36,1)}
+#sheet.pm-upload-modal.is-open{opacity:1;transform:scale(1)}
+#sheet.pm-upload-modal.is-closing{opacity:0;transform:scale(.96);transition-duration:150ms}
+#sheet.pm-upload-modal::backdrop{background:rgb(0 0 0 / .3)}
+#sheet.pm-upload-modal .handle{display:none}
+#sheet.pm-upload-modal .dialoghead{display:flex;align-items:start;gap:8px;margin:0 0 4px;padding:0}
+#sheet.pm-upload-modal .dialoghead h2{flex:1;margin:0;font:var(--type-headline-md);color:var(--color-on-surface)}
+#sheet.pm-upload-modal .dialoghead .iconbtn{display:grid;place-items:center;flex:none;width:32px;height:32px;margin:-4px -4px 0 0;padding:0;border:0;border-radius:8px;background:transparent;color:var(--color-secondary);box-shadow:none}
+#sheet.pm-upload-modal .dialoghead .iconbtn .icon{width:16px;height:16px}
+#sheet.pm-upload-modal .pm-upload-form{margin:0}
+#sheet.pm-upload-modal .pm-upload-meta{margin:0 0 16px;font:var(--type-body-sm);color:var(--color-secondary)}
+#sheet.pm-upload-modal .pm-upload-zone{position:relative;display:grid;align-items:center;min-height:112px;box-sizing:border-box;border:1px dashed var(--color-border);border-radius:12px;background:var(--color-neutral);cursor:pointer;transition:border-color 150ms,background 150ms}
+#sheet.pm-upload-modal .pm-upload-zone:hover,#sheet.pm-upload-modal .pm-upload-zone.is-dragover{border-color:var(--color-primary);background:var(--color-surface)}
+#sheet.pm-upload-modal .pm-upload-zone>input{position:absolute;inset:0;z-index:2;width:100%;height:100%;opacity:0;cursor:pointer}
+#sheet.pm-upload-modal .pm-upload-zone>input:disabled{cursor:wait}
+#sheet.pm-upload-modal .pm-upload-zone:focus-within{outline:2px solid var(--color-primary);outline-offset:2px}
+#sheet.pm-upload-modal .pm-upload-drop,#sheet.pm-upload-modal .pm-upload-file{grid-area:1/1;min-width:0;transition:opacity 250ms ease-in-out,transform 250ms ease-in-out,filter 250ms ease-in-out}
+#sheet.pm-upload-modal .pm-upload-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--color-secondary);text-align:center}
+#sheet.pm-upload-modal .pm-upload-drop .icon{width:32px;height:32px}
+#sheet.pm-upload-modal .pm-upload-drop strong{font:var(--type-label-md)}
+#sheet.pm-upload-modal .pm-upload-file{padding:12px;opacity:0;transform:translateY(4px);filter:blur(2px);pointer-events:none}
+#sheet.pm-upload-modal .pm-upload-zone[data-phase]:not([data-phase="idle"]) .pm-upload-drop{opacity:0;transform:translateY(-4px);filter:blur(2px)}
+#sheet.pm-upload-modal .pm-upload-zone[data-phase]:not([data-phase="idle"]) .pm-upload-file{opacity:1;transform:none;filter:none}
+#sheet.pm-upload-modal .pm-upload-row{display:flex;align-items:center;gap:8px;min-width:0}
+#sheet.pm-upload-modal .pm-upload-file-icon{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:8px;background:var(--color-surface)}
+#sheet.pm-upload-modal .pm-upload-icon-swap{display:grid;place-items:center}
+#sheet.pm-upload-modal .pm-upload-icon{grid-area:1/1;display:grid;place-items:center;transition:opacity 250ms ease-in-out,transform 250ms ease-in-out,filter 250ms ease-in-out}
+#sheet.pm-upload-modal .pm-upload-icon .icon{width:16px;height:16px}
+#sheet.pm-upload-modal .pm-upload-icon[data-icon="b"]{opacity:0;transform:scale(.25);filter:blur(2px)}
+#sheet.pm-upload-modal .pm-upload-icon-swap[data-state="b"] .pm-upload-icon[data-icon="a"]{opacity:0;transform:scale(.25);filter:blur(2px)}
+#sheet.pm-upload-modal .pm-upload-icon-swap[data-state="b"] .pm-upload-icon[data-icon="b"]{opacity:1;transform:scale(1);filter:none}
+#sheet.pm-upload-modal .pm-upload-file-copy{display:flex;flex:1;flex-direction:column;min-width:0}
+#sheet.pm-upload-modal .pm-upload-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-label-md)}
+#sheet.pm-upload-modal .pm-upload-file-copy small,#sheet.pm-upload-modal .pm-upload-percent{font:var(--type-body-sm);color:var(--color-secondary)}
+#sheet.pm-upload-modal .pm-upload-percent{flex:none}
+#sheet.pm-upload-modal .pm-upload-bar{display:block;height:4px;margin-top:12px;overflow:hidden;border-radius:999px;background:var(--color-disabled)}
+#sheet.pm-upload-modal .pm-upload-bar span{display:block;width:100%;height:100%;background:var(--color-primary);transform:scaleX(0);transform-origin:left;transition:transform 150ms cubic-bezier(.22,1,.36,1)}
+#sheet.pm-upload-modal .pm-upload-note{margin:12px 0 0;font:var(--type-body-sm);color:var(--color-secondary)}
+#sheet.pm-upload-modal .pm-upload-error:empty{display:none}
+#sheet.pm-upload-modal .pm-upload-error{margin:8px 0 0;font:var(--type-body-sm);color:var(--color-error)}
+#sheet.pm-upload-modal .pm-upload-hidden-preview{display:none!important}
+#sheet.pm-upload-modal .pm-upload-foot{display:flex;gap:8px;margin-top:16px}
+#sheet.pm-upload-modal .pm-upload-button{flex:1;min-height:44px;border:1px solid var(--color-primary);border-radius:10px;background:var(--color-primary);color:var(--color-surface);font:var(--type-label-md);cursor:pointer;transition:transform 150ms,opacity 150ms}
+#sheet.pm-upload-modal .pm-upload-button:active{transform:scale(.97)}
+#sheet.pm-upload-modal .pm-upload-button.is-secondary{border-color:var(--color-border);background:var(--color-surface);color:var(--color-on-surface)}
+#sheet.pm-upload-modal .pm-upload-button:disabled{opacity:.5;cursor:default}
+#sheet.pm-upload-modal .pm-upload-button-label,#sheet.pm-upload-modal .pm-upload-file-status{display:inline-block;transition:opacity 150ms ease-in-out,transform 150ms ease-in-out,filter 150ms ease-in-out}
+#sheet.pm-upload-modal .is-exit{opacity:0;transform:translateY(-4px);filter:blur(2px)}
+#sheet.pm-upload-modal .is-enter-start{opacity:0;transform:translateY(4px);filter:blur(2px)}
+@media(prefers-reduced-motion:reduce){#sheet.pm-upload-modal,#sheet.pm-upload-modal *{transition:none!important;animation:none!important}}

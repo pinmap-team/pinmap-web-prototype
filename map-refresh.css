@@ -97,7 +97,8 @@
 .lm-detail-source{margin:var(--space-md) 0 0;font:var(--type-body-sm);color:var(--lm-muted)}
 .live-map .lm-detail-link{display:flex;align-items:center;justify-content:center;gap:var(--space-sm);width:100%;min-height:44px;margin-top:var(--space-xl);border:1px solid var(--lm-line)!important;border-radius:var(--rounded-md)!important;font:var(--type-label-md)}
 .live-map .lm-detail-link svg{width:16px;height:16px}
-.live-map.has-selected-place .bottomnav{display:none!important}
+body.live-map-page:has(.live-map.has-selected-place)>.bottomnav,
+body.live-map-page:has(.lm-list-sheet:not([hidden]))>.bottomnav{display:none!important}
 .live-map:has(.lm-sheet.is-full) .lm-floating-actions{visibility:hidden;pointer-events:none}
 
 /* Navigation stays visible over the unselected nearby sheet. */
@@ -134,7 +135,7 @@
    Separate the backdrop, moving light and reflective rim so white tint does not
    wash out the content. This is a web material, not Apple's native renderer. */
 @property --nav-light { syntax: '<percentage>'; inherits: true; initial-value: 12.5%; }
-.bottomnav,.live-map .bottomnav{box-shadow:none!important}
+.bottomnav{box-shadow:none!important}
 .bottomnav .pm-nav-main{
   position:relative;
   background:transparent!important;
@@ -146,16 +147,16 @@
 .bottomnav .pm-nav-main::before{
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:radial-gradient(ellipse 35% 110% at var(--nav-light) 0%,#ffffff30,transparent 80%),linear-gradient(180deg,#ffffff38,#ffffff1f 45%,#ffffff2e);
-  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px) saturate(1.55);backdrop-filter:blur(3px) saturate(1.55);
   box-shadow:none;
 }
 .bottomnav .pm-nav-optics{position:absolute;width:0!important;height:0!important;overflow:hidden;pointer-events:none}
 .bottomnav .pm-nav-main[data-refraction="true"]::before{
-  backdrop-filter:url("#pm-nav-refraction") blur(1.5px);
+  backdrop-filter:url("#pm-nav-refraction") blur(1.5px) saturate(1.55);
 }
 .bottomnav .pm-nav-main::after{
   content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1.25px;pointer-events:none;z-index:3;
-  background:conic-gradient(from 120deg,#ffffffbf,#ffffff24 12%,#66666638 23%,#ffffffeb 38%,#ffffff66 48%,#ffffff1a 62%,#66666630 73%,#ffffffd9 88%,#ffffffbf);
+  background:conic-gradient(from 120deg,#ffffffbf,#ffffff24 12%,#52657938 23%,#ffffffeb 38%,#ffffff66 48%,#ffffff1a 62%,#52657930 73%,#ffffffd9 88%,#ffffffbf);
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;mask-composite:exclude;
 }
