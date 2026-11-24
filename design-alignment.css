@@ -897,6 +897,7 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .cfpage .cf-sec{width:100%}
 .cfpage .cf-sec .cf-tools{display:flex;flex:1 1 100%;width:100%;margin-left:0}
 .cfpage .cf-sec .cf-tools .libsort{order:-1;margin-right:auto}
+.cfpage .cf-sec .cf-tools .cf-textbtn{margin-left:auto}
 .cf-tools .libsort{font:var(--type-body-sm);color:var(--color-secondary)}
 
 /* 2026-11-10 상세: 미트볼 메뉴 · AI 요약 accent 칩 · 큰 가격 · 버튼 규격(Button large 56px, rounded-sm) */

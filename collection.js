@@ -184,7 +184,7 @@ function cfCards(list, pick, canSelect){
   return `<div class="libsection cf-sec">
       ${lead}
       <div class="cf-tools">${pick && !cfSel ? `<button type="button" class="cf-pickbtn" data-action="cfpick">${icon('plus')}담기</button>` : ''}
-      ${cfSel ? '' : `<label class="libsort"><span class="sr">정렬</span><select data-libsort>${sorts.map(([k,v]) => `<option value="${k}" ${libSort===k?'selected':''}>${v}</option>`).join('')}</select>${icon('chevron')}</label>`}${selBtn}</div>
+      <label class="libsort"><span class="sr">정렬</span><select data-libsort>${sorts.map(([k,v]) => `<option value="${k}" ${libSort===k?'selected':''}>${v}</option>`).join('')}</select>${icon('chevron')}</label>${selBtn}</div>
     </div>
     <div class="cf-items">${cfSort(list).map(cfItem).join('')}</div>`;
 }
