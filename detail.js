@@ -96,7 +96,7 @@ detail = function(){
       ${author ? `<div class="dt-author">${authorPhoto ? `<img src="${esc(authorPhoto)}" alt="">` : `<span class="dt-author-fallback" aria-hidden="true">@</span>`}<span>게시물 작성자 <b>@${esc(author)}</b></span></div>` : ''}
       ${x.desc ? x.source === '직접 추가' || x.aiSummary === false
         ? `<section class="dtsum" data-dtsum><h2>${icon('spark')}장소 설명</h2>${dtSummaryBody(x.desc)}</section>`
-        : `<section class="dtsum dtai-review"><h2 class="dtai">${dtAiSparkIcon()}<span>AI 컨텐츠 요약</span><button type="button" class="dtai-info-button" data-dtai-info aria-label="AI 컨텐츠 요약 안내"><span aria-hidden="true">i</span></button></h2>${dtAiSummaryBody(x)}</section>` : ''}
+        : `<section class="dtsum dtai-review"><h2 class="dtai">${dtAiSparkIcon()}<span class="dtai-title t-shimmer" data-text="AI 컨텐츠 요약">AI 컨텐츠 요약</span><button type="button" class="dtai-info-button" data-dtai-info aria-label="AI 컨텐츠 요약 안내"><span aria-hidden="true">i</span></button></h2>${dtAiSummaryBody(x)}</section>` : ''}
       ${extractionInfo}
       ${eventInfo}
       ${memoInfo}

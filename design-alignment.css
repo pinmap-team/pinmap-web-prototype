@@ -2575,18 +2575,20 @@ html body .homecategories .prefchip{padding-top:var(--space-xs)!important;paddin
 .bottomnav .t-goo-item:focus-visible,.bottomnav .t-goo-main:focus-visible{outline:2px solid var(--color-neutral);outline-offset:2px}
 .bottomnav .t-goo-item:hover{background:color-mix(in srgb,var(--color-neutral) 12%,transparent)!important}
 
-/* transitions.dev Shimmer text on the AI summary body. */
-.dtai-body.t-shimmer{
+/* Keep the Shimmer text visible in the heading and across multi-line summaries. */
+.dtsum.dtai-review .t-shimmer{
   --shimmer-dur:2000ms;
-  --shimmer-base:#555;
-  --shimmer-highlight:#0d0d0d;
-  --shimmer-band:400%;
+  --shimmer-base:var(--color-secondary);
+  --shimmer-highlight:#111;
+  --shimmer-band:240%;
   --shimmer-ease:linear;
   position:relative;
-  display:block;
+  display:inline-block;
 }
+.dtai-body.t-shimmer{display:block}
+html body .dtsum.dtai-review h2.dtai .dtai-title.t-shimmer{color:var(--shimmer-base)!important}
 html body .dtsum.dtai-review .dtai-body.t-shimmer{color:var(--shimmer-base)!important}
-html[data-theme="dark"] body .dtsum.dtai-review .dtai-body.t-shimmer{--shimmer-base:var(--color-secondary);--shimmer-highlight:#fff;color:var(--shimmer-base)!important}
+html[data-theme="dark"] body .dtsum.dtai-review .t-shimmer{--shimmer-highlight:#fff}
 .t-shimmer::before{
   content:attr(data-text);
   position:absolute;
