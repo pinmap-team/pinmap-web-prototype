@@ -467,6 +467,16 @@ document.addEventListener('input', e => {
   cfRefreshRecent();
 });
 
+/* ---------- 하단 메뉴: 검정 캡슐 + 오른쪽 원형 버튼 ---------- */
+// 컬렉션 화면에서는 ‘새 폴더’, 다른 화면에서는 ‘새로 저장’
+const navCore = nav;
+nav = function(){
+  const lib = page === 'library' && !detailId;
+  const fab = lib
+    ? `<button type="button" class="navfab" data-action="newfolder" aria-label="새 폴더 만들기">${icon('folderplus')}</button>`
+    : `<button type="button" class="navfab" data-action="save" aria-label="새로 저장">${icon('plus')}</button>`;
+  return `<span class="navcap">${navCore()}</span>${fab}`;
+};
 // 담기 검색창에서 Enter는 검색만 (대화상자가 닫히지 않게)
 document.addEventListener('keydown', e => { if (e.target.id === 'cfpickq' && e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
 

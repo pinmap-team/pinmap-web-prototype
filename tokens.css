@@ -9,7 +9,7 @@
   /* 2026-11-10 승인: 기존 민트 40% + 흰색의 결과를 불투명한 공통 키 컬러로 고정 */
   --color-accent:#C6F5E1;
   /* 2026-11-24 사용자 승인: 홈 카테고리 칩 아이콘 기본·마우스 올림 색 */
-  --color-icon-muted:#9C9C9C;--color-icon-hover:#4C4C4C;
+  --color-icon-muted:#737373;--color-icon-hover:#333333;
   /* 2026-11-24 사용자 승인: 기존 그라디언트(Figma Pinmap/gradients/accent). 직접 추가한 장소 설명에 유지 */
   --gradient-accent:linear-gradient(90deg,#C6F5E1 0%,#AFF3E4 100%);
   --type-headline-lg:700 28px/36px var(--font-family);
@@ -30,7 +30,7 @@
   --color-neutral:#1E1E1E;--color-surface:#2A2A2A;--color-on-surface:#F4F4F4;
   --color-secondary:#B4B4B4;--color-border:#8A8A8A;--color-primary:#F4F4F4;
   --color-primary-pressed:#D4D4D4;--color-disabled:#3D3D3D;--color-error:#D73535;--color-accent:#C6F5E1;
-  --color-icon-muted:#8A8A8A;--color-icon-hover:#D4D4D4;
+  --color-icon-muted:#A3A3A3;--color-icon-hover:#F4F4F4;
   --shadow-sm:0 1px 2px rgba(0,0,0,.18),0 6px 20px rgba(0,0,0,.26);
   --shadow-md:0 10px 32px rgba(0,0,0,.34);
 }

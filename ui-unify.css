@@ -88,7 +88,7 @@
 .live-map.has-selected-place .bottomnav{display:flex!important}
 
 /* Keep the existing glass dock and enlarge its geometry and contents together. */
-.bottomnav{width:min(calc(100% - 64px),304px)!important;max-width:304px!important;height:68px!important}
+.bottomnav,.live-map .bottomnav{width:min(calc(100% - 64px),304px)!important;max-width:304px!important;height:68px!important}
 .bottomnav .pm-nav-main{height:66px;border-radius:35px}
 .bottomnav .pm-nav-main .navitem{height:58px!important;border-radius:29px!important;gap:2px}
 .bottomnav .pm-nav-main .navitem .navicon{width:42px!important;height:33px!important}

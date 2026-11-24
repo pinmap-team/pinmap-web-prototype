@@ -78,6 +78,7 @@ dialog::backdrop{background:rgba(17,17,17,.28);-webkit-backdrop-filter:blur(4px)
 .mrow+.mrow{border-top:1px solid var(--t-line)}
 .pavatar{background:var(--t-ink)!important;color:var(--color-neutral)!important}
 .sharepromo{background:var(--t-glass)!important;border:1px solid color-mix(in srgb,var(--color-surface) 80%,transparent)!important;-webkit-backdrop-filter:var(--t-blur);backdrop-filter:var(--t-blur);box-shadow:var(--t-shadow)}
+.sw{background:var(--color-disabled)!important}.setrow input:checked+.sw{background:var(--t-ink)!important}
 
 /* 튜토리얼 */
 .cm-hole{outline-color:var(--color-surface)!important;box-shadow:0 0 0 9999px rgba(17,17,17,.62)!important}

@@ -5,7 +5,7 @@
   // 마이 > 위치 편집: 같은 위치 정보·화면을 쓰는 별도 페이지. 뒤로 가면 마이로 돌아가요.
   PARENT_TAB.myaddresses='my'; PARENT_TAB.myaddressedit='my';
   pageName.myaddresses='위치 편집'; pageName.myaddressedit='위치 편집';
-  let searchMatches=[], draftAddress='', draftCoords=null;
+  let searchMatches=[], draftAddress='', draftCoords=null, draftName='';
   let queryText='', editing=false, editKey=null, pendingDelete=null, origin='map';
   const fromMy=()=>origin==='my';
   const textValue=value=>typeof value==='string'?value:'';
@@ -39,7 +39,7 @@
   </section>`;
   pages.myaddresses=()=>pages.addresses();
   pages.addressedit=()=>{
-    const record=editKey?recordOf(editKey):{label:draftCoords?'현재 위치':'',address:draftAddress,memo:''};
+    const record=editKey?recordOf(editKey):{label:draftName,address:draftAddress,memo:''};
     return `<section class="address-page"><header class="address-header"><button type="button" data-action="addresslist" aria-label="위치 목록으로 돌아가기">${icon('back')}</button><h1 tabindex="-1">${editKey?'위치 편집':'위치 추가'}</h1></header>
     <form id="address-edit-form" class="address-edit-form">
       <label class="field"><span>위치 이름 <small>선택</small></span><input name="label" aria-label="위치 이름" placeholder="집, 학교 등" maxlength="24" value="${esc(record.label)}"></label>
@@ -66,11 +66,28 @@
   pages.myaddressconfirm=pages.addressconfirm;
   function clearConfirmMap(){geoVersion++;confirmMap?.remove();confirmMap=null;confirmHost=null;}
   new MutationObserver(()=>{if(confirmHost&&!confirmHost.isConnected)clearConfirmMap();}).observe($('#app'),{childList:true,subtree:true});
-  function describePoint(point){
+  // 2026-11-24: 지도에서 고른 위치는 주변 장소 이름을 찾아 '위치 이름' 기본값으로 써요('현재 위치' 고정 문구 대신).
+  const placeParts=props=>{
+    const name=props.name||[props.street,props.housenumber].filter(Boolean).join(' ')||props.district||props.locality||'';
+    const address=[props.city||props.county,props.district||props.locality,props.street,props.housenumber].filter(Boolean).join(' ');
+    return {name,address:[name,address].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join(' ')};
+  };
+  let reverseVersion=0;
+  async function describePoint(point){
     if(!onConfirm())return;
-    draftCoords={lat:point.lat,lng:point.lng};draftAddress=`위도 ${point.lat.toFixed(6)}, 경도 ${point.lng.toFixed(6)}`;
-    $('#location-confirm-title').textContent='선택한 위치';$('#location-confirm-detail').textContent=draftAddress+' · 위치 이름은 다음 화면에서 입력해 주세요.';
+    const version=++reverseVersion;
+    draftCoords={lat:point.lat,lng:point.lng};draftName='';draftAddress=`위도 ${point.lat.toFixed(6)}, 경도 ${point.lng.toFixed(6)}`;
+    $('#location-confirm-title').textContent='선택한 위치';$('#location-confirm-detail').textContent='장소 이름을 찾고 있어요…';
     $('#location-confirm-save').disabled=false;
+    try{
+      const response=await fetch(`https://photon.komoot.io/reverse?lat=${point.lat}&lon=${point.lng}&limit=1`);
+      if(!response.ok)throw Error('reverse');
+      const props=(await response.json()).features?.[0]?.properties;
+      if(version!==reverseVersion||!onConfirm())return;
+      if(props){const found=placeParts(props);draftName=found.name.slice(0,24);if(found.address)draftAddress=found.address;}
+    }catch{if(version!==reverseVersion||!onConfirm())return;}
+    $('#location-confirm-title').textContent=draftName||'선택한 위치';
+    $('#location-confirm-detail').textContent=draftName?draftAddress:draftAddress+' · 위치 이름은 다음 화면에서 입력해 주세요.';
   }
   function locateConfirmation(){
     const version=++geoVersion;
@@ -91,7 +108,7 @@
       describePoint(point);
     },error=>fail(error.code===1?'위치 권한을 허용하거나, 돌아가서 위치를 검색해 주세요.':'잠시 후 우측 아래 버튼으로 다시 시도해 주세요.'),{enableHighAccuracy:true,timeout:10000,maximumAge:30000});
   }
-  actions.addressnewcurrent=()=>{clearConfirmMap();draftCoords=null;draftAddress='';go(fromMy()?'myaddressconfirm':'addressconfirm');confirmHost=$('#location-confirm-map');locateConfirmation();};
+  actions.addressnewcurrent=()=>{clearConfirmMap();draftCoords=null;draftAddress='';draftName='';go(fromMy()?'myaddressconfirm':'addressconfirm');confirmHost=$('#location-confirm-map');locateConfirmation();};
   actions.locationconfirmretry=locateConfirmation;
   actions.locationconfirmback=()=>{clearConfirmMap();go(fromMy()?'myaddresssearch':'addresssearch');};
   actions.locationconfirmuse=()=>{if(!onConfirm()||!draftCoords)return;clearConfirmMap();openEditor(null);};
@@ -104,11 +121,11 @@
       const response=await fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(q)+'&lat=37.55&lon=126.98&limit=6');
       if(!response.ok)throw Error('search');const data=await response.json();
       if(!host.isConnected)return;
-      searchMatches=(data.features||[]).map(f=>({address:[f.properties.name,f.properties.city,f.properties.street,f.properties.housenumber].filter(Boolean).join(' '),lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0]}));
+      searchMatches=(data.features||[]).map(f=>({name:String(f.properties.name||f.properties.street||'').slice(0,24),address:[f.properties.name,f.properties.city,f.properties.street,f.properties.housenumber].filter(Boolean).join(' '),lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0]}));
       host.innerHTML=searchMatches.length?searchMatches.map((r,i)=>`<button class="address-search-result" data-new-address="${i}">${icon('pin')}<span>${esc(r.address)}</span>${icon('arrow')}</button>`).join(''):'찾은 위치가 없어요. 장소 이름이나 동네를 바꿔 검색해 보세요.';
     }catch{if(host.isConnected)host.textContent='검색을 완료하지 못했어요. 잠시 후 다시 시도해 주세요.';}
   });
-  document.addEventListener('click',event=>{const b=event.target.closest('[data-new-address]');if(!b)return;const r=searchMatches[Number(b.dataset.newAddress)];if(!r)return;draftAddress=r.address;draftCoords={lat:r.lat,lng:r.lng};openEditor(null);});
+  document.addEventListener('click',event=>{const b=event.target.closest('[data-new-address]');if(!b)return;const r=searchMatches[Number(b.dataset.newAddress)];if(!r)return;draftAddress=r.address;draftName=r.name;draftCoords={lat:r.lat,lng:r.lng};openEditor(null);});
 
   async function commit(next){
     if(PM_ENV.requiresAuth){const previous=settings;settings=next;const saved=await persist();if(!saved)settings=previous;return saved;}
@@ -124,7 +141,7 @@
     addressback:()=>{if(fromMy()){go('my');requestAnimationFrame(()=>$('#app [data-action="myaddresses"]')?.focus());return;}go('map');requestAnimationFrame(()=>$('#app .lm-location-title')?.focus());},
     addressmanage:()=>{editing=true;queryText='';showList();},
     addresscurrent:()=>actions.addressnewcurrent(),
-    addressadd:()=>{if(myPlaces().length>=MAX_PLACES){toast(`위치는 최대 ${MAX_PLACES}개까지 저장할 수 있어요.`);return;}draftAddress='';draftCoords=null;go(fromMy()?'myaddresssearch':'addresssearch');$('#address-new-query')?.focus();},
+    addressadd:()=>{if(myPlaces().length>=MAX_PLACES){toast(`위치는 최대 ${MAX_PLACES}개까지 저장할 수 있어요.`);return;}draftAddress='';draftName='';draftCoords=null;go(fromMy()?'myaddresssearch':'addresssearch');$('#address-new-query')?.focus();},
     addressclear:()=>{queryText='';const input=$('#address-search');if(input)input.value='';updateResults();input?.focus();},
     addressdeleteconfirm:async()=>{
       const name=pendingDelete;if(!name||!myPlaces().includes(name))return;

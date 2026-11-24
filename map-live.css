@@ -4,7 +4,7 @@
 @media (min-width: 600px) { body { background: #e9eceb !important; } }
 
 /* Shared navigation and photo places */
-.bottomnav{
+.bottomnav,.live-map .bottomnav{
   position:fixed!important;left:50%!important;right:auto!important;
   bottom:calc(14px + env(safe-area-inset-bottom))!important;
   transform:translateX(-50%)!important;
@@ -25,7 +25,7 @@ body:has(.dt) .bottomnav{display:flex!important}
 .pm-nav-add svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8}
 .pm-nav-photo,.pm-nav-initial{width:25px;height:25px;display:grid;place-items:center;border-radius:50%;object-fit:cover;background:var(--color-disabled);color:var(--color-secondary);font:var(--type-label-md);border:1px solid var(--color-disabled)}
 .bottomnav .navitem>span:not(.navicon){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-@media(min-width:600px){.bottomnav{width:316px!important}}
+@media(min-width:600px){.bottomnav,.live-map .bottomnav{width:316px!important}}
 
 .lm-photo-marker{border:0;background:transparent}
 .lm-photo-pin{display:flex;align-items:center;width:154px;height:52px;background:#fffffff5;border:2px solid var(--color-surface);border-radius:var(--rounded-lg);box-shadow:var(--shadow-sm);overflow:hidden;text-align:left;transition:transform .16s}
@@ -66,8 +66,9 @@ body.live-map-page { min-width:0; }
 .live-map {
   width:100%!important; max-width:402px!important;
   height:100dvh!important; min-height:0!important; max-height:100dvh!important;
-  transform:translateZ(0);
+  transform:translateZ(0); /* fixed navigation is anchored to this phone canvas */
 }
+.live-map .bottomnav { width:316px!important; bottom:14px!important; }
 .live-map .lm-categories { margin:var(--space-lg) calc(-1 * var(--space-sm)) var(--space-xl); }
 .live-map .lm-bottom { padding:0 var(--space-xl); }
 .live-map .lm-categories b {font:var(--type-body-sm); }
@@ -83,6 +84,7 @@ body.live-map-page { min-width:0; }
 
 /* Onboarding owns the screen; navigation returns when it closes. */
 body.onboarding-open .bottomnav,
+body.onboarding-open .live-map .bottomnav,
 body.onboarding-open:has(.dt) .bottomnav { display:none!important; }
 
 /* All routes share the responsive viewport supplied by index.html. */
