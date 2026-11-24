@@ -74,27 +74,35 @@
     const stage = addStage();
     if (!stage) return;
     clearTimeout(openTimer);
-    stage.removeAttribute('data-sink');
-    stage.dataset.open = String(open);
     const trigger = stage.querySelector('.home-add-fab');
     const options = stage.querySelector('.home-add-options');
     const optionFocused = options.contains(document.activeElement);
+    const wasOpen = stage.dataset.open === 'true';
+    const styles = getComputedStyle(stage);
+    const blur = Number.parseFloat(styles.getPropertyValue('--goo-blur')) || 6;
+    const contrast = Number.parseFloat(styles.getPropertyValue('--goo-contrast')) || 18;
+    stage.querySelector('feGaussianBlur[result="blur"]')?.setAttribute('stdDeviation', String(blur));
+    stage.querySelector('feColorMatrix[result="goo"]')?.setAttribute('values', `1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 ${contrast} ${-(contrast * 7 / 18)}`);
+    stage.dataset.open = String(open);
     trigger.setAttribute('aria-expanded', String(open));
-    trigger.tabIndex = open ? -1 : 0;
+    trigger.setAttribute('aria-label', open ? '추가 메뉴 닫기' : '콘텐츠 추가하기');
     options.setAttribute('aria-hidden', String(!open));
     options.inert = !open;
+    options.querySelectorAll('button').forEach(button => { button.tabIndex = open ? 0 : -1; });
+    stage.classList.remove('is-anticipating');
+    if (wasOpen && !open && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      stage.classList.add('is-anticipating');
+      const duration = Number.parseFloat(styles.getPropertyValue('--goo-anticip-dur')) || 700;
+      openTimer = window.setTimeout(() => stage.classList.remove('is-anticipating'), duration + 50);
+    }
     if (restoreFocus || (!open && optionFocused)) trigger.focus();
   }
   actions.addoptions = () => {
     const stage = addStage();
-    if (!stage || stage.dataset.sink === 'true') return;
+    if (!stage) return;
     if (stage.dataset.open === 'true') { setAddMenuOpen(false, true); return; }
-    stage.dataset.sink = 'true';
-    openTimer = window.setTimeout(() => {
-      if (!stage.isConnected) return;
-      setAddMenuOpen(true);
-      stage.querySelector('.home-add-options button')?.focus();
-    }, 60);
+    setAddMenuOpen(true);
+    stage.querySelector('.home-add-options button')?.focus();
   };
   actions.analysisretry=()=>{
     const item=items.find(x=>x.id===detailId);
@@ -158,9 +166,7 @@
   document.addEventListener('pointerdown', event => {
     const stage = addStage();
     if (!stage || stage.dataset.open !== 'true') return;
-    if(stage.contains(event.target))return;
-    const box = stage.querySelector('.home-add-body').getBoundingClientRect();
-    if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) setAddMenuOpen(false);
+    if (!stage.contains(event.target)) setAddMenuOpen(false);
   });
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && batchExpanded) {
