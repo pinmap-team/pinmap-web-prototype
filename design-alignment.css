@@ -1991,8 +1991,10 @@ html[data-theme="dark"] body .confirmpop .cfok.is-danger{background:var(--color-
 /* 2026-11-24: 캘린더 카테고리 버튼 + 카테고리 선택 시 시작일~마감일 막대 */
 html body .calcats{display:flex;gap:var(--space-sm);overflow-x:auto;margin:0 calc(-1 * var(--space-xl)) var(--space-md);padding:var(--space-xs) var(--space-xl);scrollbar-width:none}
 html body .calcats::-webkit-scrollbar{display:none}
-html body .calcat{flex:none;display:inline-flex;align-items:center;gap:var(--space-xs);min-height:32px;padding:0 var(--space-md);border:0;border-radius:999px;background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md);box-shadow:var(--shadow-sm)}
-html body .calcat :is(img.pm-category-icon,svg.icon){width:20px!important;height:20px!important}
+html body .calcat{flex:none;display:inline-flex;align-items:center;gap:var(--space-xs);height:32px;min-height:32px;padding:0 var(--space-md);border:0;border-radius:999px;background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md);box-shadow:none!important}
+html body .calcat :is(img.pm-category-icon,svg.pm-category-icon,svg.icon){display:block;flex:none;width:20px!important;height:20px!important}
+html body .calcat:not(.on) :is(svg.pm-category-icon,svg.icon){color:var(--color-icon-muted);transition:color .15s ease}
+html body .calcat:not(.on):is(:hover,:focus-visible) :is(svg.pm-category-icon,svg.icon){color:var(--color-icon-hover)}
 html body .calcat.on{background:var(--color-accent);color:var(--color-on-surface)}
 html[data-theme="dark"] body .calcat.on{color:var(--color-neutral)}
 html body .calgrid.is-range .calcell{height:calc(40px + var(--cal-lanes,0) * 18px + var(--space-xs));align-items:start;overflow:visible}
