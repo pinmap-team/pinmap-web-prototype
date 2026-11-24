@@ -133,7 +133,8 @@ function calCategoryButtons(){
   if (!cats.length) return '';
   if (calCat && !ids.has(calCat)) calCat = '';
   const chip = (id, label, iconHtml) => `<button type="button" class="calcat${calCat === id ? ' on' : ''}" data-calcat="${id}" aria-pressed="${calCat === id}">${iconHtml}<span>${esc(label)}</span></button>`;
-  return `<div class="calcats" role="group" aria-label="카테고리별 일정">${chip('', '전체', icon('spark'))}${cats.map(c => chip(c.id, c.label, PinmapCategories.icon(c.id, calCat === c.id))).join('')}</div>`;
+  const allIcon = typeof PinmapSolar === 'undefined' ? icon('spark') : PinmapSolar.icon('spark', 'icon', calCat === '' ? 'bold' : 'linear');
+  return `<div class="calcats" role="group" aria-label="카테고리별 일정">${chip('', '전체', allIcon)}${cats.map(c => chip(c.id, c.label, PinmapCategories.icon(c.id, calCat === c.id))).join('')}</div>`;
 }
 
 function calRow(x){
