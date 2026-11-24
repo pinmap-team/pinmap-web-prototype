@@ -259,12 +259,6 @@ if (PM_ENV.requiresAuth) (() => {
     pendingView = false;
     render();
   }
-  function revealEntryFrame() {
-    if (!window.PinmapAccountLoaded || window.parent === window || !window.parent?.postMessage ||
-        document.documentElement?.classList?.contains('auth-pending')) return;
-    requestAnimationFrame(() => window.parent.postMessage({type:'pinmap:entry-ready'}, location.origin));
-  }
-  window.PinmapEntryFrameReady = revealEntryFrame;
   document.addEventListener('focusout', () => {
     if (pendingView) setTimeout(refreshVisibleContent, 0);
   });
@@ -373,7 +367,6 @@ if (PM_ENV.requiresAuth) (() => {
       window.PinmapAccountLoadError = false;
       window.PinmapAccountState?.resolveCourses();
       refreshVisibleContent();
-      revealEntryFrame();
       if (typeof CustomEvent === 'function' && typeof window.dispatchEvent === 'function')
         window.dispatchEvent(new CustomEvent('pinmap:account-loaded', {detail:{userId}}));
     } catch (error) {
@@ -382,7 +375,6 @@ if (PM_ENV.requiresAuth) (() => {
         window.PinmapAccountLoadError = true;
         refreshVisibleContent();
         toast(error.message || '저장 목록을 불러오지 못했어요.');
-        revealEntryFrame();
       }
     }
   }
