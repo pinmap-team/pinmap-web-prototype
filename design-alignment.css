@@ -1028,8 +1028,8 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .my-quota-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md)}
 .my-quota-head b,.my-quota-head strong{font:var(--type-label-md)}
 .my-quota-head small{display:block;margin-top:var(--space-xs);font:var(--type-body-sm);color:var(--color-secondary)}
-.my-quota-track{height:8px;margin-top:var(--space-md);overflow:hidden;border-radius:var(--rounded-sm);background:var(--color-disabled)}
-.my-quota-track span{display:block;height:100%;border-radius:inherit;background:var(--color-primary)}
+.my-quota-track{position:relative;height:8px;margin-top:var(--space-md);overflow:hidden;border-radius:var(--rounded-sm);background:var(--color-disabled)}
+.my-quota-track span{position:absolute;inset:0;display:block;width:100%;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--color-accent) 0%,#FFB4C6 44%,#ED2331 78%,#4B1A82 100%);clip-path:inset(0 calc(100% - var(--quota-progress,0%)) 0 0 round 999px)}
 .my-quota p{margin:var(--space-sm) 0 0;font:var(--type-body-sm);color:var(--color-secondary)}
 .accountpage .account-lead{margin:0 0 var(--space-xl);font:var(--type-body-md);color:var(--color-secondary);word-break:keep-all}
 .accountpage .account-sub{margin:0 0 var(--space-sm);font:var(--type-label-md);color:var(--color-on-surface)}
@@ -2007,10 +2007,10 @@ html body .cf-item :is(h3,.cf-itemdesc,.cf-itemmeta,.cf-itemmeta span){word-brea
 html body .cf-item .cf-fav{position:absolute;top:var(--space-sm);right:var(--space-sm);z-index:2;display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:rgba(17,17,17,.32);color:#fff;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 html body .cf-item .cf-fav svg.icon{width:20px!important;height:20px!important}
 html body .cf-item .cf-fav::after{content:'';position:absolute;inset:-6px}
-/* 2026-11-24: 마이 — 분석 사용량 카드와 단계별 막대 색상 */
+/* 2026-11-24: 마이 — 분석 사용량 카드와 고정 그라데이션 막대 */
 html body .my-quota.my-section{padding:var(--space-lg)!important;border:0!important;border-radius:var(--rounded-lg)!important;margin-bottom:var(--space-lg)!important;background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important}
 html[data-theme="dark"] body .mgroup.my-section:not(.my-quota){background:transparent!important}
-html body .my-quota .my-quota-track span{transition:width .3s ease,background-color .3s ease}
+html body .my-quota .my-quota-track span{transition:clip-path .3s ease}
 @media(prefers-reduced-motion:reduce){html body .my-quota .my-quota-track span{transition:none}}
 /* 2026-11-24: 탈퇴 확인 — 왼쪽 '탈퇴하기' 글씨 빨강, 다크 모드 버튼은 한 단계 어둡게(surface) */
 html body .confirmpop .cfok.is-danger{color:var(--color-error)!important}
