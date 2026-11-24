@@ -102,7 +102,7 @@ function savedHomeCategories(){
 function homeCategoryChips(){
   const categories = savedHomeCategories();
   if (!categories.length) return '';
-  return `<div class="chiprows homecategories" role="group" aria-label="저장한 카테고리 바로가기">${categories.map(category => `<button class="prefchip" data-homecategory="${esc(category.id)}"><span class="pm-category-mask" aria-hidden="true" style="--pm-cat-icon:url('img/category/${esc((PinmapCategories.get(category.id)||PinmapCategories.get('other')).id)}-inactive.svg')"></span> ${esc(category.id)}</button>`).join('')}</div>`;
+  return `<div class="chiprows homecategories" role="group" aria-label="저장한 카테고리 바로가기">${categories.map(category => `<button class="prefchip" data-homecategory="${esc(category.id)}">${PinmapCategories.icon(category.id)}<span>${esc(category.id)}</span></button>`).join('')}</div>`;
 }
 function layoutHomeCategories(){
   // 2026-11-23: 한 줄에 다 들어가면 한 줄, 아니면 최대 2줄로 나누고 줄마다 옆으로 밀어서 봐요.

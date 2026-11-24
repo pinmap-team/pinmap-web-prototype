@@ -1775,7 +1775,7 @@ Figma의 colors/accent 변수(VariableID:1393:207), 선택 카드·관심 키워
 ## 2026-11-24 회색 무채색화 · 아이콘 색 2개 추가 · 스낵바 위치
 
 - 회색에 섞여 있던 파란 기운을 뺐다(R=G=B). neutral #F4F4F5→#F4F4F4, secondary·border #6B6B70→#6C6C6C, disabled #E8E8EA→#E8E8E8. 다크 neutral #1E1E20→#1E1E1E, surface #2A2A2D→#2A2A2A, secondary #B4B4B8→#B4B4B4, border #8A8A8E→#8A8A8A, pressed #D4D4D8→#D4D4D4, disabled #3D3D40→#3D3D3D. 코드에 직접 적힌 푸른 회색(카테고리 SVG, 유리 효과 회색 등)도 같은 밝기의 무채색으로 바꿨다. 민트·지도·사진 자리 색은 회색이 아니라 그대로.
-- 사용자 승인 토큰 2개 추가(색 10→12, 전체 29→31): `--color-icon-muted` 라이트 #9C9C9C / 다크 #8A8A8A, `--color-icon-hover` 라이트 #4C4C4C / 다크 #D4D4D4. 홈 캘린더 아래 카테고리 칩 아이콘의 기본색과 마우스를 올렸을 때(또는 키보드 포커스) 색. 칩 아이콘은 SVG를 mask로 써서 색을 토큰으로 칠한다.
+- 사용자 승인 토큰 2개 추가(색 10→12, 전체 29→31): `--color-icon-muted` 라이트 #9C9C9C / 다크 #8A8A8A, `--color-icon-hover` 라이트 #4C4C4C / 다크 #D4D4D4. 홈 캘린더 아래 카테고리 칩 아이콘의 기본색과 마우스를 올렸을 때(또는 키보드 포커스) 색. 현재 칩은 캘린더와 같은 Solar 카테고리 아이콘을 20px로 표시하며 이 토큰 색을 적용한다. 칩의 32px 높이와 label-md 글꼴을 유지하고 그림자는 없앤다.
 - 스낵바: 화면 세로·가로 가운데에 띄우고, 좌우 여백 space-2xl(32px)·위아래 space-lg.
 - 마이 바로가기 카드는 즐겨찾기·내 코스 2개(‘미정’ 카드 삭제), 2열.
 - 그라디언트 `--gradient-accent`(Figma 페인트 스타일 `Pinmap/gradients/accent`): 왼쪽→오른쪽 #C6F5E1 → #AFF3E4. 상세 화면 AI 설명 카드(.dtsum, Figma `Type=AI Summary, Tone=Accent`) 배경. 라이트·다크 같음.

@@ -1950,9 +1950,10 @@ html body #onboarding .ob-screen.step3 .ob-groupcard{align-content:center!import
 html body .homecategories .prefchip img.pm-category-icon{width:20px!important;height:20px!important}
 /* 2026-11-24: 온보딩 2/2 설명과 카드 사이 space-2xl(32px) */
 html body #onboarding .ob-screen.step3 .ob-groupcards{padding-top:var(--space-2xl)!important}
-/* 2026-11-24: 홈 카테고리 칩 아이콘 — SVG를 mask로 써서 토큰 색으로 칠함(기본 icon-muted, 마우스 올림·포커스 icon-hover) */
-html body .homecategories .prefchip .pm-category-mask{display:inline-block;flex:none;width:20px;height:20px;vertical-align:middle;background-color:var(--color-icon-muted);-webkit-mask:var(--pm-cat-icon) center/contain no-repeat;mask:var(--pm-cat-icon) center/contain no-repeat;transition:background-color .15s ease}
-html body .homecategories .prefchip:is(:hover,:focus-visible) .pm-category-mask{background-color:var(--color-icon-hover)}
+/* 홈 카테고리 칩은 캘린더 칩과 같은 32px 높이·20px Solar 아이콘을 사용하되 기존의 차분한 아이콘 색을 유지한다. */
+html body .homecategories .prefchip{box-shadow:none!important}
+html body .homecategories .prefchip :is(svg.pm-category-icon,img.pm-category-icon){display:block;flex:none;width:20px!important;height:20px!important;color:var(--color-icon-muted);transition:color .15s ease}
+html body .homecategories .prefchip:is(:hover,:focus-visible) svg.pm-category-icon{color:var(--color-icon-hover)}
 /* 2026-11-24: 스낵바 — 화면 가운데, 좌우 여백 space-2xl */
 html body #snackbar{top:50%!important;bottom:auto!important;padding:var(--space-lg) var(--space-2xl)!important;transform:translate(-50%,-50%) scale(.96)!important;opacity:0;transition:opacity .2s ease,transform .2s ease,visibility .2s}
 html body #snackbar.show{transform:translate(-50%,-50%)!important;opacity:1}
