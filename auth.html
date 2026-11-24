@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="tokens.css?v=e068ba25dc57">
   <link rel="stylesheet" href="style.css?v=66473887d873">
   <link rel="stylesheet" href="design-alignment.css?v=3e4337f1c46b">
+  <link rel="stylesheet" href="entry-skeleton.css?v=23b3ff2fffe5">
   <style>@font-face{font-family:"Pretendard Variable";font-style:normal;font-weight:45 920;font-display:swap;src:url("vendor/PretendardVariable.woff2") format("woff2")}</style>
   <script src="theme-mode.js?v=4e1082378355"></script>
   <script defer src="vendor/supabase.js?v=a867edbcfb02"></script>
@@ -26,7 +27,14 @@
     <section class="auth-panel" aria-label="로그인 및 회원가입">
       <div id="auth-content"><div class="auth-connection"><span class="pm-spinner" aria-hidden="true"></span><header class="auth-heading" role="status"><h1>잠시 연결을<br>기다려 주세요</h1></header></div></div>
     </section>
+    <div class="auth-entry-skeleton entry-skeleton" role="status" aria-label="핀맵 화면 준비 중">
+      <div class="entry-skel-top"><span class="entry-skel-block entry-skel-brand"></span><span class="entry-skel-block entry-skel-circle"></span></div>
+      <span class="entry-skel-block entry-skel-card"></span>
+      <div class="entry-skel-lines"><span class="entry-skel-block entry-skel-line"></span><span class="entry-skel-block entry-skel-line short"></span></div>
+      <div class="entry-skel-calendar"><div class="entry-skel-calendar-head"><span class="entry-skel-block entry-skel-line"></span><span class="entry-skel-block entry-skel-line short"></span></div><div class="entry-skel-week"><span class="entry-skel-block entry-skel-day"></span><span class="entry-skel-block entry-skel-day"></span><span class="entry-skel-block entry-skel-day"></span><span class="entry-skel-block entry-skel-day"></span><span class="entry-skel-block entry-skel-day"></span><span class="entry-skel-block entry-skel-day"></span><span class="entry-skel-block entry-skel-day"></span></div></div>
+      <div class="entry-skel-nav"><span class="entry-skel-nav-item"><span class="entry-skel-block entry-skel-circle"></span><span class="entry-skel-block entry-skel-line"></span></span><span class="entry-skel-nav-item"><span class="entry-skel-block entry-skel-circle"></span><span class="entry-skel-block entry-skel-line"></span></span><span class="entry-skel-nav-item"><span class="entry-skel-block entry-skel-circle"></span></span><span class="entry-skel-nav-item"><span class="entry-skel-block entry-skel-circle"></span><span class="entry-skel-block entry-skel-line"></span></span><span class="entry-skel-nav-item"><span class="entry-skel-block entry-skel-circle"></span><span class="entry-skel-block entry-skel-line"></span></span></div>
+    </div>
   </main>
-  <script src="phone-viewport.js?v=534575da0c1a"></script>
+  <script src="phone-viewport.js?v=9b165dcfdc05"></script>
 </body>
 </html>

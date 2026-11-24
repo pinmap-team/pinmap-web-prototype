@@ -5,16 +5,24 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>핀맵, 저장을 다시, 일상으로</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="tokens.css?v=e068ba25dc57"><style>
+<link rel="stylesheet" href="tokens.css?v=e068ba25dc57"><link rel="stylesheet" href="entry-skeleton.css?v=23b3ff2fffe5"><style>
 *{box-sizing:border-box}
 html{height:100%;background:var(--color-neutral)}
 body{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);place-items:center;margin:0;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--color-neutral)}
-.phone-frame{display:block;width:402px;height:874px;max-width:none;max-height:none;border:0;background:var(--color-surface);box-shadow:0 0 60px #1e33221a;transform:scale(var(--phone-scale,1));transform-origin:center center}
+.phone-frame{grid-area:1/1;display:block;width:402px;height:874px;max-width:none;max-height:none;border:0;background:var(--color-surface);box-shadow:0 0 60px #1e33221a;transform:scale(var(--phone-scale,1));transform-origin:center center}
 </style>
 </head>
 <body>
 <iframe allow="geolocation; accelerometer; gyroscope; magnetometer" class="phone-frame" data-phone-viewport title="핀맵, 아이폰 화면" src="about:blank"></iframe>
-<script src="phone-viewport.js?v=534575da0c1a"></script>
+<div class="phone-entry-skeleton entry-skeleton" role="status" aria-label="핀맵 화면 준비 중">
+  <div class="entry-skel-top"><span class="entry-skel-block entry-skel-brand"></span><span class="entry-skel-block entry-skel-circle"></span></div>
+  <span class="entry-skel-block entry-skel-card"></span>
+  <div class="entry-skel-lines"><span class="entry-skel-block entry-skel-line"></span><span class="entry-skel-block entry-skel-line short"></span></div>
+  <div class="entry-skel-calendar"><div class="entry-skel-calendar-head"><span class="entry-skel-block entry-skel-line"></span><span class="entry-skel-block entry-skel-line short"></span></div><div class="entry-skel-week"><span class="entry-skel-block entry-skel-day"></span><span class="entry-skel-block entry-skel-day"></span><span class="entry-skel-block entry-skel-day"></span><span class="entry-skel-block entry-skel-day"></span><span class="entry-skel-block entry-skel-day"></span><span class="entry-skel-block entry-skel-day"></span><span class="entry-skel-block entry-skel-day"></span></div></div>
+  <div class="entry-skel-nav"><span class="entry-skel-nav-item"><span class="entry-skel-block entry-skel-circle"></span><span class="entry-skel-block entry-skel-line"></span></span><span class="entry-skel-nav-item"><span class="entry-skel-block entry-skel-circle"></span><span class="entry-skel-block entry-skel-line"></span></span><span class="entry-skel-nav-item"><span class="entry-skel-block entry-skel-circle"></span></span><span class="entry-skel-nav-item"><span class="entry-skel-block entry-skel-circle"></span><span class="entry-skel-block entry-skel-line"></span></span><span class="entry-skel-nav-item"><span class="entry-skel-block entry-skel-circle"></span><span class="entry-skel-block entry-skel-line"></span></span></div>
+</div>
+<script src="phone-viewport.js?v=9b165dcfdc05"></script>
+<script src="entry-skeleton.js?v=c8b9070a381c"></script>
 <script src="entry-router.js?v=14af2f2b6498"></script>
 
 </body>
