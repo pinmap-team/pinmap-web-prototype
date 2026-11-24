@@ -7,7 +7,7 @@
     userId:() => root.window.PinmapAccountContent?.userId(),
     loaded:() => root.window.PinmapAccountLoaded && !root.window.PinmapAccountLoadError,
     knownUrls:() => root.window.PinmapAccountContent?.knownUrls() || [],
-    importLink:(url, userId) => root.window.PinmapAccountContent.importZipLink(url, userId),
+    importLink:(url, userId, signal) => root.window.PinmapAccountContent.importZipLink(url, userId, signal),
     refresh:() => root.window.PinmapAccountContent?.refresh()
   };
   const queue = makeQueue({storage:root.localStorage, account,
@@ -26,6 +26,7 @@
   const MAX_POSTS = 10000;
   function createQueue({storage, account, canonical, publish = () => {}, finish = () => {}}) {
     let userId = null, job = null, running = false, pauseRequested = false, pendingAttach = null;
+    let activeController = null, resumeRequested = false;
     const state = () => {
       if (!job) return null;
       const first = Math.min(Math.max(0, job.index - 2), Math.max(0, job.urls.length - 4));
@@ -65,6 +66,7 @@
           source:/\.zip$/i.test(String(name || '')) ? 'zip' : 'links',
           urls:[...new Set(urls)], index:0, saved:0, skipped:0, review:0, error:'', results:[]};
       pauseRequested = false;
+      resumeRequested = false;
       persist();
       return run();
     }
@@ -74,6 +76,7 @@
       const activeJob = job;
       running = true;
       pauseRequested = false;
+      resumeRequested = false;
       job.phase = 'running'; job.error = '';
       persist();
       try {
@@ -83,7 +86,9 @@
           try {
             if (known.has(url)) { job.skipped++; job.results ||= []; job.results[job.index] = 'skipped'; }
             else {
-              const item = await account.importLink(url, userId);
+              activeController = new AbortController();
+              const item = await account.importLink(url, userId, activeController.signal);
+              activeController = null;
               if (job !== activeJob) break;
               known.add(url);
               job.saved++;
@@ -95,7 +100,8 @@
             job.index++;
             persist();
           } catch (error) {
-            if (job !== activeJob) break;
+            activeController = null;
+            if (job !== activeJob || pauseRequested) break;
             job.phase = 'paused';
             job.error = error?.message || '게시물 저장이 중단됐어요. 다시 시도해 주세요.';
             persist();
@@ -106,14 +112,28 @@
         if (job.index === job.urls.length) { job.phase = 'done'; job.error = ''; persist(); finish(); }
         else if (job.phase === 'running') { job.phase = 'paused'; persist(); }
       } finally {
+        activeController = null;
         running = false; pauseRequested = false;
         if (pendingAttach) { const next = pendingAttach; pendingAttach = null; attach(next); }
+        else if (resumeRequested && job === activeJob) {
+          resumeRequested = false;
+          void resume().catch(error => { if (job === activeJob) { job.error = error.message; persist(); } });
+        }
       }
     }
-    function pause() { if (running) pauseRequested = true; else if (job?.phase === 'running') { job.phase = 'paused'; persist(); } }
+    function pause() {
+      if (!job || job.phase !== 'running') return;
+      pauseRequested = true;
+      resumeRequested = false;
+      job.phase = 'paused';
+      persist();
+      activeController?.abort();
+    }
     function forget() {
       if (!job || !userId) return false;
       pauseRequested = true;
+      resumeRequested = false;
+      activeController?.abort();
       storage.removeItem(KEY + userId);
       job = null;
       notify();
@@ -121,7 +141,7 @@
     }
     async function resume() {
       if (!job || job.phase === 'done') throw Error('이어 할 콘텐츠 저장이 없어요.');
-      if (running) return;
+      if (running) { resumeRequested = true; return; }
       if (!account.loaded() || account.userId() !== userId) throw Error('같은 계정으로 로그인한 뒤 다시 시도해 주세요.');
       await account.refresh();
       if (!account.loaded() || account.userId() !== userId) throw Error('저장 목록을 불러오지 못했어요.');
