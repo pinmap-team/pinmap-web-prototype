@@ -32,6 +32,7 @@ if (PM_ENV.requiresAuth) (() => {
     document.getElementById('auth-gate')?.remove();
     document.documentElement.classList.remove('auth-pending');
     app.inert = false; render(); maybeStartOnboarding();
+    window.PinmapEntryFrameReady?.();
   }
   // Account identity is read by the common account page, never copied to demo settings.
   const logout = async () => {
