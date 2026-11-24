@@ -10,7 +10,7 @@
   --color-accent:#C6F5E1;
   /* 2026-11-24 사용자 승인: 홈 카테고리 칩 아이콘 기본·마우스 올림 색 */
   --color-icon-muted:#9C9C9C;--color-icon-hover:#4C4C4C;
-  /* 2026-11-24 사용자 승인: AI 설명 카드 배경 그라디언트(Figma Pinmap/gradients/accent). 라이트·다크 같음 */
+  /* 2026-11-24 사용자 승인: 기존 그라디언트(Figma Pinmap/gradients/accent). 직접 추가한 장소 설명에 유지 */
   --gradient-accent:linear-gradient(90deg,#C6F5E1 0%,#AFF3E4 100%);
   --type-headline-lg:700 28px/36px var(--font-family);
   --type-headline-md:700 22px/30px var(--font-family);

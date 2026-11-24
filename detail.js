@@ -51,8 +51,6 @@ detail = function(){
     return `<li class="dt-extraction-place">${located?PinmapPlacePhotos.markup(x.backendId,index,PinmapPlacePhotos.preferredImage(locations[index],x.photo),'dt-extraction-photo'):''}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong>${located ? '' : '<span class="dt-extraction-pending">위치 확인 필요</span>'}</div>${addressInfo}</div><button type="button" class="dt-extraction-heart lm-heart-motion${favorite.favorite?' is-active':''}" data-fav-place-id="${esc(favorite.id)}" aria-pressed="${!!favorite.favorite}" aria-label="${esc(favorite.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button></li>`;
   }).join('')}</ul></section>` : '';
   const eventInfo=dtEventInfo(x.events);
-  const analysisNotes = Array.isArray(x.extractionNotes) ? x.extractionNotes.filter(note => typeof note === 'string').slice(0, 8) : [];
-  const reviewInfo = failure ? analysisFailureNotice(failure,false) : analysisNotes.length || (x.contentKind === 'unknown' && x.status !== 'extracted') ? `<section class="dtsec dt-extraction dt-analysis-notes"><h2>분석 안내</h2><ul>${(analysisNotes.length ? analysisNotes : ['게시물에서 장소 또는 행사 정보를 확인하지 못했어요.']).map(note => `<li><p>${esc(note)}</p></li>`).join('')}</ul></section>` : '';
   const memoInfo = `<section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>`;
 
   // 유형별 정보
@@ -98,10 +96,9 @@ detail = function(){
       ${author ? `<div class="dt-author">${authorPhoto ? `<img src="${esc(authorPhoto)}" alt="">` : `<span class="dt-author-fallback" aria-hidden="true">@</span>`}<span>게시물 작성자 <b>@${esc(author)}</b></span></div>` : ''}
       ${x.desc ? x.source === '직접 추가' || x.aiSummary === false
         ? `<section class="dtsum" data-dtsum><h2>${icon('spark')}장소 설명</h2>${dtSummaryBody(x.desc)}</section>`
-        : `<section class="dtsum dtai-review"><h2 class="dtai">${icon('spark')}<span>AI 설명</span><button type="button" class="dtai-info-button" data-dtai-info aria-label="AI 설명 안내" aria-expanded="false" aria-controls="dtai-info"><span aria-hidden="true">i</span></button></h2><p class="dtai-info-note" id="dtai-info" hidden>저장한 콘텐츠를 바탕으로 AI가 작성한 설명이에요. 중요한 정보는 원본에서 확인해 주세요.</p>${dtAiSummaryBody(x)}</section>` : ''}
+        : `<section class="dtsum dtai-review"><h2 class="dtai">${icon('spark')}<span>AI 컨텐츠 요약</span><button type="button" class="dtai-info-button" data-dtai-info aria-label="AI 컨텐츠 요약 안내" aria-expanded="false" aria-controls="dtai-info"><span aria-hidden="true">i</span></button></h2><p class="dtai-info-note" id="dtai-info" hidden>저장한 콘텐츠를 바탕으로 AI가 작성한 요약이에요. 중요한 정보는 원본에서 확인해 주세요.</p>${dtAiSummaryBody(x)}</section>` : ''}
       ${extractionInfo}
       ${eventInfo}
-      ${reviewInfo}
       ${memoInfo}
       ${info}
     </section>
@@ -407,13 +404,22 @@ function dtSummaryBody(text){
   return `<button type="button" class="dtsum-head" data-dtsum-toggle aria-expanded="false"><span class="dtsum-line">${esc(head)}</span>${icon('chevron')}</button>${rest ? `<p class="dtsum-rest">${esc(rest)}</p>` : ''}`;
 }
 function dtAiSummaryBody(item){
-  const parts=String(item.desc||'').trim().split(/(?<=[.!?。])\s+/);
-  const head=parts[0]||'', body=parts.slice(1).join(' ');
+  const title=String(item.title||'저장한 콘텐츠').trim(), body=String(item.desc||'').trim();
   const keywords=[...(Array.isArray(item.keywords)?item.keywords:[]),item.category]
     .filter(value=>typeof value==='string').map(value=>value.normalize('NFKC').trim().replace(/\s+/g,' '))
     .filter(value=>value.length>=2&&value.length<=24&&!['분류보류','기타','미분류'].includes(value));
-  const tags=[...new Set(keywords)].slice(0,5);
-  return `<strong class="dtai-keyline">${esc(head)}</strong>${body?`<p class="dtai-body">${esc(body)}</p>`:''}${tags.length?`<div class="dtai-tags" aria-label="분석 키워드">${tags.map(tag=>`<span class="dtai-tag">${esc(tag)}</span>`).join('')}</div>`:''}`;
+  const stopwords=new Set(['여러','보며','깨달','깨달은','숨겨진','대한','관련','소개','이야기','게시물','콘텐츠','컨텐츠','모음','정리','영상','사진','다양한','그리고','때문에','있어요','합니다']);
+  const words=text=>(text.match(/[\p{L}\p{N}]{2,}/gu)||[])
+    .map(word=>word.replace(/(?:에서|으로|에게|까지|부터|처럼|보다|들을|들이|을|를|은|는|이|가|의|에|와|과|도)$/u,''))
+    .filter(word=>word.length>=2&&word.length<=24&&!stopwords.has(word));
+  const tags=[...new Set([...keywords,...words(title).slice(0,2)])].slice(0,5);
+  const kind={place:'장소',event:'행사',mixed:'장소·행사'}[item.contentKind]||'게시물';
+  for(const word of [...words(body),item.type,item.source,kind,'저장 콘텐츠']){
+    if(tags.length>=2)break;
+    const value=typeof word==='string'?word.trim():'';
+    if(value.length>=2&&value.length<=24&&!['기타','분류보류'].includes(value)&&!tags.includes(value))tags.push(value);
+  }
+  return `<strong class="dtai-keyline" title="${esc(title)}">${esc(title)}</strong><p class="dtai-body">${esc(body)}</p><div class="dtai-tags" aria-label="콘텐츠 키워드">${tags.map(tag=>`<span class="dtai-tag">${esc(tag)}</span>`).join('')}</div>`;
 }
 function dtFitSummaries(){
   document.querySelectorAll('[data-dtsum]:not([data-fit])').forEach(box => {

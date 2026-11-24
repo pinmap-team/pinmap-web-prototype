@@ -1676,7 +1676,6 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .dt-restricted-notice p{margin:var(--space-sm) 0 0;font:var(--type-body-md);color:var(--color-secondary);word-break:keep-all}
 
 .dt-failure-label{display:flex;align-items:center;gap:var(--space-sm);margin-bottom:var(--space-sm);font:var(--type-body-sm);color:var(--color-secondary)}
-.dt-failure-notice .dt-failure-action{width:100%;min-height:48px;margin-top:var(--space-lg);border-radius:var(--rounded-sm)}
 
 .dt-failure-label .icon{width:16px;height:16px;flex:none}
 /* Collection sort grows from its own trigger as one liquid menu surface. */
@@ -1973,22 +1972,27 @@ html body #snackbar{top:50%!important;bottom:auto!important;padding:var(--space-
 html body #snackbar.show{transform:translate(-50%,-50%)!important;opacity:1}
 /* 2026-11-24: 마이 바로가기 카드 2개(‘미정’ 삭제) → 2열 */
 html body .my-quick{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-/* 2026-11-24: AI 설명 카드 배경 = --gradient-accent (라이트·다크 같음) */
+/* 직접 추가한 장소 설명의 기존 그라디언트 */
 html body .dtsum,html body [data-theme="dark"] .dtsum,html body .dt.dt-photo .dtsheet>.dtsum,html body[data-theme="dark"] .dtsum,[data-theme="dark"] body .dtsum{background:var(--gradient-accent)!important}
 html body .dtsum h2.dtai{background:transparent!important}
 html[data-theme="dark"] body .dt.dt-photo .dtsheet>.dtsum,html[data-theme="dark"] body .dtsum{background:var(--gradient-accent)!important}
-/* AI 설명만 밝은 민트 위에 은은한 바이올렛 빛을 겹친다. 직접 추가한 장소 설명은 기존 배경을 유지한다. */
-html body .dtsum:has(>h2.dtai),html body .dt.dt-photo .dtsheet>.dtsum:has(>h2.dtai),html[data-theme="dark"] body .dtsum:has(>h2.dtai),html[data-theme="dark"] body .dt.dt-photo .dtsheet>.dtsum:has(>h2.dtai){background:radial-gradient(ellipse at 8% -10%,rgba(255,255,255,.96),transparent 54%),radial-gradient(ellipse at 100% 0%,rgba(193,155,255,.42),transparent 46%),linear-gradient(120deg,#E9FFF7 0%,#D8FAF1 44%,#E0F3FA 70%,#F1E7FF 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 0 0 1px rgba(255,255,255,.35)}
+/* AI 컨텐츠 요약은 참고 화면처럼 회색 카드와 칩을 사용한다. 직접 추가한 장소 설명은 기존 배경을 유지한다. */
+html body .dtsum:has(>h2.dtai),html body .dt.dt-photo .dtsheet>.dtsum:has(>h2.dtai){background:#F4F4F6!important;box-shadow:none!important}
+html[data-theme="dark"] body .dtsum:has(>h2.dtai),html[data-theme="dark"] body .dt.dt-photo .dtsheet>.dtsum:has(>h2.dtai){background:var(--color-surface)!important}
 html body .dtsum.dtai-review h2.dtai{display:flex;align-items:center;gap:var(--space-sm);width:100%;margin:0 0 var(--space-lg);padding:0;font:var(--type-headline-md);color:#333!important}
+html[data-theme="dark"] body .dtsum.dtai-review h2.dtai{color:var(--color-on-surface)!important}
 html body .dtsum.dtai-review h2.dtai>.icon{width:24px!important;height:24px!important;color:#9256E8!important;filter:drop-shadow(0 1px 2px rgba(130,75,220,.2))}
 html body .dtsum.dtai-review .dtai-info-button{display:grid;place-items:center;flex:none;width:36px;height:36px;margin-left:-4px;padding:0;border:0;background:transparent;color:#8B8B94;cursor:pointer}
 html body .dtsum.dtai-review .dtai-info-button>span{display:grid;place-items:center;width:20px;height:20px;border:2px solid #B6B6BF;border-radius:50%;font:600 12px/1 var(--font-family)}
 html body .dtsum.dtai-review .dtai-info-button:focus-visible{outline:2px solid var(--color-on-surface);outline-offset:1px;border-radius:var(--rounded-sm)}
-html body .dtsum.dtai-review .dtai-info-note:not([hidden]){display:block;margin:0 0 var(--space-lg);padding:var(--space-md);border-radius:var(--rounded-sm);background:rgba(255,255,255,.7);font:var(--type-body-sm);color:#555!important}
-html body .dtsum.dtai-review .dtai-keyline{display:block;font:var(--type-body-md);font-weight:var(--weight-bold);color:#333;word-break:keep-all}
+html body .dtsum.dtai-review .dtai-info-note:not([hidden]){display:block;margin:0 0 var(--space-lg);padding:var(--space-md);border-radius:var(--rounded-sm);background:var(--color-surface);font:var(--type-body-sm);color:#555!important}
+html body .dtsum.dtai-review .dtai-keyline{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:var(--type-body-md);font-weight:var(--weight-bold);color:#333}
 html body .dtsum.dtai-review .dtai-body{margin:var(--space-md) 0 0;font:var(--type-body-md);color:#555!important;word-break:keep-all}
 html body .dtsum.dtai-review .dtai-tags{display:flex;flex-wrap:wrap;gap:var(--space-xs);margin-top:var(--space-lg)}
-html body .dtsum.dtai-review .dtai-tag{display:inline-flex;align-items:center;min-height:26px;padding:var(--space-xs) var(--space-sm);border-radius:var(--rounded-sm);background:rgba(90,82,116,.09);font:var(--type-body-sm);color:#555}
+html body .dtsum.dtai-review .dtai-tag{display:inline-flex;align-items:center;min-height:26px;padding:var(--space-xs) var(--space-sm);border-radius:var(--rounded-sm);background:#E8E8EC;font:var(--type-body-sm);color:#555}
+html[data-theme="dark"] body .dtsum.dtai-review :is(.dtai-keyline,.dtai-body){color:var(--color-on-surface)!important}
+html[data-theme="dark"] body .dtsum.dtai-review .dtai-tag{background:var(--color-disabled);color:var(--color-on-surface)}
+html[data-theme="dark"] body .dtsum.dtai-review .dtai-info-note:not([hidden]){color:var(--color-on-surface)!important}
 /* 2026-11-24: 상세 사진 위 카테고리 알약(카페·팝업)은 테두리 없이 */
 html body .dthpill{border:0!important}
 /* 직접 추가한 장소 설명 — 첫 문장과 16px 펼침 화살표 */
