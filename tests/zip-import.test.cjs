@@ -81,6 +81,33 @@ test('multiple pasted links use the same queue and report their source and count
   assert.deepEqual(sent,[two]);
 });
 
+test('forget removes a running ZIP job and does not restore it after the active request settles',async()=>{
+  const values=new Map();
+  const storage={getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value),
+    removeItem:key=>values.delete(key)};
+  const urls=['https://www.instagram.com/p/one/','https://www.instagram.com/p/two/'];
+  let settle;
+  const started=new Promise(resolve=>{settle=resolve;});
+  let complete;
+  const request=new Promise(resolve=>{complete=resolve;});
+  const sent=[];
+  const account={userId:()=> 'user-c',loaded:()=>true,knownUrls:()=>[],
+    importLink:async url=>{sent.push(url);settle();await request;return {contentKind:'place',status:'extracted'};}};
+  const queue=createQueue({storage,account,canonical:parser.canonical});
+  const running=queue.start(urls,'saved.zip');
+  await started;
+  assert.equal(queue.forget(),true);
+  assert.equal(queue.state(),null);
+  assert.equal(values.size,0);
+  complete();
+  await running;
+  assert.deepEqual(sent,[urls[0]]);
+  assert.equal(values.size,0);
+  const restored=createQueue({storage,account,canonical:parser.canonical});
+  restored.attach('user-c');
+  assert.equal(restored.state(),null);
+});
+
 test('ZIP importer initializes in the login app mode',()=>{
   const listeners=new Map();
   const window={

@@ -17,6 +17,9 @@
   root.window.PinmapZipImport = queue;
   root.window.addEventListener('pinmap:account-loaded', event => queue.attach(event.detail.userId));
   root.window.addEventListener('pinmap:account-cleared', () => queue.pause());
+  root.window.addEventListener('storage', event => {
+    if (event.key === 'pinmap.zip-import.v1.' + account.userId() && event.newValue === null) queue.forget();
+  });
   if (account.loaded()) queue.attach(account.userId());
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   const KEY = 'pinmap.zip-import.v1.';
@@ -59,18 +62,20 @@
     async function run() {
       if (running || !job || job.phase === 'done') return;
       if (!account.loaded() || account.userId() !== userId) return;
+      const activeJob = job;
       running = true;
       pauseRequested = false;
       job.phase = 'running'; job.error = '';
       persist();
       try {
         const known = new Set(account.knownUrls());
-        while (job.index < job.urls.length && !pauseRequested && account.userId() === userId) {
+        while (job === activeJob && job.index < job.urls.length && !pauseRequested && account.userId() === userId) {
           const url = job.urls[job.index];
           try {
             if (known.has(url)) job.skipped++;
             else {
               const item = await account.importLink(url, userId);
+              if (job !== activeJob) break;
               known.add(url);
               job.saved++;
               if (item.contentKind === 'unknown' || !['extracted','needs_review'].includes(item.status)) job.review++;
@@ -78,12 +83,14 @@
             job.index++;
             persist();
           } catch (error) {
+            if (job !== activeJob) break;
             job.phase = 'paused';
             job.error = error?.message || '게시물 저장이 중단됐어요. 다시 시도해 주세요.';
             persist();
             break;
           }
         }
+        if (job !== activeJob) return;
         if (job.index === job.urls.length) { job.phase = 'done'; job.error = ''; persist(); finish(); }
         else if (job.phase === 'running') { job.phase = 'paused'; persist(); }
       } finally {
@@ -92,6 +99,14 @@
       }
     }
     function pause() { if (running) pauseRequested = true; else if (job?.phase === 'running') { job.phase = 'paused'; persist(); } }
+    function forget() {
+      if (!job || !userId) return false;
+      pauseRequested = true;
+      storage.removeItem(KEY + userId);
+      job = null;
+      notify();
+      return true;
+    }
     async function resume() {
       if (!job || job.phase === 'done') throw Error('이어 할 콘텐츠 저장이 없어요.');
       if (running) return;
@@ -100,7 +115,7 @@
       if (!account.loaded() || account.userId() !== userId) throw Error('저장 목록을 불러오지 못했어요.');
       return run();
     }
-    return Object.freeze({attach, start, resume, pause, state, isRunning:() => running});
+    return Object.freeze({attach, start, resume, pause, forget, state, isRunning:() => running});
   }
   return createQueue;
 });

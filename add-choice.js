@@ -4,7 +4,6 @@
   let openTimer;
   let screenshotPreviewUrl;
   let captureId;
-  let batchDismissed = false;
   let batchExpanded = false;
   const batchFloating = document.createElement('div');
   batchFloating.className = 'batch-save-floating';
@@ -24,11 +23,11 @@
     ];
     const current = finished ? 4 : 3;
     return `<section class="batch-save-card" aria-label="여러 콘텐츠 저장 진행 상태">
-      <header class="batch-save-head"><span class="batch-save-badge" aria-hidden="true">✦</span><span class="batch-save-heading"><strong>${batchEscape(state.name)}</strong><small>${finished ? '완료' : paused ? '일시정지' : '저장 중'} · ${current}/4단계</small></span><button type="button" class="batch-save-dismiss" data-batch-action="${finished ? 'dismiss' : 'collapse'}" aria-label="${finished ? '진행 카드 닫기' : '진행 카드 접기'}">×</button></header>
+      <header class="batch-save-head"><span class="batch-save-badge" aria-hidden="true">✦</span><span class="batch-save-heading"><strong>${batchEscape(state.name)}</strong><small>${finished ? '완료' : paused ? '일시정지' : '저장 중'} · ${current}/4단계</small></span><button type="button" class="batch-save-dismiss" data-batch-action="collapse" aria-label="진행 카드 접기">×</button></header>
       <div class="batch-save-track" role="progressbar" aria-label="콘텐츠 저장 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}"><span style="width:${percent}%"></span></div>
       <ol class="batch-save-steps">${steps.map(([title,detail,phase]) => `<li class="batch-save-step is-${phase}"><span class="batch-save-check" aria-hidden="true">${phase === 'done' ? '✓' : phase === 'active' ? '<span class="batch-save-pulse"></span>' : phase === 'paused' ? 'Ⅱ' : ''}</span><span><strong>${title}</strong><small>${detail}</small></span></li>`).join('')}</ol>
       ${state.error ? `<p class="batch-save-error" role="alert">${batchEscape(state.error)}</p>` : ''}
-      <div class="batch-save-actions"><button type="button" data-batch-action="${finished ? 'dismiss' : paused ? 'resume' : 'pause'}">${finished ? '닫기' : paused ? '이어하기' : '일시정지'}</button></div>
+      <div class="batch-save-actions"><button type="button" data-batch-action="forget">작업 기록 삭제</button>${finished ? '' : `<button type="button" data-batch-action="${paused ? 'resume' : 'pause'}">${paused ? '이어하기' : '일시정지'}</button>`}</div>
     </section>`;
   }
   function renderZipStatus() {
@@ -37,13 +36,13 @@
     if (start) start.disabled = state?.phase === 'running' || state?.phase === 'paused';
     const linkSubmit = document.querySelector('#saveform button[type="submit"]');
     if (linkSubmit) linkSubmit.disabled = state?.source === 'links' && state.phase !== 'done';
-    batchFloating.hidden = !state || batchDismissed;
+    batchFloating.hidden = !state;
     if (batchFloating.hidden) { batchFloating.innerHTML = ''; return; }
     const percent = Math.round(state.processed / Math.max(1,state.total) * 100);
     const label = state.phase === 'done' ? '저장 완료' : state.phase === 'paused' ? '저장 일시정지' : '저장 진행 중';
     batchFloating.innerHTML = `<button type="button" class="batch-save-trigger is-${state.phase}" data-batch-action="toggle" aria-label="${label} · ${state.processed}/${state.total}개 처리 · 진행 상황 ${batchExpanded ? '접기' : '보기'}" aria-expanded="${batchExpanded}" aria-controls="batch-save-popover" style="--batch-percent:${percent}%"><span class="batch-save-trigger-ring" aria-hidden="true"><span class="batch-save-trigger-mark">${state.phase === 'done' ? '✓' : '◆'}</span></span></button><div id="batch-save-popover" class="batch-save-popover" ${batchExpanded ? '' : 'hidden'}>${batchExpanded ? batchMarkup(state) : ''}</div>`;
   }
-  window.PinmapBatchStatus = Object.freeze({render:renderZipStatus, reset:() => {batchDismissed = false; batchExpanded = false; renderZipStatus();}});
+  window.PinmapBatchStatus = Object.freeze({render:renderZipStatus, reset:() => {batchExpanded = false; renderZipStatus();}});
   document.addEventListener('click', event => {
     const action = event.target.closest('[data-batch-action]')?.dataset.batchAction;
     if (!action) return;
@@ -52,7 +51,12 @@
       renderZipStatus();
       batchFloating.querySelector('.batch-save-trigger')?.focus();
     }
-    if (action === 'dismiss') { batchDismissed = true; renderZipStatus(); }
+    if (action === 'forget') {
+      if (!window.confirm('이 저장 작업의 진행 기록을 삭제할까요? 이미 저장된 콘텐츠는 유지됩니다.')) return;
+      window.PinmapZipImport?.forget();
+      batchExpanded = false;
+      renderZipStatus();
+    }
     if (action === 'pause') window.PinmapZipImport?.pause();
     if (action === 'resume') void window.PinmapZipImport?.resume().catch(error => {
       const node = document.querySelector('#zip-import-error, #saveerror');
