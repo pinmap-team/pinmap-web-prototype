@@ -1616,6 +1616,46 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .billing-checkout-page h1{font:var(--type-headline-lg)}
 .billing-checkout-page a{color:var(--color-primary);font:var(--type-label-md)}
 
+/* Subscription card: transitions.dev motion mapped to Pinmap's existing tokens. */
+.billing-subscription{width:320px;max-width:100%;box-sizing:border-box;margin-inline:auto;padding:var(--space-lg);border-radius:24px;display:flex;flex-direction:column;gap:var(--space-md);overflow:hidden;--billing-digit-ease:cubic-bezier(.34,1.45,.64,1)}
+.billing-sub-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm)}
+.billing-sub-head h2{margin:0;font:var(--type-body-md);font-weight:var(--weight-semibold)}
+.billing-cycle-pill{padding:var(--space-xs) var(--space-sm);border-radius:999px;background:var(--color-neutral);font:var(--type-body-sm);color:var(--color-secondary);white-space:nowrap}
+.billing-sub-meta{margin:0;color:var(--color-secondary);font:var(--type-body-sm)}
+.billing-tabs{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:3px;border-radius:999px;background:var(--color-neutral)}
+.billing-tabs-pill{position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 8px)/2);border-radius:999px;background:var(--color-surface);box-shadow:var(--shadow-sm);transform:translateX(0);transition:transform 250ms cubic-bezier(.22,1,.36,1);pointer-events:none}
+.billing-subscription[data-plan="monthly"] .billing-tabs-pill{transform:translateX(calc(100% + 2px))}
+.billing-tabs button{position:relative;z-index:1;min-height:44px;border:0;border-radius:999px;background:transparent;color:var(--color-secondary);font:var(--type-label-md);cursor:pointer;transition:color 250ms cubic-bezier(.22,1,.36,1)}
+.billing-tabs button[aria-selected="true"]{color:var(--color-on-surface)}
+.billing-tabs button:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+.billing-page-slide{display:grid}
+.billing-page{grid-area:1/1;display:flex;flex-direction:column;gap:var(--space-md);opacity:0;pointer-events:none;transform:translateX(8px);filter:blur(3px);transition:opacity 250ms cubic-bezier(.22,1,.36,1),transform 250ms cubic-bezier(.22,1,.36,1),filter 250ms cubic-bezier(.22,1,.36,1)}
+.billing-page-free:not(.on){transform:translateX(-8px)}
+.billing-page.on{opacity:1;pointer-events:auto;transform:translateX(0);filter:blur(0)}
+.billing-subscription .billing-price{margin:var(--space-xs) 0}
+.billing-subscription .billing-price strong{font:var(--type-headline-lg);font-variant-numeric:tabular-nums}
+.billing-subscription .billing-price strong span{font:inherit}
+.billing-divider{height:1px;margin:var(--space-sm) 0;background:var(--color-disabled)}
+.billing-features{display:grid;gap:var(--space-xs);margin:0;padding:0;list-style:none;font:var(--type-label-md);font-weight:var(--weight-regular)}
+.billing-features li{display:flex;align-items:flex-start;gap:var(--space-sm)}
+.billing-features li::before{content:'✓';color:var(--color-secondary);font-weight:var(--weight-bold)}
+.billing-price-digits span{display:inline-block}
+.billing-price-digits.is-animating span{animation:billing-digit-in 500ms var(--billing-digit-ease) both}
+.billing-price-digits.is-animating span[data-stagger="1"]{animation-delay:70ms}
+.billing-price-digits.is-animating span[data-stagger="2"]{animation-delay:140ms}
+@keyframes billing-digit-in{from{transform:translateY(8px);opacity:0;filter:blur(2px)}to{transform:translateY(0);opacity:1;filter:blur(0)}}
+.billingpage .billing-account{width:320px;max-width:100%;box-sizing:border-box;margin:var(--space-lg) auto 0;padding:var(--space-lg);border-radius:var(--rounded-md);background:var(--color-surface);box-shadow:var(--shadow-sm)}
+.billingpage .billing-account p{margin:var(--space-sm) 0;font:var(--type-body-sm);color:var(--color-secondary)}
+.billing-account-actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-sm)}
+.billing-account-actions button{min-height:44px}
+.billing-subscription .billing-checkout{margin:0;min-height:44px;border-radius:999px;transition:transform 150ms cubic-bezier(.22,1,.36,1)}
+.billingpage>.billing-note,.billingpage>#billing-message,.billingpage>.billing-caption{width:320px;max-width:100%;box-sizing:border-box;margin-inline:auto}
+.billing-subscription .billing-checkout:active:not(:disabled){transform:scale(.99)}
+.billing-action-text{display:inline-block;transition:transform 150ms ease-in-out,filter 150ms ease-in-out,opacity 150ms ease-in-out}
+.billing-action-text.is-exit{transform:translateY(-4px);filter:blur(2px);opacity:0}
+.billing-action-text.is-enter-start{transform:translateY(4px);filter:blur(2px);opacity:0;transition:none}
+@media (prefers-reduced-motion:reduce){.billing-tabs-pill,.billing-tabs button,.billing-page,.billing-checkout,.billing-action-text{transition:none!important}.billing-price-digits span{animation:none!important}}
+
 /* Policy drafts reuse existing tokens. */
 .legal-page{margin:0;background:var(--color-neutral);color:var(--color-on-surface);font:var(--type-body-md);font-family:var(--font-family);line-height:1.7}
 .legal-page main{max-width:800px;margin:auto;padding:var(--space-2xl) var(--space-xl)}
