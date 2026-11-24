@@ -4,31 +4,62 @@
   let openTimer;
   let screenshotPreviewUrl;
   let captureId;
-  function renderZipStatus() {
-    const form = document.getElementById('zipimportform');
-    if (!form) return;
-    const state = window.PinmapZipImport?.state();
-    const status = form.querySelector('#zip-import-status');
-    const text = form.querySelector('#zip-import-progress-text');
-    const meter = form.querySelector('#zip-import-meter');
-    const start = form.querySelector('#zip-import-start');
-    const pause = form.querySelector('#zip-import-pause');
-    const resume = form.querySelector('#zip-import-resume');
-    status.hidden = !state;
-    const loader = form.querySelector('#zip-import-loading');
-    if (loader) loader.hidden = state?.phase !== 'running';
-    start.disabled = state?.phase === 'running' || state?.phase === 'paused';
-    pause.hidden = state?.phase !== 'running';
-    resume.hidden = state?.phase !== 'paused';
-    if (!state) return;
-    meter.max = Math.max(1, state.total);
-    meter.value = state.processed;
-    text.textContent = `${state.name} · ${state.processed}/${state.total}건 확인 · 새로 저장 ${state.saved}건 · 중복 ${state.skipped}건${state.review ? ` · 검토 필요 ${state.review}건` : ''}`;
-    form.querySelector('#zip-import-state').textContent = state.phase === 'done'
-      ? '가져오기가 끝났어요. 지도·컬렉션에서 결과를 확인해 주세요.'
-      : state.phase === 'paused' ? `일시정지됨 · ${state.error || '이어하기를 누르면 계속해요.'}`
-      : '게시물을 차례로 분석하고 계정에 저장 중이에요. 이 탭을 닫아도 다음 방문에 이어서 진행해요.';
+  let batchDismissed = false;
+  let batchExpanded = false;
+  const batchFloating = document.createElement('div');
+  batchFloating.className = 'batch-save-floating';
+  batchFloating.hidden = true;
+  document.body.append(batchFloating);
+  const batchEscape = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  function batchMarkup(state) {
+    const finished = state.phase === 'done';
+    const paused = state.phase === 'paused';
+    const count = Math.min(state.processed, state.total);
+    const percent = Math.round(count / Math.max(1, state.total) * 100);
+    const steps = [
+      ['링크 확인', `${state.total}개 링크 준비 완료`, 'done'],
+      ['중복 확인', `${state.skipped}개 건너뜀`, 'done'],
+      ['콘텐츠 분석·저장', `${count}/${state.total}개 처리 · ${state.saved}개 저장`, finished ? 'done' : paused ? 'paused' : 'active'],
+      ['결과 확인', `${state.saved}개 저장 · ${state.skipped}개 중복${state.review ? ` · ${state.review}개 검토 필요` : ''}`, finished ? 'done' : 'waiting']
+    ];
+    const current = finished ? 4 : 3;
+    return `<section class="batch-save-card" aria-label="여러 콘텐츠 저장 진행 상태">
+      <header class="batch-save-head"><span class="batch-save-badge" aria-hidden="true">✦</span><span class="batch-save-heading"><strong>${batchEscape(state.name)}</strong><small>${finished ? '완료' : paused ? '일시정지' : '저장 중'} · ${current}/4단계</small></span><button type="button" class="batch-save-dismiss" data-batch-action="${finished ? 'dismiss' : 'collapse'}" aria-label="${finished ? '진행 카드 닫기' : '진행 카드 접기'}">×</button></header>
+      <div class="batch-save-track" role="progressbar" aria-label="콘텐츠 저장 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}"><span style="width:${percent}%"></span></div>
+      <ol class="batch-save-steps">${steps.map(([title,detail,phase]) => `<li class="batch-save-step is-${phase}"><span class="batch-save-check" aria-hidden="true">${phase === 'done' ? '✓' : phase === 'active' ? '<span class="batch-save-pulse"></span>' : phase === 'paused' ? 'Ⅱ' : ''}</span><span><strong>${title}</strong><small>${detail}</small></span></li>`).join('')}</ol>
+      ${state.error ? `<p class="batch-save-error" role="alert">${batchEscape(state.error)}</p>` : ''}
+      <div class="batch-save-actions"><button type="button" data-batch-action="${finished ? 'dismiss' : paused ? 'resume' : 'pause'}">${finished ? '닫기' : paused ? '이어하기' : '일시정지'}</button></div>
+    </section>`;
   }
+  function renderZipStatus() {
+    const state = window.PinmapZipImport?.state();
+    const start = document.querySelector('#zipimportform #zip-import-start');
+    if (start) start.disabled = state?.phase === 'running' || state?.phase === 'paused';
+    const linkSubmit = document.querySelector('#saveform button[type="submit"]');
+    if (linkSubmit) linkSubmit.disabled = state?.source === 'links' && state.phase !== 'done';
+    batchFloating.hidden = !state || batchDismissed;
+    if (batchFloating.hidden) { batchFloating.innerHTML = ''; return; }
+    const percent = Math.round(state.processed / Math.max(1,state.total) * 100);
+    const label = state.phase === 'done' ? '저장 완료' : state.phase === 'paused' ? '저장 일시정지' : '저장 진행 중';
+    batchFloating.innerHTML = `<button type="button" class="batch-save-trigger is-${state.phase}" data-batch-action="toggle" aria-label="${label} · ${state.processed}/${state.total}개 처리 · 진행 상황 ${batchExpanded ? '접기' : '보기'}" aria-expanded="${batchExpanded}" aria-controls="batch-save-popover" style="--batch-percent:${percent}%"><span class="batch-save-trigger-ring" aria-hidden="true"><span class="batch-save-trigger-mark">${state.phase === 'done' ? '✓' : '◆'}</span></span></button><div id="batch-save-popover" class="batch-save-popover" ${batchExpanded ? '' : 'hidden'}>${batchExpanded ? batchMarkup(state) : ''}</div>`;
+  }
+  window.PinmapBatchStatus = Object.freeze({render:renderZipStatus, reset:() => {batchDismissed = false; batchExpanded = false; renderZipStatus();}});
+  document.addEventListener('click', event => {
+    const action = event.target.closest('[data-batch-action]')?.dataset.batchAction;
+    if (!action) return;
+    if (action === 'toggle' || action === 'collapse') {
+      batchExpanded = action === 'toggle' ? !batchExpanded : false;
+      renderZipStatus();
+      batchFloating.querySelector('.batch-save-trigger')?.focus();
+    }
+    if (action === 'dismiss') { batchDismissed = true; renderZipStatus(); }
+    if (action === 'pause') window.PinmapZipImport?.pause();
+    if (action === 'resume') void window.PinmapZipImport?.resume().catch(error => {
+      const node = document.querySelector('#zip-import-error, #saveerror');
+      if (node) node.textContent = error.message;
+      else toast(error.message);
+    });
+  });
   function clearScreenshotPreview() {
     if (screenshotPreviewUrl) URL.revokeObjectURL(screenshotPreviewUrl);
     screenshotPreviewUrl = null;
@@ -72,6 +103,7 @@
     sheet.className = '';
     actions.save();
     sheet.classList.add('add-import-sheet');
+    renderZipStatus();
   };
   actions.zipimport = () => {
     setAddMenuOpen(false);
@@ -82,18 +114,10 @@
       <p id="zip-file-name" class="zip-import-filename" role="status">선택한 파일 없음</p>
       <p class="zip-import-note">ZIP은 기기에서 읽고 게시물 링크만 전송해요. 중복은 건너뛰며, 월간 분석 한도나 계정 저장 100개 한도에 닿으면 남은 목록을 일시정지해요.</p>
       ${PM_ENV.requiresAuth ? '' : '<a class="textbtn" href="auth.html?screen=welcome" target="_top">로그인하고 가져오기</a>'}
-      <div id="zip-import-status" class="zip-import-status" role="status" hidden><div class="pm-loading pm-loading-compact" id="zip-import-loading" aria-hidden="true" hidden><span class="pm-spinner"></span></div><p id="zip-import-progress-text"></p><progress id="zip-import-meter" aria-label="ZIP 가져오기 진행률" max="1" value="0"></progress><p id="zip-import-state"></p><button type="button" class="textbtn" id="zip-import-pause" hidden>일시정지</button><button type="button" class="textbtn" id="zip-import-resume" hidden>이어하기</button></div>
       <p id="zip-import-error" class="eserror" role="alert"></p>
       <div class="dialogactions"><button type="button" class="textbtn" data-action="zipback">뒤로</button><button type="button" class="filled" id="zip-import-start">분석하고 저장</button></div>
     </form>`);
     document.getElementById('zip-import-start').addEventListener('click', () => actions.zipstart());
-    document.getElementById('zip-import-pause').addEventListener('click', () => window.PinmapZipImport?.pause());
-    document.getElementById('zip-import-resume').addEventListener('click', () => {
-      window.PinmapZipImport?.resume().catch(error => {
-        const node = document.getElementById('zip-import-error');
-        if (node) node.textContent = error.message;
-      });
-    });
     renderZipStatus();
   };
   window.addEventListener('pinmap:zip-progress', renderZipStatus);
@@ -125,6 +149,7 @@
   sheet.addEventListener('close', () => {
     clearScreenshotPreview();
     sheet.classList.remove('zip-import-sheet', 'screenshot-import-sheet', 'add-import-sheet');
+    renderZipStatus();
   });
   document.addEventListener('pointerdown', event => {
     const stage = addStage();
@@ -134,6 +159,13 @@
     if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) setAddMenuOpen(false);
   });
   document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && batchExpanded) {
+      batchExpanded = false;
+      renderZipStatus();
+      batchFloating.querySelector('.batch-save-trigger')?.focus();
+      event.preventDefault();
+      return;
+    }
     if (event.key === 'Escape' && addStage()?.dataset.open === 'true') {
       event.preventDefault();
       setAddMenuOpen(false, true);
@@ -225,6 +257,7 @@
       return;
     }
     error.textContent = '';
+    window.PinmapBatchStatus?.reset();
     const button = form.querySelector('#zip-import-start');
     button.disabled = true;
     button.setAttribute('aria-busy', 'true');
@@ -234,8 +267,10 @@
       const parsed = await window.PinmapZipParser.parseFile(file);
       form.querySelector('#zip-file-name').textContent = `${file.name} · 게시물 ${parsed.urls.length}건 확인`;
       void window.PinmapZipImport.start(parsed.urls, file.name).catch(reason => {
-        if (form.isConnected) error.textContent = reason.message || 'ZIP 가져오기를 시작하지 못했어요.';
+        if (sheet.open && form.isConnected) error.textContent = reason.message || 'ZIP 가져오기를 시작하지 못했어요.';
+        else toast(reason.message || 'ZIP 가져오기를 시작하지 못했어요.');
       });
+      if (window.PinmapZipImport.state()?.phase === 'running') sheet.close();
     } catch (reason) { error.textContent = reason.message || 'ZIP 파일을 읽지 못했어요.'; }
     finally {
       if (form.isConnected) {

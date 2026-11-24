@@ -443,11 +443,28 @@ if (PM_ENV.requiresAuth) (() => {
       return;
     }
     const errorNode = form.querySelector('#saveerror');
-    const url = form.elements.namedItem('url').value.trim();
-    if (!/^https:\/\/(?:www\.)?instagram\.com\/(?:p|reel|tv)\/[A-Za-z0-9_-]+\/?(?:\?.*)?$/.test(url)) {
+    const entered = form.elements.namedItem('url').value.trim().split(/\s+/).filter(Boolean);
+    const urls = entered.map(value => window.PinmapZipParser?.canonical(value));
+    if (!urls.length || urls.some(value => !value)) {
       if (errorNode) errorNode.textContent = 'Instagram 게시물 또는 릴스 링크를 입력해 주세요.';
       return;
     }
+    if (urls.length > 1) {
+      if (!window.PinmapZipImport) {
+        if (errorNode) errorNode.textContent = '여러 링크 저장 기능을 불러오지 못했어요. 새로고침 후 다시 시도해 주세요.';
+        return;
+      }
+      if (errorNode) errorNode.textContent = '';
+      window.PinmapBatchStatus?.reset();
+      void window.PinmapZipImport.start(urls, `링크 ${new Set(urls).size}개`).catch(error => {
+        const currentError = document.querySelector('#saveform #saveerror');
+        if (document.getElementById('sheet')?.open && currentError) currentError.textContent = error.message;
+        else toast(error.message);
+      });
+      if (window.PinmapZipImport.state()?.phase === 'running') document.getElementById('sheet')?.close();
+      return;
+    }
+    const url = entered[0];
     if (errorNode) errorNode.textContent = '';
     if (!PinmapSaveProgress.start()) return;
     const userId = currentUserId;
