@@ -63,6 +63,24 @@ test('ZIP import saves sequentially, skips saved links and resumes after a quota
   assert(changes.some(state=>state?.phase==='done'));
 });
 
+test('multiple pasted links use the same queue and report their source and counts',async()=>{
+  const values=new Map(), storage={getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)};
+  const one='https://www.instagram.com/p/one/';
+  const two='https://www.instagram.com/p/two/';
+  const sent=[];
+  const queue=createQueue({storage,canonical:parser.canonical,
+    account:{userId:()=> 'user-b',loaded:()=>true,knownUrls:()=>[one],
+      importLink:async url=>{sent.push(url);return {contentKind:'event',status:'extracted'};}},
+    publish:()=>{}});
+  await queue.start([one,two,two],'링크 3개');
+  assert.equal(queue.state().source,'links');
+  assert.equal(queue.state().phase,'done');
+  assert.equal(queue.state().total,2);
+  assert.equal(queue.state().saved,1);
+  assert.equal(queue.state().skipped,1);
+  assert.deepEqual(sent,[two]);
+});
+
 test('ZIP importer initializes in the login app mode',()=>{
   const listeners=new Map();
   const window={

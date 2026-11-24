@@ -23,7 +23,7 @@
   const MAX_POSTS = 10000;
   function createQueue({storage, account, canonical, publish = () => {}, finish = () => {}}) {
     let userId = null, job = null, running = false, pauseRequested = false, pendingAttach = null;
-    const state = () => job && ({phase:job.phase, name:job.name, total:job.urls.length,
+    const state = () => job && ({phase:job.phase, name:job.name, source:job.source || 'zip', total:job.urls.length,
       processed:job.index, saved:job.saved, skipped:job.skipped, review:job.review,
       error:job.error || ''});
     function notify() { publish(state()); }
@@ -45,12 +45,13 @@
       const id = account.userId();
       if (!id || !account.loaded()) throw Error('저장 목록을 불러온 뒤 다시 시도해 주세요.');
       if (running || (job && job.phase !== 'done' && job.index < job.urls.length))
-        throw Error('진행 중인 ZIP 가져오기를 먼저 완료해 주세요.');
+        throw Error('진행 중인 여러 콘텐츠 저장을 먼저 완료해 주세요.');
       if (!Array.isArray(urls) || !urls.length || urls.length > MAX_POSTS ||
           urls.some(url => canonical(url) !== url)) throw Error('ZIP의 게시물 링크 목록을 확인해 주세요.');
       userId = id;
       job = {phase:'running', name:String(name || 'Instagram ZIP').slice(0, 120),
-        urls:[...new Set(urls)], index:0, saved:0, skipped:0, review:0, error:''};
+          source:/\.zip$/i.test(String(name || '')) ? 'zip' : 'links',
+          urls:[...new Set(urls)], index:0, saved:0, skipped:0, review:0, error:''};
       pauseRequested = false;
       persist();
       return run();
@@ -92,7 +93,7 @@
     }
     function pause() { if (running) pauseRequested = true; else if (job?.phase === 'running') { job.phase = 'paused'; persist(); } }
     async function resume() {
-      if (!job || job.phase === 'done') throw Error('이어 할 ZIP 가져오기가 없어요.');
+      if (!job || job.phase === 'done') throw Error('이어 할 콘텐츠 저장이 없어요.');
       if (running) return;
       if (!account.loaded() || account.userId() !== userId) throw Error('같은 계정으로 로그인한 뒤 다시 시도해 주세요.');
       await account.refresh();
