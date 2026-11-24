@@ -1473,8 +1473,29 @@ html,body{overscroll-behavior-y:contain}
 .home-add-menu[data-open="true"] .home-add-options button:nth-child(2){transition-delay:52ms}
 .home-add-menu[data-open="true"] .home-add-options button:nth-child(3){transition-delay:74ms}
 .home-add-options button:hover,.home-add-options button:focus-visible{background:rgba(255,255,255,.14)}
+/* 지도 유리 버튼 규칙이 하단 추가 메뉴의 선택 버튼까지 덮지 않도록 메뉴 표면을 분리한다. */
+html body .live-map .bottomnav .home-add-options button{background:transparent!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html body .live-map .bottomnav .home-add-options button:is(:hover,:focus-visible){background:rgba(255,255,255,.14)!important}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.home-add-body{background:#1b1b1b}}
 @media(prefers-reduced-motion:reduce){.home-add-body,.home-add-fab,.home-add-options button{transition-duration:0s!important}.home-add-menu[data-sink="true"] :is(.home-add-body,.home-add-fab){scale:1}}
+
+/* FAQ: 한 장의 패널이 열린 질문으로 이동하고 답변 높이에 맞춰집니다. */
+.faq-panel-card{position:relative;padding:var(--space-xs);border:1px solid var(--color-disabled);border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:none;overflow:hidden}
+.faq-slide{position:absolute;top:0;left:var(--space-xs);right:var(--space-xs);height:0;border-radius:var(--rounded-md);background:var(--color-neutral);opacity:0;pointer-events:none}
+.faq-panel-card:not([data-ready]) .faq-slide{visibility:hidden}
+.faq-panel-card:not([data-ready]) .faq-item:has([aria-expanded="true"]){border-radius:var(--rounded-md);background:var(--color-neutral)}
+.faq-item{position:relative}
+.faq-item h2{margin:0;font:inherit}
+.faq-trigger{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);width:100%;min-height:56px;padding:var(--space-md) var(--space-lg);border:0;border-radius:var(--rounded-md);background:transparent;color:var(--color-on-surface);font:var(--type-body-md);font-weight:var(--weight-semibold);text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.faq-trigger>span{min-width:0}
+.faq-trigger:focus-visible{outline:2px solid var(--color-primary);outline-offset:-3px}
+.faq-chevron{width:18px;height:18px;flex:none;fill:none;stroke:var(--color-secondary);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(.64,0,.2,1)}
+.faq-trigger[aria-expanded="true"] .faq-chevron{transform:rotate(180deg)}
+.faq-answer{height:auto;overflow:hidden}
+.faq-answer[hidden]{display:none}
+.faq-text{margin:0;padding:0 var(--space-lg) var(--space-lg);color:var(--color-secondary);font:var(--type-body-sm);line-height:1.5;word-break:keep-all}
+@media(hover:hover) and (pointer:fine){.faq-trigger[aria-expanded="false"]:hover{background:var(--color-neutral)}}
+@media(prefers-reduced-motion:reduce){.faq-panel-card,.faq-chevron{transition:none}}
 
 /* The two input screens keep their existing save and ZIP handling. */
 #sheet.zip-import-sheet{width:min(400px,calc(100% - var(--space-xl) * 2));max-height:84dvh;overflow:auto;padding:var(--space-xl);background:var(--color-surface);color:var(--color-on-surface)}
