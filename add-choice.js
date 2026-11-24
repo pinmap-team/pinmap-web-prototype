@@ -41,13 +41,18 @@
     const item=items.find(x=>x.id===detailId);
     actions.linkimport(item?.url || '');
   };
-  actions.linkimport = (prefill = '') => {
+  function openFromAddMenu(action, kind, prefill = '') {
+    const stage = addStage();
+    const origin = stage?.dataset.open === 'true'
+      ? stage.querySelector(`[data-action="${action}"]`)?.getBoundingClientRect() : null;
     setAddMenuOpen(false);
-    window.PinmapLinkProgress?.open('links', typeof prefill === 'string' ? prefill : '');
+    window.PinmapLinkProgress?.open(kind, prefill, origin);
+  }
+  actions.linkimport = (prefill = '') => {
+    openFromAddMenu('linkimport', 'links', typeof prefill === 'string' ? prefill : '');
   };
   actions.zipimport = () => {
-    setAddMenuOpen(false);
-    window.PinmapLinkProgress?.open('zip');
+    openFromAddMenu('zipimport', 'zip');
   };
   window.PinmapStartZipFile = async (file, signal) => {
     if (!file || !/\.zip$/i.test(file.name) || file.size > 40 * 1024 * 1024)
@@ -71,8 +76,7 @@
     await window.PinmapZipImport.start(parsed.urls, file.name);
   };
   actions.screenshotimport = () => {
-    setAddMenuOpen(false);
-    window.PinmapLinkProgress?.open('photo');
+    openFromAddMenu('screenshotimport', 'photo');
   };
   document.addEventListener('pointerdown', event => {
     const stage = addStage();
