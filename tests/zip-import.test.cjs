@@ -59,6 +59,7 @@ test('ZIP import saves sequentially, skips saved links and resumes after a quota
   assert.equal(restored.state().phase,'done');
   assert.equal(restored.state().processed,3);
   assert.equal(restored.state().saved,2);
+  assert.deepEqual(restored.state().entries.map(entry=>entry.status),['skipped','saved','saved']);
   assert.deepEqual(sent,[urls[1],urls[1],urls[2]]);
   assert(changes.some(state=>state?.phase==='done'));
 });
