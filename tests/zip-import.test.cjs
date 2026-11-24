@@ -82,6 +82,33 @@ test('multiple pasted links use the same queue and report their source and count
   assert.deepEqual(sent,[two]);
 });
 
+test('pause immediately updates a running ZIP job and aborts its active request',async()=>{
+  const values=new Map(),storage={getItem:key=>values.get(key)||null,
+    setItem:(key,value)=>values.set(key,value)};
+  const urls=['https://www.instagram.com/p/one/','https://www.instagram.com/p/two/'];
+  let started;
+  const inFlight=new Promise(resolve=>{started=resolve;});
+  const sent=[];
+  const queue=createQueue({storage,canonical:parser.canonical,
+    account:{userId:()=> 'user-pause',loaded:()=>true,knownUrls:()=>[],refresh:async()=>{},
+      importLink:(url,id,signal)=>{
+        sent.push(url);started();
+        if(sent.length>1)return Promise.resolve({contentKind:'place',status:'extracted'});
+        return new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(signal.reason),{once:true}));
+      }},publish:()=>{}});
+  const running=queue.start(urls,'saved.zip');
+  await inFlight;
+  queue.pause();
+  assert.equal(queue.state().phase,'paused');
+  assert.equal(queue.state().processed,0);
+  assert.equal(JSON.parse(values.get('pinmap.zip-import.v1.user-pause')).phase,'paused');
+  await running;
+  assert.deepEqual(sent,[urls[0]]);
+  await queue.resume();
+  assert.equal(queue.state().phase,'done');
+  assert.deepEqual(sent,[urls[0],urls[0],urls[1]]);
+});
+
 test('forget removes a running ZIP job and does not restore it after the active request settles',async()=>{
   const values=new Map();
   const storage={getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value),

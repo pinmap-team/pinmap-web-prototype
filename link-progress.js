@@ -15,6 +15,7 @@
       </div><p class="dl-input-error" role="alert" hidden></p></div></div>
       <div class="dl-body" data-open="true"><div class="dl-body-clip"><div class="dl-head"><div class="dl-texts"><span class="dl-title t-text-swap" id="dl-title"></span><span class="dl-sub" aria-live="polite"><span class="t-text-swap" id="dl-done">0</span>개 처리</span></div>
         <button class="dl-btn t-resize" id="dl-btn" type="button"><span class="t-text-swap" id="dl-btn-label"></span></button>
+        <button class="dl-transport" id="dl-transport" type="button" hidden aria-label="일시정지" data-state="pause"><svg class="dl-pause-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><svg class="dl-play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg></button>
         <button class="dl-close" id="dl-close" type="button" aria-label="진행창 접기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" aria-hidden="true"><path d="M6 18 18 6M6 6l12 12"/></svg></button></div>
       <div class="dl-bar" role="progressbar" aria-label="링크 처리 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="dl-bar-fill" id="dl-bar-fill"></span></div>
       <ul class="dl-list"></ul><p class="dl-error" role="alert" hidden></p>
@@ -29,6 +30,8 @@
   const linkInput = get('#dl-link-input'), zipInput = get('#dl-zip-input'), photoInput = get('#dl-photo-input');
   const rows = new Map();
   let current = null, identity = '', minTimer = 0, inputMode = null, inputPending = false, inputDismissed = false;
+  let deletePending = false, resumeAfterDeleteDismiss = false;
+  let zipReadController = null;
   let photoName = '', photoPreviewUrl = '';
   const duration = (name, fallback) => {
     const raw = getComputedStyle(stage).getPropertyValue(name).trim();
@@ -36,11 +39,15 @@
     return Number.isFinite(number) ? (raw.endsWith('ms') ? number : raw.endsWith('s') ? number * 1000 : number) : fallback;
   };
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function swapText(node, next) {
+  function swapText(node, next, instant = false) {
     if (!node || node.dataset.text === next || (node.dataset.text === undefined && node.textContent === next)) return;
     node.dataset.text = next;
     clearTimeout(node._swapTimer);
-    if (reduced() || !node.textContent) { node.textContent = next; return; }
+    if (instant || reduced() || !node.textContent) {
+      node.classList.remove('is-exit', 'is-enter-start');
+      node.textContent = next;
+      return;
+    }
     node.classList.remove('is-enter-start');
     node.classList.add('is-exit');
     node._swapTimer = setTimeout(() => {
@@ -58,7 +65,7 @@
     node.disabled = disabled;
     if (text.dataset.text === label) return;
     node.style.width = oldWidth + 'px';
-    swapText(text, label);
+    swapText(text, label, label === '이어하기');
     clearTimeout(node._resizeTimer);
     node._resizeTimer = setTimeout(() => {
       if (!node.isConnected) return;
@@ -106,7 +113,18 @@
     node.hidden = !message;
   }
   function open(kind = 'links', prefill = '') {
-    if (window.PinmapSaveProgress?.isRunning() || window.PinmapZipImport?.isRunning()) {
+    const batch = window.PinmapZipImport?.state();
+    if (batch && batch.phase !== 'done') {
+      inputMode = null;
+      inputDismissed = false;
+      stage.classList.remove('is-min');
+      win.classList.remove('is-min');
+      full.inert = false;
+      ring.tabIndex = -1;
+      update();
+      return;
+    }
+    if (window.PinmapSaveProgress?.isRunning()) {
       inputMode = null;
       update();
       return;
@@ -161,14 +179,16 @@
   async function submitZip(file) {
     if (inputPending || inputMode !== 'zip' || !file) return;
     inputPending = true;
+    zipReadController = new AbortController();
+    const controller = zipReadController;
     get('.dl-paste').disabled = true;
     get('.dl-file-label').textContent = file.name;
     get('.dl-field').classList.add('is-filled');
     swapText(get('#dl-paste-label'), '확인 중');
     inputError();
-    try { await window.PinmapStartZipFile(file); }
+    try { await window.PinmapStartZipFile(file, controller.signal); }
     catch (error) { if (inputMode) inputError(error.message || 'ZIP 파일을 확인해 주세요.'); }
-    finally { inputPending = false; get('.dl-paste').disabled = false; }
+    finally { if (zipReadController === controller) zipReadController = null; inputPending = false; get('.dl-paste').disabled = false; }
   }
   async function preparePhoto(file) {
     const url = URL.createObjectURL(file);
@@ -280,13 +300,63 @@
     get('.dl-ring-pct').textContent = `${percent}%`;
     ring.classList.toggle('is-done', done);
     const error = get('.dl-error'); error.hidden = !state.error; error.textContent = state.error || '';
+    const zipJob = state.kind === 'batch' && state.source === 'zip';
+    const transport = get('.dl-transport');
+    transport.hidden = !zipJob || state.phase === 'done';
+    transport.dataset.state = state.phase === 'paused' ? 'play' : 'pause';
+    transport.setAttribute('aria-label', state.phase === 'paused' ? 'ZIP 작업 재생' : 'ZIP 작업 일시정지');
+    get('#dl-btn').hidden = zipJob && state.phase !== 'done';
+    get('.dl-close').setAttribute('aria-label', zipJob ? 'ZIP 작업 삭제' : '진행창 접기');
     button(state.kind === 'single' ? (state.phase === 'running' ? '진행 중' : '닫기')
       : state.phase === 'paused' ? '이어하기' : state.phase === 'running' ? '일시정지' : '닫기',
       state.kind === 'single' && state.phase === 'running');
   }
-  get('.dl-close').addEventListener('click', () => minimize(true,true));
+  function deleteZipJob() {
+    window.PinmapZipImport?.forget();
+    inputDismissed = false;
+    update();
+    document.querySelector('.home-add-fab')?.focus({preventScroll:true});
+  }
+  actions.zipdeleteyes = () => {
+    if (!deletePending) return;
+    deletePending = false;
+    resumeAfterDeleteDismiss = false;
+    document.getElementById('sheet')?.close();
+    deleteZipJob();
+  };
+  document.getElementById('sheet')?.addEventListener('close', () => {
+    if (!deletePending) return;
+    deletePending = false;
+    if (!resumeAfterDeleteDismiss) return;
+    resumeAfterDeleteDismiss = false;
+    void window.PinmapZipImport?.resume().catch(error => {
+      const node = get('.dl-error');
+      node.hidden = false;
+      node.textContent = error.message;
+    });
+  });
+  get('.dl-close').addEventListener('click', () => {
+    if (current?.kind !== 'batch' || current.source !== 'zip') { minimize(true,true); return; }
+    resumeAfterDeleteDismiss = current.phase === 'running';
+    if (resumeAfterDeleteDismiss) window.PinmapZipImport?.pause();
+    deletePending = true;
+    confirmPop('ZIP 작업을 삭제할까요?', '진행 기록이 삭제돼요. 이미 저장된 콘텐츠는 그대로 남아요.', 'zipdeleteyes', '작업 삭제', '계속하기');
+  });
+  get('.dl-transport').addEventListener('click', () => {
+    if (current?.kind !== 'batch' || current.source !== 'zip') return;
+    if (current.phase === 'running') window.PinmapZipImport?.pause();
+    else if (current.phase === 'paused') void window.PinmapZipImport?.resume().catch(error => {
+      const node = get('.dl-error'); node.hidden = false; node.textContent = error.message;
+    });
+    update();
+  });
+  document.addEventListener('pointerdown', event => {
+    if (stage.hidden || stage.classList.contains('is-min') || !current || inputMode || deletePending || stage.contains(event.target)) return;
+    minimize(true);
+  });
   function closeInput() {
-    if (!inputMode || inputPending) return;
+    if (!inputMode || (inputPending && inputMode !== 'zip')) return;
+    zipReadController?.abort();
     inputMode = null;
     inputDismissed = true;
     update();

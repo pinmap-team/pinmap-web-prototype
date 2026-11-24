@@ -281,21 +281,24 @@ if (PM_ENV.requiresAuth) (() => {
     return typeof response?.error === 'string' && response.error.length < 150
       ? response.error : '저장 서버에 연결하지 못했어요. 다시 시도해 주세요.';
   };
-  async function accountRequest(method, body, query = '', expectedUserId = currentUserId, accessToken = null) {
+  async function accountRequest(method, body, query = '', expectedUserId = currentUserId, accessToken = null, signal = null) {
     if (!client) throw Error('로그인 연결을 확인하고 있어요.');
+    signal?.throwIfAborted();
     if (!accessToken) {
       const {data, error} = await client.auth.getSession();
       if (error || !data?.session?.access_token) throw Error('로그인 상태가 만료됐어요. 다시 로그인해 주세요.');
       accessToken = data.session.access_token;
     }
+    signal?.throwIfAborted();
     if (!expectedUserId || currentUserId !== expectedUserId)
       throw Error('계정이 변경됐어요. 다시 로그인한 뒤 시도해 주세요.');
     const response = await fetch('/api/content-save' + query, {
       method, headers:{'Authorization':'Bearer ' + accessToken,
         ...(body ? {'Content-Type':'application/json'} : {})},
-      ...(body ? {body:JSON.stringify(body)} : {}), cache:'no-store'
+      ...(body ? {body:JSON.stringify(body)} : {}), cache:'no-store', ...(signal ? {signal} : {})
     });
     const result = await response.json().catch(() => ({}));
+    signal?.throwIfAborted();
     if (!response.ok) throw Error(message(response.status, result));
     return result;
   }
@@ -411,12 +414,13 @@ if (PM_ENV.requiresAuth) (() => {
       throw error;
     } finally { contentSaving = false; }
   };
-  async function importZipLink(url, expectedUserId) {
+  async function importZipLink(url, expectedUserId, signal = null) {
     if (!expectedUserId || expectedUserId !== currentUserId) throw Error('로그인 계정이 변경됐어요.');
     if (PinmapSaveProgress.isRunning() || contentSaving) throw Error('다른 저장 작업이 진행 중이에요.');
     contentSaving = true;
     try {
-      const result = await accountRequest('POST', {url,content_types:['place','event']}, '', expectedUserId);
+      const result = await accountRequest('POST', {url,content_types:['place','event']}, '', expectedUserId, null, signal);
+      signal?.throwIfAborted();
       if (!result.item || typeof result.item !== 'object') throw Error('게시물 저장 결과를 확인하지 못했어요.');
       if (currentUserId !== expectedUserId) throw Error('로그인 계정이 변경됐어요.');
       loadVersion++;
