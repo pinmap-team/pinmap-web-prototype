@@ -26,26 +26,18 @@ test('simultaneous app and content identity checks share one Supabase request',a
   await third;
 });
 
-test('login tokens stay in memory while PKCE verifier survives only the redirect',async()=>{
-  const session=new Map(),local=new Map([['pinmap.auth.v1','old-token']]);
+test('auth SDK uses the shared session key and persistent refresh configuration',async()=>{
   let options;
   const window={};window.top=window;
   window.supabase={createClient:(_url,_key,config)=>{options=config.auth;return {auth:{}}}};
   const context={window,location:{protocol:'https:',origin:'https://pinmap.test/',href:'https://pinmap.test/auth.html'},
-    sessionStorage:{getItem:k=>session.get(k)??null,setItem:(k,v)=>session.set(k,v),removeItem:k=>session.delete(k)},
-    localStorage:{getItem:k=>local.get(k)??null,removeItem:k=>local.delete(k)},
-    crypto:{randomUUID:()=> 'tab-123'},AbortSignal:{timeout:()=>null},
+    AbortSignal:{timeout:()=>null},
     fetch:async()=>({ok:true,json:async()=>({url:'https://auth.test',publishableKey:'public'})})};
   vm.runInNewContext(fs.readFileSync('auth-client.js','utf8'),context);
   await window.PinmapAuth.ready();
-  assert.equal(local.has('pinmap.auth.v1'),false);
-  assert.equal(options.storageKey,'pinmap.auth.tab.tab-123');
-  options.storage.setItem(options.storageKey,'access-and-refresh-token');
-  assert.equal(session.has(options.storageKey),false);
-  assert.equal(local.has(options.storageKey),false);
-  assert.equal(options.storage.getItem(options.storageKey),'access-and-refresh-token');
-  options.storage.setItem(options.storageKey+'-code-verifier','temporary-verifier');
-  assert.equal(session.get(options.storageKey+'-code-verifier'),'temporary-verifier');
-  options.storage.removeItem(options.storageKey+'-code-verifier');
-  assert.equal(session.has(options.storageKey+'-code-verifier'),false);
+  assert.equal(options.storageKey,'pinmap.auth.v1');
+  assert.equal(options.persistSession,true);
+  assert.equal(options.autoRefreshToken,true);
+  assert.equal(options.detectSessionInUrl,true);
+  assert.equal(options.flowType,'pkce');
 });

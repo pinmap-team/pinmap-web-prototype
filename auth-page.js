@@ -27,14 +27,31 @@
   const fieldIcon = type => type === 'email'
     ? '<span class="auth-input-icon" aria-hidden="true">@</span>'
     : '<span class="auth-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="6" y="10" width="12" height="10" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2"/></svg></span>';
-  const emailField = `<label class="auth-field" for="auth-email"><span class="auth-field-label">이메일</span><span class="auth-input-shell">${fieldIcon('email')}<input id="auth-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="이메일 주소" maxlength="254" required></span></label>`;
-  const passwordField = fresh => `<label class="auth-field" for="auth-password"><span class="auth-field-label">${mode === 'password' ? '새 비밀번호' : '비밀번호'}</span><span class="auth-input-shell auth-password">${fieldIcon('password')}<input id="auth-password" name="password" type="password" autocomplete="${fresh ? 'new-password' : 'current-password'}" ${fresh ? 'minlength="8"' : ''} aria-describedby="auth-password-help" maxlength="128" placeholder="${mode === 'password' ? '새 비밀번호 · 8자 이상' : fresh ? '8자 이상 입력해 주세요' : '비밀번호'}" required><button type="button" data-auth="reveal" aria-controls="auth-password" aria-label="비밀번호 표시" aria-pressed="false">보기</button></span></label>`;
-  const confirmation = `<label class="auth-field" for="auth-confirm"><span class="auth-field-label">비밀번호 확인</span><span class="auth-input-shell">${fieldIcon('password')}<input id="auth-confirm" name="confirm" type="password" placeholder="비밀번호 확인" autocomplete="new-password" minlength="8" maxlength="128" aria-describedby="auth-confirm-help" required></span><small id="auth-confirm-help" class="auth-field-help" aria-live="polite"></small></label>`;
+  const emailField = `<label class="auth-field t-input-wrap" for="auth-email"><span class="auth-field-label">이메일</span><span class="auth-input-shell t-input">${fieldIcon('email')}<input id="auth-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="이메일 주소" maxlength="254" required></span></label>`;
+  const passwordField = fresh => `<label class="auth-field t-input-wrap" for="auth-password"><span class="auth-field-label">${mode === 'password' ? '새 비밀번호' : '비밀번호'}</span><span class="auth-input-shell auth-password t-input">${fieldIcon('password')}<input id="auth-password" name="password" type="password" autocomplete="${fresh ? 'new-password' : 'current-password'}" ${fresh ? 'minlength="8"' : ''} aria-describedby="auth-password-help" maxlength="128" placeholder="${mode === 'password' ? '새 비밀번호 · 8자 이상' : fresh ? '8자 이상 입력해 주세요' : '비밀번호'}" required><button type="button" data-auth="reveal" aria-controls="auth-password" aria-label="비밀번호 표시" aria-pressed="false">보기</button></span></label>`;
+  const confirmation = `<label class="auth-field t-input-wrap" for="auth-confirm"><span class="auth-field-label">비밀번호 확인</span><span class="auth-input-shell t-input">${fieldIcon('password')}<input id="auth-confirm" name="confirm" type="password" placeholder="비밀번호 확인" autocomplete="new-password" minlength="8" maxlength="128" aria-describedby="auth-confirm-help" required></span><small id="auth-confirm-help" class="auth-field-help" aria-live="polite"></small></label>`;
   const kakao = '<button class="auth-kakao" type="button" data-auth="kakao" aria-label="카카오로 시작하기"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M12 3C6.5 3 2 6.5 2 10.8c0 2.7 1.8 5.1 4.5 6.5l-.9 3.3c-.1.3.2.5.5.3l3.9-2.6c.7.1 1.3.2 2 .2 5.5 0 10-3.5 10-7.7S17.5 3 12 3Z"/></svg></button>';
   const google = '<button class="auth-google" type="button" data-auth="google" aria-label="구글로 시작하기"><svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true"><path fill="#4285F4" d="M43.61 24.46c0-1.36-.12-2.67-.35-3.92H24v7.42h11a9.4 9.4 0 0 1-4.08 6.17v5h6.6c3.86-3.55 6.09-8.78 6.09-14.67Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.82 13.52-4.87l-6.6-5c-1.82 1.22-4.15 1.94-6.92 1.94-5.32 0-9.82-3.59-11.43-8.42H5.75v5.16A20 20 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.57 27.65a12 12 0 0 1 0-7.3v-5.16H5.75a20 20 0 0 0 0 17.62l6.82-5.16Z"/><path fill="#EA4335" d="M24 11.93c3 0 5.68 1.03 7.8 3.06l5.85-5.85C34.1 5.83 29.5 4 24 4a20 20 0 0 0-18.25 11.19l6.82 5.16C14.18 15.52 18.68 11.93 24 11.93Z"/></svg></button>';
   function notice(text, error = false) {
     const node = document.getElementById('auth-message');
     node.classList.toggle('is-error', error); node.textContent = text;
+  }
+  function shakeInvalidField(field) {
+    if (!field) return;
+    const shell = field.closest('.t-input-wrap')?.querySelector('.t-input');
+    if (!shell) return;
+    field.setAttribute('aria-invalid', 'true');
+    shell.classList.add('is-error');
+    shell.classList.remove('is-shaking');
+    void shell.offsetWidth;
+    shell.classList.add('is-shaking');
+    clearTimeout(shell.shakeTimer);
+    clearTimeout(shell.revertTimer);
+    const style = getComputedStyle(shell);
+    const ms = (name, fallback) => parseFloat(style.getPropertyValue(name)) || fallback;
+    const shakeDuration = ms('--shake-dur-a', 80) * 2 + ms('--shake-dur-b', 60) * 2;
+    shell.shakeTimer = setTimeout(() => shell.classList.remove('is-shaking'), shakeDuration + 20);
+    shell.revertTimer = setTimeout(() => shell.classList.remove('is-error'), shakeDuration + ms('--revert-hold', 3000));
   }
   function updateResend() {
     const button = content.querySelector('[data-auth="resend"]');
@@ -229,7 +246,7 @@
     const password = form.elements.password?.value;
     if (email) lastEmail = email;
     if (form.elements.confirm && form.elements.confirm.value !== password) {
-      notice('비밀번호가 일치하지 않아요.',true); form.elements.confirm.setAttribute('aria-invalid','true'); form.elements.confirm.focus(); return;
+      notice('비밀번호가 일치하지 않아요.',true); shakeInvalidField(form.elements.confirm); form.elements.confirm.focus(); return;
     }
     const submittedMode = mode;
     await PinmapButton.run(form.querySelector('[type="submit"]'), async () => {
@@ -251,16 +268,24 @@
       } catch (error) {
         if (error.code === 'email_not_confirmed' && email) {verificationPurpose = 'signup'; resendAfter = 0; render('verify');}
         notice(PinmapAuth.message(error),true);
+        if (['invalid_credentials','weak_password','same_password'].includes(error.code)) shakeInvalidField(document.getElementById('auth-password'));
+        if (['email_address_invalid','user_already_exists'].includes(error.code)) shakeInvalidField(document.getElementById('auth-email'));
       } finally {loading(false);}
     },'로그인 요청 처리 중');
   });
   content.addEventListener('invalid', event => {
-    const field = event.target; field.setAttribute('aria-invalid','true');
+    const field = event.target; shakeInvalidField(field);
     const text = field.validity.valueMissing ? '필수 항목을 모두 입력해 주세요.' : field.validity.typeMismatch ? '올바른 이메일 주소를 입력해 주세요.' : field.validity.tooShort ? '비밀번호는 8자 이상 입력해 주세요.' : '입력한 내용을 확인해 주세요.';
     notice(text,true);
   },true);
   content.addEventListener('input', event => {
     event.target.removeAttribute('aria-invalid');
+    const shell = event.target.closest('.t-input-wrap')?.querySelector('.t-input');
+    if (shell) {
+      clearTimeout(shell.shakeTimer);
+      clearTimeout(shell.revertTimer);
+      shell.classList.remove('is-error', 'is-shaking');
+    }
     if (document.getElementById('auth-message')?.classList.contains('is-error')) notice('');
     const password = document.getElementById('auth-password');
     const confirm = document.getElementById('auth-confirm');

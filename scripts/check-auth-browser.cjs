@@ -42,6 +42,8 @@ const session={access_token:token,refresh_token:'test-refresh-token',token_type:
  await page.getByRole('button',{name:'회원가입',exact:true}).click();
  await page.locator('#auth-email').fill('test@example.com');await page.locator('#auth-password').fill('test-password');await page.locator('#auth-confirm').fill('different-password');
  await page.locator('#auth-form').evaluate(form=>form.requestSubmit());await page.locator('#auth-message').getByText('비밀번호가 일치하지 않아요.',{exact:true}).waitFor();
+ assert.equal(await page.locator('#auth-confirm').getAttribute('aria-invalid'),'true');
+ assert.equal(await page.locator('#auth-confirm').evaluate(input=>getComputedStyle(input.closest('.t-input')).animationName),'t-input-shake');
  assert(!calls.some(x=>x.path.endsWith('/signup')));
  await page.locator('#auth-confirm').fill('test-password');assert.equal(await page.locator('#auth-confirm-help').innerText(),'비밀번호가 일치해요.');await page.screenshot({path:out+'/signup-form.png'});
  await page.locator('#auth-form').evaluate(form=>{form.requestSubmit();form.requestSubmit();});
@@ -54,6 +56,8 @@ const session={access_token:token,refresh_token:'test-refresh-token',token_type:
  await page.getByRole('button',{name:'인증했어요 · 로그인하기',exact:true}).click();assert.equal(await page.locator('#auth-email').inputValue(),'test@example.com');
  failPassword=true;await page.locator('#auth-email').fill('test@example.com');await page.locator('#auth-password').fill('bad-password');await page.getByRole('button',{name:'이메일로 로그인',exact:true}).click();
  await page.getByText('이메일 또는 비밀번호를 확인해 주세요.',{exact:true}).waitFor();
+ assert.equal(await page.locator('#auth-password').getAttribute('aria-invalid'),'true');
+ assert.equal(await page.locator('#auth-password').evaluate(input=>input.closest('.t-input').classList.contains('is-error')),true);
  assert.equal(await page.getByRole('button',{name:'이메일로 로그인',exact:true}).isEnabled(),true);
  unconfirmed=true;failPassword=false;await page.getByRole('button',{name:'이메일로 로그인',exact:true}).click();await page.getByRole('heading',{name:'인증 메일을 확인해 주세요'}).waitFor();assert.equal(await page.getByRole('button',{name:'인증 메일 다시 보내기',exact:true}).isEnabled(),true);await page.getByRole('button',{name:'인증했어요 · 로그인하기',exact:true}).click();unconfirmed=false;
  await page.getByRole('button',{name:'비밀번호 재설정',exact:true}).click();await page.locator('#auth-email').fill('test@example.com');await page.getByRole('button',{name:'재설정 링크 보내기',exact:true}).click();
