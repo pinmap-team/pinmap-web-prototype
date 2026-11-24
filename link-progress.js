@@ -129,13 +129,16 @@
     svg.setAttribute('class', 'dl-goo-morph');
     svg.setAttribute('viewBox', `0 0 ${innerWidth} ${innerHeight}`);
     svg.setAttribute('aria-hidden', 'true');
-    svg.innerHTML = `<defs><filter id="dl-input-goo-filter" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo"/><feComposite in="SourceGraphic" in2="goo" operator="atop"/></filter></defs><g filter="url(#dl-input-goo-filter)"><circle class="dl-goo-source"/><rect class="dl-goo-card"/></g>`;
+    svg.innerHTML = `<defs><filter id="dl-input-goo-filter" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur"/><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -7.8" result="goo"/><feComposite in="SourceGraphic" in2="goo" operator="atop"/></filter></defs><g filter="url(#dl-input-goo-filter)"><circle class="dl-goo-source"/><circle class="dl-goo-drop"/><rect class="dl-goo-card"/></g>`;
     document.body.append(svg);
     inputMorphLayer = svg;
     const source = svg.querySelector('.dl-goo-source');
+    const drop = svg.querySelector('.dl-goo-drop');
     const card = svg.querySelector('.dl-goo-card');
     const cx = origin.left + origin.width / 2, cy = origin.top + origin.height / 2;
     const radius = Math.min(origin.width, origin.height) / 2;
+    const landingX = Math.max(target.left + radius, Math.min(cx, target.right - radius));
+    const landingY = target.bottom - radius * .5;
     const start = performance.now();
     const lerp = (a, b, t) => a + (b - a) * t;
     const smooth = t => t * t * (3 - 2 * t);
@@ -143,23 +146,30 @@
     stage.style.pointerEvents = 'none';
     function frame(now) {
       if (inputMorphLayer !== svg || stage.hidden || !inputMode) { stopInputMorph(); return; }
-      const t = Math.min(1, (now - start) / 350);
-      const p = 1 + 2.25 * (t - 1) ** 3 + 1.25 * (t - 1) ** 2;
-      const sourceRadius = radius * (1 - smooth(Math.max(0, (t - .38) / .62)));
+      const t = Math.min(1, (now - start) / 430);
+      const travel = smooth(Math.min(1, t / .48));
+      const grow = smooth(Math.max(0, Math.min(1, (t - .38) / .62)));
+      const dropX = lerp(cx, landingX, travel), dropY = lerp(cy, landingY, travel);
+      const sourceRadius = radius * (1 - smooth(Math.max(0, Math.min(1, (t - .2) / .42))));
+      const dropRadius = radius * (1 - smooth(Math.max(0, Math.min(1, (t - .5) / .42))));
       source.setAttribute('cx', cx);
       source.setAttribute('cy', cy);
       source.setAttribute('r', Math.max(0, sourceRadius));
-      card.setAttribute('x', lerp(cx - radius, target.left, p));
-      card.setAttribute('y', lerp(cy - radius, target.top, p));
-      card.setAttribute('width', Math.max(0, lerp(radius * 2, target.width, p)));
-      card.setAttribute('height', Math.max(0, lerp(radius * 2, target.height, p)));
-      card.setAttribute('rx', lerp(radius, 24, p));
-      const surfaceMix = Math.round(smooth(Math.min(1, t * 1.9)) * 100);
+      drop.setAttribute('cx', dropX);
+      drop.setAttribute('cy', dropY);
+      drop.setAttribute('r', Math.max(0, dropRadius));
+      card.setAttribute('x', lerp(dropX - radius, target.left, grow));
+      card.setAttribute('y', lerp(dropY - radius, target.top, grow));
+      card.setAttribute('width', Math.max(0, lerp(radius * 2, target.width, grow)));
+      card.setAttribute('height', Math.max(0, lerp(radius * 2, target.height, grow)));
+      card.setAttribute('rx', lerp(radius, 24, grow));
+      const surfaceMix = Math.round(smooth(Math.max(0, Math.min(1, (t - .3) / .5))) * 100);
       const fill = `color-mix(in srgb, var(--color-primary) ${100 - surfaceMix}%, var(--color-surface) ${surfaceMix}%)`;
       source.style.fill = fill;
+      drop.style.fill = fill;
       card.style.fill = fill;
-      win.style.opacity = String(smooth(Math.max(0, Math.min(1, (t - .62) / .32))));
-      svg.style.opacity = String(1 - smooth(Math.max(0, Math.min(1, (t - .7) / .3))));
+      win.style.opacity = String(smooth(Math.max(0, Math.min(1, (t - .68) / .28))));
+      svg.style.opacity = String(1 - smooth(Math.max(0, Math.min(1, (t - .75) / .25))));
       if (t < 1) inputMorphFrame = requestAnimationFrame(frame);
       else stopInputMorph();
     }
@@ -325,6 +335,7 @@
         inputMode === 'zip' ? state.kind === 'batch' && state.source === 'zip' :
         state.kind === 'single' && state.source === 'link' || state.kind === 'batch' && state.source === 'links');
     if (enteredProgress) { inputMode = null; inputDismissed = false; }
+    stage.classList.toggle('is-input', Boolean(inputMode));
     stage.hidden = inputDismissed || (!state && !inputMode);
     current = state;
     linkPanel.dataset.open = inputMode ? 'true' : 'false';
