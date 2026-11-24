@@ -117,12 +117,10 @@ pages.favorites = () => {
   const row = x => {
     const isPlace=x.kind==='place';
     const description = x.desc || x.memo;
-    const place = isPlace&&x.address ? `${icon('pin')}<span>${esc(x.address)}</span>` : `<span>${esc(x.category || x.type || '')}</span>`;
     const on=favSel?.has(x.id);
     return `<button type="button" class="calrow fav-row${on?' on':''}" ${favSel?`role="checkbox" aria-checked="${!!on}"`:`data-detail="${x.sourceId}"`} data-favitem="${esc(x.id)}" data-fav-kind="${x.kind}" ${isPlace&&!x.unlocated?`data-fav-place-index="${x.locationIndex}"`:''} aria-label="${esc(x.title)} ${isPlace?'장소':'게시물'}${favSel?' 선택':' 상세 보기'}">
     <span class="calthumb${x.unlocated?' fav-unlocated-thumb':''}">${x.unlocated?icon('pin'):isPlace&&x.photo?`<img src="${esc(x.photo)}" alt="">`:libThumb(x.sourceItem)}</span>
-    <span class="caltext fav-text"><b>${esc(x.title)}</b><small class="fav-kind">${isPlace?'장소':'게시물'}</small>${description ? `<small class="fav-desc">${esc(description)}</small>` : ''}
-      <small class="fav-meta">${place}<span class="fav-time">${esc(savedAgo(x))} 저장</span></small></span>
+    <span class="caltext fav-text"><b>${esc(x.title)}</b>${description ? `<small class="fav-desc">${esc(description)}</small>` : ''}</span>
     ${favSel?`<span class="fav-choice" aria-hidden="true">${icon('check')}</span>`:''}
   </button>`;
   };

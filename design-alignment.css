@@ -992,15 +992,13 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .favpage .fav-items{display:grid;gap:var(--space-md)}
 .favpage .fav-group{display:grid;gap:var(--space-sm)}
 .favpage .fav-group-title{margin:0;font:var(--type-label-md);color:var(--color-on-surface)}
-.favpage .fav-row{min-height:96px;color:var(--color-on-surface);position:relative}
+.favpage .fav-row{min-height:96px;gap:var(--space-lg);padding:var(--space-lg);color:var(--color-on-surface);position:relative}
+.favpage .fav-row .calthumb{width:96px;height:96px;aspect-ratio:1;overflow:hidden}
+.favpage .fav-row .calthumb>img{width:100%;height:100%;object-fit:cover}
 .favpage .fav-unlocated-thumb{display:grid;place-items:center;color:var(--color-secondary)}
 .favpage .fav-unlocated-thumb .icon{width:24px;height:24px}
 .favpage .fav-text{gap:var(--space-xs)}
-.favpage .fav-text .fav-kind{font:var(--type-body-sm);color:var(--color-secondary)}
-.favpage .fav-text .fav-desc{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--color-secondary)}
-.favpage .fav-text .fav-meta{display:flex;min-width:0;gap:var(--space-xs);color:var(--color-secondary)}
-.favpage .fav-meta>span:first-of-type{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.favpage .fav-meta .fav-time{flex:none;margin-left:auto;white-space:nowrap}
+.favpage .fav-text .fav-desc{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;white-space:normal;line-height:1.45;color:var(--color-secondary)}
 .favpage .fav-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md)}
 .favpage .fav-header .fav-count{margin:0}
 .favpage .fav-remove .icon{fill:currentColor}
@@ -1967,6 +1965,7 @@ html body .homecategories .prefchip img.pm-category-icon{width:20px!important;he
 /* 2026-11-24: 온보딩 2/2 설명과 카드 사이 space-2xl(32px) */
 html body #onboarding .ob-screen.step3 .ob-groupcards{padding-top:var(--space-2xl)!important}
 /* 2026-11-24: 홈 카테고리 칩 아이콘 — SVG를 mask로 써서 토큰 색으로 칠함(기본 icon-muted, 마우스 올림·포커스 icon-hover) */
+html body .homecategories .prefchip{box-shadow:none!important}
 html body .homecategories .prefchip .pm-category-mask{display:inline-block;flex:none;width:20px;height:20px;vertical-align:middle;background-color:var(--color-icon-muted);-webkit-mask:var(--pm-cat-icon) center/contain no-repeat;mask:var(--pm-cat-icon) center/contain no-repeat;transition:background-color .15s ease}
 html body .homecategories .prefchip:is(:hover,:focus-visible) .pm-category-mask{background-color:var(--color-icon-hover)}
 /* 2026-11-24: 스낵바 — 화면 가운데, 좌우 여백 space-2xl */
@@ -1996,10 +1995,11 @@ html body .cf-item :is(h3,.cf-itemdesc,.cf-itemmeta,.cf-itemmeta span){word-brea
 html body .cf-item .cf-fav{position:absolute;top:var(--space-sm);right:var(--space-sm);z-index:2;display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:rgba(17,17,17,.32);color:#fff;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 html body .cf-item .cf-fav svg.icon{width:20px!important;height:20px!important}
 html body .cf-item .cf-fav::after{content:'';position:absolute;inset:-6px}
-/* 2026-11-24: 마이 — 무료 분석은 카드, 다크에서 섹션 배경 없음, 남은 횟수 5회 이하면 막대 빨강 */
+/* 2026-11-24: 마이 — 분석 사용량 카드와 단계별 막대 색상 */
 html body .my-quota.my-section{padding:var(--space-lg)!important;border:0!important;border-radius:var(--rounded-lg)!important;margin-bottom:var(--space-lg)!important;background:var(--color-surface)!important;box-shadow:var(--shadow-sm)!important}
 html[data-theme="dark"] body .mgroup.my-section:not(.my-quota){background:transparent!important}
-html body .my-quota.is-urgent .my-quota-track span{background:var(--color-error)!important}
+html body .my-quota .my-quota-track span{transition:width .3s ease,background-color .3s ease}
+@media(prefers-reduced-motion:reduce){html body .my-quota .my-quota-track span{transition:none}}
 /* 2026-11-24: 탈퇴 확인 — 왼쪽 '탈퇴하기' 글씨 빨강, 다크 모드 버튼은 한 단계 어둡게(surface) */
 html body .confirmpop .cfok.is-danger{color:var(--color-error)!important}
 html[data-theme="dark"] body .confirmpop .cfok.is-danger{background:var(--color-neutral)!important}
