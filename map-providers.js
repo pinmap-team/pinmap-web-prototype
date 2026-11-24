@@ -35,6 +35,7 @@
 
   function attach(map, onChange) {
     const host = map.getContainer();
+    const header = host.closest('.live-map')?.querySelector('.lm-header');
     const nativeHost = document.createElement('div');
     nativeHost.className = 'pm-native-map';
     nativeHost.setAttribute('aria-hidden', 'true');
@@ -59,8 +60,8 @@
     function sync() {
       if (!nativeMap || disposed) return;
       const canvas = host.getBoundingClientRect();
-      const header = host.closest('.live-map')?.querySelector('.lm-header')?.getBoundingClientRect();
-      const top = Math.max(0, Math.round((header?.bottom ?? canvas.top) - canvas.top));
+      const headerBounds = header?.getBoundingClientRect();
+      const top = Math.max(0, Math.round((headerBounds?.bottom ?? canvas.top) - canvas.top));
       nativeHost.style.top = top + 'px';
       const center = map.containerPointToLatLng([canvas.width / 2, (top + canvas.height) / 2]);
       try {
@@ -75,8 +76,12 @@
     const onFailure = message => showError(message);
     failureListeners.add(onFailure);
     map.on('move zoom resize', sync);
+    // Search collapses the header without moving Leaflet. Keep Google's top edge aligned.
+    const headerObserver = header && new ResizeObserver(sync);
+    if (headerObserver) headerObserver.observe(header);
     map.on('unload', () => {
       disposed = true;
+      headerObserver?.disconnect();
       failureListeners.delete(onFailure);
       if (nativeMap) window.google?.maps?.event?.clearInstanceListeners?.(nativeMap);
       nativeHost.remove();

@@ -49,6 +49,13 @@ const markRead = ids => { settings.readNoti = [...new Set([...settings.readNoti,
 const sw = (key, label, desc) => `<label class="setrow"><div><b>${label}</b><small>${desc}</small></div><input type="checkbox" role="switch" data-setting="${key}" ${settings[key]?'checked':''}><i class="sw" aria-hidden="true"></i></label>`;
 // 마이: 첫 화면은 요약만 · 자세한 설정은 누르면 아래에서 올라오는 시트에서 바꿔요
 const myRow = (act, emoji, label, value='') => `<button class="mrow" data-action="${act}"><span class="mrico" aria-hidden="true">${emoji}</span><span class="mrlabel">${label}</span>${value ? `<span class="mrval">${value}</span>` : ''}${icon('chevron')}</button>`;
+const quotaColor = percent => {
+  if (percent <= 50) return 'var(--color-accent)';
+  const from = percent <= 85 ? [198,245,225] : [237,35,49];
+  const to = percent <= 85 ? [237,35,49] : [75,26,130];
+  const ratio = percent <= 85 ? (percent-50)/35 : (percent-85)/15;
+  return `rgb(${from.map((value,index)=>Math.round(value+(to[index]-value)*ratio)).join(',')})`;
+};
 pages.my = function(){
   window.PinmapBilling?.maybeRefresh();
   const billing = window.PinmapBilling?.view();
@@ -69,9 +76,9 @@ pages.my = function(){
     <span class="myprofile-name"><b>${esc(settings.nickname || '이름 설정')}</b></span>
     <button type="button" class="myprofile-go" data-page="account" aria-label="계정 관리로 이동">${icon('chevright')}</button>
   </div>${myQuickCards()}
-  <section class="my-quota mgroup my-section${quotaUsed !== null && quotaLimit - quotaUsed <= 5 ? ' is-urgent' : ''}" aria-label="월간 분석 사용량">
+  <section class="my-quota mgroup my-section" aria-label="월간 분석 사용량">
     <div class="my-quota-head"><div><b>${quotaTitle}</b><small>매월 ${quotaLimit}회</small></div><strong>${quotaUsed === null ? '—' : `${quotaUsed} / ${quotaLimit}`}</strong></div>
-    <div class="my-quota-track" role="progressbar" aria-label="${quotaTitle} 사용량" aria-valuemin="0" aria-valuemax="${quotaLimit}" ${quotaUsed === null ? '' : `aria-valuenow="${quotaUsed}"`}><span style="width:${quotaPercent}%"></span></div>
+    <div class="my-quota-track" role="progressbar" aria-label="${quotaTitle} 사용량" aria-valuemin="0" aria-valuemax="${quotaLimit}" ${quotaUsed === null ? '' : `aria-valuenow="${quotaUsed}"`}><span style="width:${quotaPercent}%;background-color:${quotaColor(quotaPercent)}"></span></div>
     <p role="status">${esc(quotaDetail)}</p>
   </section>
 
