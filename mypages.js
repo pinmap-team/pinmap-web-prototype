@@ -394,15 +394,13 @@ document.addEventListener('click', e => {
 const calExportList = () => (typeof calDueList === 'function' ? calDueList().filter(x => calDue(x) >= calToday && !x.eventCandidate && x.dueLabel !== '행사 시작') : []);
 // 2026-11-23: 원하는 일정만 골라서 내보내요. 페이지에 들어올 때는 모두 선택된 상태로 시작해요.
 let calxPick = null;
-// 2026-11-24: 한 콘텐츠에 일정이 여러 개(시작·종료 등)면 id가 같아서 하나를 누르면 같이 켜지고 꺼졌어요. 일정마다 따로 고르도록 id·날짜·종류·제목으로 구분해요.
-const calxKey = x => [x.id, calDue(x) ? calKey(calDue(x)) : '', x.dueLabel || '', x.title || ''].join('|');
-const calxSelected = () => { const list = calExportList(); if (!calxPick) calxPick = new Set(list.map(calxKey)); return list.filter(x => calxPick.has(calxKey(x))); };
+const calxSelected = () => { const list = calExportList(); if (!calxPick) calxPick = new Set(list.map(x => String(x.id))); return list.filter(x => calxPick.has(String(x.id))); };
 pages.calexport = () => {
   const list = calExportList(), picked = calxSelected(), n = picked.length, all = list.length && n === list.length;
   return myPage('캘린더로 내보내기', `<p class="mpdesc calx-desc">내 캘린더에 넣을 마감 일정을 골라 주세요.</p>
   <section class="mycard calx-list" aria-label="내보낼 마감 일정">
     <div class="calx-head"><h2>마감 일정 <span>${list.length ? `${n}/${list.length}` : '0'}</span></h2>${list.length ? `<button type="button" class="textbtn calx-all" data-action="calxall">${all ? '모두 해제' : '모두 선택'}</button>` : ''}</div>
-    ${list.length ? list.map(x => { const on = calxPick.has(calxKey(x)); return `<button type="button" class="calx-row calx-pick ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" data-calx-pick="${esc(calxKey(x))}"><span class="calx-check" aria-hidden="true">${on ? icon('check') : ''}</span><span class="calx-text"><b>${esc(x.title)}</b><span class="calx-date">${esc(fmtDay(calDue(x)))} · ${esc(x.dueLabel || '마감')}</span></span></button>`; }).join('') : '<p class="muted">다가오는 마감 일정이 없어요.</p>'}
+    ${list.length ? list.map(x => { const on = calxPick.has(String(x.id)); return `<button type="button" class="calx-row calx-pick ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" data-calx-pick="${esc(String(x.id))}"><span class="calx-check" aria-hidden="true">${on ? icon('check') : ''}</span><span class="calx-text"><b>${esc(x.title)}</b><span class="calx-date">${esc(fmtDay(calDue(x)))} · ${esc(x.dueLabel || '마감')}</span></span></button>`; }).join('') : '<p class="muted">다가오는 마감 일정이 없어요.</p>'}
   </section>
   <div class="calx-actions">
     <button type="button" class="filled calx-btn" data-action="calexportapple" ${n ? '' : 'disabled'}>${icon('calendar')}Apple 캘린더로 내보내기</button>
@@ -433,7 +431,7 @@ function calExportFile(){
 }
 Object.assign(actions, {
   calexport: () => { calxPick = null; go('calexport'); },
-  calxall: () => { const list = calExportList(), all = calxSelected().length === list.length; calxPick = new Set(all ? [] : list.map(calxKey)); const y = window.scrollY; render(); window.scrollTo(0, y); },
+  calxall: () => { const list = calExportList(), all = calxSelected().length === list.length; calxPick = new Set(all ? [] : list.map(x => String(x.id))); const y = window.scrollY; render(); window.scrollTo(0, y); },
   calexportapple: () => { const n = calExportFile(); if (n) toast(`고른 일정 ${n}개를 캘린더 파일로 저장했어요.\n파일을 열면 Apple 캘린더에 추가돼요.`); },
   calexportgoogle: () => { const n = calExportFile(); if (n) { toast(`고른 일정 ${n}개를 캘린더 파일로 저장했어요.\nGoogle 캘린더의 가져오기에서 이 파일을 선택해 주세요.`); try { window.open('https://calendar.google.com/calendar/r/settings/export', '_blank', 'noopener,noreferrer'); } catch {} } }
 });

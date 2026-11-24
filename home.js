@@ -1,4 +1,4 @@
-// 홈 화면 (레이아웃 개편) · calendar.js 다음, navlabels.js 앞에 불러와요
+// 홈 화면 (레이아웃 개편) · calendar.js 다음에 불러와요
 // 구성: 마감 임박 띠배너(맨 위 고정) → 최근 저장 카드 → 캘린더 위젯 → 카테고리 · 최근 저장
 
 /* ---------- 홈 관심 키워드 추가 (온보딩 선택지에는 나오지 않아요) ---------- */
@@ -134,7 +134,38 @@ document.addEventListener('click', e => {
 
 /* ---------- 홈 ---------- */
 // 2026-11-23: '추가' 버튼은 홈 화면 대신 하단 메뉴 가운데에 있어요 (app.js nav()).
-const homeAddMarkup = () => `<div class="home-add-menu" id="home-add-menu" data-open="false"><div class="home-add-body" aria-hidden="true"></div><button type="button" class="home-add-fab" data-action="addoptions" aria-label="콘텐츠 추가하기" aria-expanded="false" aria-controls="home-add-options">${icon('plus')}<span>추가</span></button><div class="home-add-options" id="home-add-options" role="group" aria-label="콘텐츠 추가 방법" aria-hidden="true" inert><button type="button" data-action="zipimport">${icon('folder')}<span>Instagram ZIP 가져오기</span></button><button type="button" data-action="linkimport">${icon('link')}<span>Instagram 링크로 저장</span></button><button type="button" data-action="screenshotimport">${icon('image')}<span>캡처 화면으로 추가</span></button></div></div>`;
+const homeAddMarkup = () => `<div class="home-add-menu t-goo-anchor" id="home-add-menu" data-open="false">
+  <svg class="t-goo-layer" viewBox="0 0 200 140" aria-hidden="true" focusable="false"><defs>
+    <filter id="pinmap-goo-filter" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo"/>
+      <feComposite in="SourceGraphic" in2="goo" operator="atop" result="shape"/>
+      <feColorMatrix in="shape" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 60 -29.5" result="ring-solid"/>
+      <feMorphology in="ring-solid" operator="dilate" radius="1" result="ring-a"/>
+      <feFlood flood-color="#000000" flood-opacity="0.06" result="ring-c"/>
+      <feComposite in="ring-c" in2="ring-a" operator="in" result="ring"/>
+      <feGaussianBlur in="shape" stdDeviation="3" result="s2-b"/>
+      <feOffset in="s2-b" dy="2" result="s2-o"/>
+      <feFlood flood-color="#000000" flood-opacity="0.05" result="s2-c"/>
+      <feComposite in="s2-c" in2="s2-o" operator="in" result="s2"/>
+      <feGaussianBlur in="shape" stdDeviation="21" result="s3-b"/>
+      <feOffset in="s3-b" dy="4" result="s3-o"/>
+      <feFlood flood-color="#000000" flood-opacity="0.06" result="s3-c"/>
+      <feComposite in="s3-c" in2="s3-o" operator="in" result="s3"/>
+      <feMerge><feMergeNode in="s3"/><feMergeNode in="s2"/><feMergeNode in="ring"/><feMergeNode in="shape"/></feMerge>
+    </filter></defs><g filter="url(#pinmap-goo-filter)">
+      <circle class="t-goo-blob" cx="100" cy="100" r="20" style="--fx:-54px;--fy:-34px;--i:0"/>
+      <circle class="t-goo-blob" cx="100" cy="100" r="20" style="--fx:0px;--fy:-64px;--i:1"/>
+      <circle class="t-goo-blob" cx="100" cy="100" r="20" style="--fx:54px;--fy:-34px;--i:2"/>
+      <circle class="t-goo-blob t-goo-blob-main" cx="100" cy="100" r="20"/>
+    </g></svg>
+  <div class="home-add-options" id="home-add-options" role="group" aria-label="콘텐츠 추가 방법" aria-hidden="true" inert>
+    <button type="button" class="t-goo-item" style="--fx:-54px;--fy:-34px;--i:0" data-action="zipimport" aria-label="Instagram ZIP 가져오기" tabindex="-1">${icon('folder')}</button>
+    <button type="button" class="t-goo-item" style="--fx:0px;--fy:-64px;--i:1" data-action="linkimport" aria-label="Instagram 링크로 저장" tabindex="-1">${icon('link')}</button>
+    <button type="button" class="t-goo-item" style="--fx:54px;--fy:-34px;--i:2" data-action="screenshotimport" aria-label="캡처 화면으로 추가" tabindex="-1">${icon('image')}</button>
+  </div>
+  <button type="button" class="home-add-fab t-goo-main" data-action="addoptions" aria-label="콘텐츠 추가하기" aria-expanded="false" aria-controls="home-add-options"><span class="t-goo-swap"><span class="t-goo-icon">${icon('plus')}</span></span></button>
+</div>`;
 pages.home = function(){
   const chips = homeCategoryChips();
   const picks = homePicks();

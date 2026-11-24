@@ -2,8 +2,7 @@
 // 마감이 있는 저장 콘텐츠를 달력에 표시하고, 날짜별 · 곧 마감되는 콘텐츠를 보여줘요.
 // pinmap.js 다음에 불러와야 해요(브라우저에 저장된 데이터를 읽은 뒤 실행).
 
-/* ---------- 하단 메뉴에 캘린더 추가 ---------- */
-NAV.splice(3, 0, ['calendar', 'calendar', '캘린더']);
+/* ---------- 캘린더 화면 ---------- */
 pageName.calendar = '캘린더';
 
 /* ---------- 마감이 적힌 콘텐츠만 캘린더에 ---------- */
@@ -24,33 +23,6 @@ if (!PM_ENV.development && !settings.calSeeded) {
   ];
   seeds.forEach(x => { if (!items.some(i => i.id === x.id)) items.push(x); });
   settings.calSeeded = true;
-}
-// 2026-11-24: 예시 일정이 모두 비슷해 보이지 않도록 기간·하루 일정을 섞은 예시를 더해요(오늘 기준 날짜, 한 번만 추가).
-if (!PM_ENV.development) {
-  const day = n => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
-  const ev = (a, b, title) => [{start_date:day(a), end_date:day(b), title}];
-  const seeds2 = [
-    {id:9014,photo:'img/lamp.jpg',title:'빛의 정원 사진전',type:'전시/팝업',category:'전시',source:'Instagram',ago:'2일 전',desc:'겨울 정원을 빛으로 기록한 사진 120점을 보여 주는 전시예요.',art:'exhibit',address:'서울 종로구, 예시 전시관',events:ev(6,20,'빛의 정원 사진전'),aiClassified:true},
-    {id:9015,photo:'img/notebook.jpg',title:'디자이너 토크: 기록하는 습관',type:'전시/팝업',category:'전시',source:'Instagram',ago:'5일 전',desc:'하루 저녁 열리는 작업 기록 토크예요.',art:'exhibit',events:ev(9,9,'디자이너 토크'),aiClassified:true},
-    {id:9016,photo:'img/park-picnic.jpg',title:'한강 겨울 불빛 축제',type:'공연/축제',category:'축제',source:'Instagram',ago:'1주 전',desc:'나흘 동안 한강공원에서 불빛 설치와 공연이 열려요.',art:'event',events:ev(2,5,'한강 겨울 불빛 축제'),aiClassified:true},
-    {id:9017,photo:'img/cafe.jpg',title:'연말 재즈 콘서트',type:'공연/축제',category:'공연',source:'Instagram',ago:'3일 전',desc:'이틀만 열리는 소극장 재즈 공연이에요.',art:'event',events:ev(12,13,'연말 재즈 콘서트'),aiClassified:true},
-    {id:9018,photo:'img/classroom.jpg',title:'겨울방학 UX 스터디 모집',type:'공부',category:'공부',source:'Instagram',ago:'4일 전',desc:'방학 동안 함께 사례를 분석할 스터디원을 모집해요.',art:'tips',events:ev(-3,8,'UX 스터디 모집'),aiClassified:true},
-    {id:9019,photo:'img/desk-organizer.jpg',title:'포트폴리오 리뷰 데이',type:'공부',category:'공부',source:'Instagram',ago:'어제',desc:'현직 디자이너가 포트폴리오를 1:1로 봐 주는 하루 행사예요.',art:'tips',events:ev(15,15,'포트폴리오 리뷰 데이'),aiClassified:true}
-  ];
-  // 처음 한 번만 추가하고, 이후에는 남아 있는 예시의 날짜만 오늘 기준으로 다시 맞춰요(지운 예시는 다시 생기지 않아요).
-  seeds2.forEach(x => { const old = items.find(i => i.id === x.id && i.title === x.title); if (old) old.events = x.events; else if (!settings.calSeeded2) items.push(x); });
-  settings.calSeeded2 = true;
-}
-// 기존 예시 두 개(초록 사이 전시·성수 팝업)는 기간이 겹쳐 같은 막대로 보여서, 오늘 기준으로 서로 다른 기간을 줘요.
-if (!PM_ENV.development) {
-  const day = n => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
-  const fmt = n => { const d = new Date(); d.setDate(d.getDate() + n); return `${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} (${'일월화수목금토'[d.getDay()]})`; };
-  [[4,'초록 사이, 주말의 전시',-9,3],[13,'성수 오브젝트 팝업 스토어',1,11]].forEach(([id,title,a,b]) => {
-    const x = items.find(i => i.id === id && i.title === title);
-    if (!x) return;
-    x.events = [{start_date:day(a), end_date:day(b), title, date_text:`${fmt(a)} – ${fmt(b)}`}];
-    x.period = `${fmt(a)} – ${fmt(b)}, 예시 기간`;
-  });
 }
 afterChange();
 
@@ -151,8 +123,7 @@ function calRanges(){
     if (start > end) start = new Date(end);
     ranges.push({item, start, end, title:item.title, entry:item});
   });
-  // 2026-11-24: 같은 카테고리 일정끼리 구분되도록 일정마다 색 진하기(tone 0~3)를 다르게 해요.
-  return ranges.filter(r => PinmapCategories.of(r.item).id === calCat).sort((a,b) => a.start - b.start || b.end - a.end).map((r, i) => ({...r, tone: i % 4}));
+  return ranges.filter(r => PinmapCategories.of(r.item).id === calCat).sort((a,b) => a.start - b.start || b.end - a.end);
 }
 function calCategoryButtons(){
   if (typeof PinmapCategories === 'undefined') return '';
@@ -161,7 +132,7 @@ function calCategoryButtons(){
   if (!cats.length) return '';
   if (calCat && !ids.has(calCat)) calCat = '';
   const chip = (id, label, iconHtml) => `<button type="button" class="calcat${calCat === id ? ' on' : ''}" data-calcat="${id}" aria-pressed="${calCat === id}">${iconHtml}<span>${esc(label)}</span></button>`;
-  return `<div class="calcats" role="group" aria-label="카테고리별 일정">${chip('', '전체', `<img class="pm-category-icon" src="img/category/all-${calCat === '' ? 'active' : 'inactive'}.svg" width="24" height="24" alt="" aria-hidden="true">`)}${cats.map(c => chip(c.id, c.label, PinmapCategories.icon(c.id, calCat === c.id))).join('')}</div>`;
+  return `<div class="calcats" role="group" aria-label="카테고리별 일정">${chip('', '전체', icon('spark'))}${cats.map(c => chip(c.id, c.label, PinmapCategories.icon(c.id, calCat === c.id))).join('')}</div>`;
 }
 
 function calRow(x){
@@ -191,7 +162,7 @@ pages.calendar = function(){
     const col = calWeekOffset(date), isStart = r.start.getTime() === date.getTime(), isEnd = r.end.getTime() === date.getTime();
     const label = isStart || col === 0 || date.getDate() === 1;
     let span = 1; if (label) { const d = new Date(date); while (span < 7 - col) { d.setDate(d.getDate() + 1); if (d > r.end || d.getMonth() !== m) break; span++; } }
-    return `<i class="calspan lane-${r.lane} tone-${r.tone}${isStart ? ' is-start' : ''}${isEnd ? ' is-end' : ''}" aria-hidden="true">${label ? `<em style="--span:${span}">${esc(r.title)}</em>` : ''}</i>`;
+    return `<i class="calspan lane-${r.lane}${isStart ? ' is-start' : ''}${isEnd ? ' is-end' : ''}" aria-hidden="true">${label ? `<em style="--span:${span}">${esc(r.title)}</em>` : ''}</i>`;
   }).join('');
   const cells = [];
   for (let i = 0; i < first; i++) cells.push('<span class="calcell calblank"></span>');
