@@ -96,7 +96,9 @@ detail = function(){
     <section class="dtsheet" id="detail-info" aria-label="콘텐츠 상세 정보">
       <button type="button" class="dt-sheet-handle" data-action="dtsheettoggle" aria-label="상세 정보 펼치기" aria-controls="detail-info" aria-expanded="false"><span aria-hidden="true"></span></button>
       ${author ? `<div class="dt-author">${authorPhoto ? `<img src="${esc(authorPhoto)}" alt="">` : `<span class="dt-author-fallback" aria-hidden="true">@</span>`}<span>게시물 작성자 <b>@${esc(author)}</b></span></div>` : ''}
-      ${x.desc ? `<section class="dtsum" data-dtsum><h2${x.source === '직접 추가' || x.aiSummary === false ? '' : ' class="dtai"'}>${icon('spark')}${esc(x.source === '직접 추가' || x.aiSummary === false ? '장소 설명' : 'AI 설명')}</h2>${dtSummaryBody(x.desc)}</section>` : ''}
+      ${x.desc ? x.source === '직접 추가' || x.aiSummary === false
+        ? `<section class="dtsum" data-dtsum><h2>${icon('spark')}장소 설명</h2>${dtSummaryBody(x.desc)}</section>`
+        : `<section class="dtsum dtai-review"><h2 class="dtai">${icon('spark')}<span>AI 설명</span><button type="button" class="dtai-info-button" data-dtai-info aria-label="AI 설명 안내" aria-expanded="false" aria-controls="dtai-info"><span aria-hidden="true">i</span></button></h2><p class="dtai-info-note" id="dtai-info" hidden>저장한 콘텐츠를 바탕으로 AI가 작성한 설명이에요. 중요한 정보는 원본에서 확인해 주세요.</p>${dtAiSummaryBody(x)}</section>` : ''}
       ${extractionInfo}
       ${eventInfo}
       ${reviewInfo}
@@ -397,12 +399,21 @@ document.addEventListener('click', async event => {
   toast(await dtCopy(address)?'주소를 복사했어요.':`주소: ${address}`);
 });
 
-/* 2026-11-24 AI 설명: 한 줄이 넘으면 첫 문장(한 줄 요약)만 보이고, 오른쪽 끝 화살표로 펼쳐 전체 설명을 봐요. */
+/* 직접 추가한 장소 설명은 첫 문장을 접힌 상태로 보여 줍니다. */
 function dtSummaryBody(text){
   const all = String(text || '').trim();
   const parts = all.split(/(?<=[.!?。])\s+/);
   const head = parts[0] || all, rest = parts.slice(1).join(' ');
   return `<button type="button" class="dtsum-head" data-dtsum-toggle aria-expanded="false"><span class="dtsum-line">${esc(head)}</span>${icon('chevron')}</button>${rest ? `<p class="dtsum-rest">${esc(rest)}</p>` : ''}`;
+}
+function dtAiSummaryBody(item){
+  const parts=String(item.desc||'').trim().split(/(?<=[.!?。])\s+/);
+  const head=parts[0]||'', body=parts.slice(1).join(' ');
+  const keywords=[...(Array.isArray(item.keywords)?item.keywords:[]),item.category]
+    .filter(value=>typeof value==='string').map(value=>value.normalize('NFKC').trim().replace(/\s+/g,' '))
+    .filter(value=>value.length>=2&&value.length<=24&&!['분류보류','기타','미분류'].includes(value));
+  const tags=[...new Set(keywords)].slice(0,5);
+  return `<strong class="dtai-keyline">${esc(head)}</strong>${body?`<p class="dtai-body">${esc(body)}</p>`:''}${tags.length?`<div class="dtai-tags" aria-label="분석 키워드">${tags.map(tag=>`<span class="dtai-tag">${esc(tag)}</span>`).join('')}</div>`:''}`;
 }
 function dtFitSummaries(){
   document.querySelectorAll('[data-dtsum]:not([data-fit])').forEach(box => {
@@ -414,6 +425,8 @@ function dtFitSummaries(){
 }
 new MutationObserver(() => { if (document.querySelector('[data-dtsum]:not([data-fit])')) requestAnimationFrame(dtFitSummaries); }).observe(document.body, {childList:true, subtree:true});
 document.addEventListener('click', event => {
+  const info=event.target.closest('[data-dtai-info]');
+  if(info){const note=document.getElementById(info.getAttribute('aria-controls'));if(note){note.hidden=!note.hidden;info.setAttribute('aria-expanded',String(!note.hidden));}return;}
   const toggle = event.target.closest('[data-dtsum-toggle]'); if (!toggle) return;
   const box = toggle.closest('[data-dtsum]'); if (!box || box.classList.contains('is-single')) return;
   const open = !box.classList.contains('is-open'); box.classList.toggle('is-open', open); toggle.setAttribute('aria-expanded', String(open));
