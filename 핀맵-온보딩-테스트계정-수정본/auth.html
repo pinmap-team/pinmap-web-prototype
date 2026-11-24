@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>핀맵 · 로그인</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="tokens.css?v=e068ba25dc57">
+  <link rel="stylesheet" href="style.css?v=66473887d873">
+  <link rel="stylesheet" href="design-alignment.css?v=1e623c12aa56">
+  <style>@font-face{font-family:"Pretendard Variable";font-style:normal;font-weight:45 920;font-display:swap;src:url("vendor/PretendardVariable.woff2") format("woff2")}</style>
+  <script src="theme-mode.js?v=4e1082378355"></script>
+  <script defer src="vendor/supabase.js?v=a867edbcfb02"></script>
+  <script defer src="button-state.js?v=e73eff63b967"></script>
+  <script defer src="auth-client.js?v=e2f780ddf874"></script>
+  <script defer src="pinmap-intro.js?v=232b793cf2d5"></script>
+  <script defer src="auth-page.js?v=81c6046d9394"></script>
+</head>
+<body class="auth-body">
+  <main class="pm-auth auth-shell" id="auth-main" data-phone-viewport data-screen="intro" aria-busy="true">
+    <section class="auth-hero" aria-label="핀맵 소개">
+      <span class="auth-brand" role="img" aria-label="핀맵 로고"><span class="auth-brand-logo" aria-hidden="true"></span></span>
+      <div class="auth-hero-copy"><h1>저장한 취향이<br>일상이 되는 곳,<br>핀맵.</h1><p>흩어진 장소와 콘텐츠를<br>나만의 지도에 모아 보세요.</p></div>
+      <div class="auth-hero-art" aria-hidden="true"><span class="auth-hero-shadow"></span><span class="auth-hero-symbol"></span></div>
+    </section>
+    <section class="auth-panel" aria-label="로그인 및 회원가입">
+      <div id="auth-content"><div class="auth-connection"><span class="pm-spinner" aria-hidden="true"></span><header class="auth-heading" role="status"><h1>잠시 연결을<br>기다려 주세요</h1></header></div></div>
+    </section>
+  </main>
+  <script src="phone-viewport.js?v=534575da0c1a"></script>
+</body>
+</html>
