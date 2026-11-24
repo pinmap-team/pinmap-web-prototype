@@ -1,4 +1,4 @@
-// 마이 하위 페이지: 프로필 편집 (home.js 다음, navlabels.js 앞에 불러와요)
+// 마이 하위 페이지: 프로필 편집 (home.js 다음에 불러와요)
 // 하단 시트가 아니라 페이지로 넘어가고, 왼쪽 위 ← 버튼으로 마이로 돌아가요.
 
 /* ---------- 프로필 사진 ---------- */
@@ -57,8 +57,6 @@ actions.avatarreset = () => {
 };
 /* 하위 페이지와 캘린더에서도 하단 메뉴의 해당 탭이 켜져 있게 */
 const PARENT_TAB = {profile:'my', courses:'my', course:'my', calendar:'home', topic:'home'};
-const navBase = nav;
-nav = function(){ const real = page; if (PARENT_TAB[page]) page = PARENT_TAB[page]; const h = navBase(); page = real; return h; };
 
 /* 홈 검색 버튼: 저장됨 탭의 검색으로 */
 // 홈 검색은 home.js에서 같은 줄에 펼쳐지는 검색창으로 열어요 (2026-11-04).

@@ -77,8 +77,7 @@
       <div class="lm-search-results" id="lm-search-results" role="status" aria-live="polite" hidden></div>
       <div class="lm-locate-top">${round('현재 위치로 이동','target')}</div>
       <div class="lm-list-scrim" data-lm="close-list" hidden></div><section class="lm-list-sheet" id="lm-list-sheet" role="dialog" aria-label="저장한 장소 목록" hidden></section>
-      <section class="lm-selected-host" id="lm-selected-place" aria-label="이 근방 저장된 장소"></section>
-      <nav class="bottomnav lm-shared-nav" aria-label="하단 메뉴">${nav()}</nav></section>`;
+      <section class="lm-selected-host" id="lm-selected-place" aria-label="이 근방 저장된 장소"></section></section>`;
   }
   function status(message) { const el = $('#app .lm-status'); if (el) { el.textContent = message; el.hidden = !/못|실패|입력|확인|검색하고/.test(message); } }
   function updateMapState(state) {
@@ -333,6 +332,7 @@
     if (focusId != null) { window.pmMapFocus = null; searchResults = null; searchQuery = ''; category = 'all';
       const f = savedPlaces().find(p => p.id === focusId); if (f) { center = [f.lat, f.lng]; zoom = 15; } }
     if (isMap) { $('#app').innerHTML=content();
+      window.PinmapBottomNav?.mount();
       const categoryBar=document.querySelector('.lm-categories');
       alignCategoryIndicator(categoryBar);
       categoryObserver=new ResizeObserver(()=>alignCategoryIndicator(categoryBar));
@@ -475,7 +475,6 @@
   });
   document.addEventListener('error',event=>{if(event.target.matches?.('.lm-badge-image img'))event.target.hidden=true;},true);
   document.addEventListener('keydown',event=>{if(page==='map'&&event.key===' '&&event.target.closest('.lm-photo-marker')){event.preventDefault();event.target.closest('.lm-photo-marker').click();}});
-  document.addEventListener('keydown',event=>{if(page==='map'&&event.key==='Escape')hideProviderOptions();});
   document.addEventListener('input',event=>{if(event.target.matches('#lm-search input'))searchPlaces(event.target.value);});
   document.addEventListener('compositionend',event=>{if(event.target.matches('#lm-search input'))searchPlaces(event.target.value);});
   document.addEventListener('submit',event => {
