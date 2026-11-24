@@ -1,7 +1,7 @@
 /* Integration layer: keep collection/detail implementations untouched. */
 (() => {
   if (typeof document!=='undefined') document.documentElement.classList.add('nav-icononly');
-  // 2026-11-24: 선택 전·후 모양이 같은 내비 아이콘. 선택되면 같은 윤곽을 채우고 안쪽 선만 비워요(mask). 지도는 카테고리 '여행·명소'와 같은 아이콘.
+  // 2026-11-24: 선택 전·후 모양이 같은 내비 아이콘. 선택되면 같은 윤곽을 채우고 안쪽 선만 비워요(mask). 홈 선택은 문 구멍 아래 바닥 선이 이어져요. 지도는 카테고리 '여행·명소'와 같은 아이콘.
   const NAV_GLYPHS={
     home:{outline:'M3 10 12 3l9 7v10H3z',detail:'M9 20v-7h6v7',cut:'M9 13h6v5.3H9z',cutFill:true},
     map:{outline:'M3 5 9 3l6 2 6-2v16l-6 2-6-2-6 2z',detail:'M9 3v16 M15 5v16',cut:'M9 3v16 M15 5v16'},

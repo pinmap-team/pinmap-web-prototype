@@ -21,7 +21,7 @@ const ALLOWED=new Map([
   ['collection.js collection 5f0232918980','condition only; collection text is escaped in the nested template'],
   // transformed values that are escaped at render time
   ['library.js title 353d511dd3d1','toast writes textContent'],
-  ['detail.js desc 11942046031d','condition only; description is escaped when rendered'],
+  ['detail.js desc 0dc01175947d','condition only; description is escaped when rendered'],
 ]);
 
 const lineHash=line=>crypto.createHash('sha256').update(line.trim()).digest('hex').slice(0,12);

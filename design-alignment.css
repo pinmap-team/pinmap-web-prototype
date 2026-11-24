@@ -1970,6 +1970,7 @@ body:has(.dt) .bottomnav .home-add-menu{display:none!important}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/nature-active.svg"]{content:url("img/category/nature-active-dark.svg")}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/other-active.svg"]{content:url("img/category/other-active-dark.svg")}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/pets-active.svg"]{content:url("img/category/pets-active-dark.svg")}
+[data-theme="dark"] .lm-categories img.pm-category-icon[src*="/all-active.svg"]{content:url("img/category/all-active-dark.svg")}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/recipe-active.svg"]{content:url("img/category/recipe-active-dark.svg")}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/stay-active.svg"]{content:url("img/category/stay-active-dark.svg")}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/tech-active.svg"]{content:url("img/category/tech-active-dark.svg")}
@@ -2661,4 +2662,4 @@ html body .calcat img.pm-category-icon[src*="/media-active.svg"]{transform:trans
 html body .calcat img.pm-category-icon[src*="/humor-active.svg"]{transform:translate(-0.00px,-1.25px) scale(1.000)!important}
 html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:translate(-0.00px,-0.90px) scale(0.919)!important}
 
-[data-theme="dark"] :is(.lm-categories,.calcats) img.pm-category-icon[src*="/all-active.svg"]{content:url("img/category/all-active-dark.svg")}
+/* 캘린더 버튼(.calcats)은 선택 배경이 민트라 다크에서도 진한 아이콘을 그대로 써요. */

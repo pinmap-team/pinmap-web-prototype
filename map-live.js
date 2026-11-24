@@ -5,6 +5,7 @@
   let liveMap, pinLayer, locationMarker, locationHeadingMarker, placeController, mapProviderController;
   let expandedKey=null, sheetStage='peek', sheetDrag=null, suppressSheetClickUntil=0;
   let mapLocationName=null, searchOpen=false;
+  // 2026-11-24: 목록 아이콘 왼쪽 점은 선이 아니라 칠한 원(Figma Icon / list).
   const listIcon=()=>`<svg class="icon pm-list-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11 M9 12h11 M9 18h11"/><circle class="pm-list-dot" cx="4.5" cy="6" r="1.3"/><circle class="pm-list-dot" cx="4.5" cy="12" r="1.3"/><circle class="pm-list-dot" cx="4.5" cy="18" r="1.3"/></svg>`;
   let listOpen=false, listGesture=null; // 2026-11-10 목록 시트 · 직접 핀 찍기
   let followNextFix=false;
