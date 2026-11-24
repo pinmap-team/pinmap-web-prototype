@@ -60,7 +60,7 @@
       <div class="course-list-body">
         <button class="course-new" data-course-new>${icon('plus')} 새 코스 만들기</button>
         <div class="course-list-heading">코스 ${courses.length}개</div>
-        ${courses.length?courses.map(saved=>{const places=saved.days.flat().map(stop=>findPlace(stop.id)).filter(Boolean);return `<button class="course-saved-card" data-course-open="${esc(saved.id)}">${places.some(place=>coordinates(place))?`<span class="course-saved-map" data-course-map="${esc(saved.id)}" role="img" aria-label="${esc(saved.title)} 장소 순서 지도" inert></span>`:`<span class="course-saved-placeholder">${icon('map')}</span>`}<span><b>${esc(saved.title)}</b><small>${esc(fmtDay(saved.date))}, 장소 ${places.length}곳</small><span class="course-saved-stops">${places.map(place=>esc(place.title)).join(' → ')||'장소를 추가해 주세요'}</span></span>${icon('arrow')}</button>`}).join(''):'<div class="course-list-empty"><span class="course-empty-icon" aria-hidden="true"></span><h2>아직 저장한 코스가 없어요.</h2><p>저장한 장소로 첫 코스를 만들어 보세요.</p></div>'}
+        ${courses.length?courses.map(saved=>{const places=saved.days.flat().map(stop=>findPlace(stop.id)).filter(Boolean);return `<button class="course-saved-card" data-course-open="${esc(saved.id)}">${places.some(place=>coordinates(place))?`<span class="course-saved-map" data-course-map="${esc(saved.id)}" role="img" aria-label="${esc(saved.title)} 장소 순서 지도" inert></span>`:`<span class="course-saved-placeholder">${icon('map')}</span>`}<span><b>${esc(saved.title)}</b><small>${esc(fmtDay(saved.date))}, 장소 ${places.length}곳</small><span class="course-saved-stops">${places.map(place=>esc(place.title)).join(' → ')||'장소를 추가해 주세요'}</span></span>${icon('arrow')}</button>`}).join(''):`<div class="course-list-empty">${typeof PinmapSolar !== 'undefined' ? PinmapSolar.icon('route', 'course-empty-icon') : icon('route')}<h2>아직 저장한 코스가 없어요.</h2><p>저장한 장소로 첫 코스를 만들어 보세요.</p></div>`}
         ${courses.length?'<p class="course-map-credit">지도 © Google</p>':''}
       </div></section>`;
   };
@@ -70,8 +70,8 @@
     return `<section class="coursepage ${editing?'is-editing':''}">
       <header class="course-header">
         <div class="course-toolbar"><button class="course-close" data-page="${courseOrigin}" aria-label="${courseOrigin==='map'?'지도로 돌아가기':'저장한 코스로 돌아가기'}">${icon('back')}</button>
-          <div class="course-title-row"><div><input data-course-field="title" aria-label="코스 이름" maxlength="50" value="${esc(course.title)}" readonly><button class="course-title-edit" data-course-edit-title aria-label="코스 제목 수정" title="코스 제목 수정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l11-11-4-4L4 16v4Zm9-13 4 4"/></svg></button></div></div>
-          <div class="course-header-actions"><button class="course-share" data-course-share aria-label="코스 공유하기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 13v8h14v-8"/></svg></button><button class="course-save" data-course-save>저장</button></div>
+          <div class="course-title-row"><div><input data-course-field="title" aria-label="코스 이름" maxlength="50" value="${esc(course.title)}" readonly><button class="course-title-edit" data-course-edit-title aria-label="코스 제목 수정" title="코스 제목 수정">${icon('pen')}</button></div></div>
+          <div class="course-header-actions"><button class="course-share" data-course-share aria-label="코스 공유하기">${icon('share')}</button><button class="course-save" data-course-save>저장</button></div>
         </div>
         <label class="course-date-row"><span class="sr">코스 출발일</span><input data-course-field="date" type="date" aria-label="코스 출발일" value="${esc(course.date)}"></label>
       </header>
@@ -79,7 +79,7 @@
       <div class="course-map-wrap"><div id="course-map" aria-label="코스 장소 지도"></div></div>
       <div class="course-body">
         <div class="course-edit-bar" ${editing?'':'hidden'}><button data-course-done ${editing?'':'hidden'}>완료</button></div>
-        ${stops.length?`<div class="course-timeline">${stops.map((stop,index)=>`<div class="course-row" data-course-id="${esc(stop.id)}"><span class="course-badge" style="background:${stopColor(index)}">${index+1}</span><article class="course-card" tabindex="0" aria-label="${esc(stop.place.title)} 일정 편집"><button class="course-remove" data-course-remove="${esc(stop.id)}" aria-label="${esc(stop.place.title)} 삭제" ${editing?'':'hidden'}>×</button><div class="course-card-head"><img src="${thumbnail(stop.place)}" alt=""><div><b>${esc(stop.place.title)}</b><small>${esc(stop.place.category||stop.place.type)}, ${esc(stop.place.address)}</small></div></div></article><button class="course-drag-handle" data-course-drag aria-label="${esc(stop.place.title)} 순서 변경" title="드래그로 순서 변경, 방향키 위/아래로 이동"><svg viewBox="0 0 16 24" aria-hidden="true"><circle cx="5" cy="5" r="1.7"/><circle cx="11" cy="5" r="1.7"/><circle cx="5" cy="12" r="1.7"/><circle cx="11" cy="12" r="1.7"/><circle cx="5" cy="19" r="1.7"/><circle cx="11" cy="19" r="1.7"/></svg></button></div>`).join('')}</div>`:'<div class="course-empty">코스가 비어 있어요.<br>저장한 장소를 추가해 보세요.</div>'}
+        ${stops.length?`<div class="course-timeline">${stops.map((stop,index)=>`<div class="course-row" data-course-id="${esc(stop.id)}"><span class="course-badge" style="background:${stopColor(index)}">${index+1}</span><article class="course-card" tabindex="0" aria-label="${esc(stop.place.title)} 일정 편집"><button class="course-remove" data-course-remove="${esc(stop.id)}" aria-label="${esc(stop.place.title)} 삭제" ${editing?'':'hidden'}>${icon('close')}</button><div class="course-card-head"><img src="${thumbnail(stop.place)}" alt=""><div><b>${esc(stop.place.title)}</b><small>${esc(stop.place.category||stop.place.type)}, ${esc(stop.place.address)}</small></div></div></article><button class="course-drag-handle" data-course-drag aria-label="${esc(stop.place.title)} 순서 변경" title="드래그로 순서 변경, 방향키 위/아래로 이동">${icon('drag')}</button></div>`).join('')}</div>`:'<div class="course-empty">코스가 비어 있어요.<br>저장한 장소를 추가해 보세요.</div>'}
         <button type="button" class="course-add-place" data-course-picker aria-haspopup="dialog">${icon('plus')}장소 추가하기</button>
 
       </div>
@@ -91,7 +91,7 @@
     const saved=courses.find(value=>value.id===course.id);
     const done=[course.title.trim()&&course.title!=='새 코스',count>0,count>1,!!saved&&JSON.stringify(saved)===JSON.stringify(course)];
     const current=done.findIndex(v=>!v);
-    return `<ol class="course-steps" aria-label="코스 만드는 순서">${['이름 정하기','장소 고르기','순서 확인','저장'].map((label,i)=>`<li class="${done[i]?'done':''} ${i===current?'now':''}" ${i===current?'aria-current="step"':''}><span>${done[i]?'✓':i+1}</span>${label}</li>`).join('')}</ol>`;
+    return `<ol class="course-steps" aria-label="코스 만드는 순서">${['이름 정하기','장소 고르기','순서 확인','저장'].map((label,i)=>`<li class="${done[i]?'done':''} ${i===current?'now':''}" ${i===current?'aria-current="step"':''}><span>${done[i]?icon('check'):i+1}</span>${label}</li>`).join('')}</ol>`;
   }
   // 장소 추가 시트의 거리 기준: 지금 고른 위치(마이 '위치 편집'의 첫 위치)에서 직선거리
   const RANGES=[['all','전체',Infinity],['walk1','도보 1km',1],['walk3','도보 3km',3],['car10','차량 10km',10]];

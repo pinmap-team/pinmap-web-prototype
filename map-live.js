@@ -28,7 +28,7 @@
     const savedIds = new Set(savedPlaces().map(place=>place.categoryId));
     return [['all','전체'],...PinmapCategories.all.filter(c=>savedIds.has(c.id)).map(c=>[c.id,c.label])];
   };
-  const categoryIcon = (kind,active=false) => kind==='all'?`<svg class="lm-category-svg" viewBox="0 0 24 24" aria-hidden="true"><path class="lm-category-all" d="${paths.spark}"/></svg>`:PinmapCategories.icon(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind),active);
+  const categoryIcon = (kind,active=false) => kind==='all'?(typeof PinmapSolar !== 'undefined' ? PinmapSolar.icon('spark', 'lm-category-svg', active ? 'bold' : 'linear') : icon('spark')):PinmapCategories.icon(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind),active);
   const localPhoto = kind => PM_ENV.development ? PM_ENV.placeholderImage : ({eat:'img/brunch.jpg',cafe:'img/cafe.jpg',event:'img/exhibit.jpg',walk:'img/park.jpg',shop:'img/lamp.jpg'})[kind] || 'img/park.jpg';
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
   const round = (name, symbol) => `<button class="lm-round" data-lm="locate" aria-label="${name}" title="${name}">${icon(symbol)}</button>`;
@@ -188,10 +188,12 @@
       setSheetStage(stages[Math.max(0,Math.min(stages.length-1,stages.indexOf(sheetStage)+(event.key==='ArrowUp'?1:-1)))]);
     });
   }
-  const favoriteButton = place => place.saved ? `<button type="button" class="lm-carousel-heart lm-heart-motion${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>` : '';
+  const favoriteButton = place => place.saved ? `<button type="button" class="lm-carousel-heart lm-heart-motion${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon(!!place.favorite)}</span></button>` : '';
   function playHeartMotion(button, liked) {
     button.querySelector('.lm-heart-burst')?.remove();
     button.classList.remove('is-bursting');
+    const glyph=button.querySelector('.lm-heart-glyph');
+    if(glyph)glyph.innerHTML=likeHeartIcon(liked);
     if(!liked || window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     const burst=document.createElement('span');
     burst.className='lm-heart-burst';
