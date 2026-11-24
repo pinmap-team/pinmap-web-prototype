@@ -203,7 +203,6 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 .cf-hcount{flex:none;margin-left:var(--space-sm);font:var(--type-headline-md);color:var(--color-secondary);font-variant-numeric:tabular-nums}
 .cf-sortlead{margin-left:calc(-1 * var(--space-xs));font:var(--type-body-sm);color:var(--color-on-surface)}
 .cf-sortlead select{padding-left:var(--space-xs)}
-.cf-selhint{font:var(--type-body-sm);color:var(--t-sub)}
 .cf-resulthead{font:var(--type-label-md) !important;color:var(--color-on-surface)}
 .cf-resulthead span{margin-left:var(--space-xs);color:var(--color-secondary)}
 .cf-sortlead select{field-sizing:content}

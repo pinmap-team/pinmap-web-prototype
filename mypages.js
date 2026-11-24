@@ -103,7 +103,7 @@ function favSyncSelection(){
   if (!favSel) return;
   const list=favoriteItems(), count=favSel.size;
   const label=document.querySelector('.fav-selcount');
-  if(label)label.textContent=count ? `${count}개 선택` : '게시물이나 장소를 골라 주세요';
+  if(label)label.textContent=count ? `${count}개 선택` : '';
   const all=document.querySelector('.fav-selall');
   if(all)all.textContent=list.length&&list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택';
   const remove=document.querySelector('.fav-remove');
@@ -128,7 +128,7 @@ pages.favorites = () => {
   return myPage('즐겨찾기', list.length
     ? `<div class="fav-header"><p class="fav-count">${list.length}개</p><button type="button" class="cf-textbtn" data-action="${favSel?'favselectoff':'favselect'}">${favSel?'취소':'선택'}</button></div>
       <div class="fav-items">${posts.length?`<section class="fav-group"><h2 class="fav-group-title">게시물</h2>${posts.map(row).join('')}</section>`:''}${places.length?`<section class="fav-group"><h2 class="fav-group-title">장소</h2>${places.map(row).join('')}</section>`:''}</div>
-      ${favSel?`<div class="cf-selbar" role="toolbar" aria-label="선택한 즐겨찾기"><button type="button" class="cf-selall fav-selall" data-action="favselall">${list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택'}</button><span class="cf-selcount fav-selcount" aria-live="polite">${count?`${count}개 선택`:'게시물이나 장소를 골라 주세요'}</span><button type="button" class="cf-seldel fav-remove" data-action="favremove" ${count&&!favRemoving?'':'disabled'}>${likeHeartIcon()}좋아요 취소</button></div>`:''}`
+      ${favSel?`<div class="cf-selbar" role="toolbar" aria-label="선택한 즐겨찾기"><button type="button" class="cf-selall fav-selall" data-action="favselall">${list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택'}</button><span class="cf-selcount fav-selcount" aria-live="polite">${count?`${count}개 선택`:''}</span><button type="button" class="cf-seldel fav-remove" data-action="favremove" ${count&&!favRemoving?'':'disabled'}>${likeHeartIcon()}좋아요 취소</button></div>`:''}`
     : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 게시물이나 장소가 없어요</h3><p class="muted">게시물 상세나 지도에서 별를 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="map">지도로 가기</button></div>`, `favpage${favSel?' cf-selecting':''}`);
 };
 actions.favselect=()=>{favSel=new Set();render();};
