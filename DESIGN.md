@@ -25,7 +25,7 @@ typography:
 fontWeights: {regular: 400, semibold: 600, bold: 700}
 spacing: {xs: 4px, sm: 8px, md: 12px, lg: 16px, xl: 24px, 2xl: 32px}
 rounded: {sm: 8px, md: 12px, lg: 16px}
-# Project extension (2026-11-24, user approved): gradient used by the AI 설명 card.
+# Project extension (2026-11-24, user approved): gradient retained for direct place descriptions.
 gradients:
   accent: "linear-gradient(90deg, #C6F5E1 0%, #AFF3E4 100%)"
 # Project extensions: mode overrides and Effect Styles, not standard schema keys.
@@ -1772,14 +1772,14 @@ Figma의 colors/accent 변수(VariableID:1393:207), 선택 카드·관심 키워
 - 사용자 승인 토큰 2개 추가(색 10→12, 전체 29→31): `--color-icon-muted` 라이트 #9C9C9C / 다크 #8A8A8A, `--color-icon-hover` 라이트 #4C4C4C / 다크 #D4D4D4. 홈 캘린더 아래 카테고리 칩 아이콘의 기본색과 마우스를 올렸을 때(또는 키보드 포커스) 색. 칩 아이콘은 SVG를 mask로 써서 색을 토큰으로 칠한다.
 - 스낵바: 화면 세로·가로 가운데에 띄우고, 좌우 여백 space-2xl(32px)·위아래 space-lg.
 - 마이 바로가기 카드는 즐겨찾기·내 코스 2개(‘미정’ 카드 삭제), 2열.
-- 그라디언트 `--gradient-accent`(Figma 페인트 스타일 `Pinmap/gradients/accent`): 왼쪽→오른쪽 #C6F5E1 → #AFF3E4. 상세 화면 AI 설명 카드(.dtsum, Figma `Type=AI Summary, Tone=Accent`) 배경. 라이트·다크 같음.
-- 웹 적용(2026-11-24): AI 설명 카드만 기존 민트 그라디언트 위에 밝은 흰빛과 옅은 바이올렛 광택을 겹친다. 제목 옆의 회색 원형 i는 생성 정보 안내를 펼친다. 설명의 첫 문장을 굵게, 나머지를 본문으로 전부 보여 주고, 저장된 분류 키워드와 카테고리만 최대 5개의 칩으로 표시한다. 직접 추가한 장소 설명은 기존 민트 배경과 접기 동작을 유지한다. Figma 페인트 스타일은 별도다.
+- 그라디언트 `--gradient-accent`(Figma 페인트 스타일 `Pinmap/gradients/accent`): 왼쪽→오른쪽 #C6F5E1 → #AFF3E4. 현재 웹에서는 직접 추가한 장소 설명에 유지한다.
+- 웹 적용(2026-11-24): `AI 컨텐츠 요약` 카드는 회색 배경이다. 제목 옆의 회색 원형 i는 생성 정보 안내를 펼친다. 저장된 콘텐츠 제목은 한 줄 말줄임으로, AI 요약 본문은 전체 문장으로 보여 준다. 태그는 저장된 분류 키워드·카테고리를 우선하고 부족하면 실제 제목·본문 단어로 보충해 2~5개 표시한다. 직접 추가한 장소 설명은 기존 민트 배경과 접기 동작을 유지한다. 상세 화면의 `분석 안내` 섹션은 표시하지 않는다. Figma 페인트 스타일은 별도다.
 - Figma: 변수 컬렉션 이름 Tokens 29 → Tokens 31, 색 변수 12개를 페인트 스타일 `Pinmap/colors/*`로도 연결했다.
 
 ## 2026-11-24 상세·컬렉션·마이·캘린더 다듬기
 
 - 상세 사진 위 카테고리 알약(.dthpill): 테두리 없음.
-- 직접 추가한 장소 설명(.dtsum)은 첫 문장을 한 줄로 보여 주고 16px 화살표로 펼친다. AI 설명은 위의 로컬 시안대로 전체 본문을 보여 준다.
+- 직접 추가한 장소 설명(.dtsum)은 첫 문장을 한 줄로 보여 주고 16px 화살표로 펼친다. AI 컨텐츠 요약은 위의 웹 적용 규칙대로 전체 본문을 보여 준다.
 - 컬렉션 폴더 안 콘텐츠 카드: 제목·설명·정보 줄은 단어 단위 줄바꿈(keep-all). 사진 오른쪽 위 '○일 전 저장' 자리에 즐겨찾기 별(32px 유리 원, 별 20px, 누르면 채운 별). 카드 열기와 따로 동작.
 - 마이: '무료 분석'은 카드(surface, rounded-lg, 안쪽 space-lg, shadow-sm). 사용량 막대는 아래의 고정 그라데이션을 사용한다. 다크 모드에서 메뉴 묶음 뒤 별도 배경 없음(기본 배경 위에 바로).
 - 탈퇴 확인 창: 왼쪽 '탈퇴하기' 글씨 error 색, 다크 모드 버튼 바탕은 neutral(한 단계 어둡게).
