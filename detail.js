@@ -96,7 +96,7 @@ detail = function(){
       ${author ? `<div class="dt-author">${authorPhoto ? `<img src="${esc(authorPhoto)}" alt="">` : `<span class="dt-author-fallback" aria-hidden="true">@</span>`}<span>게시물 작성자 <b>@${esc(author)}</b></span></div>` : ''}
       ${x.desc ? x.source === '직접 추가' || x.aiSummary === false
         ? `<section class="dtsum" data-dtsum><h2>${icon('spark')}장소 설명</h2>${dtSummaryBody(x.desc)}</section>`
-        : `<section class="dtsum dtai-review"><h2 class="dtai">${icon('spark')}<span>AI 컨텐츠 요약</span><button type="button" class="dtai-info-button" data-dtai-info aria-label="AI 컨텐츠 요약 안내" aria-expanded="false" aria-controls="dtai-info"><span aria-hidden="true">i</span></button></h2><p class="dtai-info-note" id="dtai-info" hidden>저장한 콘텐츠를 바탕으로 AI가 작성한 요약이에요. 중요한 정보는 원본에서 확인해 주세요.</p>${dtAiSummaryBody(x)}</section>` : ''}
+        : `<section class="dtsum dtai-review"><h2 class="dtai">${icon('spark')}<span>AI 컨텐츠 요약</span><button type="button" class="dtai-info-button" data-dtai-info aria-label="AI 컨텐츠 요약 안내"><span aria-hidden="true">i</span></button></h2>${dtAiSummaryBody(x)}</section>` : ''}
       ${extractionInfo}
       ${eventInfo}
       ${memoInfo}
@@ -429,10 +429,41 @@ function dtFitSummaries(){
     if (!more) { box.classList.add('is-single'); const b = box.querySelector('[data-dtsum-toggle]'); b?.setAttribute('tabindex', '-1'); b?.removeAttribute('aria-expanded'); }
   });
 }
-new MutationObserver(() => { if (document.querySelector('[data-dtsum]:not([data-fit])')) requestAnimationFrame(dtFitSummaries); }).observe(document.body, {childList:true, subtree:true});
+new MutationObserver(() => { if (document.querySelector('[data-dtsum]:not([data-fit])')) requestAnimationFrame(dtFitSummaries); if(dtAiTooltipButton&&!dtAiTooltipButton.isConnected)dtAiInfoHide(); }).observe(document.body, {childList:true, subtree:true});
+const dtAiInfoText='저장한 콘텐츠를 바탕으로 AI가 작성한 요약이에요. 중요한 정보는 원본에서 확인해 주세요.';
+let dtAiTooltip=null,dtAiTooltipButton=null,dtAiTooltipPinned=false;
+function dtAiInfoHide(){
+  dtAiTooltipButton?.removeAttribute('aria-describedby');
+  dtAiTooltip?.remove();
+  dtAiTooltip=null;dtAiTooltipButton=null;dtAiTooltipPinned=false;
+}
+function dtAiInfoShow(button,pinned=false){
+  if(dtAiTooltipButton===button&&dtAiTooltip){dtAiTooltipPinned ||= pinned;return;}
+  dtAiInfoHide();
+  const tip=document.createElement('div');
+  tip.id='dtai-info-tooltip';tip.className='dtai-info-tooltip';tip.setAttribute('role','tooltip');tip.textContent=dtAiInfoText;
+  document.body.append(tip);
+  dtAiTooltip=tip;dtAiTooltipButton=button;dtAiTooltipPinned=pinned;
+  button.setAttribute('aria-describedby',tip.id);
+  const rect=button.getBoundingClientRect(),width=tip.offsetWidth,height=tip.offsetHeight;
+  const center=rect.left+rect.width/2;
+  const left=Math.max(width/2+12,Math.min(innerWidth-width/2-12,center));
+  const below=rect.top-height-10<8;
+  tip.classList.toggle('is-below',below);
+  tip.style.left=`${left}px`;tip.style.top=`${below?rect.bottom+10:rect.top-10}px`;
+  tip.style.setProperty('--dtai-arrow-left',`${Math.max(16,Math.min(width-16,center-left+width/2))}px`);
+}
+document.addEventListener('pointerover',event=>{const button=event.target.closest?.('[data-dtai-info]');if(button&&event.pointerType!=='touch')dtAiInfoShow(button);});
+document.addEventListener('pointerout',event=>{const button=event.target.closest?.('[data-dtai-info]');if(button&&!button.contains(event.relatedTarget)&&!dtAiTooltipPinned)dtAiInfoHide();});
+document.addEventListener('focusin',event=>{const button=event.target.closest?.('[data-dtai-info]');if(button)dtAiInfoShow(button);});
+document.addEventListener('focusout',event=>{const button=event.target.closest?.('[data-dtai-info]');if(button&&!dtAiTooltipPinned)dtAiInfoHide();});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&dtAiTooltip)dtAiInfoHide();});
+window.addEventListener('scroll',dtAiInfoHide,true);
+window.addEventListener('resize',dtAiInfoHide);
 document.addEventListener('click', event => {
   const info=event.target.closest('[data-dtai-info]');
-  if(info){const note=document.getElementById(info.getAttribute('aria-controls'));if(note){note.hidden=!note.hidden;info.setAttribute('aria-expanded',String(!note.hidden));}return;}
+  if(info){if(dtAiTooltipButton===info&&dtAiTooltipPinned)dtAiInfoHide();else dtAiInfoShow(info,true);return;}
+  if(dtAiTooltip)dtAiInfoHide();
   const toggle = event.target.closest('[data-dtsum-toggle]'); if (!toggle) return;
   const box = toggle.closest('[data-dtsum]'); if (!box || box.classList.contains('is-single')) return;
   const open = !box.classList.contains('is-open'); box.classList.toggle('is-open', open); toggle.setAttribute('aria-expanded', String(open));

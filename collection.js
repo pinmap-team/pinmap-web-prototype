@@ -180,9 +180,7 @@ function cfCards(list, pick, canSelect){
     ? `<button type="button" class="cf-textbtn" data-action="cfselectoff">취소</button>`
     : `<button type="button" class="cf-textbtn" data-action="cfselect">선택</button>`) : '';
   // 폴더 안에서는 개수를 제목 옆에 보여주고, 여기에는 정렬 · 선택만 (검색 결과일 때만 개수 표시)
-  const lead = canSelect
-    ? (cfSel ? `<span class="cf-selhint">삭제할 콘텐츠를 골라 주세요</span>` : '')
-    : `<h2 class="cf-resulthead">검색 결과 <span>${list.length}</span></h2>`;
+  const lead = canSelect ? '' : `<h2 class="cf-resulthead">검색 결과 <span>${list.length}</span></h2>`;
   return `<div class="libsection cf-sec">
       ${lead}
       <div class="cf-tools">${pick && !cfSel ? `<button type="button" class="cf-pickbtn" data-action="cfpick">${icon('plus')}담기</button>` : ''}
@@ -279,7 +277,7 @@ pages.library = function(){
   const n = cfSel?.size || 0;
   const selbar = cfSel ? `<div class="cf-selbar" role="toolbar" aria-label="선택한 콘텐츠">
       <button type="button" class="cf-selall" data-action="cfselall">${cfOpenList().length && cfOpenList().every(x => cfSel.has(x.id)) ? '선택 해제' : '전체 선택'}</button>
-      <span class="cf-selcount" aria-live="polite">${n ? `${n}개 선택` : '콘텐츠를 골라 주세요'}</span>
+      <span class="cf-selcount" aria-live="polite">${n ? `${n}개 선택` : ''}</span>
       <button type="button" class="cf-seldel" data-action="cfdelete" ${n ? '' : 'disabled'}>${icon('close')}삭제</button>
     </div>` : '';
   return `<div class="libpage cfpage ${open ? 'cf-infolder' : ''} ${cfSel ? 'cf-selecting' : ''}">${CF_DEFS}
@@ -323,7 +321,7 @@ document.addEventListener('keydown',e=>{
 /* ---------- 선택 삭제 ---------- */
 function cfSyncSel(){
   const n = cfSel?.size || 0, list = cfOpenList();
-  const c = $('.cf-selcount'); if (c) c.textContent = n ? `${n}개 선택` : '콘텐츠를 골라 주세요';
+  const c = $('.cf-selcount'); if (c) c.textContent = n ? `${n}개 선택` : '';
   const d = $('.cf-seldel'); if (d) d.disabled = !n;
   const all = $('.cf-selall'); if (all) all.textContent = list.length && list.every(x => cfSel.has(x.id)) ? '선택 해제' : '전체 선택';
 }
