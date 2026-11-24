@@ -71,9 +71,12 @@
       const stage=bottomNav.querySelector('#home-add-menu');
       if (stage?.dataset.open==='true') {
         stage.dataset.open='false';
-        stage.querySelector('.home-add-fab')?.setAttribute('aria-expanded','false');
+        stage.classList.remove('is-anticipating');
+        const trigger=stage.querySelector('.home-add-fab');
+        trigger?.setAttribute('aria-expanded','false');
+        trigger?.setAttribute('aria-label','콘텐츠 추가하기');
         const options=stage.querySelector('.home-add-options');
-        if(options){options.setAttribute('aria-hidden','true');options.inert=true;}
+        if(options){options.setAttribute('aria-hidden','true');options.inert=true;options.querySelectorAll('button').forEach(button=>{button.tabIndex=-1;});}
       }
       slideNav(index,from);
     }

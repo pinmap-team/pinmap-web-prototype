@@ -141,9 +141,11 @@ test('empty development home keeps decorative cards and a three-path home add me
   for(const slot of ['pickimg','pickword','picktext','pickdots'])assert(html.includes('class="'+slot+'"'));
   assert(!html.includes('data-detail='));
   assert.equal((html.match(/data-action="addoptions"/g)||[]).length,1);
-  assert(html.includes('class="home-add-fab"'));
+  assert(html.includes('class="home-add-fab t-goo-main"'));
   assert(!html.includes('저장한 콘텐츠 불러오는 중'));
-  assert(html.includes('class="home-add-menu"'));
+  assert(html.includes('class="home-add-menu t-goo-anchor"'));
+  assert.equal((html.match(/class="t-goo-blob"/g)||[]).length,3);
+  assert.equal((html.match(/class="t-goo-item"/g)||[]).length,3);
   assert(html.includes('aria-expanded="false" aria-controls="home-add-options"'));
   assert(html.includes('data-action="zipimport"'));
   assert(html.includes('data-action="linkimport"'));
