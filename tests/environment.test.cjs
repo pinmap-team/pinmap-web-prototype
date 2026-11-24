@@ -130,17 +130,18 @@ test('map search refreshes on every Korean IME input event',()=>{
   assert.deepEqual(values,['ㄱ','가','가게']);
 });
 
-test('empty development home keeps decorative cards and a three-path home add menu',()=>{
+test('account loading home shows skeleton instead of an empty account and keeps the add menu',()=>{
   // 2026-11-23: 추가 메뉴는 홈 본문 대신 하단 메뉴 가운데에서 그려요(homeAddMarkup).
   const source=read('home.js'),start=source.indexOf('const homeAddMarkup = '),end=source.indexOf('\n};',start)+3;
-  const placeholderStart=source.indexOf('function emptyPickCards(){'),placeholderEnd=source.indexOf('\n/* ---------- 캘린더',placeholderStart);
-  const html=vm.runInNewContext(source.slice(placeholderStart,placeholderEnd)+source.slice(start,end)+';pages.home()+homeAddMarkup();',{
+  const app=read('app.js'),slotStart=app.indexOf('const pendingSkeletonSlots = '),slotEnd=app.indexOf('\nconst readyPlaces',slotStart);
+  const html=vm.runInNewContext(app.slice(slotStart,slotEnd)+source.slice(start,end)+';pages.home()+homeAddMarkup();',{
     PM_ENV:{development:true,requiresAuth:true},window:{PinmapAccountLoaded:false,PinmapAccountLoadError:false},items:[],pages:{},preferences:[],interestOptions:[],homePicks:()=>[],icon:()=>'<svg></svg>',
     homeCategoryChips:()=>'',stripBar:()=>'',calWidget:()=>'<section id="calendar"></section>',subWidgets:()=>'<section>최근 저장한 목록</section>',PM_IMG:{logo:'logo.png'}
   });
-  assert(html.includes('class="mainpick" data-placeholder="true" aria-hidden="true"'));
-  assert.equal((html.match(/class="pick pick-placeholder"/g)||[]).length,3);
-  for(const slot of ['pickimg','pickword','picktext','pickdots'])assert(html.includes('class="'+slot+'"'));
+  assert(html.includes('data-state="loading" aria-busy="true"'));
+  assert(html.includes('class="pm-skel-hero"'));
+  assert(!html.includes('첫 콘텐츠를 저장해 볼까요?'));
+  assert(!html.includes('이 날짜에 등록된 일정이 없어요.'));
   assert(!html.includes('data-detail='));
   assert.equal((html.match(/data-action="addoptions"/g)||[]).length,1);
   assert(html.includes('class="home-add-fab t-goo-main"'));
@@ -152,13 +153,13 @@ test('empty development home keeps decorative cards and a three-path home add me
   assert(html.includes('data-action="zipimport"'));
   assert(html.includes('data-action="linkimport"'));
   assert(html.includes('data-action="screenshotimport"'));
-  assert(html.includes('aria-label="첫 콘텐츠 추가"'));
+  assert(!html.includes('aria-label="첫 콘텐츠 추가"'));
   assert(html.includes('콘텐츠 추가하기'));
-  assert(html.includes('공유로 저장하는 방법'));
-  assert(html.includes('class="home-empty-calendar" inert aria-hidden="true"'));
+  assert(!html.includes('공유로 저장하는 방법'));
+  assert(!html.includes('class="home-empty-calendar" inert aria-hidden="true"'));
   assert(!html.includes('최근 저장한 목록'));
   assert(!html.includes('선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.'));
-  assert(html.indexOf('mainpick')<html.indexOf('id="calendar"'));
+  assert(!html.includes('id="calendar"'));
 });
 test('home replaces the first-save prompt with account content after loading',()=>{
   const source=read('home.js');

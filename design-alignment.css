@@ -1383,6 +1383,78 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .pm-spinner.pm-spinner-inline,button[aria-busy="true"]::after{width:16px;height:16px;border-width:2px}
 button[aria-busy="true"]::after{content:"";position:absolute;inset:0;margin:auto;text-indent:0}
 @keyframes pm-spin{to{transform:rotate(360deg)}}
+/* Skeleton loader and reveal: transitions.dev motion, scoped to account content. */
+.pm-account-skeleton{--pulse-dur:1000ms;--pulse-count:1;--pulse-min:.5;--reveal-dur:400ms;--reveal-blur:2px;--reveal-ease:ease-in-out}
+/* The wrap stacks two layers on the same coordinates. The
+   skeleton owns the cold pulse + the fade-out side of the
+   reveal; the content owns the fade-in side. They share the
+   same duration / ease so the swap reads as one motion. */
+.t-skel { position: relative; }
+.t-skel-skeleton,
+.t-skel-content {
+  position: absolute;
+  inset: 0;
+}
+
+.t-skel-skeleton {
+  z-index: 1;
+  opacity: 1;
+  filter: blur(0);
+  transition:
+    opacity var(--reveal-dur) var(--reveal-ease),
+    filter  var(--reveal-dur) var(--reveal-ease);
+}
+.t-skel-content {
+  z-index: 2;
+  opacity: 0;
+  filter: blur(var(--reveal-blur));
+  transition:
+    opacity var(--reveal-dur) var(--reveal-ease),
+    filter  var(--reveal-dur) var(--reveal-ease);
+}
+.t-skel.is-revealed .t-skel-skeleton {
+  opacity: 0;
+  filter: blur(var(--reveal-blur));
+}
+.t-skel.is-revealed .t-skel-content {
+  opacity: 1;
+  filter: blur(0);
+}
+/* Snap-back when replaying: kill transitions so the reverse
+   (revealed → skeleton) is instant. Drop `.is-resetting`
+   after a forced reflow and the next reveal animates again. */
+.t-skel.is-resetting .t-skel-skeleton,
+.t-skel.is-resetting .t-skel-content {
+  transition: none !important;
+}
+
+/* Pulse: place the animation on the bar/avatar children, not
+   on the skeleton itself, so the skeleton's opacity / filter
+   stay free for the cross-fade transition above. */
+.t-skel-skeleton.is-pulsing > * {
+  animation: t-skel-pulse var(--pulse-dur) ease-in-out var(--pulse-count);
+}
+@keyframes t-skel-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: var(--pulse-min); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-skel-skeleton, .t-skel-content {
+    transition: none !important;
+  }
+  .t-skel-skeleton.is-pulsing > * { animation: none !important; }
+}
+.pm-skel-home{--pw:min(264px,66vw);--ph:calc(var(--pw) * 1.22);height:calc(var(--ph) + 56px)}
+.pm-skel-home .t-skel-skeleton{display:flex;flex-direction:column;align-items:center;padding-top:var(--space-sm)}
+.pm-skel-hero{display:block;width:var(--pw);height:var(--ph);border-radius:var(--rounded-lg);background:var(--color-disabled)}
+.pm-skel-hero-line{display:block;width:48%;height:12px;margin-top:var(--space-md);border-radius:var(--rounded-sm);background:var(--color-disabled)}
+.pm-skel-hero-line.short{width:32%;margin-top:var(--space-sm)}
+.pm-skel-collection{min-height:340px}
+.pm-skel-collection .t-skel-skeleton{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-md)}
+.pm-skel-card{display:block;aspect-ratio:9/16;border-radius:var(--rounded-lg);background:var(--color-disabled)}
+.pm-account-skeleton[data-state="loading"] .t-skel-content{pointer-events:none}
+.pm-account-skeleton[data-state="ready"] .t-skel-skeleton{pointer-events:none}
 /* Disable browser pull-to-refresh while keeping normal vertical scrolling. */
 html,body{overscroll-behavior-y:contain}
 

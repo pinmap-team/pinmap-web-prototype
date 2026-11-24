@@ -158,6 +158,18 @@ const galleryMode = () => !collection && filter!=='전체' && !typeOf(filter).pl
 const unavailableScreen = () => '<div class="empty small" role="status"><p class="muted">화면을 불러오지 못했어요. 새로고침해 주세요.</p></div>';
 let resultCards = unavailableScreen;
 
+const pendingSkeletonSlots = new Set();
+function accountSkeletonSlot(name, skeleton, content, loading, className = '') {
+  if (loading) pendingSkeletonSlots.add(name);
+  else if (!pendingSkeletonSlots.has(name)) return content;
+  else pendingSkeletonSlots.delete(name);
+  const state = loading ? 'loading' : 'ready';
+  return `<div class="t-skel pm-account-skeleton ${className}" data-state="${state}" aria-busy="${loading}">
+    <div class="t-skel-skeleton is-pulsing" aria-hidden="true">${skeleton}</div>
+    <div class="t-skel-content" ${loading ? 'inert aria-hidden="true"' : ''}>${content}</div>
+  </div>`;
+}
+
 const readyPlaces = () => items.filter(x=>isPlace(x)&&x.address&&!x.pending);
 const distanceOf = x => /도보/.test(x.distance||'') ? Number(String(x.distance).replace(/\D/g,''))||99 : 999;
 
@@ -168,6 +180,13 @@ function render(){
   const content=detailId?detail():(pages[page] || unavailableScreen)();
   $('#app').innerHTML=`<div class="layout"><aside class="rail"><a href="#" class="brand" data-page="home"><b class="brandmark">${icon('bookmark')}</b><span>핀맵</span></a><button class="filled" data-action="save">${icon('plus')}<span>새로 저장</span></button><div class="railfoot">저장을 다시, 일상으로.<button data-action="intro">사용 방법 알아보기</button><span>Prototype 03</span></div></aside><main class="main"><header class="topbar"><span class="breadcrumb">핀맵 / ${detailId?'콘텐츠 상세':pageName[page]}</span>${page==='my'&&!detailId?'<h1 class="toptitle">마이</h1>':`<a href="#" class="brand mobilebrand" data-page="home"><b class="brandmark">${icon('bookmark')}</b>핀맵</a>`}<div class="topactions">${(page === 'home' || page === 'my') && !detailId ? (n=>`<button class="bellbtn" data-action="noti" aria-label="알림${n?` ${n} 개 안 읽음`:''}">${icon('bell')}${n?`<span class="belldot" aria-hidden="true">${n}</span>`:''}</button>`)(unreadCount()) : ''}</div></header>${content}<footer class="footer"><span>핀맵, 저장을 다시, 일상으로.</span><span>예시 데이터로 체험하는 프로토타입</span></footer></main></div>`;
   window.PinmapBottomNav?.mount();
+  const revealing = [...document.querySelectorAll('.pm-account-skeleton[data-state="ready"]')];
+  if (revealing.length) window.PinmapSkeletonRevealingUntil = Date.now() + 400;
+  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(() => revealing.forEach(slot => {
+    if (!slot.isConnected) return;
+    if (slot.classList.contains('pm-skel-auto-height')) slot.style.height = `${slot.querySelector('.t-skel-content').scrollHeight}px`;
+    slot.classList.add('is-revealed');
+  }));
 }
 function go(p){p=PinmapScreenPolicy.resolve(p,pages);page=p;detailId=null;collection=null;filter='전체';query='';render();window.scrollTo(0,0)}
 let detailReturnTarget=null;
