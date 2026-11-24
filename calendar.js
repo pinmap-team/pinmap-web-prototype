@@ -123,7 +123,7 @@ function calRanges(){
     if (start > end) start = new Date(end);
     ranges.push({item, start, end, title:item.title, entry:item});
   });
-  return ranges.filter(r => PinmapCategories.of(r.item).id === calCat).sort((a,b) => a.start - b.start || b.end - a.end);
+  return ranges.filter(r => PinmapCategories.of(r.item).id === calCat).sort((a,b) => a.start - b.start || b.end - a.end).map((r, i) => ({...r, tone: i % 4}));
 }
 function calCategoryButtons(){
   if (typeof PinmapCategories === 'undefined') return '';
@@ -132,7 +132,7 @@ function calCategoryButtons(){
   if (!cats.length) return '';
   if (calCat && !ids.has(calCat)) calCat = '';
   const chip = (id, label, iconHtml) => `<button type="button" class="calcat${calCat === id ? ' on' : ''}" data-calcat="${id}" aria-pressed="${calCat === id}">${iconHtml}<span>${esc(label)}</span></button>`;
-  return `<div class="calcats" role="group" aria-label="카테고리별 일정">${chip('', '전체', icon('spark'))}${cats.map(c => chip(c.id, c.label, PinmapCategories.icon(c.id, calCat === c.id))).join('')}</div>`;
+  return `<div class="calcats" role="group" aria-label="카테고리별 일정">${chip('', '전체', `<img class="pm-category-icon" src="img/category/all-${calCat === '' ? 'active' : 'inactive'}.svg" width="24" height="24" alt="" aria-hidden="true">`)}${cats.map(c => chip(c.id, c.label, PinmapCategories.icon(c.id, calCat === c.id))).join('')}</div>`;
 }
 
 function calRow(x){
@@ -162,7 +162,7 @@ pages.calendar = function(){
     const col = calWeekOffset(date), isStart = r.start.getTime() === date.getTime(), isEnd = r.end.getTime() === date.getTime();
     const label = isStart || col === 0 || date.getDate() === 1;
     let span = 1; if (label) { const d = new Date(date); while (span < 7 - col) { d.setDate(d.getDate() + 1); if (d > r.end || d.getMonth() !== m) break; span++; } }
-    return `<i class="calspan lane-${r.lane}${isStart ? ' is-start' : ''}${isEnd ? ' is-end' : ''}" aria-hidden="true">${label ? `<em style="--span:${span}">${esc(r.title)}</em>` : ''}</i>`;
+    return `<i class="calspan lane-${r.lane} tone-${r.tone}${isStart ? ' is-start' : ''}${isEnd ? ' is-end' : ''}" aria-hidden="true">${label ? `<em style="--span:${span}">${esc(r.title)}</em>` : ''}</i>`;
   }).join('');
   const cells = [];
   for (let i = 0; i < first; i++) cells.push('<span class="calcell calblank"></span>');
