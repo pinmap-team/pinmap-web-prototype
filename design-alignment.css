@@ -2778,3 +2778,296 @@ html body .calcat img.pm-category-icon[src*="/humor-active.svg"]{transform:trans
 html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:translate(-0.00px,-0.90px) scale(0.919)!important}
 
 /* 캘린더 버튼(.calcats)은 선택 배경이 민트라 다크에서도 진한 아이콘을 그대로 써요. */
+
+/* transitions.dev Pro: spinner-check-morph. Motion variables stay local to this badge. */
+.t-check-blur-wrap {
+  --check-spin-dur:    900ms;
+  --check-pop-dur:     350ms;
+  --check-pop-ease:    cubic-bezier(0.34, 1.96, 0.94, 1);
+  --check-fill-dur:    350ms;  /* green disc fade-in */
+  --check-fill-ease:   cubic-bezier(0.34, 1.35, 0.64, 1);
+  --check-draw-dur:    600ms;
+  --check-draw-delay:  80ms;
+  --check-draw-ease:   cubic-bezier(0.22, 1, 0.36, 1);
+  --check-hold:        2000ms; /* time on the check before reverting */
+  --check-revert-dur:  250ms;
+  --check-revert-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --check-hop:         3px;    /* how far the badge rises on the morph */
+  --check-up-dur:      250ms;  /* hop UP: the rise */
+  --check-up-ease:     cubic-bezier(0.34, 1.35, 0.64, 1);
+  --check-down-dur:    300ms;  /* hop DOWN: the fall back */
+  --check-down-ease:   cubic-bezier(0.14, 2.56, 0.94, 1);
+  --check-pop-scale:   1.09;   /* done size (22 -> 24px disc) */
+  --check-blur:        0.5px;  /* cross-blur while morphing */
+  --check-ring-w:      2.5px;  /* spinner track + arc stroke weight */
+  --check-mark-w:      2;      /* check draw stroke weight */
+  --check-green:       #1ebb26;
+}
+
+/* Cross-blur wrapper: blurs the badge as ONE surface, so every layer
+   softens together through the morph and resolves crisp — a genuine
+   cross-blur, not a one-way blur on a single layer. It must be a
+   SEPARATE element: CSS `filter` is applied BEFORE `mask`/clipping, so
+   blurring a masked layer does nothing, and filtering the badge itself
+   would also blur its own scale/translate compositing. */
+.t-check-blur-wrap {
+  display: inline-flex;
+  filter: blur(0);
+  transition: filter var(--check-revert-dur) var(--check-revert-ease);
+  will-change: filter;
+}
+.t-check-blur-wrap.is-crossing {
+  filter: blur(var(--check-blur));
+  transition: filter calc(var(--check-fill-dur) * 0.45) var(--check-fill-ease);
+}
+
+/* The badge scales 22 → 24 (the done size) with the pop ease and hops
+   vertically. Both live here so the ring, fill and check compose
+   underneath as one object. */
+.t-check-badge {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  scale: 1;
+  transition: scale var(--check-revert-dur) var(--check-revert-ease);
+  will-change: scale, transform;
+}
+.t-check-badge[data-state="done"] {
+  scale: var(--check-pop-scale);   /* 22 → 24, the done size */
+  transition: scale var(--check-pop-dur) var(--check-pop-ease);
+  /* TWO-PHASE HOP, independently controllable: up, then down, as two
+     animations where the second is DELAYED by the first's duration.
+     fill-mode is `forwards` (NOT `both`) — with `both` the delayed
+     down-animation would apply its `from` state immediately and yank
+     the badge up before the rise had a chance to play.
+     Longhands, not the `animation` shorthand: WebKit mis-parses
+     `var()` inside the shorthand and falls back to 0s. */
+  animation-name: t-check-pop-up, t-check-pop-down;
+  animation-duration: var(--check-up-dur), var(--check-down-dur);
+  animation-timing-function: var(--check-up-ease), var(--check-down-ease);
+  animation-delay: 0ms, var(--check-up-dur);
+  animation-fill-mode: forwards, forwards;
+}
+/* Classic `transform` keyframes, NOT the individual `translate:`
+   property — WebKit's support for individual transform properties
+   inside @keyframes is recent and inconsistent, and the hop felt wrong
+   in Safari. The `scale` property composes with `transform`, so the
+   badge's scale transition above is unaffected. */
+@keyframes t-check-pop-up {
+  from { transform: translateY(0); }
+  to   { transform: translateY(calc(var(--check-hop, 3px) * -1)); }
+}
+@keyframes t-check-pop-down {
+  from { transform: translateY(calc(var(--check-hop, 3px) * -1)); }
+  to   { transform: translateY(0); }
+}
+
+/* Track ring — the light circle. It never morphs; the green disc
+   simply fades in over it while it fades out. */
+.t-check-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: var(--check-ring-w) solid rgba(0, 0, 0, 0.1);
+  transition: opacity var(--check-revert-dur) ease,
+              filter var(--check-revert-dur) ease;
+}
+.t-check-badge[data-state="done"] .t-check-ring {
+  opacity: 0;
+  transition: opacity calc(var(--check-fill-dur) * 0.7) ease;
+}
+
+/* Green disc — it fades IN (opacity) rather than growing a stroke or
+   flooding through a mask. Same read, far less machinery, and the fade
+   is trivially tunable. */
+.t-check-fill {
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  background: var(--check-green);
+  /* Two declarations on purpose: p3-capable browsers take the second,
+     everyone else keeps the sRGB rgba() fallback above it. */
+  box-shadow:
+    0 0 0 0.504px rgba(0, 0, 0, 0.05) inset,
+    0 0.504px 0.504px 0 rgba(0, 0, 0, 0.10),
+    0 0.504px 2.016px 0 rgba(0, 0, 0, 0.08),
+    0 -0.504px 0.504px 0 rgba(0, 0, 0, 0.09) inset;
+  box-shadow:
+    0 0 0 0.504px color(display-p3 0 0 0 / 0.05) inset,
+    0 0.504px 0.504px 0 color(display-p3 0 0 0 / 0.10),
+    0 0.504px 2.016px 0 color(display-p3 0 0 0 / 0.08),
+    0 -0.504px 0.504px 0 color(display-p3 0 0 0 / 0.09) inset;
+  opacity: 0;
+  transition: opacity var(--check-revert-dur) var(--check-revert-ease);
+  will-change: opacity;
+}
+.t-check-badge[data-state="done"] .t-check-fill {
+  opacity: 1;
+  transition: opacity var(--check-fill-dur) var(--check-fill-ease);
+}
+
+/* Lead arc — the dark highlight, on its own layer so the morph never
+   TRANSFORMS it: when the fill starts, the spin simply pauses in place
+   and the arc fades out. (Transforming it — scaling or rotating it into
+   the check — fought the morph and read as two things happening.) */
+.t-check-arc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: var(--check-ring-w) solid transparent;
+  border-top-color: #7a7a7a;
+  animation-name: t-check-spin;
+  animation-duration: var(--check-spin-dur);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  transition: opacity var(--check-revert-dur) var(--check-revert-ease);
+  will-change: transform;
+}
+@keyframes t-check-spin {
+  to { transform: rotate(360deg); }
+}
+.t-check-badge[data-state="done"] .t-check-arc {
+  opacity: 0;
+  animation-play-state: paused;
+  transition: opacity calc(var(--check-fill-dur) * 0.5) ease;
+}
+
+/* Check overlay — the svg fills the badge box (22 × 1.09 = the 24px
+   done disc), so the 24-viewBox check renders at exactly design size. */
+.t-check-disc {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.t-check-disc svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Check path — a stroke-dashoffset draw. The dash length is calibrated
+   from the real path length in JS (getTotalLength), so the draw never
+   over- or under-shoots; the 20 fallback only covers the first frame. */
+.t-check-mark {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: var(--check-mark-w);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: var(--check-mark-len, 20);
+  stroke-dashoffset: var(--check-mark-len, 20);
+  transition: stroke-dashoffset var(--check-revert-dur) var(--check-revert-ease);
+}
+.t-check-badge[data-state="done"] .t-check-mark {
+  stroke-dashoffset: 0;
+  /* Sequenced, not queued: the draw takes over while the green is still
+     arriving — 200ms BEFORE the fill completes, plus the draw delay. It
+     reads as one connected gesture instead of two steps. */
+  transition: stroke-dashoffset var(--check-draw-dur) var(--check-draw-ease)
+    calc(var(--check-fill-dur) + var(--check-draw-delay) - 200ms);
+}
+
+/* Reduced motion: no spin, no hop, no blur — the badge jumps straight
+   to the drawn check. */
+@media (prefers-reduced-motion: reduce) {
+  .t-check-arc { animation: none !important; }
+  .t-check-blur-wrap,
+  .t-check-blur-wrap.is-crossing {
+    filter: none !important;
+    transition: none !important;
+  }
+  .t-check-ring, .t-check-arc, .t-check-fill { transition: none !important; }
+  .t-check-badge, .t-check-mark {
+    transition: none !important;
+    animation: none !important;
+  }
+  .t-check-badge[data-state="done"] .t-check-mark { stroke-dashoffset: 0; }
+}
+
+/* Supplied Multi-file download layout, driven by actual link import results. */
+.dl-stage{
+  --stage-bg:var(--color-neutral);--stage-fg:var(--color-on-surface);--stage-muted:var(--color-secondary);
+  --stage-border:var(--color-disabled);--stage-surface:var(--color-surface);--stage-accent:var(--color-accent);
+  --stage-on-accent:var(--color-on-surface);
+  --check-spin-dur:900ms;--check-pop-dur:350ms;--check-pop-ease:cubic-bezier(.34,1.96,.94,1);
+  --check-fill-dur:350ms;--check-fill-ease:cubic-bezier(.34,1.35,.64,1);
+  --check-box:150ms;--check-draw:350ms;--check-delay:0ms;--check-uncheck:150ms;
+  --check-ease:cubic-bezier(.22,1,.36,1);--check-revert-dur:250ms;--check-revert-ease:cubic-bezier(.22,1,.36,1);
+  --check-hop:3px;--check-up-dur:250ms;--check-up-ease:cubic-bezier(.34,1.35,.64,1);
+  --check-down-dur:300ms;--check-down-ease:cubic-bezier(.14,2.56,.94,1);
+  --check-pop-scale:1.09;--check-blur:.5px;--check-ring-w:2.5px;--check-mark-w:2;--check-green:#1ebb26;
+  --text-swap-dur:150ms;--text-swap-translate-y:4px;--text-swap-blur:2px;--text-swap-ease:ease-in-out;
+  --resize-dur:300ms;--resize-ease:cubic-bezier(.22,1,.36,1);
+  --min-dur:450ms;--min-ease:cubic-bezier(.22,1,.36,1);--min-blur:4px;
+  --acc-dur:250ms;--acc-ease:cubic-bezier(.22,1,.36,1);
+  --press-scale:.97;--press-dur:150ms;--ease-smooth-out:cubic-bezier(.22,1,.36,1);
+  position:fixed;z-index:1001;right:24px;bottom:calc(100px + env(safe-area-inset-bottom));
+  box-sizing:border-box;width:320px;max-width:calc(100vw - 48px);height:auto;display:block;
+  background:none;transition:width var(--min-dur) var(--min-ease),height var(--min-dur) var(--min-ease)
+}
+.dl-stage[hidden]{display:none}.dl-stage.is-min{width:64px;height:64px}
+.dl-card{position:relative;width:320px;max-width:100%;box-sizing:border-box;border-radius:24px;overflow:hidden;color:var(--stage-fg);
+  background:linear-gradient(135deg,rgba(255,255,255,.62),rgba(255,255,255,.3));
+  -webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),inset 0 1px 0 0 rgba(255,255,255,.9),inset 0 -1px 0 0 rgba(255,255,255,.25),0 12px 32px -6px rgba(0,0,0,.18),0 1px 3px rgba(0,0,0,.06);
+  transition:width var(--min-dur) var(--min-ease),height var(--min-dur) var(--min-ease),border-radius var(--min-dur) var(--min-ease)}
+[data-theme="dark"] .dl-card{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05));box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 1px 0 0 rgba(255,255,255,.22),0 12px 32px -6px rgba(0,0,0,.5)}
+.dl-card.is-min{border-radius:32px}.dl-full{box-sizing:border-box;width:320px;max-width:100%;padding:16px;transform-origin:bottom right;transition:opacity var(--min-dur) var(--min-ease),filter var(--min-dur) var(--min-ease),transform var(--min-dur) var(--min-ease)}
+.dl-card.is-min .dl-full{position:absolute;bottom:0;right:0;opacity:0;filter:blur(var(--min-blur));transform:scale(.96);pointer-events:none}
+.dl-head{display:flex;align-items:center;gap:8px;padding:8px 8px 0}.dl-texts{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.dl-title{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-body-md);font-weight:var(--weight-semibold)}
+.dl-sub{display:block;font:var(--type-body-sm);color:var(--stage-muted)}
+.dl-btn,.dl-close{flex:none;border:0;color:var(--stage-fg);cursor:pointer;transition:transform var(--press-dur) var(--ease-smooth-out),background var(--press-dur) var(--ease-smooth-out)}
+.dl-btn{height:32px;padding:0 12px;border-radius:40px;background:rgba(0,0,0,.04);font:var(--type-body-sm);white-space:nowrap;overflow:hidden;transition:transform var(--press-dur) var(--ease-smooth-out),background var(--press-dur) var(--ease-smooth-out),width var(--resize-dur) var(--resize-ease)}
+.dl-close{position:relative;width:32px;height:32px;display:grid;place-items:center;padding:0;border-radius:50%;background:rgba(0,0,0,.04)}
+.dl-btn:disabled{cursor:default;color:var(--stage-muted)}.dl-btn:active:not(:disabled),.dl-close:active,.dl-ring:active{transform:scale(var(--press-scale))}
+@media(hover:hover) and (pointer:fine){.dl-btn:hover:not(:disabled),.dl-close:hover{background:rgba(0,0,0,.08)}}
+[data-theme="dark"] .dl-btn,[data-theme="dark"] .dl-close{background:rgba(255,255,255,.07)}
+.dl-btn:focus-visible,.dl-close:focus-visible,.dl-ring:focus-visible{outline:0;box-shadow:0 0 0 2px var(--stage-surface),0 0 0 4px var(--stage-accent)}
+.dl-bar{height:4px;margin:16px 8px 8px;border-radius:2px;background:rgba(0,0,0,.06);overflow:hidden}
+[data-theme="dark"] .dl-bar{background:rgba(238,238,239,.1)}
+.dl-bar-fill{display:block;height:100%;border-radius:2px;background:var(--check-green);transform:scaleX(0);transform-origin:left center;transition:transform .35s ease}
+.dl-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;max-height:176px;overflow:auto}
+.dl-row{display:flex;align-items:center;gap:12px;padding:8px;border-radius:12px;font:var(--type-body-sm);min-height:38px}
+.dl-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dl-meta{flex:none;font:var(--type-body-sm);color:var(--stage-muted);font-variant-numeric:tabular-nums}
+.dl-error{margin:8px;color:var(--color-error);font:var(--type-body-sm);overflow-wrap:anywhere;max-height:48px;overflow:auto}.dl-error[hidden]{display:none}
+.t-text-swap{display:inline-block;white-space:pre;transform:translateY(0);filter:blur(0);opacity:1;transition:transform var(--text-swap-dur) var(--text-swap-ease),filter var(--text-swap-dur) var(--text-swap-ease),opacity var(--text-swap-dur) var(--text-swap-ease)}
+.t-text-swap.is-exit{transform:translateY(calc(var(--text-swap-translate-y)*-1));filter:blur(var(--text-swap-blur));opacity:0}
+.t-text-swap.is-enter-start{transform:translateY(var(--text-swap-translate-y));filter:blur(var(--text-swap-blur));opacity:0;transition:none}
+.dl-ring{position:absolute;inset:0;padding:0;border:0;border-radius:50%;background:none;color:var(--stage-fg);cursor:pointer;opacity:0;pointer-events:none;transition:opacity var(--min-dur) var(--min-ease),transform var(--press-dur) var(--ease-smooth-out)}
+.dl-card.is-min .dl-ring{opacity:1;pointer-events:auto}.dl-ring-svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.dl-ring-track,.dl-ring-prog{fill:none;stroke-width:4}.dl-ring-track{stroke:rgba(0,0,0,.1)}[data-theme="dark"] .dl-ring-track{stroke:rgba(255,255,255,.14)}
+.dl-ring-prog{stroke:var(--check-green);stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100}
+.dl-ring-center{position:absolute;inset:0;display:grid;place-items:center}.dl-ring-center>span{grid-area:1/1;font:var(--type-body-sm);font-variant-numeric:tabular-nums;transition:opacity var(--min-dur) var(--min-ease),filter var(--min-dur) var(--min-ease),transform var(--min-dur) var(--min-ease)}
+.dl-ring-check{display:grid;place-items:center;color:var(--check-green);opacity:0;filter:blur(var(--min-blur));transform:scale(.25)}
+.dl-ring.is-done .dl-ring-pct{opacity:0;filter:blur(var(--min-blur));transform:scale(.5)}.dl-ring.is-done .dl-ring-check{opacity:1;filter:blur(0);transform:scale(1)}
+.dl-stage .t-check-badge[data-state="queued"] .t-check-arc{opacity:0}
+.dl-stage .t-check-badge[data-state="done"] .t-check-mark{transition:stroke-dashoffset var(--check-draw) var(--check-ease) calc(var(--check-box) + var(--check-delay) + 80ms)}
+.dl-link,.dl-body{display:grid;grid-template-rows:1fr;transition:grid-template-rows var(--acc-dur) var(--acc-ease)}
+.dl-link[data-open="false"],.dl-body[data-open="false"]{grid-template-rows:0fr}
+.dl-link-clip,.dl-body-clip{min-height:0;overflow:hidden;opacity:1;filter:blur(0);transition:opacity var(--acc-dur) var(--acc-ease),filter var(--acc-dur) var(--acc-ease)}
+.dl-link[data-open="false"] .dl-link-clip,.dl-body[data-open="false"] .dl-body-clip{opacity:0;filter:blur(var(--text-swap-blur));pointer-events:none}
+.dl-input-head{display:flex;justify-content:flex-end;align-items:center;height:24px;padding:0 8px}
+.dl-input-close{display:grid;place-items:center;flex:none;width:24px;height:24px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--stage-muted);cursor:pointer}
+.dl-input-close:focus-visible{outline:2px solid var(--stage-fg);outline-offset:2px}
+.dl-link-row{display:flex;align-items:center;gap:8px;padding:8px}
+.dl-field{position:relative;flex:1;min-width:0;height:36px;box-sizing:border-box;display:flex;align-items:center;padding:0 12px;border-radius:10px;overflow:hidden;color:var(--stage-muted);background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
+.dl-field.is-filled{color:var(--stage-fg)}
+.dl-field textarea{width:100%;height:20px;min-height:20px;margin:0;padding:0;border:0;outline:0;resize:none;overflow:hidden;background:transparent;color:var(--stage-fg);font:var(--type-body-sm);white-space:nowrap}
+.dl-field textarea::placeholder{color:var(--stage-muted)}
+.dl-field:focus-within{box-shadow:inset 0 0 0 1px var(--stage-fg)}
+.dl-file-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-body-sm)}
+.dl-zip-input{position:absolute;width:1px;height:1px;opacity:0;clip-path:inset(50%);pointer-events:none}
+.dl-field.is-photo{height:56px;gap:8px;border:0;border-radius:14px;background:var(--color-neutral);box-shadow:none}
+.dl-field.is-photo:focus-within{box-shadow:none}
+.dl-field-icon{flex:none;color:var(--stage-muted)}
+.dl-field-icon[hidden]{display:none}
+.dl-photo-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;font:var(--type-body-sm)}
+.dl-photo-thumb{flex:none;width:28px;height:28px;border-radius:50%;object-fit:cover}
+[data-theme="dark"] .dl-field.is-photo{background:var(--color-neutral);box-shadow:none}
+[data-theme="dark"] .dl-field{background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.dl-input-error{margin:4px 8px 8px;color:var(--color-error);font:var(--type-body-sm);overflow-wrap:anywhere}
+.dl-input-error[hidden]{display:none}
+@media(prefers-reduced-motion:reduce){.dl-stage,.dl-card,.dl-full,.dl-ring,.dl-ring-center>span,.dl-close,.dl-btn,.dl-bar-fill,.t-text-swap,.dl-link,.dl-body,.dl-link-clip,.dl-body-clip{transition:none!important}}
