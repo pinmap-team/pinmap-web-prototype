@@ -1,5 +1,6 @@
 /* Integration layer: keep collection/detail implementations untouched. */
 (() => {
+  if (typeof document!=='undefined') document.documentElement.classList.add('nav-icononly');
   // 2026-11-24: 선택 전·후 모양이 같은 내비 아이콘. 선택되면 같은 윤곽을 채우고 안쪽 선만 비워요(mask). 지도는 카테고리 '여행·명소'와 같은 아이콘.
   const NAV_GLYPHS={
     home:{outline:'M3 10 12 3l9 7v10H3z',detail:'M9 20v-7h6v7',cut:'M9 21.5V13h6v8.5z',cutFill:true},
@@ -34,21 +35,62 @@
         {duration:480,easing:'cubic-bezier(.22,1,.36,1)'});
     });
   }
-  nav=function(){
+  function navState(){
     const current=(typeof PARENT_TAB!=='undefined'&&PARENT_TAB[page])||page;
     const activePage=['course','courses'].includes(current)?'map':current;
     const index=Math.max(0,['home','map','library','my'].indexOf(activePage));
-    const previousDock=document.querySelector('.bottomnav .pm-nav-main');
-    const previousMarker=previousDock?.querySelector('.pm-nav-indicator');
-    // Read the live visual position, including any unfinished animation.
-    const from=previousMarker
-      ? (()=>{const tab=(previousDock.clientWidth-8-NAV_GAP)/4,x=previousMarker.getBoundingClientRect().left-previousDock.getBoundingClientRect().left-previousDock.clientLeft-4;return x>=1.5*tab+NAV_GAP/2?(x-NAV_GAP)/tab:x/tab;})()
-      : lastNavIndex??index;
-    queueMicrotask(()=>{lastNavIndex=index;});
-    if(Math.abs(from-index)>.01)slideNav(index,from);
+    return {activePage,index};
+  }
+  function navMarkup(){
+    const {activePage,index}=navState();
     const entry=(p,label,glyph)=>{const active=activePage===p;return `<button class="navitem ${active?'active':''}" data-page="${p}" aria-label="${label}" ${active?'aria-current="page"':''}><span class="navicon">${navGlyph(glyph,active)}</span><span class="pm-nav-label" aria-hidden="true">${label}</span></button>`};
     return `<span class="pm-nav-main" data-nav-target="${index}" style="--nav-index:${index};--nav-shift:${index>=2?1:0}"><span class="pm-nav-indicator" aria-hidden="true"></span>${entry('home','홈','home')}${entry('map','지도','map')}<span class="pm-nav-gap" aria-hidden="true"></span>${entry('library','컬렉션','bookmark')}${entry('my','마이','user')}</span>${typeof homeAddMarkup==='function'?homeAddMarkup():''}`;
-  };
+  }
+  let bottomNav;
+  function syncBottomNav(){
+    const {activePage,index}=navState();
+    const dock=bottomNav.querySelector('.pm-nav-main');
+    if (!dock) return;
+    const marker=dock.querySelector('.pm-nav-indicator');
+    const from=marker && dock.clientWidth>NAV_GAP+8 && lastNavIndex!==null
+      ? (()=>{const tab=(dock.clientWidth-8-NAV_GAP)/4,x=marker.getBoundingClientRect().left-dock.getBoundingClientRect().left-dock.clientLeft-4;return x>=1.5*tab+NAV_GAP/2?(x-NAV_GAP)/tab:x/tab;})()
+      : lastNavIndex??index;
+    dock.dataset.navTarget=String(index);
+    dock.style.setProperty('--nav-index',String(index));
+    dock.style.setProperty('--nav-shift',index>=2?'1':'0');
+    for (const button of dock.querySelectorAll('.navitem')) {
+      const active=button.dataset.page===activePage;
+      if (button.classList.contains('active')!==active) {
+        button.classList.toggle('active',active);
+        button.querySelector('.navicon').innerHTML=navGlyph({home:'home',map:'map',library:'bookmark',my:'user'}[button.dataset.page],active);
+      }
+      if (active) button.setAttribute('aria-current','page');
+      else button.removeAttribute('aria-current');
+    }
+    if (Math.abs(from-index)>.01) {
+      const stage=bottomNav.querySelector('#home-add-menu');
+      if (stage?.dataset.open==='true') {
+        stage.dataset.open='false';
+        stage.querySelector('.home-add-fab')?.setAttribute('aria-expanded','false');
+        const options=stage.querySelector('.home-add-options');
+        if(options){options.setAttribute('aria-hidden','true');options.inert=true;}
+      }
+      slideNav(index,from);
+    }
+    lastNavIndex=index;
+  }
+  window.PinmapBottomNav=Object.freeze({mount(){
+    if (typeof document==='undefined') return;
+    if (!bottomNav) {
+      bottomNav=document.createElement('nav');
+      bottomNav.className='bottomnav';
+      bottomNav.setAttribute('aria-label','하단 메뉴');
+    }
+    if (!bottomNav.hasChildNodes()) bottomNav.innerHTML=navMarkup();
+    if (!bottomNav.isConnected) document.body.append(bottomNav);
+    syncBottomNav();
+  },get element(){return bottomNav}});
+  if (typeof document!=='undefined' && document.querySelector('#app .layout,#app .live-map')) window.PinmapBottomNav.mount();
   // All map views share the same Google background and Leaflet overlay.
   window.attachPinmapBasemap=(map,onChange)=>window.PinmapMapProviders.attach(map,onChange);
 })();

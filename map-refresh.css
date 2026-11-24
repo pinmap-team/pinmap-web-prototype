@@ -97,7 +97,8 @@
 .lm-detail-source{margin:var(--space-md) 0 0;font:var(--type-body-sm);color:var(--lm-muted)}
 .live-map .lm-detail-link{display:flex;align-items:center;justify-content:center;gap:var(--space-sm);width:100%;min-height:44px;margin-top:var(--space-xl);border:1px solid var(--lm-line)!important;border-radius:var(--rounded-md)!important;font:var(--type-label-md)}
 .live-map .lm-detail-link svg{width:16px;height:16px}
-.live-map.has-selected-place .bottomnav{display:none!important}
+body.live-map-page:has(.live-map.has-selected-place)>.bottomnav,
+body.live-map-page:has(.lm-list-sheet:not([hidden]))>.bottomnav{display:none!important}
 .live-map:has(.lm-sheet.is-full) .lm-floating-actions{visibility:hidden;pointer-events:none}
 
 /* Navigation stays visible over the unselected nearby sheet. */
@@ -134,7 +135,7 @@
    Separate the backdrop, moving light and reflective rim so white tint does not
    wash out the content. This is a web material, not Apple's native renderer. */
 @property --nav-light { syntax: '<percentage>'; inherits: true; initial-value: 12.5%; }
-.bottomnav,.live-map .bottomnav{box-shadow:none!important}
+.bottomnav{box-shadow:none!important}
 .bottomnav .pm-nav-main{
   position:relative;
   background:transparent!important;
