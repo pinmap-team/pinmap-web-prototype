@@ -46,7 +46,7 @@ function notiSheet(){
 const markRead = ids => { settings.readNoti = [...new Set([...settings.readNoti, ...ids])]; afterChange(); };
 
 /* ---------- 마이 페이지 ---------- */
-const sw = (key, label, desc) => `<label class="setrow"><div><b>${label}</b><small>${desc}</small></div><input type="checkbox" role="switch" data-setting="${key}" ${settings[key]?'checked':''}><i class="sw" aria-hidden="true"></i></label>`;
+const sw = (key, label, desc) => `<label class="setrow"><div><b>${label}</b><small>${desc}</small></div><input type="checkbox" role="switch" data-setting="${key}" ${settings[key]?'checked':''}><i class="sw t-toggle" data-on="${!!settings[key]}" aria-hidden="true"><span class="t-toggle-thumb"></span></i></label>`;
 // 마이: 첫 화면은 요약만 · 자세한 설정은 누르면 아래에서 올라오는 시트에서 바꿔요
 const myRow = (act, emoji, label, value='') => `<button class="mrow" data-action="${act}"><span class="mrico" aria-hidden="true">${emoji}</span><span class="mrlabel">${label}</span>${value ? `<span class="mrval">${value}</span>` : ''}${icon('chevron')}</button>`;
 pages.my = function(){
@@ -142,7 +142,12 @@ document.addEventListener('change', e => {
   const key = e.target.dataset?.setting;
   if (!key) return;
   if (!['notiDeadline','notiNearby','notiReminder','aiDefault'].includes(key)) return;
-  settings[key] = e.target.checked; afterChange();
-  const y = window.scrollY; render(); window.scrollTo(0, y);
-  mySheet?.(); // 열려 있는 설정 시트도 바로 갱신
+  const track = e.target.nextElementSibling;
+  track?.classList.add('is-init');
+  if (track) track.dataset.on = String(e.target.checked);
+  settings[key] = e.target.checked;
+  afterChange();
+  // 현재 설정 페이지의 스위치를 유지해야 전환이 끝까지 보입니다.
+  // 저장 실패 시 계정 어댑터가 설정을 되돌리고 화면을 다시 그립니다.
+  if (mySheet) window.setTimeout(() => { if (track?.isConnected) mySheet?.(); }, 350);
 });
