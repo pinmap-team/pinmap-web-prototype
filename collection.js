@@ -190,7 +190,7 @@ function cfCards(list, pick, canSelect){
 }
 const cfEmpty = (ic, h, p, btn) => `<div class="cf-list"><div class="empty">${icon(ic)}<h3>${h}</h3><p class="muted">${p}</p>${btn}</div></div>`;
 
-resultCards = function(){
+const accountResultCards = function(){
   const q = cfQ(), open = cfOpenTitle();
   // 폴더 안: 폴더 카드 없이 콘텐츠만
   if (open) {
@@ -229,6 +229,12 @@ resultCards = function(){
   if (!q) return cfFolderToolbar() + grid;
   if (!list.length) return cfEmpty('search', '찾는 콘텐츠가 없어요', '다른 키워드나 카테고리로 다시 찾아 보세요.', `<button class="tonal" data-action="resetfilter">전체 컬렉션 보기</button>`);
   return grid + cfCards(list, false, false);
+};
+resultCards = function(){
+  const loading = PM_ENV.requiresAuth && !items.length && !window.PinmapAccountLoaded && !window.PinmapAccountLoadError;
+  if (window.PinmapAccountLoadError) pendingSkeletonSlots.delete('collection-results');
+  const skeleton = '<span class="pm-skel-card"></span><span class="pm-skel-card"></span>';
+  return accountSkeletonSlot('collection-results', skeleton, loading ? '' : accountResultCards(), loading, 'pm-skel-collection pm-skel-auto-height');
 };
 
 let cfSearchOpen = false;

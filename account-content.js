@@ -241,6 +241,7 @@ if (PM_ENV.requiresAuth) (() => {
     return localIds.get(key);
   };
   let pendingView = false;
+  let skeletonRefreshTimer;
   function refreshVisibleContent() {
     if (typeof page === 'undefined') { render(); return; }
     if (detailId || !['home','library','favorites'].includes(page) || document.querySelector?.('dialog[open]')) {
@@ -248,6 +249,12 @@ if (PM_ENV.requiresAuth) (() => {
     }
     if (document.activeElement?.matches?.('input,textarea,select,[contenteditable]')) {
       pendingView = true; return;
+    }
+    const revealRemaining = (window.PinmapSkeletonRevealingUntil || 0) - Date.now();
+    if (revealRemaining > 0) {
+      clearTimeout(skeletonRefreshTimer);
+      skeletonRefreshTimer = setTimeout(refreshVisibleContent, revealRemaining + 20);
+      return;
     }
     pendingView = false;
     render();

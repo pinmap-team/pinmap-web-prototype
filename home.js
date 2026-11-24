@@ -170,15 +170,21 @@ pages.home = function(){
   const chips = homeCategoryChips();
   const picks = homePicks();
   const accountError = PM_ENV.requiresAuth && !items.length && window.PinmapAccountLoadError;
-  const emptyHome = PM_ENV.development && !items.length && !accountError;
+  const accountLoading = PM_ENV.requiresAuth && !items.length && !window.PinmapAccountLoaded && !accountError;
+  const emptyHome = PM_ENV.development && !items.length && !accountError && !accountLoading;
+  const heroSkeleton = '<span class="pm-skel-hero"></span><span class="pm-skel-hero-line"></span><span class="pm-skel-hero-line short"></span>';
+  const pickMarkup = `<div class="mainpick" role="group" aria-label="최근 저장한 콘텐츠">${picks.map((p, i) => pickCard(p, i, picks.length)).join('')}</div>`;
   const main = accountError
     ? '<div class="empty small" role="status"><p class="muted">저장한 콘텐츠를 불러오지 못했어요.</p><button class="tonal" data-action="accountretry">다시 불러오기</button></div>'
-    : picks.length || emptyHome
+    : accountLoading || picks.length
+    ? `<div class="mainwrap">${accountSkeletonSlot('home-hero', heroSkeleton, pickMarkup, accountLoading, 'pm-skel-home')}</div>`
+    : emptyHome
     ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'role="group" aria-label="최근 저장한 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div>${emptyHome ? `<section class="home-first-save" aria-label="첫 콘텐츠 추가"><h2>첫 콘텐츠를 저장해 볼까요?</h2><p>다시 보고 싶은 콘텐츠를 모아 보세요.</p><button type="button" class="home-share-help" data-action="sharehelp">공유로 저장하는 방법</button></section>` : ''}</div>`
     : `<div class="empty small"><p class="muted">아직 저장한 콘텐츠가 없어요.</p></div>`;
+  if (!accountLoading && !picks.length) pendingSkeletonSlots.delete('home-hero');
   const brand = '<div class="homebrand" aria-label="Pinmap"><img class="homebrand-symbol" src="img/pinmap-symbol-splash.svg" alt=""><span class="homebrand-name" aria-hidden="true">Pinmap</span></div>';
   // 2026-11-23: 마감 임박 배너는 맨 위 고정 대신 캘린더 위젯 바로 아래에 보여줘요.
-  return brand + main + (accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + stripBar() + chips + (emptyHome || accountError ? '' : subWidgets());
+  return brand + main + (accountLoading || accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + (accountLoading ? '' : stripBar() + chips + (emptyHome || accountError ? '' : subWidgets()));
 };
 
 // Android 공유 안내: 실제 설치나 공유 수신이 연결된 것으로 표시하지 않아요.
