@@ -79,17 +79,17 @@ detail = function(){
         <div class="dttopr">
           <button type="button" class="dtbtn dtfavorite lm-heart-motion${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 게시물 즐겨찾기" title="즐겨찾기" aria-pressed="${!!x.favorite}"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>
           <button class="dtbtn dtmorebtn" data-action="dtmore" aria-label="더보기" aria-haspopup="menu" aria-expanded="false" aria-controls="dtmenu">${icon('more')}</button>
-          <div class="dtmenu" id="dtmenu" role="menu" aria-label="콘텐츠 메뉴" hidden>
-            <button type="button" role="menuitem" data-action="dtshare">${icon('share')}공유</button>
-            <button type="button" role="menuitem" data-action="edit">${icon('pen')}수정</button>
-            <button type="button" role="menuitem" class="dtmenu-danger" data-unsave="${x.id}">${icon('trash')}삭제</button>
-          </div>
         </div></div>
       <div class="dtsrc dthtitle">
         <span class="dthpill">${esc(failure?failure.label:x.category || shortType(x.type))}</span>
         <h1>${esc(failure&&x.title==='Instagram 게시물'?'분석 결과가 없는 게시물':x.title)}</h1>
         <small>${esc(src)}, ${esc(savedAgo(x))} 저장</small>
       </div>
+    </div>
+    <div class="dtmenu" id="dtmenu" role="menu" aria-label="콘텐츠 메뉴" hidden>
+      <button type="button" role="menuitem" data-action="dtshare">${icon('share')}공유</button>
+      <button type="button" role="menuitem" data-action="edit">${icon('pen')}수정</button>
+      <button type="button" role="menuitem" class="dtmenu-danger" data-unsave="${x.id}">${icon('trash')}삭제</button>
     </div>
     <section class="dtsheet" id="detail-info" aria-label="콘텐츠 상세 정보">
       <button type="button" class="dt-sheet-handle" data-action="dtsheettoggle" aria-label="상세 정보 펼치기" aria-controls="detail-info" aria-expanded="false"><span aria-hidden="true"></span></button>
@@ -186,6 +186,11 @@ document.addEventListener('pointercancel',dtSheetRelease);
 const dtMenuSet = open => {
   const btn = document.querySelector('.dtmorebtn'), menu = document.getElementById('dtmenu');
   if (!btn || !menu) return;
+  if (open) {
+    const rect = btn.getBoundingClientRect();
+    menu.style.setProperty('--dt-menu-top', `calc(${rect.bottom}px + var(--space-sm))`);
+    menu.style.setProperty('--dt-menu-right', `max(var(--space-lg), ${innerWidth - rect.right}px)`);
+  }
   menu.hidden = !open; btn.setAttribute('aria-expanded', String(open));
   if (open) menu.querySelector('[role="menuitem"]')?.focus();
 };
@@ -203,6 +208,8 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { e.preventDefault(); dtMenuSet(false); document.querySelector('.dtmorebtn')?.focus(); }
   else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); list[(i + (e.key === 'ArrowDown' ? 1 : -1) + list.length) % list.length]?.focus(); }
 });
+addEventListener('scroll', () => {if (document.getElementById('dtmenu')?.hidden === false) dtMenuSet(false);}, true);
+addEventListener('resize', () => {if (document.getElementById('dtmenu')?.hidden === false) dtMenuSet(false);});
 
 // 공유: 휴대폰 공유 메뉴 → 안 되면 제목 · 주소 · 링크를 복사
 actions.dtshare = async () => {
