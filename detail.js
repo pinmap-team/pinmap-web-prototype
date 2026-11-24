@@ -430,7 +430,7 @@ function dtAiSummaryBody(item){
     const value=typeof word==='string'?word.trim():'';
     if(value.length>=2&&value.length<=24&&!['기타','분류보류'].includes(value)&&!tags.includes(value))tags.push(value);
   }
-  return `<strong class="dtai-keyline" title="${esc(title)}">${esc(title)}</strong><p class="dtai-body">${esc(body)}</p><div class="dtai-tags" aria-label="콘텐츠 키워드">${tags.map(tag=>`<span class="dtai-tag">${esc(tag)}</span>`).join('')}</div>`;
+  return `<strong class="dtai-keyline" title="${esc(title)}">${esc(title)}</strong><p class="dtai-body t-shimmer" data-text="${esc(body)}">${esc(body)}</p><div class="dtai-tags" aria-label="콘텐츠 키워드">${tags.map(tag=>`<span class="dtai-tag">${esc(tag)}</span>`).join('')}</div>`;
 }
 function dtFitSummaries(){
   document.querySelectorAll('[data-dtsum]:not([data-fit])').forEach(box => {
