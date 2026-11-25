@@ -2625,8 +2625,8 @@ html body .homecategories .prefchip{padding-top:var(--space-xs)!important;paddin
 .cf-goo-action .cf-filled-pin path,.cf-pinmark .cf-filled-pin path{fill:currentColor!important;stroke:none!important}
 .cf-goo-action .cf-unpin-icon{fill:currentColor;stroke:none}
 .cf-goo-action .cf-unpin-gap,.cf-goo-action .cf-unpin-slash{fill:none;stroke-linecap:round}
-.cf-goo-action .cf-unpin-gap{stroke:#1e1e1e;stroke-width:5}
-.cf-goo-action .cf-unpin-slash{stroke:currentColor;stroke-width:2}
+.cf-goo-action .cf-unpin-gap{stroke:#1e1e1e;stroke-width:2.5}
+.cf-goo-action .cf-unpin-slash{stroke:currentColor;stroke-width:1.1}
 .cf-goo-menu[data-open="true"] .cf-goo-action:hover{filter:brightness(1.12)}
 .cf-goo-action:focus-visible{outline:0;filter:brightness(1.2)}
 @media(prefers-reduced-motion:reduce){.cf-menu-backdrop,.cf-menu-focus,.cf-goo-menu,.cf-goo-blob,.cf-goo-action,.cf-goo-action .icon{transition:none!important}}
