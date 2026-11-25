@@ -78,8 +78,8 @@
         <button class="cx-new" data-course-new>${icon('plus')}새 코스 만들기</button>
         <div class="cx-section-head"><h2>코스 ${courses.length}개</h2></div>
         ${courses.length?`<div class="cx-plan-list">${courses.map(saved=>{const places=saved.days.flat().map(stop=>findPlace(stop.id)).filter(Boolean);return `<button class="cx-plan" data-course-open="${esc(saved.id)}" aria-label="${esc(saved.title)}, 장소 ${places.length}곳 코스 열기">
-          <span class="cx-plan-copy"><b>${esc(saved.title)}</b><span class="cx-meta"><span>${icon('map')}장소 ${places.length}곳</span>${routeMeta(places)}</span><span class="cx-chips">${places.length?chips(places):''}</span></span>
-          ${places.some(place=>coordinates(place))?`<span class="cx-plan-map course-map-pattern"><span class="course-saved-map" data-course-map="${esc(saved.id)}" role="img" aria-label="${esc(saved.title)} 장소 순서 지도" inert></span></span>`:`<span class="cx-plan-map course-map-pattern is-empty">${icon('map')}</span>`}
+          <span class="cx-plan-copy"><b>${esc(saved.title)}</b><span class="cx-meta"><span>${icon('route')}장소 ${places.length}곳</span>${routeMeta(places)}</span><span class="cx-chips">${places.length?chips(places):''}</span></span>
+          ${places.some(place=>coordinates(place))?`<span class="cx-plan-map course-map-pattern"><span class="course-saved-map" data-course-map="${esc(saved.id)}" role="img" aria-label="${esc(saved.title)} 장소 순서 지도" inert></span></span>`:`<span class="cx-plan-map course-map-pattern is-empty">${icon('route')}</span>`}
         </button>`}).join('')}</div><p class="cx-credit">지도 © Google</p>`:`<div class="course-list-empty">${icon('route')}<h2>아직 저장한 코스가 없어요.</h2><p>저장한 장소로 첫 코스를 만들어 보세요.</p></div>`}
       </div></section>`;
   };
@@ -93,7 +93,7 @@
       <div class="cx-body">
         <div class="cx-map course-map-wrap course-map-pattern"><div id="course-map" aria-label="코스 장소와 이동 순서 지도"></div></div>
         <div class="course-edit-bar" ${editing?'':'hidden'}><span>드래그로 순서 변경, ×로 삭제</span><button data-course-done ${editing?'':'hidden'}>완료</button></div>
-        ${stops.length?`<div class="cx-section-head"><h2>코스 순서</h2><span class="cx-meta"><span>${icon('map')}장소 ${stops.length}곳</span>${routeMeta(places)}</span></div>
+        ${stops.length?`<div class="cx-section-head"><h2>코스 순서</h2><span class="cx-meta"><span>${icon('route')}장소 ${stops.length}곳</span>${routeMeta(places)}</span></div>
         <ol class="course-timeline cx-timeline">${stops.map((stop,index)=>`<li class="course-row" data-course-id="${esc(stop.id)}"><span class="cx-num" aria-hidden="true">${index+1}</span><article class="course-card cx-stop" tabindex="0" data-course-stop="${esc(stop.id)}" aria-label="${index+1}번째, ${esc(stop.place.title)}. 눌러서 상세 보기, 왼쪽 손잡이로 순서 변경"><button class="course-drag-handle cx-grip" data-course-drag aria-label="${esc(stop.place.title)} 순서 변경" title="끌어서 순서 변경, 방향키 위/아래로 이동">${icon('drag')}</button><span class="cx-stop-copy"><small>${index+1}번째 장소</small><b>${esc(stop.place.title)}</b><span class="cx-stop-address">${esc(stop.place.address)}</span><span class="cx-chips">${chip(stop.place)}</span></span><img class="cx-stop-photo" src="${esc(thumbnail(stop.place))}" alt=""><button class="course-remove" data-course-remove="${esc(stop.id)}" aria-label="${esc(stop.place.title)} 삭제" ${editing?'':'hidden'}>${icon('close')}</button></article></li>`).join('')}</ol>
         <p class="cx-note">거리는 장소 사이 직선거리로 계산한 예상값이에요.</p>`:'<div class="course-empty">코스가 비어 있어요.<br>저장한 장소를 추가해 보세요.</div>'}
         <button type="button" class="cx-add course-add-place" data-course-picker aria-haspopup="dialog">${icon('plus')}장소 추가하기</button>
