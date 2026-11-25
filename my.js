@@ -71,7 +71,7 @@ pages.my = function(){
   const quotaDetail = PM_ENV.requiresAuth ? billing?.error ? '사용량을 불러오지 못했어요.' : quotaUsed === null ? '사용량을 확인하고 있어요.' : `${quotaUsed}회 사용 · ${Math.max(0,quotaLimit-quotaUsed)}회 남음` : '로그인하면 사용량을 확인할 수 있어요.';
   return `
   <div class="mprofile profilecard myprofile" role="group" aria-label="프로필">
-    <button type="button" class="myprofile-photo" data-action="profilephoto" aria-label="프로필 사진 변경">${avatarHtml()}<span class="account-photo-edit" aria-hidden="true">${icon('image')}</span></button>
+    <button type="button" class="myprofile-photo" data-action="profilephoto" aria-label="프로필 사진 변경">${avatarHtml()}<span class="account-photo-edit" aria-hidden="true">${icon('galleryAdd')}</span></button>
     <input type="file" id="avatarfile" accept="image/*" hidden>
     <span class="myprofile-name"><b>${esc(settings.nickname || '이름 설정')}</b></span>
     <button type="button" class="myprofile-go" data-page="profile" aria-label="프로필 편집으로 이동">${icon('chevright')}</button>
