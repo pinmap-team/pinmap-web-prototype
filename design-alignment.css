@@ -3197,7 +3197,6 @@ html body .bottomnav svg .pm-nav-fill,html body .main:has(.myprofile) svg.solar-
 .dl-stage.is-input .dl-input-error{margin:0 12px 12px}
 
 /* 2026-11-25 hand-drawn map layout. Coordinates follow the 402 × 874 Figma frames. */
-html body.live-map-page .bottomnav{display:none!important}
 html body .lm-drawn-map{--lm-drawn-sheet-height:383px;background:#f5f5f5;color:#282828}
 html body .lm-drawn-map .lm-header{position:absolute;inset:0 0 auto!important;z-index:600;width:100%;height:132px;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;pointer-events:none}
 html body .lm-drawn-map .lm-header::before{content:'';position:absolute;inset:0 0 auto;height:79px;background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,0));pointer-events:none}
@@ -3240,7 +3239,7 @@ html body .lm-drawn-map .lm-drawn-tabs button{flex:1;display:flex;align-items:ce
 html body .lm-drawn-map .lm-drawn-tabs button[aria-selected="true"]{background:#fff!important}
 html body .lm-drawn-map .lm-drawn-tabs button svg{width:18px;height:18px;color:#282828;stroke-width:2}
 html body .lm-drawn-map .lm-drawn-tabs button[aria-selected="true"] svg{color:#00ffd4;fill:#00ffd4}
-html body .lm-drawn-map .lm-sheet-scroll{flex:1;min-height:0;overflow:auto;padding:0;overscroll-behavior:contain}
+html body .lm-drawn-map .lm-sheet-scroll{flex:1;min-height:0;overflow:auto;padding:0 0 100px;overscroll-behavior:contain}
 html body .lm-drawn-map .lm-sheet-scroll [hidden]{display:none!important}
 html body .lm-drawn-map .lm-drawn-place-list{padding:6px 17px 0}
 html body .lm-drawn-map .lm-drawn-place-row{position:relative;display:flex;align-items:flex-start;gap:18px;min-height:119px;padding:14px 13px;border-bottom:1px solid #e4e4e4}
