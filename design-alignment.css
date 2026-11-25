@@ -1318,8 +1318,8 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .dt-photo .dtbar>.dtghost{background:var(--color-surface);color:var(--color-on-surface);border:1px solid var(--color-disabled)}
 .dt-photo .dtbar>.dtprimary{background:var(--color-primary);color:var(--color-neutral);border:0}
 .dt-photo .dtbar .icon{width:20px;height:20px;stroke-width:1.6}
-body:has(.dt) .dtbar,.dt.dt-photo .dtbar{bottom:calc(var(--space-xl) + env(safe-area-inset-bottom))}
-body:has(.dt) .dtbar::before,.dt.dt-photo .dtbar::before{bottom:calc(-1 * var(--space-xl) - env(safe-area-inset-bottom))}
+body:has(.dt) .dtbar,.dt.dt-photo .dtbar{bottom:0;padding-bottom:calc(var(--space-xl) + env(safe-area-inset-bottom))}
+body:has(.dt) .dtbar::before,.dt.dt-photo .dtbar::before{bottom:0}
 .dt.dt-photo:not(.dt-no-actions) .dtsheet{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.dt.dt-photo .dtsheet{background:var(--color-surface)}}
 
