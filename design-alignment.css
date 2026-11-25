@@ -2627,6 +2627,9 @@ html body .homecategories .prefchip{padding-top:var(--space-xs)!important;paddin
 .cf-goo-action .cf-unpin-gap,.cf-goo-action .cf-unpin-slash{fill:none;stroke-linecap:round}
 .cf-goo-action .cf-unpin-gap{stroke:#1e1e1e;stroke-width:2.5}
 .cf-goo-action .cf-unpin-slash{stroke:currentColor;stroke-width:1.1}
+html body svg.solar-pin-bold,html body svg.solar-volume-loud-bold{fill:currentColor!important;stroke:none!important}
+html body svg.solar-pin-bold>path:first-child,html body svg.solar-volume-loud-bold>path{fill:currentColor!important;stroke:none!important}
+html body svg.solar-bill-list-linear>path{fill:none!important;stroke:currentColor!important;stroke-width:1.5px!important}
 .cf-goo-menu[data-open="true"] .cf-goo-action:hover{filter:brightness(1.12)}
 .cf-goo-action:focus-visible{outline:0;filter:brightness(1.2)}
 @media(prefers-reduced-motion:reduce){.cf-menu-backdrop,.cf-menu-focus,.cf-goo-menu,.cf-goo-blob,.cf-goo-action,.cf-goo-action .icon{transition:none!important}}
