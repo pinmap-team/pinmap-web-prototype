@@ -49,6 +49,11 @@
   const eligible=()=>PinmapPlaces.all(items).filter(place=>place.address);
   const dayStops=()=>course.days[0];
   const findPlace=id=>eligible().find(item=>item.id===id);
+  window.PinmapCourses.list=()=>courses.map(saved=>({
+    id:saved.id,title:saved.title,date:saved.date,
+    places:saved.days.flat().map(stop=>findPlace(stop.id)).filter(Boolean)
+  }));
+  window.PinmapCourses.open=id=>{const saved=courses.find(value=>value.id===id);if(saved)openCourse(saved);};
   // 장소 사진이 '사진 없음' 자리표시이면 게시물 대표 사진을 써요
   const thumbnail=item=>{const own=item.photo&&item.photo!==PM_ENV.placeholderImage?item.photo:'';return own||(typeof libPhoto==='function'?libPhoto(item.sourceItem):'')||PM_ENV.placeholderImage;};
   const stopTime=()=>{const last=dayStops().at(-1)?.time||'08:30';const [h,m]=last.split(':').map(Number);const total=Math.min(h*60+m+90,23*60+45);return `${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`};
@@ -132,6 +137,7 @@
     window.unmountCourseThumbnails();
     if(!window.L)return;
     document.querySelectorAll('[data-course-map]').forEach(element=>{
+      const drawn=element.classList.contains('lm-drawn-course-map');
       const saved=courses.find(value=>value.id===element.dataset.courseMap);if(!saved)return;
       const stops=saved.days.flat().map(stop=>findPlace(stop.id)).filter(Boolean);
       const points=stops.map((place,index)=>({point:coordinates(place),index})).filter(stop=>stop.point);
@@ -140,10 +146,10 @@
       thumbnailMaps.push(map);
       if(points.length>1){
         map.fitBounds(points.map(stop=>stop.point),{padding:[26,26],maxZoom:16});
-        L.polyline(points.map(stop=>stop.point),{color:cssVar('--color-on-surface'),weight:2,opacity:.8,lineJoin:'round',interactive:false}).addTo(map);
+        L.polyline(points.map(stop=>stop.point),{color:drawn?'#282828':cssVar('--color-on-surface'),weight:drawn?2.5:2,opacity:drawn?1:.8,lineJoin:'round',interactive:false}).addTo(map);
       }
-      points.forEach(({point})=>L.circleMarker(point,{radius:2.5,weight:0,fillColor:cssVar('--color-on-surface'),fillOpacity:1,interactive:false}).addTo(map));
-      points.forEach(({point,index})=>L.marker(point,{interactive:false,keyboard:false,icon:L.divIcon({className:'course-photo-marker',html:photoPin(stops[index],index,'sm'),iconSize:[28,28],iconAnchor:[14,14]})}).addTo(map));
+      points.forEach(({point})=>L.circleMarker(point,{radius:drawn?4:2.5,weight:0,fillColor:drawn?'#282828':cssVar('--color-on-surface'),fillOpacity:1,interactive:false}).addTo(map));
+      if(!drawn)points.forEach(({point,index})=>L.marker(point,{interactive:false,keyboard:false,icon:L.divIcon({className:'course-photo-marker',html:photoPin(stops[index],index,'sm'),iconSize:[28,28],iconAnchor:[14,14]})}).addTo(map));
       window.attachPinmapBasemap(map,undefined,{places:stops.map(mapPlace)});
       map.attributionControl.remove();
     });
