@@ -34,25 +34,37 @@
   }
 
   function loadNaver(clientId) {
+    if (window.naver?.maps?.Map) return Promise.resolve();
     if (naverScriptPromise) return naverScriptPromise;
     naverScriptPromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
       const callback = '__pinmapNaverMapsReady';
-      let timer;
+      let timer, pollTimer, settled = false;
       const fail = () => {
+        if (settled) return;
+        settled = true;
         clearTimeout(timer);
+        clearTimeout(pollTimer);
         delete window[callback];
         script.remove();
         naverScriptPromise = null;
         reject(new Error('네이버 지도를 불러오지 못했어요. 연결을 확인해 주세요.'));
       };
-      window[callback] = () => {
+      const ready = () => {
+        if (settled) return;
+        if (!window.naver?.maps?.Map) {
+          if (!pollTimer) pollTimer = setTimeout(() => { pollTimer = null; ready(); }, 50);
+          return;
+        }
+        settled = true;
         clearTimeout(timer);
+        clearTimeout(pollTimer);
         delete window[callback];
-        if (!window.naver?.maps?.Map) { fail(); return; }
         resolve();
       };
+      window[callback] = ready;
       script.src = 'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + encodeURIComponent(clientId) + '&callback=' + callback;
+      script.onload = ready;
       script.onerror = fail;
       timer = setTimeout(fail, 15000);
       document.head.append(script);
