@@ -3050,6 +3050,8 @@ html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:trans
 .dl-btn:disabled{cursor:default;color:var(--stage-muted)}.dl-btn:active:not(:disabled),.dl-close:active,.dl-transport:active,.dl-ring:active{transform:scale(var(--press-scale))}
 @media(hover:hover) and (pointer:fine){.dl-btn:hover:not(:disabled),.dl-close:hover,.dl-transport:hover{background:rgba(0,0,0,.08)}}
 [data-theme="dark"] .dl-btn,[data-theme="dark"] .dl-close,[data-theme="dark"] .dl-transport{background:rgba(255,255,255,.07)}
+.dl-close,[data-theme="dark"] .dl-close{background:var(--color-error);color:#fff}
+@media(hover:hover) and (pointer:fine){.dl-close:hover{background:color-mix(in srgb,var(--color-error) 88%,black)}}
 .dl-btn:focus-visible,.dl-close:focus-visible,.dl-transport:focus-visible,.dl-ring:focus-visible{outline:0;box-shadow:0 0 0 2px var(--stage-surface),0 0 0 4px var(--stage-accent)}
 .dl-bar{height:4px;margin:16px 8px 8px;border-radius:2px;background:rgba(0,0,0,.06);overflow:hidden}
 [data-theme="dark"] .dl-bar{background:rgba(238,238,239,.1)}
