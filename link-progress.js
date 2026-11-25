@@ -166,7 +166,7 @@
     const cx = origin.left + origin.width / 2, cy = origin.top + origin.height / 2;
     const radius = Math.min(origin.width, origin.height) / 2;
     const landingX = Math.max(target.left + radius, Math.min(cx, target.right - radius));
-    const landingY = target.bottom - radius * .5;
+    const landingY = target.top + target.height / 2;
     const start = performance.now();
     const lerp = (a, b, t) => a + (b - a) * t;
     const smooth = t => t * t * (3 - 2 * t);
@@ -224,7 +224,7 @@
     const cx = origin.left + origin.width / 2, cy = origin.top + origin.height / 2;
     const radius = Math.min(origin.width, origin.height) / 2;
     const landingX = Math.max(target.left + radius, Math.min(cx, target.right - radius));
-    const landingY = target.bottom - radius * .5;
+    const landingY = target.top + target.height / 2;
     const start = performance.now();
     const lerp = (a, b, t) => a + (b - a) * t;
     const smooth = t => t * t * (3 - 2 * t);
