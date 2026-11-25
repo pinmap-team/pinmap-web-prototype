@@ -78,6 +78,7 @@ detail = function(){
       <div class="dttop"><button class="dtbtn" data-action="back" aria-label="돌아가기">${icon('chevleft')}</button>
         <div class="dttopr">
           <button type="button" class="dtbtn dtfavorite lm-heart-motion${x.favorite?' is-active':''}" data-action="fav" aria-label="${esc(x.title)} 게시물 즐겨찾기" title="즐겨찾기" aria-pressed="${!!x.favorite}"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>
+          <button type="button" class="dtbtn dtsharebtn" data-action="dtshare" aria-label="게시물 공유하기" title="공유">${icon('plane')}</button>
           <button class="dtbtn dtmorebtn" data-action="dtmore" aria-label="더보기" aria-haspopup="menu" aria-expanded="false" aria-controls="dtmenu">${icon('more')}</button>
         </div></div>
       <div class="dtsrc dthtitle">
@@ -87,7 +88,7 @@ detail = function(){
       </div>
     </div>
     <div class="dtmenu" id="dtmenu" role="menu" aria-label="콘텐츠 메뉴" hidden>
-      <button type="button" role="menuitem" data-action="dtshare">${icon('share')}공유</button>
+      <button type="button" role="menuitem" data-action="dtshare">${icon('plane')}공유</button>
       <button type="button" role="menuitem" data-action="edit">${icon('pen')}수정</button>
       <button type="button" role="menuitem" class="dtmenu-danger" data-unsave="${x.id}">${icon('trash')}삭제</button>
     </div>
@@ -96,7 +97,7 @@ detail = function(){
       ${author ? `<div class="dt-author">${authorPhoto ? `<img src="${esc(authorPhoto)}" alt="">` : `<span class="dt-author-fallback" aria-hidden="true">@</span>`}<span>게시물 작성자 <b>@${esc(author)}</b></span></div>` : ''}
       ${x.desc ? x.source === '직접 추가' || x.aiSummary === false
         ? `<section class="dtsum" data-dtsum><h2>${icon('spark')}장소 설명</h2>${dtSummaryBody(x.desc)}</section>`
-        : `<section class="dtsum dtai-review"><h2 class="dtai">${dtAiSparkIcon()}<span class="dtai-title t-shimmer" data-text="AI 컨텐츠 요약">AI 컨텐츠 요약</span><button type="button" class="dtai-info-button" data-dtai-info aria-label="AI 컨텐츠 요약 안내"><span aria-hidden="true">i</span></button></h2>${dtAiSummaryBody(x)}</section>` : ''}
+        : `<section class="dtsum dtai-review"><h2 class="dtai">${dtAiSparkIcon()}<span class="dtai-title t-shimmer" data-text="AI 컨텐츠 요약">AI 컨텐츠 요약</span><button type="button" class="dtai-info-button" data-dtai-info aria-label="AI 컨텐츠 요약 안내">${icon('info')}</button></h2>${dtAiSummaryBody(x)}</section>` : ''}
       ${extractionInfo}
       ${eventInfo}
       ${memoInfo}
@@ -404,9 +405,9 @@ document.addEventListener('click', async event => {
 });
 
 /* 직접 추가한 장소 설명은 첫 문장을 접힌 상태로 보여 줍니다. */
-// 2026-11-24: AI 컨텐츠 요약 아이콘은 디자인 시스템 gradient(#C6F5E1→#AFF3E4)로 채워요(Figma Icon / spark / gradient).
+// AI 요약에는 사용자가 지정한 세 개의 선형 별을 사용해요.
 function dtAiSparkIcon(){
-  return `<svg class="icon dtai-spark" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="dtai-spark-gradient" x1="2" y1="12" x2="22" y2="12" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#C6F5E1"/><stop offset="1" stop-color="#AFF3E4"/></linearGradient></defs><path d="${paths.spark}"/></svg>`;
+  return icon('spark').replace('class="solar solar-sparkles-linear icon"','class="solar solar-sparkles-linear icon dtai-spark"');
 }
 function dtSummaryBody(text){
   const all = String(text || '').trim();

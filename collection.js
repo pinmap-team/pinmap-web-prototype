@@ -16,7 +16,7 @@ Object.assign(paths, {
 // 칩과 폴더에 쓰는 카테고리 (순서 = 화면 순서)
 const CF_FOLDERS = PinmapCategories.all.map(c=>({id:c.label,icon:c.id}));
 function cfCategories(){return CF_FOLDERS;}
-const CF_ALL_FOLDER = {id:'전체 저장', title:'전체', icon:'bookmark'};
+const CF_ALL_FOLDER = {id:'전체 저장', title:'전체', icon:'all'};
 function folderOf(x){return PinmapCategories.of(x).label;}
 // 다른 화면에서 넘어온 필터(예: 홈의 '맛집·카페')도 폴더로 바꿔요
 const CF_ALIAS = {};
@@ -67,7 +67,7 @@ function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected 
       <svg class="cf-shade" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
       <span class="cf-front"></span>
       <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
-      <span class="cf-meta">${pinned ? `<span class="cf-pinmark" aria-hidden="true">${cfFilledPinIcon()}</span>` : ''}<span class="cf-title">${esc(title)}</span><span class="cf-count">${count}<span class="sr">개 저장된 폴더${pinned ? ', 상단 고정됨' : ''}</span></span></span>
+      <span class="cf-meta">${pinned ? `<span class="cf-pinmark" aria-hidden="true">${cfFilledPinIcon()}</span>` : ''}${id===CF_ALL_FOLDER.id?`<span class="cf-allmark" aria-hidden="true">${icon('all')}</span>`:''}<span class="cf-title">${esc(title)}</span><span class="cf-count">${count}<span class="sr">개 저장된 폴더${pinned ? ', 상단 고정됨' : ''}</span></span></span>
     </span>
   </button>`;
 }

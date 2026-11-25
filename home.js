@@ -162,7 +162,7 @@ const homeAddMarkup = () => `<div class="home-add-menu t-goo-anchor" id="home-ad
   <div class="home-add-options" id="home-add-options" role="group" aria-label="콘텐츠 추가 방법" aria-hidden="true" inert>
     <button type="button" class="t-goo-item" style="--fx:-54px;--fy:-34px;--i:0" data-action="zipimport" aria-label="Instagram ZIP 가져오기" tabindex="-1">${icon('folder')}</button>
     <button type="button" class="t-goo-item" style="--fx:0px;--fy:-64px;--i:1" data-action="linkimport" aria-label="Instagram 링크로 저장" tabindex="-1">${icon('link')}</button>
-    <button type="button" class="t-goo-item" style="--fx:54px;--fy:-34px;--i:2" data-action="screenshotimport" aria-label="캡처 화면으로 추가" tabindex="-1">${icon('image')}</button>
+    <button type="button" class="t-goo-item" style="--fx:54px;--fy:-34px;--i:2" data-action="screenshotimport" aria-label="캡처 화면으로 추가" tabindex="-1">${icon('galleryAdd')}</button>
   </div>
   <button type="button" class="home-add-fab t-goo-main" data-action="addoptions" aria-label="콘텐츠 추가하기" aria-expanded="false" aria-controls="home-add-options"><span class="t-goo-swap"><span class="t-goo-icon">${icon('plus')}</span></span></button>
 </div>`;
