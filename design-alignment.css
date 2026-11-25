@@ -3011,11 +3011,12 @@ html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:trans
 .dl-stage[hidden]{display:none}.dl-stage.is-min{width:64px;height:64px}
 .dl-goo-morph{position:fixed;inset:0;z-index:1002;width:100vw;height:100vh;overflow:visible;pointer-events:none;will-change:opacity}
 .dl-goo-morph .dl-goo-source,.dl-goo-morph .dl-goo-drop,.dl-goo-morph .dl-goo-card{fill:var(--color-primary)}
-.dl-card{position:relative;width:320px;max-width:100%;box-sizing:border-box;border-radius:24px;overflow:hidden;color:var(--stage-fg);
+.dl-card{position:relative;width:320px;max-width:100%;box-sizing:border-box;border-radius:24px;overflow:hidden;color:var(--stage-fg);opacity:1;transform:translate(0,0) scale(1);filter:blur(0);transform-origin:center;
   background:linear-gradient(135deg,rgba(255,255,255,.62),rgba(255,255,255,.3));
   -webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),inset 0 1px 0 0 rgba(255,255,255,.9),inset 0 -1px 0 0 rgba(255,255,255,.25),0 12px 32px -6px rgba(0,0,0,.18),0 1px 3px rgba(0,0,0,.06);
   transition:width var(--min-dur) var(--min-ease),height var(--min-dur) var(--min-ease),border-radius var(--min-dur) var(--min-ease)}
+.dl-stage.is-input-closing .dl-card{opacity:0;transform:translate(var(--dl-close-x,0px),var(--dl-close-y,80px)) scale(.18);filter:blur(3px);transition:opacity var(--acc-dur) var(--acc-ease),transform var(--acc-dur) var(--acc-ease),filter var(--acc-dur) var(--acc-ease)}
 [data-theme="dark"] .dl-card{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05));box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 1px 0 0 rgba(255,255,255,.22),0 12px 32px -6px rgba(0,0,0,.5)}
 .dl-card.is-min{border-radius:32px}.dl-full{box-sizing:border-box;width:320px;max-width:100%;padding:16px;transform-origin:bottom right;transition:opacity var(--min-dur) var(--min-ease),filter var(--min-dur) var(--min-ease),transform var(--min-dur) var(--min-ease)}
 .dl-card.is-min .dl-full{position:absolute;bottom:0;right:0;opacity:0;filter:blur(var(--min-blur));transform:scale(.96);pointer-events:none}
@@ -3055,13 +3056,11 @@ html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:trans
 .dl-link[data-open="false"],.dl-body[data-open="false"]{grid-template-rows:0fr}
 .dl-link-clip,.dl-body-clip{min-height:0;overflow:hidden;opacity:1;filter:blur(0);transition:opacity var(--acc-dur) var(--acc-ease),filter var(--acc-dur) var(--acc-ease)}
 .dl-link[data-open="false"] .dl-link-clip,.dl-body[data-open="false"] .dl-body-clip{opacity:0;filter:blur(var(--text-swap-blur));pointer-events:none}
-.dl-input-head{display:flex;justify-content:flex-end;align-items:center;height:24px;padding:0 8px}
-.dl-input-close{display:grid;place-items:center;flex:none;width:24px;height:24px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--stage-muted);cursor:pointer}
-.dl-input-close:focus-visible{outline:2px solid var(--stage-fg);outline-offset:2px}
 .dl-link-row{display:flex;align-items:center;gap:8px;padding:8px}
+.dl-link-row .dl-paste{display:grid;place-items:center;height:36px}
 .dl-field{position:relative;flex:1;min-width:0;height:36px;box-sizing:border-box;display:flex;align-items:center;padding:0 12px;border-radius:10px;overflow:hidden;color:var(--stage-muted);background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
 .dl-field.is-filled{color:var(--stage-fg)}
-.dl-field textarea{width:100%;height:20px;min-height:20px;margin:0;padding:0;border:0;outline:0;resize:none;overflow:hidden;background:transparent;color:var(--stage-fg);font:var(--type-body-sm);white-space:nowrap}
+.dl-field textarea{width:100%;height:16px;min-height:16px;margin:0;padding:0;border:0;outline:0;resize:none;overflow:hidden;background:transparent;color:var(--stage-fg);font:var(--type-body-sm);white-space:nowrap}
 .dl-field textarea::placeholder{color:var(--stage-muted)}
 .dl-field:focus-within{box-shadow:inset 0 0 0 1px var(--stage-fg)}
 .dl-file-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-body-sm)}

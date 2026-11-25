@@ -6,7 +6,7 @@
   stage.setAttribute('role', 'region');
   stage.setAttribute('aria-label', '링크 가져오기 진행 상태');
   stage.innerHTML = `<div class="dl-card" id="dl-win"><div class="dl-full" id="dl-full">
-      <div class="dl-link" data-open="false"><div class="dl-link-clip"><div class="dl-input-head"><button class="dl-input-close" type="button" aria-label="입력창 닫기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="dl-link-row">
+      <div class="dl-link" data-open="false"><div class="dl-link-clip"><div class="dl-link-row">
         <label class="dl-field"><textarea id="dl-link-input" rows="1" inputmode="url" aria-label="Instagram 링크 붙여넣기" placeholder="링크 붙여넣기"></textarea><span class="dl-file-label" hidden>ZIP 파일 선택</span>
           <svg class="dl-field-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" aria-hidden="true" hidden><path d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
           <span class="dl-photo-label" hidden>앨범에서 사진 선택</span><img class="dl-photo-thumb" alt="" hidden>
@@ -33,6 +33,7 @@
   let deletePending = false, resumeAfterDeleteDismiss = false;
   let zipReadController = null;
   let inputMorphFrame = 0, inputMorphLayer = null;
+  let inputCloseTimer = 0;
   let photoName = '', photoPreviewUrl = '';
   const duration = (name, fallback) => {
     const raw = getComputedStyle(stage).getPropertyValue(name).trim();
@@ -176,6 +177,8 @@
     inputMorphFrame = requestAnimationFrame(frame);
   }
   function open(kind = 'links', prefill = '', origin = null) {
+    clearTimeout(inputCloseTimer);
+    stage.classList.remove('is-input-closing');
     stopInputMorph();
     const batch = window.PinmapZipImport?.state();
     if (batch && batch.phase !== 'done') {
@@ -252,7 +255,7 @@
     swapText(get('#dl-paste-label'), '확인 중');
     inputError();
     try { await window.PinmapStartZipFile(file, controller.signal); }
-    catch (error) { if (inputMode) inputError(error.message || 'ZIP 파일을 확인해 주세요.'); }
+    catch (error) { if (inputMode && !stage.classList.contains('is-input-closing')) inputError(error.message || 'ZIP 파일을 확인해 주세요.'); }
     finally { if (zipReadController === controller) zipReadController = null; inputPending = false; get('.dl-paste').disabled = false; }
   }
   async function preparePhoto(file) {
@@ -417,18 +420,41 @@
     update();
   });
   document.addEventListener('pointerdown', event => {
-    if (stage.hidden || stage.classList.contains('is-min') || !current || inputMode || deletePending || stage.contains(event.target)) return;
+    if (stage.hidden || deletePending || stage.contains(event.target)) return;
+    if (inputMode) { closeInput(); return; }
+    if (stage.classList.contains('is-min') || !current) return;
     minimize(true);
   });
   function closeInput() {
-    if (!inputMode || (inputPending && inputMode !== 'zip')) return;
+    if (!inputMode || stage.classList.contains('is-input-closing') || (inputPending && inputMode !== 'zip')) return;
     stopInputMorph();
     zipReadController?.abort();
-    inputMode = null;
-    inputDismissed = true;
-    update();
+    const closingMode = inputMode;
+    const focusedInside = stage.contains(document.activeElement);
+    const addButton = document.querySelector('.home-add-fab');
+    const cardRect = win.getBoundingClientRect();
+    const addRect = addButton?.getBoundingClientRect();
+    if (addRect) {
+      win.style.setProperty('--dl-close-x', `${addRect.left + addRect.width / 2 - cardRect.left - cardRect.width / 2}px`);
+      win.style.setProperty('--dl-close-y', `${addRect.top + addRect.height / 2 - cardRect.top - cardRect.height / 2}px`);
+    }
+    const finish = () => {
+      stage.classList.remove('is-input-closing');
+      stage.style.removeProperty('pointer-events');
+      win.style.removeProperty('--dl-close-x');
+      win.style.removeProperty('--dl-close-y');
+      if (inputMode !== closingMode) return;
+      inputMode = null;
+      inputDismissed = true;
+      update();
+      if (focusedInside) document.querySelector('.home-add-fab')?.focus({preventScroll:true});
+    };
+    if (reduced()) { finish(); return; }
+    stage.classList.add('is-input-closing');
+    stage.style.pointerEvents = 'none';
+    clearTimeout(inputCloseTimer);
+    inputCloseTimer = setTimeout(finish, duration('--acc-dur', 250));
   }
-  get('.dl-input-close').addEventListener('click', closeInput);
   ring.addEventListener('click', () => minimize(false,true));
   get('.dl-paste').addEventListener('click', () => {
     if (inputMode === 'zip') zipInput.click();
@@ -446,7 +472,7 @@
   zipInput.addEventListener('change', () => void submitZip(zipInput.files?.[0]));
   photoInput.addEventListener('change', () => void submitPhoto(photoInput.files?.[0]));
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && inputMode && !inputPending) closeInput();
+    if (event.key === 'Escape' && inputMode && (!inputPending || inputMode === 'zip')) closeInput();
   });
   get('#dl-btn').addEventListener('click', () => {
     if (!current) return;
