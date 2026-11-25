@@ -111,5 +111,5 @@
   },get element(){return bottomNav}});
   if (typeof document!=='undefined' && document.querySelector('#app .layout,#app .live-map')) window.PinmapBottomNav.mount();
   // All map views share the same Google background and Leaflet overlay.
-  window.attachPinmapBasemap=(map,onChange)=>window.PinmapMapProviders.attach(map,onChange);
+  window.attachPinmapBasemap=(map,onChange,options)=>window.PinmapMapProviders.attach(map,onChange,options);
 })();

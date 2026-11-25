@@ -1,11 +1,11 @@
-/* Google owns the default background. Leaflet continues to own places and gestures. */
+/* The configured map owns the background. Leaflet owns places and gestures. */
 (() => {
-  let scriptPromise;
+  let googleScriptPromise, naverScriptPromise;
   let authenticationFailed = false;
   const failureListeners = new Set();
   function loadGoogle(key) {
-    if (scriptPromise) return scriptPromise;
-    scriptPromise = new Promise((resolve, reject) => {
+    if (googleScriptPromise) return googleScriptPromise;
+    googleScriptPromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
       const callback = '__pinmapGoogleMapsReady';
       let timer;
@@ -13,7 +13,7 @@
         clearTimeout(timer);
         delete window[callback];
         script.remove();
-        scriptPromise = null;
+        googleScriptPromise = null;
         reject(new Error('구글 지도를 불러오지 못했어요. 연결을 확인해 주세요.'));
       };
       window[callback] = () => {
@@ -30,18 +30,69 @@
       timer = setTimeout(fail, 15000);
       document.head.append(script);
     });
-    return scriptPromise;
+    return googleScriptPromise;
   }
 
-  function attach(map, onChange) {
+  function loadNaver(clientId) {
+    if (naverScriptPromise) return naverScriptPromise;
+    naverScriptPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      const callback = '__pinmapNaverMapsReady';
+      let timer;
+      const fail = () => {
+        clearTimeout(timer);
+        delete window[callback];
+        script.remove();
+        naverScriptPromise = null;
+        reject(new Error('네이버 지도를 불러오지 못했어요. 연결을 확인해 주세요.'));
+      };
+      window[callback] = () => {
+        clearTimeout(timer);
+        delete window[callback];
+        if (!window.naver?.maps?.Map) { fail(); return; }
+        resolve();
+      };
+      script.src = 'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + encodeURIComponent(clientId) + '&callback=' + callback;
+      script.onerror = fail;
+      timer = setTimeout(fail, 15000);
+      document.head.append(script);
+    });
+    return naverScriptPromise;
+  }
+
+  // A coarse peninsula outline avoids classifying nearby Fukuoka as Korea.
+  const peninsula = [[126.1,38.6],[127.1,38.7],[128.4,38.5],[129.5,37.2],
+    [129.5,35.5],[129.2,35.0],[128.3,34.3],[127.3,34.2],[126.1,34.3],
+    [125.9,35.0],[126.0,36.3],[126.2,37.3]];
+  function inPolygon(lat,lng,polygon) {
+    let inside=false;
+    for(let i=0,j=polygon.length-1;i<polygon.length;j=i++){
+      const [xi,yi]=polygon[i],[xj,yj]=polygon[j];
+      if((yi>lat)!==(yj>lat)&&lng<(xj-xi)*(lat-yi)/(yj-yi)+xi)inside=!inside;
+    }
+    return inside;
+  }
+  const isKoreanCoordinate = ({lat, lng, countryCode, country_code} = {}) => {
+    const country=String(countryCode||country_code||'').toUpperCase();
+    if(country)return country==='KR';
+    if(!Number.isFinite(lat)||!Number.isFinite(lng))return false;
+    return inPolygon(lat,lng,peninsula)
+      || (lat>=33.1&&lat<=33.65&&lng>=126.1&&lng<=127.05) // Jeju
+      || (lat>=37.3&&lat<=37.7&&lng>=130.7&&lng<=131.2) // Ulleungdo
+      || (lat>=37.1&&lat<=37.4&&lng>=131.7&&lng<=132); // Dokdo
+  };
+  const needsGoogle = place => Boolean(place && (!isKoreanCoordinate(place) || /^google_places$/i.test(place.coordinateSource || '')));
+
+  function attach(map, onChange, {places = []} = {}) {
     const host = map.getContainer();
     const header = host.closest('.live-map')?.querySelector('.lm-header');
     const nativeHost = document.createElement('div');
     nativeHost.className = 'pm-native-map';
     nativeHost.setAttribute('aria-hidden', 'true');
     host.prepend(nativeHost);
-    host.dataset.mapProvider = 'google';
-    let nativeMap = null, disposed = false;
+    host.dataset.mapProvider = 'loading';
+    let nativeMap = null, activeProvider = '', disposed = false, naverAuthObserver = null;
+    let config = null, selectedPlace = null, requestId = 0, naverFailed = false;
 
     function showError(message) {
       if (disposed) return;
@@ -54,7 +105,7 @@
         host.append(notice);
       }
       notice.textContent = message;
-      onChange?.({current: 'google', error: message});
+      onChange?.({current: activeProvider || 'loading', error: message});
     }
 
     function sync() {
@@ -67,58 +118,113 @@
       try {
         // Leaflet moves badges in the current pointer event. Keep the Google
         // camera on that same event instead of waiting for a later paint frame.
-        nativeMap.moveCamera({center: {lat: center.lat, lng: center.lng}, zoom: map.getZoom()});
+        if (activeProvider === 'naver') {
+          nativeMap.setSize(new naver.maps.Size(nativeHost.clientWidth, nativeHost.clientHeight));
+          nativeMap.setCenter(new naver.maps.LatLng(center.lat, center.lng));
+          nativeMap.setZoom(map.getZoom());
+        } else nativeMap.moveCamera({center: {lat: center.lat, lng: center.lng}, zoom: map.getZoom()});
       } catch {
-        showError('구글 지도 연결을 확인해 주세요.');
+        showError(`${activeProvider === 'naver' ? '네이버' : '구글'} 지도 연결을 확인해 주세요.`);
       }
     }
 
-    const onFailure = message => showError(message);
+    const onFailure = message => { if (activeProvider === 'google') showError(message); };
     failureListeners.add(onFailure);
     map.on('move zoom resize', sync);
+    map.on('moveend', refreshProvider);
     // Search collapses the header without moving Leaflet. Keep Google's top edge aligned.
     const headerObserver = header && new ResizeObserver(sync);
     if (headerObserver) headerObserver.observe(header);
     map.on('unload', () => {
       disposed = true;
       headerObserver?.disconnect();
+      naverAuthObserver?.disconnect();
       failureListeners.delete(onFailure);
-      if (nativeMap) window.google?.maps?.event?.clearInstanceListeners?.(nativeMap);
+      if (activeProvider === 'google' && nativeMap) window.google?.maps?.event?.clearInstanceListeners?.(nativeMap);
       nativeHost.remove();
     });
 
-    fetch('/api/map-config', {cache: 'no-store'})
-      .then(response => {
-        if (!response.ok) throw new Error('구글 지도 설정을 확인해 주세요.');
-        return response.json();
-      })
-      .then(async config => {
-        if (disposed) return;
-        if (!config.available?.google || !config.googleBrowserKey) throw new Error('구글 지도 설정을 확인해 주세요.');
+    async function showProvider(provider, config, id) {
+      if (provider === 'naver') await loadNaver(config.naverClientId);
+      else {
         await loadGoogle(config.googleBrowserKey);
-        if (disposed) return;
         if (authenticationFailed) throw new Error('구글 지도 인증을 확인해 주세요.');
-        const surface = document.createElement('div');
-        surface.className = 'pm-native-map-surface';
-        nativeHost.replaceChildren(surface);
-        const center = map.getCenter();
-        nativeMap = new google.maps.Map(surface, {
-          center: {lat: center.lat, lng: center.lng},
-          zoom: map.getZoom(),
-          disableDefaultUI: true,
-          gestureHandling: 'none',
-          clickableIcons: false,
+      }
+      if (disposed || id !== requestId) return;
+      naverAuthObserver?.disconnect();
+      if (activeProvider === 'google' && nativeMap) window.google?.maps?.event?.clearInstanceListeners?.(nativeMap);
+      const surface = document.createElement('div');
+      surface.className = 'pm-native-map-surface';
+      nativeHost.replaceChildren(surface);
+      const center = map.getCenter();
+      activeProvider = provider;
+      nativeMap = provider === 'naver'
+        ? new naver.maps.Map(surface, {
+          center: new naver.maps.LatLng(center.lat, center.lng), zoom: map.getZoom(),
+          draggable: false, scrollWheel: false, disableDoubleClickZoom: true,
+          disableTwoFingerTapZoom: true, keyboardShortcuts: false, zoomControl: false,
+          scaleControl: false
+        })
+        : new google.maps.Map(surface, {
+          center: {lat: center.lat, lng: center.lng}, zoom: map.getZoom(),
+          disableDefaultUI: true, gestureHandling: 'none', clickableIcons: false,
           keyboardShortcuts: false
         });
-        delete host.dataset.mapError;
-        host.querySelector('.pm-map-error')?.remove();
-        sync();
-        onChange?.({current: 'google'});
-      })
-      .catch(error => showError(error.message || '구글 지도 연결을 확인해 주세요.'));
+      host.dataset.mapProvider = provider;
+      delete host.dataset.mapError;
+      host.querySelector('.pm-map-error')?.remove();
+      sync();
+      onChange?.({current: provider});
+      if (provider === 'naver' && typeof MutationObserver === 'function') {
+        naverAuthObserver?.disconnect();
+        naverAuthObserver = new MutationObserver(() => {
+          if (disposed || !surface.style.backgroundImage.includes('auth_fail')) return;
+          naverAuthObserver.disconnect();
+          naverFailed = true;
+          refreshProvider();
+        });
+        naverAuthObserver.observe(surface, {attributes: true, attributeFilter: ['style']});
+      }
+    }
 
-    return {get current() { return 'google'; }, setLocation() {}};
+    async function refreshProvider() {
+      if (!config || disposed) return;
+      const id = ++requestId;
+      const target = needsGoogle(selectedPlace) || needsGoogle(map.getCenter()) || places.some(needsGoogle) ? 'google' : 'naver';
+      const hasNaver = config.available?.naver && config.naverClientId && !naverFailed;
+      const hasGoogle = config.available?.google && config.googleBrowserKey;
+      const provider = target === 'google' ? 'google' : hasNaver ? 'naver' : 'google';
+      if (provider === activeProvider && nativeMap) { sync(); return; }
+      if ((provider === 'google' && !hasGoogle) || (provider === 'naver' && !hasNaver)) {
+        showError(target === 'google' ? '해외 장소에 필요한 구글 지도 설정을 확인해 주세요.' : '지도 설정을 확인해 주세요.');
+        return;
+      }
+      try { await showProvider(provider, config, id); }
+      catch (error) {
+        if (id !== requestId || disposed) return;
+        if (provider === 'naver') { naverFailed = true; refreshProvider(); }
+        else showError(error.message || '지도 연결을 확인해 주세요.');
+      }
+    }
+
+    fetch('/api/map-config', {cache: 'no-store'})
+      .then(response => {
+        if (!response.ok) throw new Error('지도 설정을 확인해 주세요.');
+        return response.json();
+      })
+      .then(result => {
+        if (disposed) return;
+        config = result;
+        refreshProvider();
+      })
+      .catch(error => showError(error.message || '지도 연결을 확인해 주세요.'));
+
+    return {
+      get current() { return activeProvider || 'loading'; },
+      selectPlace(place) { selectedPlace = place || null; refreshProvider(); },
+      setLocation() {}
+    };
   }
 
-  window.PinmapMapProviders = {attach};
+  window.PinmapMapProviders = {attach, isKoreanCoordinate, needsGoogle};
 })();
