@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 
-function setup(config,{naverAvailable=true}={}){
+function setup(config,{naverAvailable=true,naverReadyAfterCallback=false}={}){
   const elements=[];
   const element=tag=>({tag,style:{},dataset:{},children:[],setAttribute(){},remove(){},prepend(child){this.children.unshift(child)},append(child){this.children.push(child)},replaceChildren(...children){this.children=children},querySelector(selector){return selector==='.pm-map-error'?this.children.find(child=>child.className==='pm-map-error')||null:null}});
   const host=element('div');
@@ -17,8 +17,7 @@ function setup(config,{naverAvailable=true}={}){
   const cameraMoves=[],naverMoves=[];
   const google={maps:{Map:class{constructor(surface,options){googleOptions=options;this.surface=surface}moveCamera(options){cameraMoves.push(options)}setOptions(options){updatedOptions=options}},event:{clearInstanceListeners(){}}}};
   const naver={maps:{LatLng:class{constructor(lat,lng){this.lat=lat;this.lng=lng}},Size:class{constructor(width,height){this.width=width;this.height=height}},Map:class{constructor(surface,options){naverOptions=options;this.surface=surface}setSize(size){naverMoves.push({size})}setCenter(center){naverMoves.push({center})}setZoom(zoom){naverMoves.push({zoom})}}}};
-  if(naverAvailable)window.naver=naver;
-  const document={documentElement:{dataset:{theme:'light'}},createElement:tag=>{const node=element(tag);elements.push(node);return node},head:{append(script){if(script.src.includes('maps.googleapis.com'))window.__pinmapGoogleMapsReady();else window.__pinmapNaverMapsReady()}}};
+  const document={documentElement:{dataset:{theme:'light'}},createElement:tag=>{const node=element(tag);elements.push(node);return node},head:{append(script){if(script.src.includes('maps.googleapis.com'))window.__pinmapGoogleMapsReady();else if(!naverAvailable)script.onerror();else {if(!naverReadyAfterCallback)window.naver=naver;window.__pinmapNaverMapsReady();if(naverReadyAfterCallback)setTimeout(()=>{window.naver=naver},5)}}}};
   const context={window,document,google,naver,fetch:async()=>({ok:true,json:async()=>config}),setTimeout,clearTimeout,requestAnimationFrame:callback=>{callback();return 1},cancelAnimationFrame(){}};
   vm.runInNewContext(fs.readFileSync('map-providers.js','utf8'),context);
   return {window,host,map,mapListeners,cameraMoves,naverMoves,elements,document,listeners,getGoogleOptions:()=>googleOptions,getNaverOptions:()=>naverOptions,getUpdatedOptions:()=>updatedOptions};
@@ -70,6 +69,14 @@ test('Naver is the background when a current browser client ID is configured',as
   app.mapListeners['move zoom resize']();
   assert.equal(app.naverMoves.length,before+3);
   assert.equal(app.naverMoves.at(-2).center.lat,37.6);
+});
+
+test('Naver stays the default when its callback precedes the map constructor',async()=>{
+  const app=setup({defaultProvider:'naver',available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'},{naverReadyAfterCallback:true});
+  app.window.PinmapMapProviders.attach(app.map);
+  await new Promise(resolve=>setTimeout(resolve,70));
+  assert.equal(app.host.dataset.mapProvider,'naver');
+  assert.equal(app.getGoogleOptions(),undefined);
 });
 
 test('Korean places use Naver even when another saved place came from Google',async()=>{
