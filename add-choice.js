@@ -43,10 +43,12 @@
   };
   function openFromAddMenu(action, kind, prefill = '') {
     const stage = addStage();
-    const origin = stage?.dataset.open === 'true'
-      ? stage.querySelector(`[data-action="${action}"]`)?.getBoundingClientRect() : null;
+    const menuOpen = stage?.dataset.open === 'true';
+    const origin = menuOpen ? stage.querySelector(`[data-action="${action}"]`)?.getBoundingClientRect() : null;
+    const linkButton = menuOpen ? stage.querySelector('[data-action="linkimport"]')?.getBoundingClientRect() : null;
+    const linkCenterY = linkButton ? linkButton.top + linkButton.height / 2 : null;
     setAddMenuOpen(false);
-    window.PinmapLinkProgress?.open(kind, prefill, origin);
+    window.PinmapLinkProgress?.open(kind, prefill, origin, linkCenterY);
   }
   actions.linkimport = (prefill = '') => {
     openFromAddMenu('linkimport', 'links', typeof prefill === 'string' ? prefill : '');
