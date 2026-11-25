@@ -63,6 +63,7 @@ const myBillingIcon = () => `<svg xmlns="http://www.w3.org/2000/svg" width="24" 
   <path d="M10.5 7.5H17" stroke-linecap="round" stroke="currentColor"/>
   <path d="M10.5 14.5H17" stroke-linecap="round" stroke="currentColor"/>
 </svg>`;
+const myScreenModeIcon = () => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" class="solar solar-moon-bold icon" aria-hidden="true"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 11.5373 21.3065 11.4608 21.0672 11.8568C19.9289 13.7406 17.8615 15 15.5 15C11.9101 15 9 12.0899 9 8.5C9 6.13845 10.2594 4.07105 12.1432 2.93276C12.5392 2.69347 12.4627 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="currentColor"/></svg>';
 pages.my = function(){
   window.PinmapBilling?.maybeRefresh();
   const billing = window.PinmapBilling?.view();
@@ -96,7 +97,7 @@ pages.my = function(){
   <section class="mgroup my-section" aria-label="앱 설정">
     ${myRow('billing',myBillingIcon(),'요금제 및 결제','월 5,000원')}
     ${myRow('savesheet','✨','저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
-    ${myRow('appearance','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>','화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
+    ${myRow('appearance',myScreenModeIcon(),'화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
     ${myRow('notisheet','🔔','알림 설정', notiOn ? `${notiOn}개 켜짐` : '꺼짐')}
     ${myRow('calsettings',icon('calendar'),'캘린더 설정')}
   </section>
