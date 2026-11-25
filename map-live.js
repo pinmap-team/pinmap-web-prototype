@@ -57,7 +57,8 @@
         kind:item.mapKind||sample?.kind||kindOf(item.category||''),
         image:place.photo||libPhoto(item)||sample?.image||localPhoto(item.mapKind||''),
         sourceTitle:item.title,title:place.title,address:place.address||'주소 확인 필요',
-        areaHint:loc?.area_hint||'',category:item.category||item.type,
+        areaHint:loc?.area_hint||'',coordinateSource:loc?.coordinate_source||loc?.provider||'',
+        countryCode:loc?.country_code||loc?.countryCode||'',category:item.category||item.type,
         description:item.desc||'',searchSummary:item.searchSummary||'',
         savedLabel:loc?.review_required?'지도 검색 위치 · 확인 필요':savedAgo(item)+' 저장',
         source:'저장한 콘텐츠',saved:true,favorite:place.favorite};
@@ -73,7 +74,7 @@
         <section class="cf-recent lm-recent" id="lm-recent" aria-label="최근 지도 검색어" ${searchOpen&&!searchQuery.trim()?'':'hidden'}>${mapRecentContent()}</section>
         <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,mapCategories().findIndex(([id])=>id===category))*100}%">${mapCategories().map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id,category===id)}</span><b>${label.replace('·','·<wbr>')}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
       </header>
-      <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">${icon('info')}</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p>지도 © Google</p></div></details>
+      <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">${icon('info')}</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p data-map-credit>지도 연결 중</p></div></details>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" role="status" aria-live="polite" hidden></div>
       <div class="lm-locate-top">${round('현재 위치로 이동','target')}</div>
@@ -83,10 +84,24 @@
   function status(message) { const el = $('#app .lm-status'); if (el) { el.textContent = message; el.hidden = !/못|실패|입력|확인|검색하고/.test(message); } }
   function updateMapState(state) {
     const notice=$('#app .lm-status');
+    const credit=$('#app [data-map-credit]');
+    if(credit&&['google','naver'].includes(state.current))credit.textContent=`지도 © ${state.current==='naver'?'NAVER':'Google'}`;
     if(state.error&&notice){notice.textContent=state.error;notice.hidden=false;}
-    else if(notice && /^구글 지도/.test(notice.textContent)){
+    else if(notice && /^(구글 지도|네이버 지도|지도 설정|지도 연결)/.test(notice.textContent)){
       notice.textContent='';
       notice.hidden=true;
+    }
+    syncMarkerVisibility(state.current);
+  }
+  function syncMarkerVisibility(provider=mapProviderController?.current) {
+    if(!pinLayer)return;
+    for(const entry of markerEntries.values()){
+      const allowed=provider==='google'||!/^google_places$/i.test(entry.place.coordinateSource||'');
+      if(allowed&&!pinLayer.hasLayer(entry.marker)){
+        entry.marker.addTo(pinLayer);
+        updateMarker(entry,placeKey(entry.place)===expandedKey);
+      }
+      else if(!allowed&&pinLayer.hasLayer(entry.marker))pinLayer.removeLayer(entry.marker);
     }
   }
   function alignCategoryIndicator(bar) {
@@ -131,10 +146,11 @@
     element?.setAttribute('aria-current',String(expanded));
     element?.setAttribute('aria-controls','lm-selected-place');
   }
-  function clearSelection() {
+  function clearSelection(resetProvider=true) {
     if(expandedKey&&markerEntries.has(expandedKey))updateMarker(markerEntries.get(expandedKey),false);
     expandedKey=null;
     $('#app .live-map')?.classList.remove('has-selected-place');
+    if(resetProvider)mapProviderController?.selectPlace(null);
   }
   function nearbyPlaces() {
     const bounds=liveMap?.getBounds().pad(1);
@@ -289,7 +305,8 @@
   });
   function expandPlace(place,moveMap=true,scrollCard=true) {
     const key=placeKey(place),entry=markerEntries.get(key);if(!entry)return;
-    if(expandedKey!==key){clearSelection();expandedKey=key;updateMarker(entry,true);window.PinmapFx?.landCard(key);}
+    if(expandedKey!==key){clearSelection(false);expandedKey=key;updateMarker(entry,true);window.PinmapFx?.landCard(key);}
+    mapProviderController?.selectPlace(place);
     if(scrollCard){
       const card=[...document.querySelectorAll('.lm-carousel-card')].find(node=>node.dataset.placeKey===key);
       card?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
@@ -302,10 +319,11 @@
     clearSelection();markerEntries.clear();pinLayer.clearLayers();
     const list = visiblePlaces();
     list.forEach(place => {
-      const marker=L.marker([place.lat,place.lng],{title:place.title,icon:markerIcon(place),bubblingMouseEvents:false}).addTo(pinLayer);
-      const entry={place,marker};markerEntries.set(placeKey(place),entry);updateMarker(entry,false);
+      const marker=L.marker([place.lat,place.lng],{title:place.title,icon:markerIcon(place),bubblingMouseEvents:false});
+      const entry={place,marker};markerEntries.set(placeKey(place),entry);
       marker.on('click',()=>expandPlace(place));
     });
+    syncMarkerVisibility();
     renderSheet();
     status(searchResults ? `${list.length}개 저장 장소 검색 결과` : `${list.length}개 저장 장소`);
   }

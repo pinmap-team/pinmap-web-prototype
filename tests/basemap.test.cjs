@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 
-function setup(config){
+function setup(config,{naverAvailable=true}={}){
   const elements=[];
   const element=tag=>({tag,style:{},dataset:{},children:[],setAttribute(){},remove(){},prepend(child){this.children.unshift(child)},append(child){this.children.push(child)},replaceChildren(...children){this.children=children},querySelector(selector){return selector==='.pm-map-error'?this.children.find(child=>child.className==='pm-map-error')||null:null}});
   const host=element('div');
@@ -13,18 +13,20 @@ function setup(config){
   const map={getContainer:()=>host,getCenter:()=>({lat:37.5,lng:127}),getZoom:()=>14,containerPointToLatLng:()=>({lat:37.5,lng:127}),on(name,handler){mapListeners[name]=handler}};
   const listeners={};
   const window={addEventListener(name,handler){listeners[name]=handler},removeEventListener(name){delete listeners[name]}};
-  let googleOptions,updatedOptions;
-  const cameraMoves=[];
+  let googleOptions,naverOptions,updatedOptions;
+  const cameraMoves=[],naverMoves=[];
   const google={maps:{Map:class{constructor(surface,options){googleOptions=options;this.surface=surface}moveCamera(options){cameraMoves.push(options)}setOptions(options){updatedOptions=options}},event:{clearInstanceListeners(){}}}};
-  const document={documentElement:{dataset:{theme:'light'}},createElement:tag=>{const node=element(tag);elements.push(node);return node},head:{append(script){window.__pinmapGoogleMapsReady()}}};
-  const context={window,document,google,fetch:async()=>({ok:true,json:async()=>config}),setTimeout,clearTimeout,requestAnimationFrame:callback=>{callback();return 1},cancelAnimationFrame(){}};
+  const naver={maps:{LatLng:class{constructor(lat,lng){this.lat=lat;this.lng=lng}},Size:class{constructor(width,height){this.width=width;this.height=height}},Map:class{constructor(surface,options){naverOptions=options;this.surface=surface}setSize(size){naverMoves.push({size})}setCenter(center){naverMoves.push({center})}setZoom(zoom){naverMoves.push({zoom})}}}};
+  if(naverAvailable)window.naver=naver;
+  const document={documentElement:{dataset:{theme:'light'}},createElement:tag=>{const node=element(tag);elements.push(node);return node},head:{append(script){if(script.src.includes('maps.googleapis.com'))window.__pinmapGoogleMapsReady();else window.__pinmapNaverMapsReady()}}};
+  const context={window,document,google,naver,fetch:async()=>({ok:true,json:async()=>config}),setTimeout,clearTimeout,requestAnimationFrame:callback=>{callback();return 1},cancelAnimationFrame(){}};
   vm.runInNewContext(fs.readFileSync('map-providers.js','utf8'),context);
-  return {window,host,map,mapListeners,cameraMoves,elements,document,listeners,getGoogleOptions:()=>googleOptions,getUpdatedOptions:()=>updatedOptions};
+  return {window,host,map,mapListeners,cameraMoves,naverMoves,elements,document,listeners,getGoogleOptions:()=>googleOptions,getNaverOptions:()=>naverOptions,getUpdatedOptions:()=>updatedOptions};
 }
 
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
 
-test('every map view delegates to the single Google background',()=>{
+test('every map view delegates to the shared background provider',()=>{
   const calls=[];
   const window={PinmapMapProviders:{attach:(map,onChange)=>{calls.push({map,onChange});return 'google'}}};
   vm.runInNewContext(fs.readFileSync('integration.js','utf8'),{window});
@@ -44,15 +46,100 @@ test('Google loads without a saved provider choice or alternate basemap',async()
   assert.equal(app.host.querySelector('.pm-map-error'),null);
 });
 
-test('missing Google configuration shows an error instead of another map',async()=>{
+test('missing map configuration shows an error',async()=>{
   const app=setup({available:{google:false},googleBrowserKey:''});
   let message='';
   app.window.PinmapMapProviders.attach(app.map,state=>{message=state.error||''});
   await flush();
-  assert.equal(app.host.dataset.mapProvider,'google');
+  assert.equal(app.host.dataset.mapProvider,'loading');
   assert.equal(app.host.dataset.mapError,'true');
-  assert.match(message,/구글 지도 설정/);
+  assert.match(message,/지도 설정/);
   assert.equal(app.elements.filter(node=>node.tag==='script').length,0);
+});
+
+test('Naver is the background when a current browser client ID is configured',async()=>{
+  const app=setup({defaultProvider:'naver',available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'});
+  app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'naver');
+  assert(app.elements.some(node=>node.tag==='script'&&node.src.includes('ncpKeyId=naver-test')));
+  assert.equal(app.getNaverOptions().zoom,14);
+  assert.equal(app.getGoogleOptions(),undefined);
+  const before=app.naverMoves.length;
+  app.map.containerPointToLatLng=()=>({lat:37.6,lng:127.1});
+  app.mapListeners['move zoom resize']();
+  assert.equal(app.naverMoves.length,before+3);
+  assert.equal(app.naverMoves.at(-2).center.lat,37.6);
+});
+
+test('Korean places use Naver even when another saved place came from Google',async()=>{
+  const app=setup({defaultProvider:'naver',available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'});
+  const controller=app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'naver');
+  controller.selectPlace({lat:35.16,lng:129.06});
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'naver');
+  assert.equal(app.getGoogleOptions(),undefined);
+});
+
+test('foreign content switches to Google and domestic content returns to Naver',async()=>{
+  const app=setup({defaultProvider:'naver',available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'});
+  const controller=app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  controller.selectPlace({lat:35.68,lng:139.69});
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'google');
+  controller.selectPlace({lat:33.45,lng:126.57});
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'naver');
+});
+
+test('a selected domestic Google Places coordinate uses Google for its attribution',async()=>{
+  const app=setup({defaultProvider:'naver',available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'});
+  const controller=app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  controller.selectPlace({lat:37.5,lng:127,coordinateSource:'google_places'});
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'google');
+});
+
+test('map center outside Korea also uses Google and returns on moving home',async()=>{
+  const app=setup({defaultProvider:'naver',available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'});
+  app.map.getCenter=()=>({lat:48.85,lng:2.35});
+  app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'google');
+  app.map.getCenter=()=>({lat:37.5,lng:127});
+  app.mapListeners.moveend();
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'naver');
+});
+
+test('a route containing an overseas stop uses Google even if its center is in Korea',async()=>{
+  const app=setup({defaultProvider:'naver',available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'});
+  app.window.PinmapMapProviders.attach(app.map,undefined,{places:[{lat:37.5,lng:127},{lat:35.68,lng:139.69}]});
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'google');
+});
+
+test('domestic bounds include Jeju and Dokdo',()=>{
+  const route=setup({available:{}}).window.PinmapMapProviders;
+  assert.equal(route.needsGoogle({lat:37.46,lng:126.44}),false); // Incheon Airport
+  assert.equal(route.needsGoogle({lat:35.18,lng:129.07}),false); // Busan
+  assert.equal(route.needsGoogle({lat:33.45,lng:126.57}),false);
+  assert.equal(route.needsGoogle({lat:37.24,lng:131.87}),false);
+  assert.equal(route.needsGoogle({lat:33.59,lng:130.4}),true);
+  assert.equal(route.needsGoogle({lat:35.68,lng:139.69}),true);
+  assert.equal(route.needsGoogle({lat:35.68,lng:139.69,countryCode:'KR'}),false);
+});
+
+test('Google remains available when Naver fails to initialize',async()=>{
+  const app=setup({defaultProvider:'naver',available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'invalid-test'},{naverAvailable:false});
+  app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'google');
+  assert.equal(app.getGoogleOptions().zoom,14);
 });
 
 test('map uses the unstyled Google default in every appearance mode',async()=>{

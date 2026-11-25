@@ -53,6 +53,9 @@
   const thumbnail=item=>{const own=item.photo&&item.photo!==PM_ENV.placeholderImage?item.photo:'';return own||(typeof libPhoto==='function'?libPhoto(item.sourceItem):'')||PM_ENV.placeholderImage;};
   const stopTime=()=>{const last=dayStops().at(-1)?.time||'08:30';const [h,m]=last.split(':').map(Number);const total=Math.min(h*60+m+90,23*60+45);return `${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`};
   const coordinates=item=>item.lat!=null&&item.lng!=null?[item.lat,item.lng]:undefined;
+  const mapPlace=place=>({lat:place.lat,lng:place.lng,
+    coordinateSource:place.sourceItem?.mapLocations?.[place.locationIndex]?.coordinate_source
+      ||place.sourceItem?.mapLocations?.[place.locationIndex]?.provider||''});
   /* 2026-11-24 코스 목록 카드 · 사진 경로 지도 · 순서 타임라인 */
   const cssVar=name=>(typeof getComputedStyle==='function'&&getComputedStyle(document.documentElement).getPropertyValue(name).trim())||'#333333';
   const categoryOf=place=>{const label=place.category||'';const c=typeof PinmapCategories!=='undefined'&&PinmapCategories.all.find(x=>x.label===label||(x.aliases||[]).includes(label));return {id:c?.id||'other',label:c?.label||label||'장소'};};
@@ -80,7 +83,7 @@
         ${courses.length?`<div class="cx-plan-list">${courses.map(saved=>{const places=saved.days.flat().map(stop=>findPlace(stop.id)).filter(Boolean);return `<button class="cx-plan" data-course-open="${esc(saved.id)}" aria-label="${esc(saved.title)}, 장소 ${places.length}곳 코스 열기">
           <span class="cx-plan-copy"><b>${esc(saved.title)}</b><span class="cx-meta"><span>${icon('route')}장소 ${places.length}곳</span>${routeMeta(places)}</span><span class="cx-chips">${places.length?chips(places):''}</span></span>
           ${places.some(place=>coordinates(place))?`<span class="cx-plan-map course-map-pattern"><span class="course-saved-map" data-course-map="${esc(saved.id)}" role="img" aria-label="${esc(saved.title)} 장소 순서 지도" inert></span></span>`:`<span class="cx-plan-map course-map-pattern is-empty">${icon('route')}</span>`}
-        </button>`}).join('')}</div><p class="cx-credit">지도 © Google</p>`:`<div class="course-list-empty">${icon('route')}<h2>아직 저장한 코스가 없어요.</h2><p>저장한 장소로 첫 코스를 만들어 보세요.</p></div>`}
+        </button>`}).join('')}</div>`:`<div class="course-list-empty">${icon('route')}<h2>아직 저장한 코스가 없어요.</h2><p>저장한 장소로 첫 코스를 만들어 보세요.</p></div>`}
       </div></section>`;
   };
   pages.course=function(){
@@ -141,7 +144,7 @@
       }
       points.forEach(({point})=>L.circleMarker(point,{radius:2.5,weight:0,fillColor:cssVar('--color-on-surface'),fillOpacity:1,interactive:false}).addTo(map));
       points.forEach(({point,index})=>L.marker(point,{interactive:false,keyboard:false,icon:L.divIcon({className:'course-photo-marker',html:photoPin(stops[index],index,'sm'),iconSize:[28,28],iconAnchor:[14,14]})}).addTo(map));
-      window.attachPinmapBasemap(map);
+      window.attachPinmapBasemap(map,undefined,{places:stops.map(mapPlace)});
       map.attributionControl.remove();
     });
   };
@@ -159,7 +162,7 @@
     points.forEach(({point,place,index})=>L.marker(point,{keyboard:true,title:`${index+1}. ${place.title} 상세 보기`,alt:`${index+1}번째 ${place.title}`,riseOnHover:true,icon:L.divIcon({className:'course-photo-marker is-clickable',html:photoPin(place,index,'md'),iconSize:[48,48],iconAnchor:[24,24]})}).on('click',event=>openStopDetail(place,event.originalEvent?.target)).addTo(courseMap));
     if(points.length>1)courseMap.fitBounds(points.map(p=>p.point),{padding:[44,44],maxZoom:16});
     else if(points.length===1)courseMap.setView(points[0].point,15);
-    window.attachPinmapBasemap(courseMap);
+    window.attachPinmapBasemap(courseMap,undefined,{places:points.map(({place})=>mapPlace(place))});
     requestAnimationFrame(()=>courseMap?.invalidateSize());
   };
   const renderInPlace=()=>{const y=window.scrollY;render();window.scrollTo(0,y);requestAnimationFrame(()=>window.scrollTo(0,y))};
