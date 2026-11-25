@@ -69,16 +69,12 @@ pages.my = function(){
   const quotaPercent = quotaUsed === null ? 0 : Math.round(quotaUsed / quotaLimit * 100);
   const quotaTitle = quota?.active ? '월간 이용권 분석' : '무료 분석';
   const quotaDetail = PM_ENV.requiresAuth ? billing?.error ? '사용량을 불러오지 못했어요.' : quotaUsed === null ? '사용량을 확인하고 있어요.' : `${quotaUsed}회 사용 · ${Math.max(0,quotaLimit-quotaUsed)}회 남음` : '로그인하면 사용량을 확인할 수 있어요.';
-  const cols = collectionNames(), places = items.filter(isPlace).length;
-  const prefs = preferences.map(id => interestOf(id).short);
-  const prefText = prefs.length ? (prefs.length > 1 ? `${prefs[0]} 외 ${prefs.length-1}개` : prefs[0]) : '선택 안 함';
-  const notiOn = ['notiNearby','notiDeadline','notiReminder'].filter(k => settings[k]).length;
   return `
   <div class="mprofile profilecard myprofile" role="group" aria-label="프로필">
     <button type="button" class="myprofile-photo" data-action="profilephoto" aria-label="프로필 사진 변경">${avatarHtml()}<span class="account-photo-edit" aria-hidden="true">${icon('image')}</span></button>
     <input type="file" id="avatarfile" accept="image/*" hidden>
     <span class="myprofile-name"><b>${esc(settings.nickname || '이름 설정')}</b></span>
-    <button type="button" class="myprofile-go" data-page="account" aria-label="계정 관리로 이동">${icon('chevright')}</button>
+    <button type="button" class="myprofile-go" data-page="profile" aria-label="프로필 편집으로 이동">${icon('chevright')}</button>
   </div>${myQuickCards()}
   <section class="my-quota mgroup my-section" aria-label="월간 분석 사용량">
     <div class="my-quota-head"><div><b>${quotaTitle}</b><small>매월 ${quotaLimit}회</small></div><strong>${quotaUsed === null ? '—' : `${quotaUsed} / ${quotaLimit}`}</strong></div>
@@ -86,16 +82,8 @@ pages.my = function(){
     <p role="status">${esc(quotaDetail)}</p>
   </section>
 
-  <section class="mgroup my-section" aria-label="위치와 관심 키워드">
-    ${myRow('myaddresses','📍','위치 편집', esc(myPlaces().join(', ')))}
-    ${myRow('interests','💡','관심 키워드 설정', esc(prefText))}
-  </section>
   <section class="mgroup my-section" aria-label="앱 설정">
     ${myRow('billing',myBillingIcon(),'요금제 및 결제','월 5,000원')}
-    ${myRow('savesheet',icon('spark'),'저장 설정', settings.aiDefault ? 'AI 자동 분류' : '직접 분류')}
-    ${myRow('appearance',myScreenModeIcon(),'화면 모드',`<span data-theme-label>${PinmapTheme.label()}</span>`)}
-    ${myRow('notisheet','🔔','알림 설정', notiOn ? `${notiOn}개 켜짐` : '꺼짐')}
-    ${myRow('calsettings',icon('calendar'),'캘린더 설정')}
     ${myRow('settingspage',icon('settings'),'설정')}
   </section>
   <section class="mgroup my-section" aria-label="도움말">
