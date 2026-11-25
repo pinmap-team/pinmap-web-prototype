@@ -10,7 +10,7 @@
         <div class="dl-field"><span class="dl-field-icon">${icon('link')}</span><textarea id="dl-link-input" rows="1" inputmode="url" aria-label="Instagram 링크 붙여넣기" placeholder="링크 붙여넣기"></textarea><span class="dl-file-label" hidden>ZIP 파일 선택</span>
           <span class="dl-photo-label" hidden>앨범에서 사진 선택</span><img class="dl-photo-thumb" alt="" hidden>
           <input id="dl-zip-input" class="dl-zip-input" type="file" accept=".zip,application/zip" aria-label="Instagram ZIP 파일 선택" tabindex="-1"><input id="dl-photo-input" class="dl-zip-input" type="file" accept="image/png,image/jpeg,image/webp" aria-label="캡처 이미지 선택" tabindex="-1"></div>
-        <button class="dl-input-close" type="button" aria-label="입력창 닫기"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M5 5 19 19M19 5 5 19"/></svg></button>
+
       </div><p class="dl-input-error" role="alert" hidden></p></div></div>
       <div class="dl-body" data-open="true"><div class="dl-body-clip"><div class="dl-head"><div class="dl-texts"><span class="dl-title t-text-swap" id="dl-title"></span><span class="dl-sub" aria-live="polite"><span class="t-text-swap" id="dl-done">0</span>개 처리</span></div>
         <button class="dl-btn t-resize" id="dl-btn" type="button"><span class="t-text-swap" id="dl-btn-label"></span></button>
@@ -18,7 +18,8 @@
         <button class="dl-close" id="dl-close" type="button" aria-label="진행창 접기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" aria-hidden="true"><path d="M6 18 18 6M6 6l12 12"/></svg></button></div>
       <div class="dl-bar" role="progressbar" aria-label="링크 처리 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="dl-bar-fill" id="dl-bar-fill"></span></div>
       <ul class="dl-list"></ul><p class="dl-error" role="alert" hidden></p>
-    </div></div></div><button class="dl-ring" id="dl-ring" type="button" aria-label="진행창 펼치기" tabindex="-1">
+    </div></div></div>      <button class="dl-input-close" type="button" aria-label="입력창 닫기"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M5 5 19 19M19 5 5 19"/></svg></button>
+<button class="dl-ring" id="dl-ring" type="button" aria-label="진행창 펼치기" tabindex="-1">
       <svg class="dl-ring-svg" viewBox="0 0 64 64" aria-hidden="true"><circle class="dl-ring-track" cx="32" cy="32" r="26"/><circle class="dl-ring-prog" id="dl-ring-prog" cx="32" cy="32" r="26" pathLength="100"/></svg>
       <span class="dl-ring-center"><span class="dl-ring-pct" id="dl-ring-pct">0%</span></span>
       <span class="dl-ring-success t-success-check" data-state="out" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="currentColor"/><path d="M23 33l6 6 12-14" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -255,7 +256,7 @@
     inputMorphFrame = requestAnimationFrame(frame);
     return true;
   }
-  function open(kind = 'links', prefill = '', origin = null) {
+  function open(kind = 'links', prefill = '', origin = null, linkCenterY = null) {
     clearTimeout(inputCloseTimer);
     stage.classList.remove('is-input-closing');
     stopInputMorph();
@@ -276,6 +277,7 @@
       return;
     }
     inputMode = kind === 'zip' ? 'zip' : kind === 'photo' ? 'photo' : 'links';
+    stage.style.setProperty('--dl-input-link-center', Number.isFinite(linkCenterY) ? `${linkCenterY}px` : 'calc(100dvh - 162px)');
     inputPending = false;
     inputDismissed = false;
     identity = '';

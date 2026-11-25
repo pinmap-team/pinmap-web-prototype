@@ -3205,11 +3205,11 @@ html body .bottomnav .t-goo-main .icon,html body .bottomnav .t-goo-item .icon{st
 html body .bottomnav svg .pm-nav-fill,html body .main:has(.myprofile) svg.solar-routing-2-bold path{stroke:none!important}
 
 /* The three add inputs share a single dark glass card on the link satellite axis. */
-.dl-stage.is-input{width:min(320px,calc(100vw - 48px));left:50%;right:auto;bottom:calc(185px + env(safe-area-inset-bottom));transform:translateX(-50%)}
-.dl-stage.is-input .dl-card{width:100%;border-radius:20px;background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.03)),rgba(0,0,0,.68);-webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);box-shadow:inset 0 0 0 1px rgba(255,255,255,.27),inset 0 1px 0 rgba(255,255,255,.17),0 14px 32px rgba(0,0,0,.19)}
+.dl-stage.is-input{width:min(320px,calc(100vw - 48px));left:50%;right:auto;top:var(--dl-input-link-center,calc(100dvh - 162px));bottom:auto;transform:translate(-50%,-50%)}
+.dl-stage.is-input .dl-card{width:100%;overflow:visible;border-radius:20px;background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.03)),rgba(0,0,0,.68);-webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);box-shadow:inset 0 0 0 1px rgba(255,255,255,.27),inset 0 1px 0 rgba(255,255,255,.17),0 14px 32px rgba(0,0,0,.19)}
 [data-theme="dark"] .dl-stage.is-input .dl-card{background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.03)),rgba(0,0,0,.68)}
 .dl-stage.is-input .dl-full{width:100%;padding:0}
-.dl-stage.is-input .dl-link-row{position:relative;display:block;padding:12px 36px 12px 12px}
+.dl-stage.is-input .dl-link-row{position:relative;display:block;padding:12px}
 .dl-stage.is-input .dl-field{width:100%;height:44px;gap:10px;padding:0 14px;border-radius:12px;cursor:pointer;background:rgba(0,0,0,.35);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
 .dl-stage.is-input .dl-field:focus-within{box-shadow:inset 0 0 0 1px rgba(255,255,255,.38)}
 .dl-stage.is-input .dl-field-icon{width:20px;height:20px;display:grid;place-items:center;flex:none;color:inherit}
@@ -3217,7 +3217,7 @@ html body .bottomnav svg .pm-nav-fill,html body .main:has(.myprofile) svg.solar-
 .dl-stage.is-input .dl-field-icon svg :is(path,circle,rect,line){stroke-width:1.5px!important;vector-effect:non-scaling-stroke}
 .dl-stage.is-input .dl-field textarea{height:22px;min-height:22px;line-height:22px;cursor:text}
 .dl-stage.is-input .dl-field.is-pending{opacity:.72;pointer-events:none}
-.dl-input-close{position:absolute;right:8px;top:8px;width:20px;height:20px;display:grid;place-items:center;border:0;border-radius:50%;padding:0;color:var(--color-neutral);background:rgba(255,255,255,.18);cursor:pointer}
+.dl-input-close{position:absolute;z-index:2;right:16px;top:-12px;width:28px;height:28px;display:grid;place-items:center;border:0;border-radius:50%;padding:0;color:var(--color-neutral);background:rgba(255,255,255,.18);cursor:pointer}
 .dl-input-close:focus-visible{outline:2px solid var(--color-neutral);outline-offset:2px}
 .dl-stage:not(.is-input) .dl-input-close{display:none}
 .dl-stage.is-input .dl-input-error{margin:0 12px 12px}
