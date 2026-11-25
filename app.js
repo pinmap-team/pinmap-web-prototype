@@ -77,6 +77,18 @@ let settings = PM_ENV.development ? {nickname:'',area:'',notiDeadline:false,noti
 const LOC_PERM = {always:'항상 허용', using:'앱을 사용하는 동안', none:'허용 안 함'};
 let dueDismissed = false; // 마감 임박 배너를 닫으면 이번 방문 동안 숨김
 let unreadCount = () => 0; // my.js가 알림 개수 계산을 연결합니다
+let lastBellUnreadCount = 0;
+let pendingBellBadgeOpen = null;
+function notificationBell(){
+  const count = unreadCount();
+  const entering = count > lastBellUnreadCount && count > 0;
+  const leaving = count === 0 && lastBellUnreadCount > 0;
+  const initialOpen = leaving || (count > 0 && !entering);
+  const visibleCount = count || lastBellUnreadCount;
+  lastBellUnreadCount = count;
+  pendingBellBadgeOpen = entering || leaving ? count > 0 : null;
+  return `<button class="bellbtn" data-action="noti" aria-label="알림${count ? ` ${count} 개 안 읽음` : ''}">${icon('bell')}<span class="t-badge" data-open="${initialOpen}" data-motion="${entering ? 'enter' : 'none'}" aria-hidden="true"><span class="belldot t-badge-dot">${visibleCount || ''}</span></span></button>`;
+}
 const pages = {};          // 화면 렌더 함수 (pinmap.js가 home을 개인화 버전으로 바꿉니다)
 let afterChange = () => {}; // 데이터가 바뀌면 호출 (pinmap.js가 브라우저 저장을 연결합니다)
 // Screens call the same persistence boundary in both modes. The account data
@@ -178,7 +190,14 @@ let detail = unavailableScreen;
 function render(){
   page=PinmapScreenPolicy.resolve(page,pages);
   const content=detailId?detail():(pages[page] || unavailableScreen)();
-  $('#app').innerHTML=`<div class="layout"><aside class="rail"><a href="#" class="brand" data-page="home"><b class="brandmark">${icon('bookmark')}</b><span>핀맵</span></a><button class="filled" data-action="save">${icon('plus')}<span>새로 저장</span></button><div class="railfoot">저장을 다시, 일상으로.<button data-action="intro">사용 방법 알아보기</button><span>Prototype 03</span></div></aside><main class="main"><header class="topbar"><span class="breadcrumb">핀맵 / ${detailId?'콘텐츠 상세':pageName[page]}</span>${page==='my'&&!detailId?'<h1 class="toptitle">마이</h1>':`<a href="#" class="brand mobilebrand" data-page="home"><b class="brandmark">${icon('bookmark')}</b>핀맵</a>`}<div class="topactions">${(page === 'home' || page === 'my') && !detailId ? (n=>`<button class="bellbtn" data-action="noti" aria-label="알림${n?` ${n} 개 안 읽음`:''}">${icon('bell')}${n?`<span class="belldot" aria-hidden="true">${n}</span>`:''}</button>`)(unreadCount()) : ''}</div></header>${content}<footer class="footer"><span>핀맵, 저장을 다시, 일상으로.</span><span>예시 데이터로 체험하는 프로토타입</span></footer></main></div>`;
+  pendingBellBadgeOpen = null;
+  $('#app').innerHTML=`<div class="layout"><aside class="rail"><a href="#" class="brand" data-page="home"><b class="brandmark">${icon('bookmark')}</b><span>핀맵</span></a><button class="filled" data-action="save">${icon('plus')}<span>새로 저장</span></button><div class="railfoot">저장을 다시, 일상으로.<button data-action="intro">사용 방법 알아보기</button><span>Prototype 03</span></div></aside><main class="main"><header class="topbar"><span class="breadcrumb">핀맵 / ${detailId?'콘텐츠 상세':pageName[page]}</span>${page==='my'&&!detailId?'<h1 class="toptitle">마이</h1>':`<a href="#" class="brand mobilebrand" data-page="home"><b class="brandmark">${icon('bookmark')}</b>핀맵</a>`}<div class="topactions">${(page === 'home' || page === 'my') && !detailId ? notificationBell() : ''}</div></header>${content}<footer class="footer"><span>핀맵, 저장을 다시, 일상으로.</span><span>예시 데이터로 체험하는 프로토타입</span></footer></main></div>`;
+  const badge = $('.main>.topbar .bellbtn .t-badge');
+  if (badge && pendingBellBadgeOpen !== null) {
+    const open = pendingBellBadgeOpen;
+    void badge.offsetHeight;
+    requestAnimationFrame(() => { if (badge.isConnected) badge.dataset.open = String(open); });
+  }
   window.PinmapBottomNav?.mount();
   const revealing = [...document.querySelectorAll('.pm-account-skeleton[data-state="ready"]')];
   if (revealing.length) window.PinmapSkeletonRevealingUntil = Date.now() + 400;
