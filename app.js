@@ -89,6 +89,11 @@ function notificationBell(){
   pendingBellBadgeOpen = entering || leaving ? count > 0 : null;
   return `<button class="bellbtn" data-action="noti" aria-label="알림${count ? ` ${count} 개 안 읽음` : ''}">${icon('bell')}<span class="t-badge" data-open="${initialOpen}" data-motion="${entering ? 'enter' : 'none'}" aria-hidden="true"><span class="belldot t-badge-dot">${visibleCount || ''}</span></span></button>`;
 }
+function themeToggleButton(){
+  const dark=document.documentElement.dataset.theme==='dark';
+  const label=dark?'라이트 모드로 전환':'다크 모드로 전환';
+  return `<button type="button" class="pm-theme-toggle" data-action="themetoggle" aria-label="${label}" title="${label}">${icon(dark?'moon':'sun')}</button>`;
+}
 const pages = {};          // 화면 렌더 함수 (pinmap.js가 home을 개인화 버전으로 바꿉니다)
 let afterChange = () => {}; // 데이터가 바뀌면 호출 (pinmap.js가 브라우저 저장을 연결합니다)
 // Screens call the same persistence boundary in both modes. The account data
@@ -191,7 +196,7 @@ function render(){
   page=PinmapScreenPolicy.resolve(page,pages);
   const content=detailId?detail():(pages[page] || unavailableScreen)();
   pendingBellBadgeOpen = null;
-  $('#app').innerHTML=`<div class="layout"><aside class="rail"><a href="#" class="brand" data-page="home"><b class="brandmark">${icon('bookmark')}</b><span>핀맵</span></a><button class="filled" data-action="save">${icon('plus')}<span>새로 저장</span></button><div class="railfoot">저장을 다시, 일상으로.<button data-action="intro">사용 방법 알아보기</button><span>Prototype 03</span></div></aside><main class="main"><header class="topbar"><span class="breadcrumb">핀맵 / ${detailId?'콘텐츠 상세':pageName[page]}</span>${page==='my'&&!detailId?'<h1 class="toptitle">마이</h1>':`<a href="#" class="brand mobilebrand" data-page="home"><b class="brandmark">${icon('bookmark')}</b>핀맵</a>`}<div class="topactions">${(page === 'home' || page === 'my') && !detailId ? notificationBell() : ''}</div></header>${content}<footer class="footer"><span>핀맵, 저장을 다시, 일상으로.</span><span>예시 데이터로 체험하는 프로토타입</span></footer></main></div>`;
+  $('#app').innerHTML=`<div class="layout"><aside class="rail"><a href="#" class="brand" data-page="home"><b class="brandmark">${icon('bookmark')}</b><span>핀맵</span></a><button class="filled" data-action="save">${icon('plus')}<span>새로 저장</span></button><div class="railfoot">저장을 다시, 일상으로.<button data-action="intro">사용 방법 알아보기</button><span>Prototype 03</span></div></aside><main class="main"><header class="topbar"><span class="breadcrumb">핀맵 / ${detailId?'콘텐츠 상세':pageName[page]}</span>${page==='my'&&!detailId?'<h1 class="toptitle">마이</h1>':`<a href="#" class="brand mobilebrand" data-page="home"><b class="brandmark">${icon('bookmark')}</b>핀맵</a>`}<div class="topactions">${(page === 'home' || page === 'my') && !detailId ? themeToggleButton()+notificationBell() : ''}</div></header>${content}<footer class="footer"><span>핀맵, 저장을 다시, 일상으로.</span><span>예시 데이터로 체험하는 프로토타입</span></footer></main></div>`;
   const badge = $('.main>.topbar .bellbtn .t-badge');
   if (badge && pendingBellBadgeOpen !== null) {
     const open = pendingBellBadgeOpen;
@@ -264,6 +269,16 @@ const actions = {
     modal(x.source==='캡처'?'캡처 미리보기':'원본 콘텐츠 보기',x.source==='캡처'?`${x.photo?`<img class="screenshot-import-preview" src="${esc(x.photo)}" alt="저장한 캡처 화면 미리보기">`:'<p>캡처 미리보기를 저장하지 못했어요.</p>'}<div class="dialogactions"><button class="filled" data-action="close">닫기</button></div>`:`<p>‘${esc(x.title)}’은 체험용 콘텐츠예요.</p><p class="muted">실제 서비스에서는 이 단계에서 저장한 ${esc(x.source)} 게시물로 이동해요.</p><div class="dialogactions"><button class="filled" data-action="close">확인</button></div>`); }
 };
 function action(a){ if(!PinmapScreenPolicy.allowsAction(a))return; (Object.hasOwn(actions,a)&&typeof actions[a]==='function'?actions[a]:(()=>{}))(); }
+actions.themetoggle=()=>window.PinmapTheme.set(document.documentElement.dataset.theme==='dark'?'light':'dark');
+window.addEventListener('pinmap:theme-changed',()=>{
+  const button=document.querySelector('.pm-theme-toggle');
+  if(!button)return;
+  const dark=document.documentElement.dataset.theme==='dark';
+  const label=dark?'라이트 모드로 전환':'다크 모드로 전환';
+  button.setAttribute('aria-label',label);
+  button.title=label;
+  button.innerHTML=icon(dark?'moon':'sun');
+});
 
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-page],[data-detail],[data-filter],[data-action],[data-collection],[data-pin],[data-libfilter],[data-libquery]');

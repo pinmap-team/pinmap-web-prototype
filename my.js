@@ -59,7 +59,6 @@ const myBillingIcon = () => `<svg xmlns="http://www.w3.org/2000/svg" width="24" 
   <path d="M10.5 7.5H17" stroke-linecap="round" stroke="currentColor"/>
   <path d="M10.5 14.5H17" stroke-linecap="round" stroke="currentColor"/>
 </svg>`;
-const myScreenModeIcon = () => document.documentElement.dataset.theme==='light' ? icon('sun') : icon('moon');
 pages.my = function(){
   window.PinmapBilling?.maybeRefresh();
   const billing = window.PinmapBilling?.view();
@@ -112,7 +111,6 @@ $('#sheet').addEventListener('close', () => { mySheet = null; });
 
 /* ---------- 동작 ---------- */
 Object.assign(actions, {
-  appearance: () => go('themeset'),
   noti: notiSheet,
   readall: () => { markRead(notifications().map(n => n.id)); notiSheet(); render(); },
   notisettings: () => go('notiset'),
