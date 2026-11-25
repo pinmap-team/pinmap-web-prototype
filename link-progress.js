@@ -7,11 +7,10 @@
   stage.setAttribute('aria-label', '링크 가져오기 진행 상태');
   stage.innerHTML = `<div class="dl-card" id="dl-win"><div class="dl-full" id="dl-full">
       <div class="dl-link" data-open="false"><div class="dl-link-clip"><div class="dl-link-row">
-        <label class="dl-field"><textarea id="dl-link-input" rows="1" inputmode="url" aria-label="Instagram 링크 붙여넣기" placeholder="링크 붙여넣기"></textarea><span class="dl-file-label" hidden>ZIP 파일 선택</span>
-          <span class="dl-field-icon" hidden>${icon('galleryAdd')}</span>
+        <div class="dl-field"><span class="dl-field-icon">${icon('link')}</span><textarea id="dl-link-input" rows="1" inputmode="url" aria-label="Instagram 링크 붙여넣기" placeholder="링크 붙여넣기"></textarea><span class="dl-file-label" hidden>ZIP 파일 선택</span>
           <span class="dl-photo-label" hidden>앨범에서 사진 선택</span><img class="dl-photo-thumb" alt="" hidden>
-          <input id="dl-zip-input" class="dl-zip-input" type="file" accept=".zip,application/zip" aria-label="Instagram ZIP 파일 선택" tabindex="-1"><input id="dl-photo-input" class="dl-zip-input" type="file" accept="image/png,image/jpeg,image/webp" aria-label="캡처 이미지 선택" tabindex="-1"></label>
-        <button class="dl-btn dl-paste" id="dl-paste" type="button"><span class="t-text-swap" id="dl-paste-label">붙여넣기</span></button>
+          <input id="dl-zip-input" class="dl-zip-input" type="file" accept=".zip,application/zip" aria-label="Instagram ZIP 파일 선택" tabindex="-1"><input id="dl-photo-input" class="dl-zip-input" type="file" accept="image/png,image/jpeg,image/webp" aria-label="캡처 이미지 선택" tabindex="-1"></div>
+        <button class="dl-input-close" type="button" aria-label="입력창 닫기"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M5 5 19 19M19 5 5 19"/></svg></button>
       </div><p class="dl-input-error" role="alert" hidden></p></div></div>
       <div class="dl-body" data-open="true"><div class="dl-body-clip"><div class="dl-head"><div class="dl-texts"><span class="dl-title t-text-swap" id="dl-title"></span><span class="dl-sub" aria-live="polite"><span class="t-text-swap" id="dl-done">0</span>개 처리</span></div>
         <button class="dl-btn t-resize" id="dl-btn" type="button"><span class="t-text-swap" id="dl-btn-label"></span></button>
@@ -193,7 +192,7 @@
       card.setAttribute('height', Math.max(0, lerp(radius * 2, target.height, grow)));
       card.setAttribute('rx', lerp(radius, 24, grow));
       const surfaceMix = Math.round(smooth(Math.max(0, Math.min(1, (t - .3) / .5))) * 100);
-      const fill = `color-mix(in srgb, var(--color-primary) ${100 - surfaceMix}%, black ${surfaceMix}%)`;
+      const fill = `color-mix(in srgb, var(--color-primary) ${100 - surfaceMix}%, var(--color-on-surface) ${surfaceMix}%)`;
       source.style.fill = fill;
       drop.style.fill = fill;
       card.style.fill = fill;
@@ -247,7 +246,7 @@
       card.setAttribute('height', Math.max(0, lerp(radius * 2, target.height, grow)));
       card.setAttribute('rx', lerp(radius, 24, grow));
       const surfaceMix = Math.round(smooth(clamp((u - .3) / .5)) * 100);
-      const fill = `color-mix(in srgb, var(--color-primary) ${100 - surfaceMix}%, black ${surfaceMix}%)`;
+      const fill = `color-mix(in srgb, var(--color-primary) ${100 - surfaceMix}%, var(--color-on-surface) ${surfaceMix}%)`;
       source.style.fill = fill; drop.style.fill = fill; card.style.fill = fill; neck.style.fill = fill;
       win.style.opacity = String(1 - smooth(clamp(t / .22)));
       svg.style.opacity = String(smooth(clamp(t / .18)) * (1 - smooth(clamp((t - .82) / .18))));
@@ -287,10 +286,12 @@
     full.inert = false; ring.tabIndex = -1;
     linkInput.hidden = inputMode !== 'links';
     get('.dl-file-label').hidden = inputMode !== 'zip';
-    get('.dl-field-icon').toggleAttribute('hidden', inputMode !== 'photo');
+    get('.dl-field-icon').innerHTML = icon(inputMode === 'zip' ? 'folder' : inputMode === 'photo' ? 'galleryAdd' : 'link');
     get('.dl-photo-label').hidden = inputMode !== 'photo';
     get('.dl-photo-thumb').hidden = true;
     get('.dl-field').classList.toggle('is-photo', inputMode === 'photo');
+    get('.dl-field').setAttribute('role', inputMode === 'links' ? 'group' : 'button');
+    get('.dl-field').tabIndex = inputMode === 'links' ? -1 : 0;
     zipInput.disabled = inputMode !== 'zip';
     photoInput.disabled = inputMode !== 'photo';
     zipInput.value = '';
@@ -303,8 +304,7 @@
     get('.dl-file-label').textContent = 'ZIP 파일 선택';
     linkInput.value = prefill;
     get('.dl-field').classList.toggle('is-filled', Boolean(prefill));
-    swapText(get('#dl-paste-label'), inputMode === 'zip' ? '파일 선택' : inputMode === 'photo' ? '선택' : prefill ? '가져오기' : '붙여넣기');
-    get('.dl-paste').disabled = false;
+    get('.dl-field').classList.remove('is-pending');
     inputError();
     update();
     if (origin) animateInputFrom(origin);
@@ -318,25 +318,24 @@
     }
     if (!linkInput.value.trim()) { linkInput.focus(); return; }
     inputPending = true;
-    get('.dl-paste').disabled = true;
+    get('.dl-field').classList.add('is-pending');
     inputError();
     try { await window.PinmapSubmitLinks(linkInput.value); }
     catch (error) { if (inputMode) inputError(error.message || '링크를 확인해 주세요.'); }
-    finally { inputPending = false; get('.dl-paste').disabled = false; }
+    finally { inputPending = false; get('.dl-field').classList.remove('is-pending'); }
   }
   async function submitZip(file) {
     if (inputPending || inputMode !== 'zip' || !file) return;
     inputPending = true;
     zipReadController = new AbortController();
     const controller = zipReadController;
-    get('.dl-paste').disabled = true;
+    get('.dl-field').classList.add('is-pending');
     get('.dl-file-label').textContent = file.name;
     get('.dl-field').classList.add('is-filled');
-    swapText(get('#dl-paste-label'), '확인 중');
     inputError();
     try { await window.PinmapStartZipFile(file, controller.signal); }
     catch (error) { if (inputMode && !stage.classList.contains('is-input-closing')) inputError(error.message || 'ZIP 파일을 확인해 주세요.'); }
-    finally { if (zipReadController === controller) zipReadController = null; inputPending = false; get('.dl-paste').disabled = false; }
+    finally { if (zipReadController === controller) zipReadController = null; inputPending = false; get('.dl-field').classList.remove('is-pending'); }
   }
   async function preparePhoto(file) {
     const url = URL.createObjectURL(file);
@@ -364,7 +363,7 @@
       return;
     }
     inputPending = true;
-    get('.dl-paste').disabled = true;
+    get('.dl-field').classList.add('is-pending');
     photoName = file.name;
     photoPreviewUrl = URL.createObjectURL(file);
     const thumb = get('.dl-photo-thumb');
@@ -372,7 +371,6 @@
     thumb.hidden = false;
     get('.dl-photo-label').textContent = file.name;
     get('.dl-field').classList.add('is-filled');
-    swapText(get('#dl-paste-label'), '선택됨');
     inputError();
     try {
       const image = await preparePhoto(file);
@@ -380,7 +378,7 @@
       if (!window.PinmapCaptureSave) throw Error('사진 분석·저장은 로그인 후 사용할 수 있어요.');
       await window.PinmapCaptureSave(image, crypto.randomUUID());
     } catch (error) { if (inputMode) inputError(error.message || '사진을 확인해 주세요.'); }
-    finally { inputPending = false; get('.dl-paste').disabled = false; }
+    finally { inputPending = false; get('.dl-field').classList.remove('is-pending'); }
   }
   function renderRows(entries) {
     const list = get('.dl-list');
@@ -508,18 +506,23 @@
     inputCloseTimer = setTimeout(finish, 430);
   }
   ring.addEventListener('click', () => minimize(false,true));
-  get('.dl-paste').addEventListener('click', () => {
+  get('.dl-input-close').addEventListener('click', closeInput);
+  get('.dl-field').addEventListener('click', () => {
+    if (inputPending) return;
     if (inputMode === 'zip') zipInput.click();
     else if (inputMode === 'photo') photoInput.click();
-    else void submitLinks();
+    else linkInput.focus();
+  });
+  get('.dl-field').addEventListener('keydown', event => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    if (inputMode === 'zip' || inputMode === 'photo') { event.preventDefault(); (inputMode === 'zip' ? zipInput : photoInput).click(); }
   });
   linkInput.addEventListener('input', () => {
     get('.dl-field').classList.toggle('is-filled', Boolean(linkInput.value.trim()));
-    swapText(get('#dl-paste-label'), linkInput.value.trim() ? '가져오기' : '붙여넣기');
   });
   linkInput.addEventListener('paste', () => setTimeout(() => { if (inputMode === 'links') void submitLinks(); }, 0));
   linkInput.addEventListener('keydown', event => {
-    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) { event.preventDefault(); void submitLinks(); }
+    if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); void submitLinks(); }
   });
   zipInput.addEventListener('change', () => void submitZip(zipInput.files?.[0]));
   photoInput.addEventListener('change', () => void submitPhoto(photoInput.files?.[0]));

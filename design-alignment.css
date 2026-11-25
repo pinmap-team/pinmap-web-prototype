@@ -2080,7 +2080,7 @@ body:has(.dt) .bottomnav .home-add-menu{display:none!important}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/tech-active.svg"]{content:url("img/category/tech-active-dark.svg")}
 [data-theme="dark"] .lm-categories img.pm-category-icon[src*="/travel-active.svg"]{content:url("img/category/travel-active-dark.svg")}
 /* 2026-11-24: 아이콘 선 굵기 통일 — 크기(14~36px)와 상관없이 화면에서 1.7px, 끝·꺾임은 둥글게 */
-html body :is(svg.icon,.course-share svg,.course-header-actions svg,.course-title-edit svg,svg.ob-icon) :is(path,circle,rect,line,polyline,polygon,ellipse){vector-effect:non-scaling-stroke;stroke-width:1.7px!important;stroke-linecap:round;stroke-linejoin:round}
+html body :is(svg.icon,.course-share svg,.course-header-actions svg,.course-title-edit svg,svg.ob-icon) :is(path,circle,rect,line,polyline,polygon,ellipse){vector-effect:non-scaling-stroke;stroke-width:1.5px!important;stroke-linecap:round;stroke-linejoin:round}
 .live-map .lm-category-svg .lm-category-all{stroke:currentColor;stroke-width:1.7px;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 /* 2026-11-24: 내비 아이콘 — 선택 전(선)과 선택 후(같은 윤곽을 채움) 모양이 같아요 */
 html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph{width:26px!important;height:26px!important;fill:none!important;stroke:currentColor!important}
@@ -3192,8 +3192,32 @@ html body .main:has(.myprofile) .myprofile-photo .pavatar svg.icon,html body .ma
 html body .main:has(.myprofile) .myprofile-photo .pavatar svg.icon :is(path,circle,rect,line){stroke-width:1.5px!important}
 html body .bottomnav .pm-nav-main .navitem .navicon{width:28px!important;height:28px!important;display:grid!important;place-items:center}
 html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph{display:block;width:26px!important;height:26px!important}
-html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph:not(.is-selected):not(.solar-home-bold) :is(path,circle,rect,line,polyline){stroke-width:1.7px!important}
+html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph:not(.is-selected):not(.solar-home-bold) :is(path,circle,rect,line,polyline){stroke-width:1.5px!important;vector-effect:non-scaling-stroke!important}
 html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph.is-selected .pm-nav-fill{stroke:none!important}
 html body .bottomnav .pm-nav-main .navitem[data-page="map"] .navicon svg{transform:scale(1.1)}
 html body .bottomnav .pm-nav-main .navitem[data-page="library"] .navicon svg{transform:scale(1.1)}
 html body .bottomnav .pm-nav-main .navitem[data-page="my"] .navicon svg{transform:scale(1.16)}
+
+/* A single 1.5px rendered line weight for the My screen and navigation. */
+html body .main:has(.myprofile) :is(.mrico,.myq-ico,.myprofile-photo,.myprofile-go,.bellbtn,.account-photo-edit) svg :is(path,circle,rect,line,polyline,polygon,ellipse),
+html body .bottomnav :is(.navicon,.t-goo-main,.t-goo-item) svg :is(path,circle,rect,line,polyline,polygon,ellipse){stroke-width:1.5px!important;vector-effect:non-scaling-stroke!important}
+html body .bottomnav .t-goo-main .icon,html body .bottomnav .t-goo-item .icon{stroke-width:1.5px!important}
+html body .bottomnav svg .pm-nav-fill,html body .main:has(.myprofile) svg.solar-routing-2-bold path{stroke:none!important}
+
+/* The three add inputs share a single dark glass card on the link satellite axis. */
+.dl-stage.is-input{width:min(320px,calc(100vw - 48px));left:50%;right:auto;bottom:calc(185px + env(safe-area-inset-bottom));transform:translateX(-50%)}
+.dl-stage.is-input .dl-card{width:100%;border-radius:20px;background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.03)),rgba(0,0,0,.68);-webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);box-shadow:inset 0 0 0 1px rgba(255,255,255,.27),inset 0 1px 0 rgba(255,255,255,.17),0 14px 32px rgba(0,0,0,.19)}
+[data-theme="dark"] .dl-stage.is-input .dl-card{background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.03)),rgba(0,0,0,.68)}
+.dl-stage.is-input .dl-full{width:100%;padding:0}
+.dl-stage.is-input .dl-link-row{position:relative;display:block;padding:12px 36px 12px 12px}
+.dl-stage.is-input .dl-field{width:100%;height:44px;gap:10px;padding:0 14px;border-radius:12px;cursor:pointer;background:rgba(0,0,0,.35);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+.dl-stage.is-input .dl-field:focus-within{box-shadow:inset 0 0 0 1px rgba(255,255,255,.38)}
+.dl-stage.is-input .dl-field-icon{width:20px;height:20px;display:grid;place-items:center;flex:none;color:inherit}
+.dl-stage.is-input .dl-field-icon svg{width:20px;height:20px;stroke-width:1.5px}
+.dl-stage.is-input .dl-field-icon svg :is(path,circle,rect,line){stroke-width:1.5px!important;vector-effect:non-scaling-stroke}
+.dl-stage.is-input .dl-field textarea{height:22px;min-height:22px;line-height:22px;cursor:text}
+.dl-stage.is-input .dl-field.is-pending{opacity:.72;pointer-events:none}
+.dl-input-close{position:absolute;right:8px;top:8px;width:20px;height:20px;display:grid;place-items:center;border:0;border-radius:50%;padding:0;color:var(--color-neutral);background:rgba(255,255,255,.18);cursor:pointer}
+.dl-input-close:focus-visible{outline:2px solid var(--color-neutral);outline-offset:2px}
+.dl-stage:not(.is-input) .dl-input-close{display:none}
+.dl-stage.is-input .dl-input-error{margin:0 12px 12px}
