@@ -13,6 +13,7 @@
 (() => {
   let job = null;
   let dismiss = null;
+  let controls = null;
   function render() {
     const form = document.getElementById('saveform');
     const button = form?.querySelector('button[type="submit"]');
@@ -30,15 +31,33 @@
   function clear() {
     clearTimeout(dismiss);
     dismiss = null;
+    controls?.pause?.();
+    controls = null;
     job = null;
     render();
   }
-  function start(kind = 'link') {
-    if (job?.phase === 'running') return false;
+  function start(kind = 'link', nextControls = null) {
+    if (job?.phase === 'running' || job?.phase === 'paused') return false;
     clear();
+    controls = nextControls;
     job = {kind, phase:'running', started:Date.now(), error:''};
     render();
     return true;
+  }
+  function pause() {
+    if (job?.phase !== 'running') return false;
+    job.phase = 'paused';
+    controls?.pause?.();
+    render();
+    return true;
+  }
+  async function resume() {
+    if (!job || !['paused','failed'].includes(job.phase) || !controls?.resume)
+      throw Error('이어 할 저장 작업이 없어요.');
+    clearTimeout(dismiss);
+    job.phase = 'running'; job.error = '';
+    render();
+    await controls.resume();
   }
   function finish(error, info = {}) {
     if (!job || job.phase !== 'running') return;
@@ -48,6 +67,7 @@
     render();
     dismiss = setTimeout(clear, error ? 8000 : 5000);
   }
-  window.PinmapSaveProgress = Object.freeze({start, finish, clear, render,
-    state:() => job && {...job}, isRunning:() => job?.phase === 'running'});
+  window.PinmapSaveProgress = Object.freeze({start, finish, clear, pause, resume, render,
+    state:() => job && {...job}, isRunning:() => job?.phase === 'running',
+    isActive:() => job?.phase === 'running' || job?.phase === 'paused'});
 })();
