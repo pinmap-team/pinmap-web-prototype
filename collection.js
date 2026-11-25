@@ -48,6 +48,8 @@ function cfFolderData(list){
 // 사진 슬롯 3개는 모든 폴더에서 같은 자리 · 같은 각도 (collection.css의 .cf-slot0~2)
 // thumbnails[0] = 가장 최근 → 가운데 맨 앞
 const CF_EDGE = 'M0 40.16Q0 32 9 32L30 32C39 32 41 41.6 50 41.6L91 41.6Q100 41.6 100 49.76'; // 앞판 top 40% · cfFrontClip과 같은 가장자리
+const CF_FRONT_GOO_PATH = 'M0 .17Q0 0 .09 0L.3 0C.39 0 .41 .2 .5 .2L.91 .2Q1 .2 1 .37L1 .83Q1 1 .91 1L.09 1Q0 1 0 .83Z';
+const cfFilledPinIcon = () => '<svg class="icon cf-filled-pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.97 2.47a1 1 0 0 1 1.42 0l4.14 4.14a1 1 0 0 1 0 1.42l-1.82 1.82a1 1 0 0 1-.86.28l-1.11-.17-3.85 3.85.17 1.11a1 1 0 0 1-.28.86l-1.82 1.82a1 1 0 0 1-1.42 0L6.4 13.47a1 1 0 0 1 0-1.42l1.82-1.82a1 1 0 0 1 .86-.28l1.11.17 3.85-3.85-.17-1.11a1 1 0 0 1 .28-.86zM9.4 14.6l1.4 1.4-6.75 6.75a1 1 0 0 1-1.4-1.4z"/></svg>';
 function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected = false, attr, pinned = false}){
   // 있는 사진만 보여줘요 (사진이 없으면 가운데 자리표시 1장)
   const shown = Math.max(1, Math.min(3, thumbnails.length));
@@ -64,13 +66,13 @@ function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected 
       <svg class="cf-shade" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
       <span class="cf-front"></span>
       <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
-      <span class="cf-meta">${pinned ? `<span class="cf-pinmark" aria-hidden="true">${icon('pushpin')}</span>` : ''}<span class="cf-title">${esc(title)}</span><span class="cf-count">${count}<span class="sr">개 저장된 폴더${pinned ? ', 상단 고정됨' : ''}</span></span></span>
+      <span class="cf-meta">${pinned ? `<span class="cf-pinmark" aria-hidden="true">${cfFilledPinIcon()}</span>` : ''}<span class="cf-title">${esc(title)}</span><span class="cf-count">${count}<span class="sr">개 저장된 폴더${pinned ? ', 상단 고정됨' : ''}</span></span></span>
     </span>
   </button>`;
 }
 // 폴더 모양 (clipPath · 블러는 한 번만 정의해 모든 폴더가 같이 써요)
 const CF_DEFS = `<svg class="cf-defs" width="0" height="0" aria-hidden="true" focusable="false">
-  <clipPath id="cfFrontClip" clipPathUnits="objectBoundingBox"><path d="M0 .17Q0 0 .09 0L.3 0C.39 0 .41 .2 .5 .2L.91 .2Q1 .2 1 .37L1 .83Q1 1 .91 1L.09 1Q0 1 0 .83Z"/></clipPath>
+  <clipPath id="cfFrontClip" clipPathUnits="objectBoundingBox"><path d="${CF_FRONT_GOO_PATH}"/></clipPath>
   <clipPath id="cfBackClip" clipPathUnits="objectBoundingBox"><path d="M0 .14Q0 0 .09 0L.32 0C.37 0 .39 .07 .44 .07L.91 .07Q1 .07 1 .21L1 .86Q1 1 .91 1L.09 1Q0 1 0 .86Z"/></clipPath>
   <filter id="cfBlur" x="-10%" y="-50%" width="120%" height="200%"><feGaussianBlur stdDeviation="1.4"/></filter>
 </svg>`;
@@ -503,35 +505,95 @@ actions.cfdelfolderok = () => {
 
 /* 폴더를 꾹 누르면(또는 우클릭) 메뉴: 상단 고정/해제 · 내가 만든 폴더는 삭제도. 스크롤과 일반 탭은 그대로예요. */
 let cfMenuKey=null;
-function cfOpenFolderMenu(tile){
+let cfHoldMenu=null,cfHoldMenuTile=null;
+function cfCloseFolderMenu({restoreFocus=false,immediate=false}={}){
+  const menu=cfHoldMenu;if(!menu)return;
+  const tile=menu._folderTile;
+  cfHoldMenu=null;cfHoldMenuTile=null;
+  if(cfMenuKey===menu._folderKey)cfMenuKey=null;
+  cancelAnimationFrame(menu._trackFrame);
+  menu.dataset.open='false';
+  menu._backdrop.dataset.open='false';
+  menu._focus.dataset.open='false';
+  menu.querySelectorAll('.cf-goo-action').forEach(button=>{button.tabIndex=-1;});
+  if(tile?._cfGooMenu===menu)tile._cfGooMenu=null;
+  const release=()=>{menu.remove();menu._backdrop.remove();menu._focus.remove();};
+  if(immediate||matchMedia('(prefers-reduced-motion: reduce)').matches)release();
+  else setTimeout(release,300);
+  if(restoreFocus)tile?.focus();
+}
+function cfOpenFolderMenu(tile,point){
   const key=cfTileKey(tile);if(!key)return;
+  if(!tile.isConnected){tile=[...document.querySelectorAll('.cf-folder')].find(node=>cfTileKey(node)===key);if(!tile)return;}
   const custom=key.startsWith('c:'),name=key.slice(2);
   if(custom&&!cfCustom().includes(name))return;
+  if(cfHoldMenuTile===tile&&cfHoldMenu?.dataset.open==='true')return;
+  cfCloseFolderMenu({immediate:true});
+  document.querySelectorAll('.cf-goo-menu,.cf-menu-backdrop,.cf-menu-focus').forEach(node=>node.remove());
   cfMenuKey=key;
   const pinned=cfPinned().includes(key);
-  modal('', `<div class="esform cf-holdsheet">
-    <div class="nthead"><div><h2>‘${esc(name)}’ 폴더</h2><p>${custom ? '내가 만든 폴더예요.' : '카테고리 폴더예요.'}</p></div><button type="button" class="ntclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
-    <div class="cf-holdmenu" role="menu" aria-label="‘${esc(name)}’ 폴더 메뉴">
-      <button type="button" role="menuitem" class="cf-holditem" data-action="cfpintoggle">${icon('pushpin')}<span>${pinned ? '상단 고정 해제' : '상단에 고정'}</span></button>
-      <button type="button" role="menuitem" class="cf-holditem is-danger" data-action="cfmenudelete">${icon('trash')}<span>폴더 삭제</span></button>
-    </div>
-  </div>`);
-  $('#sheet').classList.add('editsheet');
-  requestAnimationFrame(()=>document.querySelector('.cf-holditem')?.focus());
+  const rect=tile.getBoundingClientRect();
+  const front=tile.querySelector('.cf-front').getBoundingClientRect();
+  const width=front.width,frontTop=front.top-rect.top,frontHeight=front.height;
+  const frontBottom=front.bottom-rect.top;
+  const centerX=Math.max(78-rect.left,Math.min(innerWidth-78-rect.left,(point?.x??rect.left+width/2)-rect.left));
+  const centerY=frontBottom-27;
+  const id='cf-goo-'+Math.random().toString(36).slice(2);
+  const backdrop=document.createElement('div');backdrop.className='cf-menu-backdrop';backdrop.dataset.open='false';backdrop.setAttribute('aria-hidden','true');
+  const focus=document.createElement('div');focus.className='cfpage cf-menu-focus';focus.dataset.open='false';focus.setAttribute('aria-hidden','true');
+  const visual=tile.cloneNode(true);visual.tabIndex=-1;visual.removeAttribute('data-cffolder');visual.removeAttribute('data-collection');visual.removeAttribute('data-action');focus.append(visual);
+  focus.style.left=`${rect.left}px`;focus.style.top=`${rect.top}px`;focus.style.width=`${rect.width}px`;focus.style.height=`${rect.height}px`;
+  const menu=document.createElement('div');
+  menu.className='cf-goo-menu';menu.dataset.open='false';
+  menu.style.left=`${rect.left}px`;menu.style.top=`${rect.top}px`;
+  menu.style.width=`${width}px`;menu.style.height=`${frontBottom+104}px`;
+  menu.setAttribute('role','group');menu.setAttribute('aria-label',`‘${name}’ 폴더 메뉴`);
+  menu.innerHTML=`<svg class="cf-goo-layer" viewBox="0 0 ${width} ${frontBottom+104}" aria-hidden="true" focusable="false">
+    <defs><filter id="${id}" x="-70%" y="-70%" width="240%" height="240%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo"/>
+      <feComposite in="SourceGraphic" in2="goo" operator="atop" result="shape"/>
+      <feGaussianBlur in="shape" stdDeviation="4" result="shadow-blur"/><feOffset in="shadow-blur" dy="3" result="shadow-offset"/>
+      <feFlood flood-color="#000" flood-opacity=".12" result="shadow-color"/><feComposite in="shadow-color" in2="shadow-offset" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="shape"/></feMerge>
+    </filter><clipPath id="${id}-reveal"><rect x="-32" y="${frontBottom-2}" width="${width+64}" height="106"/></clipPath></defs>
+    <g clip-path="url(#${id}-reveal)"><g filter="url(#${id})">
+      <path class="cf-goo-folder" d="${CF_FRONT_GOO_PATH}" transform="translate(0 ${frontTop}) scale(${width} ${frontHeight})"/>
+      <circle class="cf-goo-blob cf-goo-left" cx="${centerX}" cy="${centerY}" r="27"/>
+      <circle class="cf-goo-blob cf-goo-right" cx="${centerX}" cy="${centerY}" r="27"/>
+    </g></g></svg>
+    <button type="button" class="cf-goo-action cf-goo-left" style="left:${centerX-27}px;top:${centerY-27}px" data-action="cfpintoggle" aria-label="${pinned?'상단 고정 해제':'상단에 고정'}" title="${pinned?'상단 고정 해제':'상단에 고정'}" tabindex="-1">${cfFilledPinIcon()}</button>
+    <button type="button" class="cf-goo-action cf-goo-right is-danger" style="left:${centerX-27}px;top:${centerY-27}px" data-action="cfmenudelete" aria-label="폴더 삭제" title="폴더 삭제" tabindex="-1">${icon('trash')}</button>`;
+  menu._folderTile=tile;menu._folderKey=key;menu._backdrop=backdrop;menu._focus=focus;
+  tile._cfGooMenu=menu;cfHoldMenu=menu;cfHoldMenuTile=tile;
+  document.body.append(backdrop,focus,menu);
+  const track=()=>{
+    if(cfHoldMenu!==menu)return;
+    let live=menu._folderTile;
+    if(!live.isConnected){live=[...document.querySelectorAll('.cf-folder')].find(node=>cfTileKey(node)===key);if(!live){cfCloseFolderMenu({immediate:true});return;}menu._folderTile=live;cfHoldMenuTile=live;live._cfGooMenu=menu;}
+    const current=live.getBoundingClientRect();
+    menu.style.left=`${current.left}px`;menu.style.top=`${current.top}px`;
+    focus.style.left=`${current.left}px`;focus.style.top=`${current.top}px`;
+    menu._trackFrame=requestAnimationFrame(track);
+  };
+  menu._trackFrame=requestAnimationFrame(track);
+  requestAnimationFrame(()=>{if(cfHoldMenu===menu){backdrop.dataset.open='true';focus.dataset.open='true';menu.dataset.open='true';menu.querySelectorAll('.cf-goo-action').forEach(button=>button.tabIndex=0);menu.querySelector('.cf-goo-action')?.focus({preventScroll:true});}});
 }
 actions.cfpintoggle = () => {
   const key=cfMenuKey;if(!key)return;cfMenuKey=null;
+  cfCloseFolderMenu();
   const on=!cfPinned().includes(key);cfSetPinned(key,on);
-  afterChange();$('#sheet').close();render();
+  afterChange();render();
   toast(on?`‘${key.slice(2)}’ 폴더를 상단에 고정했어요.`:`‘${key.slice(2)}’ 폴더 고정을 해제했어요.`);
 };
 actions.cfmenudelete = () => {
   const key=cfMenuKey;cfMenuKey=null;if(!key)return;
-  // 메뉴 시트가 완전히 닫힌 다음 확인창을 열어요 (닫힘 정리가 확인창 스타일을 지우지 않게)
-  const sheet=$('#sheet');
-  sheet.addEventListener('close',()=>key.startsWith('c:') ? cfAskDeleteFolder(key.slice(2)) : cfAskDeleteCategory(key.slice(2)),{once:true});
-  sheet.close();
+  cfCloseFolderMenu();
+  setTimeout(()=>key.startsWith('c:') ? cfAskDeleteFolder(key.slice(2)) : cfAskDeleteCategory(key.slice(2)),matchMedia('(prefers-reduced-motion: reduce)').matches?0:260);
 };
+document.addEventListener('pointerdown',e=>{if(cfHoldMenu&&!cfHoldMenu.contains(e.target)&&!cfHoldMenuTile?.contains(e.target))cfCloseFolderMenu();},true);
+document.addEventListener('keydown',e=>{if(cfHoldMenu&&e.key==='Escape'){e.preventDefault();cfCloseFolderMenu({restoreFocus:true});}},true);
+document.addEventListener('scroll',()=>cfCloseFolderMenu(),{capture:true,passive:true});
 /* 카테고리 폴더 삭제 = 그 카테고리로 저장된 콘텐츠를 모두 삭제. 기존 선택 삭제(cfdelconfirm)를 그대로 써서
    계정 모드에서는 백엔드에서도 지워요. 확인창을 닫으면 임시 선택은 풀어요. */
 let cfCatDeleting=false;
@@ -570,7 +632,10 @@ document.addEventListener('pointerdown',e=>{
   const tile=cfHoldTile(e.target);if(!tile)return;
   cfHoldStart={x:e.clientX,y:e.clientY};
   cfHoldTimer=setTimeout(()=>{
-    cfBlockClick={tile,until:Date.now()+1200};navigator.vibrate?.(12);cfOpenFolderMenu(tile);cfCancelHold();
+    const key=cfTileKey(tile);
+    const current=tile.isConnected?tile:[...document.querySelectorAll('.cf-folder')].find(node=>cfTileKey(node)===key);
+    if(current){cfBlockClick={tile:current,until:Date.now()+1200};navigator.vibrate?.(12);cfOpenFolderMenu(current,cfHoldStart);}
+    cfCancelHold();
   },550);
 });
 document.addEventListener('pointermove',e=>{if(cfHoldStart&&Math.hypot(e.clientX-cfHoldStart.x,e.clientY-cfHoldStart.y)>10)cfCancelHold();},{passive:true});
@@ -582,7 +647,7 @@ document.addEventListener('click',e=>{
 },true);
 document.addEventListener('contextmenu',e=>{
   const tile=cfHoldTile(e.target);if(!tile)return;
-  e.preventDefault();cfCancelHold();cfOpenFolderMenu(tile);
+  e.preventDefault();cfCancelHold();cfOpenFolderMenu(tile,{x:e.clientX,y:e.clientY});
 });
 // 키보드: 폴더에 초점을 두고 Shift+F10 또는 메뉴 키로 같은 메뉴를 열어요
 document.addEventListener('keydown',e=>{
