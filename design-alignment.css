@@ -3215,7 +3215,7 @@ html body .lm-drawn-map .lm-drawn-tabs button{flex:1;display:flex;align-items:ce
 html body .lm-drawn-map .lm-drawn-tabs button[aria-selected="true"]{background:#fff!important}
 html body .lm-drawn-map .lm-drawn-tabs button svg{width:18px;height:18px;color:#282828;stroke-width:2}
 html body .lm-drawn-map .lm-drawn-tabs button[aria-selected="true"] svg{color:#282828;fill:#282828}
-html body .lm-drawn-map .lm-drawn-tabs button svg.lm-place-tab-icon{stroke-width:1.5}
+html body .lm-drawn-map .lm-drawn-tabs button svg.lm-place-tab-icon{width:24px;height:24px;stroke-width:1.5}
 html body .lm-drawn-map .lm-drawn-tabs button svg.lm-place-tab-icon.is-bold,html body .lm-drawn-map .lm-drawn-tabs button svg.lm-place-tab-icon.is-bold path{stroke:none!important}
 html body .lm-drawn-map .lm-drawn-tabs button svg.lm-place-tab-icon.is-linear :is(path,circle){fill:none!important;stroke:currentColor!important;stroke-width:1.5!important}
 html body .lm-drawn-map .lm-sheet-scroll{flex:1;min-height:0;overflow:auto;padding:0 0 100px;overscroll-behavior:contain}
