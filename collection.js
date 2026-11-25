@@ -50,6 +50,7 @@ function cfFolderData(list){
 const CF_EDGE = 'M0 40.16Q0 32 9 32L30 32C39 32 41 41.6 50 41.6L91 41.6Q100 41.6 100 49.76'; // 앞판 top 40% · cfFrontClip과 같은 가장자리
 const CF_FRONT_GOO_PATH = 'M0 .17Q0 0 .09 0L.3 0C.39 0 .41 .2 .5 .2L.91 .2Q1 .2 1 .37L1 .83Q1 1 .91 1L.09 1Q0 1 0 .83Z';
 const cfFilledPinIcon = () => '<svg class="icon cf-filled-pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.97 2.47a1 1 0 0 1 1.42 0l4.14 4.14a1 1 0 0 1 0 1.42l-1.82 1.82a1 1 0 0 1-.86.28l-1.11-.17-3.85 3.85.17 1.11a1 1 0 0 1-.28.86l-1.82 1.82a1 1 0 0 1-1.42 0L6.4 13.47a1 1 0 0 1 0-1.42l1.82-1.82a1 1 0 0 1 .86-.28l1.11.17 3.85-3.85-.17-1.11a1 1 0 0 1 .28-.86zM9.4 14.6l1.4 1.4-6.75 6.75a1 1 0 0 1-1.4-1.4z"/></svg>';
+const cfUnpinIcon = () => cfFilledPinIcon().replace('cf-filled-pin"', 'cf-unpin-icon"').replace('</svg>', '<path class="cf-unpin-gap" d="M3 3l18 18"/><path class="cf-unpin-slash" d="M3 3l18 18"/></svg>');
 function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected = false, attr, pinned = false}){
   // 있는 사진만 보여줘요 (사진이 없으면 가운데 자리표시 1장)
   const shown = Math.max(1, Math.min(3, thumbnails.length));
@@ -562,7 +563,7 @@ function cfOpenFolderMenu(tile,point){
       <circle class="cf-goo-blob cf-goo-left" cx="${centerX}" cy="${centerY}" r="27"/>
       <circle class="cf-goo-blob cf-goo-right" cx="${centerX}" cy="${centerY}" r="27"/>
     </g></g></svg>
-    <button type="button" class="cf-goo-action cf-goo-left" style="left:${centerX-27}px;top:${centerY-27}px" data-action="cfpintoggle" aria-label="${pinned?'상단 고정 해제':'상단에 고정'}" title="${pinned?'상단 고정 해제':'상단에 고정'}" tabindex="-1">${cfFilledPinIcon()}</button>
+    <button type="button" class="cf-goo-action cf-goo-left" style="left:${centerX-27}px;top:${centerY-27}px" data-action="cfpintoggle" aria-label="${pinned?'상단 고정 해제':'상단에 고정'}" title="${pinned?'상단 고정 해제':'상단에 고정'}" tabindex="-1">${pinned?cfUnpinIcon():cfFilledPinIcon()}</button>
     <button type="button" class="cf-goo-action cf-goo-right is-danger" style="left:${centerX-27}px;top:${centerY-27}px" data-action="cfmenudelete" aria-label="폴더 삭제" title="폴더 삭제" tabindex="-1">${icon('trash')}</button>`;
   menu._folderTile=tile;menu._folderKey=key;menu._backdrop=backdrop;menu._focus=focus;
   tile._cfGooMenu=menu;cfHoldMenu=menu;cfHoldMenuTile=tile;
