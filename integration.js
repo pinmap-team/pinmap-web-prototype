@@ -47,6 +47,8 @@
     return `<span class="pm-nav-main" data-nav-target="${index}" style="--nav-index:${index};--nav-shift:${index>=2?1:0}"><span class="pm-nav-indicator" aria-hidden="true"></span>${entry('home','홈','home')}${entry('map','지도','map')}<span class="pm-nav-gap" aria-hidden="true"></span>${entry('library','컬렉션','bookmark')}${entry('my','마이','user')}</span>${typeof homeAddMarkup==='function'?homeAddMarkup():''}`;
   }
   let bottomNav;
+  const showBottomNav=()=>['home','map','library','my'].includes(page)
+    && !detailId && (page!=='library' || (!collection && filter==='전체'));
   function syncBottomNav(){
     const {activePage,index}=navState();
     const dock=bottomNav.querySelector('.pm-nav-main');
@@ -91,6 +93,19 @@
     }
     if (!bottomNav.hasChildNodes()) bottomNav.innerHTML=navMarkup();
     if (!bottomNav.isConnected) document.body.append(bottomNav);
+    bottomNav.hidden=!showBottomNav();
+    if (bottomNav.hidden) {
+      const stage=bottomNav.querySelector('#home-add-menu');
+      if(stage?.dataset.open==='true'){
+        stage.dataset.open='false';
+        stage.classList.remove('is-anticipating');
+        const trigger=stage.querySelector('.home-add-fab');
+        trigger?.setAttribute('aria-expanded','false');
+        trigger?.setAttribute('aria-label','콘텐츠 추가하기');
+        const options=stage.querySelector('.home-add-options');
+        if(options){options.setAttribute('aria-hidden','true');options.inert=true;options.querySelectorAll('button').forEach(button=>{button.tabIndex=-1;});}
+      }
+    }
     syncBottomNav();
   },get element(){return bottomNav}});
   if (typeof document!=='undefined' && document.querySelector('#app .layout,#app .live-map')) window.PinmapBottomNav.mount();
