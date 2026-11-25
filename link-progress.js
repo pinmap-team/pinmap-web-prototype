@@ -13,7 +13,7 @@
           <input id="dl-zip-input" class="dl-zip-input" type="file" accept=".zip,application/zip" aria-label="Instagram ZIP 파일 선택" tabindex="-1"><input id="dl-photo-input" class="dl-zip-input" type="file" accept="image/png,image/jpeg,image/webp" aria-label="캡처 이미지 선택" tabindex="-1"></label>
         <button class="dl-btn dl-paste" id="dl-paste" type="button"><span class="t-text-swap" id="dl-paste-label">붙여넣기</span></button>
       </div><p class="dl-input-error" role="alert" hidden></p></div></div>
-      <div class="dl-body" data-open="true"><div class="dl-body-clip"><div class="dl-head"><div class="dl-texts"><span class="dl-title t-text-swap" id="dl-title"></span><span class="dl-sub" aria-live="polite"><span class="t-text-swap" id="dl-done">0</span>개 처리</span></div>
+      <div class="dl-body" data-open="true"><div class="dl-body-clip"><div class="dl-head"><span class="dl-success-check t-success-check" data-state="out" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M9 25l10 10L40 13" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="dl-texts"><span class="dl-title t-text-swap" id="dl-title"></span><span class="dl-sub" aria-live="polite"><span class="t-text-swap" id="dl-done">0</span>개 처리</span></div>
         <button class="dl-btn t-resize" id="dl-btn" type="button"><span class="t-text-swap" id="dl-btn-label"></span></button>
         <button class="dl-transport" id="dl-transport" type="button" hidden aria-label="일시정지" data-state="pause"><svg class="dl-pause-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><svg class="dl-play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg></button>
         <button class="dl-close" id="dl-close" type="button" aria-label="진행창 접기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" aria-hidden="true"><path d="M6 18 18 6M6 6l12 12"/></svg></button></div>
@@ -21,13 +21,16 @@
       <ul class="dl-list"></ul><p class="dl-error" role="alert" hidden></p>
     </div></div></div><button class="dl-ring" id="dl-ring" type="button" aria-label="진행창 펼치기" tabindex="-1">
       <svg class="dl-ring-svg" viewBox="0 0 64 64" aria-hidden="true"><circle class="dl-ring-track" cx="32" cy="32" r="26"/><circle class="dl-ring-prog" id="dl-ring-prog" cx="32" cy="32" r="26" pathLength="100"/></svg>
-      <span class="dl-ring-center"><span class="dl-ring-pct" id="dl-ring-pct">0%</span><span class="dl-ring-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" aria-hidden="true"><path d="M5.25 12.7033 9.40385 17.37 18.75 6.87"/></svg></span></span>
+      <span class="dl-ring-center"><span class="dl-ring-pct" id="dl-ring-pct">0%</span><span class="dl-ring-check t-success-check" data-state="out" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M9 25l10 10L40 13" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
     </button></div>`;
   document.body.append(stage);
   const get = selector => stage.querySelector(selector);
   const win = get('.dl-card'), full = get('.dl-full'), ring = get('.dl-ring');
   const linkPanel = get('.dl-link'), bodyPanel = get('.dl-body');
   const linkInput = get('#dl-link-input'), zipInput = get('#dl-zip-input'), photoInput = get('#dl-photo-input');
+  for (const path of stage.querySelectorAll('.t-success-check path')) {
+    path.style.setProperty('--success-path-length', String(Math.ceil(path.getTotalLength())));
+  }
   const rows = new Map();
   let current = null, identity = '', minTimer = 0, inputMode = null, inputPending = false, inputDismissed = false;
   let deletePending = false, resumeAfterDeleteDismiss = false;
@@ -368,6 +371,7 @@
     get('.dl-ring-prog').style.strokeDashoffset = String(100 - percent);
     get('.dl-ring-pct').textContent = `${percent}%`;
     ring.classList.toggle('is-done', done);
+    for (const check of stage.querySelectorAll('.t-success-check')) check.dataset.state = done ? 'in' : 'out';
     const error = get('.dl-error'); error.hidden = !state.error; error.textContent = state.error || '';
     const zipJob = state.kind === 'batch' && state.source === 'zip';
     const transport = get('.dl-transport');
