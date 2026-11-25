@@ -2629,6 +2629,7 @@ html body .homecategories .prefchip{padding-top:var(--space-xs)!important;paddin
 .cf-goo-action .cf-unpin-slash{stroke:currentColor;stroke-width:1.1}
 html body svg.solar-pin-bold,html body svg.solar-volume-loud-bold,html body svg.solar-moon-bold{fill:currentColor!important;stroke:none!important}
 html body svg.solar-pin-bold>path:first-child,html body svg.solar-volume-loud-bold>path,html body svg.solar-moon-bold>path{fill:currentColor!important;stroke:none!important}
+html body svg.solar-routing-2-bold,html body svg.solar-routing-2-bold>path{fill:currentColor!important;stroke:none!important}
 html body svg.solar-bill-list-linear>path{fill:none!important;stroke:currentColor!important;stroke-width:1.5px!important}
 .cf-goo-menu[data-open="true"] .cf-goo-action:hover{filter:brightness(1.12)}
 .cf-goo-action:focus-visible{outline:0;filter:brightness(1.2)}
