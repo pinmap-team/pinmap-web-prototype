@@ -3195,3 +3195,87 @@ html body .bottomnav svg .pm-nav-fill,html body .main:has(.myprofile) svg.solar-
 .dl-input-close:focus-visible{outline:2px solid var(--color-neutral);outline-offset:2px}
 .dl-stage:not(.is-input) .dl-input-close{display:none}
 .dl-stage.is-input .dl-input-error{margin:0 12px 12px}
+
+/* 2026-11-25 hand-drawn map layout. Coordinates follow the 402 × 874 Figma frames. */
+html body .lm-drawn-map{--lm-drawn-sheet-height:383px;background:#f5f5f5;color:#282828}
+html body .lm-drawn-map .lm-header{position:absolute;inset:0 0 auto!important;z-index:600;width:100%;height:132px;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;pointer-events:none}
+html body .lm-drawn-map .lm-header::before{content:'';position:absolute;inset:0 0 auto;height:79px;background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,0));pointer-events:none}
+html body .lm-drawn-map .lm-drawn-search{position:absolute;left:17px;right:16px;top:40px;height:53px;display:flex;align-items:center;gap:13px;padding:0 9px 0 17px;border:0;border-radius:30px;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.1);pointer-events:auto}
+html body .lm-drawn-map .lm-drawn-search>.icon{flex:none;width:24px;height:24px;color:#858b95;stroke-width:1.7}
+html body .lm-drawn-map .lm-drawn-search input{flex:1;min-width:0;width:100%;height:100%;padding:0!important;border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;font:400 18px/24px var(--font-family);color:#282828}
+html body .lm-drawn-map .lm-drawn-search input::placeholder{color:#858b95;opacity:1}
+html body .lm-drawn-map .lm-drawn-search input::-webkit-search-cancel-button{display:none}
+html body .lm-drawn-map .lm-drawn-avatar{flex:none;width:35px;height:35px;padding:0;border:0;border-radius:50%;overflow:hidden;background:#d7d7d7!important;display:grid;place-items:center}
+html body .lm-drawn-map .lm-drawn-avatar .pavatar,html body .lm-drawn-map .lm-drawn-avatar img{display:block;width:35px;height:35px;border:0;border-radius:50%;object-fit:cover;background:#d7d7d7}
+html body .lm-drawn-map .lm-drawn-clear{flex:none;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:#f0f2f4!important;color:#282828;display:grid;place-items:center}
+html body .lm-drawn-map .lm-drawn-clear[hidden]{display:none!important}
+html body .lm-drawn-map .lm-drawn-clear svg{width:16px;height:16px}
+html body .lm-drawn-map .lm-header .lm-categories{position:absolute;left:17px;right:17px;top:104px;height:28px;display:flex;justify-content:flex-start;gap:8px;margin:0!important;padding:0!important;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;pointer-events:auto}
+html body .lm-drawn-map .lm-header .lm-categories::-webkit-scrollbar{display:none}
+html body .lm-drawn-map .lm-header .lm-categories button{flex:0 0 65px;min-width:65px;min-height:28px;height:28px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:4px;margin:0;padding:0 5px!important;border:0!important;border-radius:30px!important;background:#fff!important;box-shadow:0 0 20px rgba(0,0,0,.1)!important;color:#282828!important;white-space:nowrap}
+html body .lm-drawn-map .lm-header .lm-categories button.selected{background:#282828!important;color:#fff!important}
+html body .lm-drawn-map .lm-header .lm-categories .lm-category-art{flex:none;width:12px;height:12px;display:grid;place-items:center;color:inherit}
+html body .lm-drawn-map .lm-header .lm-categories .lm-category-art :is(svg,img){display:block;width:12px!important;height:12px!important;transform:none!important}
+html body .lm-drawn-map .lm-header .lm-categories .lm-category-art img{filter:brightness(0)}
+html body .lm-drawn-map .lm-header .lm-categories button.selected .lm-category-art img{filter:brightness(0) invert(1)}
+html body .lm-drawn-map .lm-header .lm-categories button.selected .lm-category-art svg{color:#fff}
+html body .lm-drawn-map .lm-header .lm-categories b,html body .lm-drawn-map .lm-header .lm-categories .selected b{font:500 14px/20px var(--font-family);color:inherit;text-decoration:none}
+html body .lm-drawn-map.is-searching .lm-header .lm-categories{visibility:hidden;pointer-events:none}
+html body .lm-drawn-map .lm-recent,html body .lm-drawn-map .lm-search-results{position:absolute;left:17px;right:16px;top:101px;z-index:615;max-height:min(440px,50dvh);border:0;border-radius:20px;background:#fff;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+html body .lm-drawn-map .lm-status{top:144px;left:17px;right:16px}
+html body .lm-drawn-map .lm-drawn-actions{position:absolute;z-index:650;right:28px;bottom:calc(var(--lm-drawn-sheet-height) + 25px);display:flex;flex-direction:column;gap:10px}
+html body .lm-drawn-map .lm-drawn-actions>button{width:36px;height:36px;min-width:36px;min-height:36px;display:grid;place-items:center;padding:0;border:0!important;border-radius:50%;background:#fff!important;color:#282828;box-shadow:0 0 10px rgba(0,0,0,.1)!important}
+html body .lm-drawn-map .lm-drawn-actions svg{width:22px;height:22px}
+html body .lm-drawn-map .lm-drawn-favorites.is-active svg{fill:#282828}
+html body .lm-drawn-map .lm-selected-host{position:absolute;inset:0!important;z-index:680;pointer-events:none}
+html body .lm-drawn-map .lm-sheet,html body .lm-drawn-map .lm-sheet.is-half{--lm-sheet-height:min(383px,calc(100% - 144px));position:absolute;inset:auto 0 0;height:var(--lm-sheet-height);max-height:none;overflow:hidden;display:flex;flex-direction:column;border:0;border-radius:30px 30px 0 0;background:#fff!important;color:#282828!important;box-shadow:0 -4px 10px rgba(0,0,0,.1);pointer-events:auto}
+html body .lm-drawn-map .lm-sheet.is-peek{--lm-sheet-height:162px}
+html body .lm-drawn-map .lm-sheet.is-full{--lm-sheet-height:100%;border-radius:0}
+html body .lm-drawn-map:has(.lm-sheet.is-full) .lm-drawn-actions{display:none}
+html body .lm-drawn-map .lm-sheet-handle{flex:none;width:100%;height:35px;min-height:35px;display:flex;align-items:flex-start;justify-content:center;padding:11px 0 0!important;background:transparent!important;touch-action:none}
+html body .lm-drawn-map .lm-sheet-handle span{width:57px;height:5px;min-width:57px;min-height:5px;border-radius:100px;background:#8c8c8c}
+html body .lm-drawn-map .lm-drawn-tabs{flex:none;display:flex;gap:0;width:calc(100% - 33px);height:58px;margin:0 16px 0 17px;padding:7px;border-radius:10px;background:#f0f2f4}
+html body .lm-drawn-map .lm-drawn-tabs button{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;min-width:0;height:44px;padding:0!important;border:0!important;border-radius:8px;background:transparent!important;color:#2e2e2e;font:600 18px/24px var(--font-family);white-space:nowrap}
+html body .lm-drawn-map .lm-drawn-tabs button[aria-selected="true"]{background:#fff!important}
+html body .lm-drawn-map .lm-drawn-tabs button svg{width:18px;height:18px;color:#282828;stroke-width:2}
+html body .lm-drawn-map .lm-drawn-tabs button[aria-selected="true"] svg{color:#00ffd4;fill:#00ffd4}
+html body .lm-drawn-map .lm-sheet-scroll{flex:1;min-height:0;overflow:auto;padding:0 0 100px;overscroll-behavior:contain}
+html body .lm-drawn-map .lm-sheet-scroll [hidden]{display:none!important}
+html body .lm-drawn-map .lm-drawn-place-list{padding:6px 17px 0}
+html body .lm-drawn-map .lm-drawn-place-row{position:relative;display:flex;align-items:flex-start;gap:18px;min-height:119px;padding:14px 13px;border-bottom:1px solid #e4e4e4}
+html body .lm-drawn-map .lm-drawn-place-row.is-selected{background:#f8faf9}
+html body .lm-drawn-map .lm-drawn-place-photo{flex:none;width:91px;height:91px;margin:0;overflow:hidden;border-radius:10px;background:#f0f2f4}
+html body .lm-drawn-map .lm-drawn-place-photo img{display:block;width:100%;height:100%;object-fit:cover}
+html body .lm-drawn-map .lm-drawn-place-main{flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch;text-align:left;margin:0;padding:1px 31px 0 0!important;border:0!important;background:transparent!important;color:#282828}
+html body .lm-drawn-map .lm-drawn-place-heading{display:flex;align-items:baseline;gap:8px;min-width:0;white-space:nowrap}
+html body .lm-drawn-map .lm-drawn-place-heading strong{min-width:0;overflow:hidden;text-overflow:ellipsis;font:700 14px/20px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-place-heading small{flex:none;color:#6b6b70;font:400 12px/16px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-place-address{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;color:#282828;font:700 12px/17px var(--font-family);text-decoration:underline;text-underline-offset:2px}
+html body .lm-drawn-map .lm-drawn-place-description{display:-webkit-box;overflow:hidden;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-top:12px;color:#2e2e2e;font:400 12px/17px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-place-row .lm-carousel-heart{position:absolute;top:20px;right:12px;width:28px;height:28px;display:grid;place-items:center;padding:0!important;color:#282828;background:transparent!important;border:0!important;box-shadow:none!important}
+html body .lm-drawn-map .lm-drawn-place-row .lm-carousel-heart svg{width:22px;height:22px;fill:none;stroke:#282828;stroke-width:1.8}
+html body .lm-drawn-map .lm-drawn-place-row .lm-carousel-heart.is-active svg{fill:#282828;stroke:#282828}
+html body .lm-drawn-map .lm-drawn-course-list{display:grid;gap:15px;padding:25px 17px 24px}
+html body .lm-drawn-map .lm-drawn-course-card{position:relative;display:block;width:100%;height:174px;min-height:174px;padding:0!important;overflow:hidden;text-align:left;border:0!important;border-radius:10px!important;background:#fff!important;box-shadow:0 4px 15px rgba(0,0,0,.1)!important}
+html body .lm-drawn-map .lm-drawn-course-copy{position:absolute;inset:16px auto 16px 19px;width:178px;display:block;pointer-events:none}
+html body .lm-drawn-map .lm-drawn-course-copy>strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#282828;font:700 20px/26px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-course-copy>small{display:block;margin-top:1px;color:#909090;font:300 13px/18px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-course-stops{position:absolute;left:0;bottom:0;display:grid;grid-template-columns:85px 85px;grid-template-rows:23px 23px;align-items:center;color:#2e2e2e}
+html body .lm-drawn-map .lm-drawn-course-stops>span{display:flex;align-items:center;gap:3px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:400 12px/19px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-course-stops svg{flex:none;width:19px;height:19px}
+html body .lm-drawn-map .lm-drawn-course-map{position:absolute;right:10px;top:12px;width:158px;height:150px;overflow:hidden;border:1px solid #d7d7d7;border-radius:10px;background:#f0f2f4;pointer-events:none}
+html body .lm-drawn-map .lm-drawn-course-map .leaflet-container{width:100%;height:100%}
+html body .lm-drawn-map .lm-drawn-empty{padding:30px 14px;color:#858b95;text-align:center;font:400 14px/20px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-empty button{display:block;margin:16px auto;padding:8px 16px!important;border-radius:8px;background:#282828!important;color:#fff}
+html body .lm-drawn-map .lm-drawn-marker{z-index:400!important;background:transparent!important;border:0!important}
+html body .lm-drawn-map .lm-drawn-marker-body{position:absolute;left:0;top:0;width:86px;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+html body .lm-drawn-map .lm-drawn-marker-disc{width:34px;height:34px;display:grid;place-items:center;border:2px solid #fff;border-radius:50%;background:#282828;box-shadow:0 0 10px rgba(0,0,0,.15);transition:transform .25s ease}
+html body .lm-drawn-map .lm-drawn-marker-disc :is(svg,img){display:block;width:18px!important;height:18px!important;color:#fff;filter:brightness(0) invert(1)}
+html body .lm-drawn-map .lm-drawn-marker-label{display:block;max-width:86px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#282828;text-align:center;font:700 14px/20px var(--font-family);text-shadow:0 1px 2px #fff,0 -1px 2px #fff}
+html body .lm-drawn-map .lm-drawn-marker.is-selected .lm-drawn-marker-disc{transform:translateY(-6px) scale(1.08)}
+html body .lm-drawn-map .leaflet-control-attribution{margin-bottom:calc(var(--lm-drawn-sheet-height) + 1px)!important;font-size:8px!important}
+html body .lm-drawn-map .lm-map-credits{display:none}
+@media(max-width:360px){html body .lm-drawn-map .lm-header .lm-categories{left:12px;right:12px}html body .lm-drawn-map .lm-drawn-search{left:12px;right:12px}html body .lm-drawn-map .lm-drawn-place-heading small{display:none}}
+@media(prefers-reduced-motion:reduce){html body .lm-drawn-map .lm-drawn-marker-disc{transition:none}}
+html[data-theme="dark"] body .lm-drawn-map{background:#f5f5f5!important;color:#282828!important}
+html[data-theme="dark"] body .lm-drawn-map :is(.lm-drawn-search,.lm-recent,.lm-search-results){background:#fff!important;color:#282828!important}

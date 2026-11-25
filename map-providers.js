@@ -124,7 +124,7 @@
       if (!nativeMap || disposed) return;
       const canvas = host.getBoundingClientRect();
       const headerBounds = header?.getBoundingClientRect();
-      const top = Math.max(0, Math.round((headerBounds?.bottom ?? canvas.top) - canvas.top));
+      const top = host.closest('.lm-drawn-map') ? 0 : Math.max(0, Math.round((headerBounds?.bottom ?? canvas.top) - canvas.top));
       nativeHost.style.top = top + 'px';
       const center = map.containerPointToLatLng([canvas.width / 2, (top + canvas.height) / 2]);
       try {

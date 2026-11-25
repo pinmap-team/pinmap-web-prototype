@@ -26,13 +26,14 @@ test('every backend category maps to its canonical label without inventing place
  assert.equal(item.category,c.label);assert.equal(item.aiClassified,true);assert.equal(item.events.length,0);assert.equal(item.mapLocations.length,0);}
 });
 
-test('map categories include only saved places that can be displayed on the map',()=>{
+test('map categories keep the full scrollable catalog even when no place is saved',()=>{
  const source=fs.readFileSync('map-live.js','utf8');
  const start=source.indexOf('const mapCategories =');
  const end=source.indexOf('  const categoryIcon',start);
  const context={PinmapCategories:categories,savedPlaces:()=>[{categoryId:'cafe'},{categoryId:'cafe'},{categoryId:'exhibition'}],items:[{category:'레시피'},{category:'쇼핑'}]};
  const actual=vm.runInNewContext(source.slice(start,end)+'\nmapCategories()',context);
- assert.deepEqual(Array.from(actual,x=>Array.from(x)),[['all','전체'],['cafe','카페'],['exhibition','전시']]);
+ const expected=[['all','전체'],...categories.all.map(category=>[category.id,category.label])];
+ assert.deepEqual(Array.from(actual,x=>Array.from(x)),expected);
  context.savedPlaces=()=>[];
- assert.deepEqual(Array.from(vm.runInNewContext('mapCategories()',context),x=>Array.from(x)),[['all','전체']]);
+ assert.deepEqual(Array.from(vm.runInNewContext('mapCategories()',context),x=>Array.from(x)),expected);
 });
