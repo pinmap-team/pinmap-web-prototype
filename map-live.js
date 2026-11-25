@@ -31,7 +31,7 @@
   };
   const categoryIcon = (kind,active=false) => kind==='all'?icon(active?'allBold':'all'):PinmapCategories.chipIcon(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind),active);
   const mapChipIcon = (kind,active=false) => kind==='all' ? categoryIcon('all',active) : PinmapCategories.chipIcon(kind,active);
-  const placeTabIcon = () => '<svg class="icon lm-place-tab-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2a9 9 0 0 0-9 9c0 6.45 7.14 11.35 8.36 12.14a1.15 1.15 0 0 0 1.28 0C13.86 22.35 21 17.45 21 11a9 9 0 0 0-9-9Z" fill="currentColor"/></svg>';
+  const placeTabIcon = () => '<svg class="lm-place-tab-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" fill="currentColor"/></svg>';
   const localPhoto = kind => PM_ENV.development ? PM_ENV.placeholderImage : ({eat:'img/brunch.jpg',cafe:'img/cafe.jpg',event:'img/exhibit.jpg',walk:'img/park.jpg',shop:'img/lamp.jpg'})[kind] || 'img/park.jpg';
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
   const round = (name, symbol) => `<button class="lm-round" data-lm="locate" aria-label="${name}" title="${name}">${icon(symbol)}</button>`;
