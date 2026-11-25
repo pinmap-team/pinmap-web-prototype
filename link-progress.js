@@ -33,7 +33,6 @@
   successPath.style.setProperty('--success-path-length', String(Math.ceil(successPath.getTotalLength())));
   const rows = new Map();
   let current = null, identity = '', minTimer = 0, successTimer = 0, inputMode = null, inputPending = false, inputDismissed = false;
-  let deletePending = false, resumeAfterDeleteDismiss = false;
   let zipReadController = null;
   let inputMorphFrame = 0, inputMorphLayer = null;
   let inputCloseTimer = 0;
@@ -457,45 +456,18 @@
     transport.dataset.state = ['paused','failed'].includes(state.phase) ? 'play' : 'pause';
     transport.setAttribute('aria-label', ['paused','failed'].includes(state.phase) ? '작업 재생' : '작업 일시정지');
     get('#dl-btn').hidden = controllable && state.phase !== 'done';
-    get('.dl-close').setAttribute('aria-label', '작업 삭제');
+    get('.dl-close').setAttribute('aria-label', state.phase === 'done' ? '진행창 닫기' : '작업 즉시 취소');
     button(state.phase === 'done' ? '닫기' : state.phase === 'paused' ? '이어하기' : '진행 중', state.phase === 'running');
   }
-  let deleteSource = null;
   function controlledJob() {
     return current?.kind === 'single' ? window.PinmapSaveProgress : window.PinmapZipImport;
   }
-  function deleteCurrentJob() {
-    (deleteSource === 'single' ? window.PinmapSaveProgress : window.PinmapZipImport)?.[deleteSource === 'single' ? 'clear' : 'forget']();
+  get('.dl-close').addEventListener('click', () => {
+    if (!current) return;
+    controlledJob()?.[current.kind === 'single' ? 'clear' : 'forget']();
     inputDismissed = false;
     update();
     document.querySelector('.home-add-fab')?.focus({preventScroll:true});
-  }
-  actions.zipdeleteyes = () => {
-    if (!deletePending) return;
-    deletePending = false;
-    resumeAfterDeleteDismiss = false;
-    document.getElementById('sheet')?.close();
-    deleteCurrentJob();
-  };
-  document.getElementById('sheet')?.addEventListener('close', () => {
-    if (!deletePending) return;
-    deletePending = false;
-    if (!resumeAfterDeleteDismiss) return;
-    resumeAfterDeleteDismiss = false;
-    void (deleteSource === 'single' ? window.PinmapSaveProgress : window.PinmapZipImport)?.resume().catch(error => {
-      const node = get('.dl-error');
-      node.hidden = false;
-      node.textContent = error.message;
-    });
-  });
-  get('.dl-close').addEventListener('click', () => {
-    if (!current) return;
-    deleteSource = current.kind;
-    resumeAfterDeleteDismiss = current.phase === 'running';
-    if (resumeAfterDeleteDismiss) controlledJob()?.pause();
-    deletePending = true;
-    const subject = current.kind === 'single' ? current.source === 'capture' ? '캡처' : '링크' : current.source === 'zip' ? 'ZIP' : '링크';
-    confirmPop(`${subject} 작업을 삭제할까요?`, '진행 기록이 삭제돼요. 이미 저장된 콘텐츠는 그대로 남아요.', 'zipdeleteyes', '작업 삭제', '계속하기');
   });
   get('.dl-transport').addEventListener('click', () => {
     if (!current || current.phase === 'done') return;
@@ -507,7 +479,7 @@
     update();
   });
   document.addEventListener('pointerdown', event => {
-    if (stage.hidden || deletePending || stage.contains(event.target)) return;
+    if (stage.hidden || stage.contains(event.target)) return;
     if (inputMode) { closeInput(); return; }
     if (stage.classList.contains('is-min') || !current) return;
     minimize(true);
