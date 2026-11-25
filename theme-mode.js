@@ -27,7 +27,7 @@
     apply();
   }
   window.PinmapTheme={set,beginPreview(){if(previewMode===null)previewMode=mode;},preview(value){if(Object.hasOwn(labels,value)){previewMode=value;updatePreview();}},commitPreview(){if(previewMode===null)return;const value=previewMode;previewMode=null;set(value);},get mode(){return mode;},label:()=>labels[mode],show(){
-    modal('화면 모드',`<section class="mycard settings"><p class="muted">편하게 볼 수 있는 화면을 선택해 주세요.</p><div class="pm-theme-options" role="group" aria-label="화면 모드">${Object.entries(labels).map(([value,label])=>`<button type="button" data-theme-choice="${value}" aria-pressed="${(previewMode??mode)===value}">${label}</button>`).join('')}</div><p class="hint">기기 설정을 선택하면 기기의 밝은 화면/어두운 화면 설정을 따라가요.</p>
+    modal('화면 모드',`<section class="mycard settings"><p class="muted">편하게 볼 수 있는 화면을 선택해 주세요.</p><div class="pm-theme-options" role="group" aria-label="화면 모드">${Object.entries(labels).map(([value,label])=>`<button type="button" data-theme-choice="${value}" aria-pressed="${(previewMode??mode)===value}">${value==='light'?icon('sun'):value==='dark'?icon('moon'):icon('settings')}${label}</button>`).join('')}</div><p class="hint">기기 설정을 선택하면 기기의 밝은 화면/어두운 화면 설정을 따라가요.</p>
       <div class="pm-theme-preview" data-theme="${resolved(previewMode??mode)}" role="img" aria-label="선택한 화면 모드의 핀맵 홈 미리보기">
         <div class="pm-preview-header"><b>Pinmap</b><span aria-hidden="true">${icon('search')}${icon('bell')}</span></div>
         <div class="pm-preview-card"><img src="img/cafe.jpg" alt=""><div><b>다시 꺼내 보고 싶은 순간</b><small>좋아하는 장소를 모아 보세요</small></div></div>

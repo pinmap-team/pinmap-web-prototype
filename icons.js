@@ -25,7 +25,7 @@ const EMOJI_ICONS = {
 };
 const EMOJI_RE = new RegExp(`(${Object.keys(EMOJI_ICONS).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\uFE0F?`, 'g');
 const EMOJI_TEST = new RegExp(EMOJI_RE.source); // 검사용 (전역 플래그 없음)
-const emojiIcon = e => `<svg class="icon emo" viewBox="0 0 24 24" aria-hidden="true"><path d="${EMOJI_ICONS[e]}"/></svg>`;
+const emojiIcon = e => ({'✨':'spark','ℹ':'info','✈':'plane','📸':'galleryAdd','🔗':'link','🏠':'home'}[e] ? icon({'✨':'spark','ℹ':'info','✈':'plane','📸':'galleryAdd','🔗':'link','🏠':'home'}[e]) : `<svg class="icon emo" viewBox="0 0 24 24" aria-hidden="true"><path d="${EMOJI_ICONS[e]}"/></svg>`);
 const SKIP = new Set(['SCRIPT','STYLE','TEXTAREA','INPUT','OPTION','TITLE','text','tspan']);
 function swapEmoji(root){
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode: n =>

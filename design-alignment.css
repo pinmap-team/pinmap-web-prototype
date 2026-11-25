@@ -2760,7 +2760,7 @@ html body .mgroup.my-section:not(.my-quota) .mrow{padding:0!important}
 /* 2026-11-24: 지도 목록 아이콘의 점은 칠한 원 */
 html body .live-map .lm-list-tab svg.pm-list-icon circle.pm-list-dot{fill:currentColor!important;stroke:none!important;stroke-width:0!important}
 /* 2026-11-24: AI 컨텐츠 요약 아이콘 — gradient 채움·선 */
-html body .dtsum h2.dtai svg.dtai-spark path{fill:url(#dtai-spark-gradient)!important;stroke:url(#dtai-spark-gradient)!important}
+html body .dtsum h2.dtai svg.dtai-spark path{fill:none!important;stroke:currentColor!important}
 /* 2026-11-24: 하단 메뉴 호버 — 흰 글씨 대신 진한 글씨 + 옅은 회색 둥근 배경 */
 @media(hover:hover){
   html body .bottomnav .pm-nav-main .navitem:not(.active):hover,html body .bottomnav .pm-nav-main .navitem:not(.active):hover *{color:var(--color-on-surface)!important}
@@ -3160,3 +3160,14 @@ html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:trans
 .dl-input-error{margin:4px 8px 8px;color:var(--color-error);font:var(--type-body-sm);overflow-wrap:anywhere}
 .dl-input-error[hidden]{display:none}
 @media(prefers-reduced-motion:reduce){.dl-stage,.dl-card,.dl-full,.dl-ring,.dl-ring-center>span,.dl-close,.dl-btn,.dl-bar-fill,.t-text-swap,.dl-link,.dl-body,.dl-link-clip,.dl-body-clip{transition:none!important}}
+
+/* Supplied Solar line icons inherit the existing page colors. */
+html body svg.solar:not(.solar-routing-2-bold):not(.solar-pin-bold):not(.solar-bill-list-linear){fill:none!important;stroke:currentColor!important}
+html body svg.solar:not(.solar-routing-2-bold):not(.solar-pin-bold):not(.solar-bill-list-linear) :is(path,circle,rect,line,polyline){fill:none!important;stroke:currentColor!important;stroke-width:1.5px!important}
+html body .dtsum.dtai-review .dtai-info-button svg{width:20px;height:20px;color:var(--color-secondary)}
+html body .dtsum.dtai-review .dtai-info-button>span{border:0}
+html body .cf-meta .cf-allmark{display:inline-flex;flex:none;align-self:center;color:var(--color-on-surface)}
+html body .cf-meta .cf-allmark svg{width:16px;height:16px}
+html body .dl-field-icon svg{width:20px;height:20px}
+html body .lm-map-credits summary svg{width:18px;height:18px;vertical-align:middle}
+html body .pm-theme-options button svg{width:20px;height:20px;margin-right:6px;vertical-align:middle}

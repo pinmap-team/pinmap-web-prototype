@@ -2,7 +2,7 @@
 // 마이에서 누르는 기능은 아래에서 올라오는 시트 대신 새 페이지로 열리고, 왼쪽 위 ← 로 마이로 돌아가요.
 // 현재 위치 · 관심 키워드 · 알림 · 저장 · 위치/지도 · 저장하는 방법 · 앱 정보 · 핀맵 계정 설정
 
-const MY_PAGES = {calexport:'캘린더로 내보내기', calsettings:'캘린더 설정', calweek:'한 주의 시작 요일', favorites:'즐겨찾기', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리'};
+const MY_PAGES = {settingspage:'설정', calexport:'캘린더로 내보내기', calsettings:'캘린더 설정', calweek:'한 주의 시작 요일', favorites:'즐겨찾기', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리'};
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
 const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
@@ -13,6 +13,17 @@ function myQuickCards(){
     <button type="button" class="myq-card" data-page="courses"><span class="myq-ico" aria-hidden="true">${icon('route')}</span><b>내 코스</b></button>
   </div>`;
 }
+
+pages.settingspage = () => myPage('설정', `<section class="mgroup my-section" aria-label="설정 항목">
+  ${myRow('placesheet',icon('pin'),'위치 설정')}
+  ${myRow('interests',icon('spark'),'관심 키워드 설정')}
+  ${myRow('savesheet',icon('spark'),'저장 설정')}
+  ${myRow('appearance',myScreenModeIcon(),'화면 모드')}
+  ${myRow('notisettings',icon('bell'),'알림 설정')}
+  ${myRow('calsettings',icon('calendar'),'캘린더 설정')}
+  ${myRow('account',icon('user'),'계정 관리')}
+</section>`, 'settingpage');
+actions.settingspage = () => go('settingspage');
 
 /* ---------- 관심 키워드 설정 (온보딩으로 가지 않고 이 페이지에서 바로 바꿔요) ---------- */
 pages.interestset = function(){
