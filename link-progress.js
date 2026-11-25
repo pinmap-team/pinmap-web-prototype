@@ -88,11 +88,15 @@
     stage.classList.toggle('is-min', min);
     full.inert = min;
     ring.tabIndex = min ? 0 : -1;
-    win.style.width = (min ? 64 : 320) + 'px';
-    win.style.height = (min ? 64 : full.offsetHeight) + 'px';
+    const expandedWidth = Math.min(320, Math.max(64, innerWidth - 48));
+    win.style.width = (min ? 64 : expandedWidth) + 'px';
+    if (!min) full.style.maxWidth = expandedWidth + 'px';
+    const expandedHeight = full.offsetHeight;
+    win.style.height = (min ? 64 : expandedHeight) + 'px';
+    if (min) full.style.removeProperty('max-width');
     clearTimeout(minTimer);
     minTimer = setTimeout(() => {
-      if (!min) { win.style.removeProperty('width'); win.style.removeProperty('height'); }
+      if (!min) { win.style.removeProperty('width'); win.style.removeProperty('height'); full.style.removeProperty('max-width'); }
     }, duration('--min-dur', 450) + 40);
     successCheck.dataset.state = 'out';
     if (min && ring.classList.contains('is-done')) {
