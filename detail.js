@@ -88,7 +88,6 @@ detail = function(){
       </div>
     </div>
     <div class="dtmenu" id="dtmenu" role="menu" aria-label="콘텐츠 메뉴" hidden>
-      <button type="button" role="menuitem" data-action="dtshare">${icon('plane')}공유</button>
       <button type="button" role="menuitem" data-action="edit">${icon('pen')}수정</button>
       <button type="button" role="menuitem" class="dtmenu-danger" data-unsave="${x.id}">${icon('trash')}삭제</button>
     </div>
