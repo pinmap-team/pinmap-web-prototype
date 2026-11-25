@@ -1318,6 +1318,9 @@ body:has(.dt-photo) .dt.dt-photo{position:relative;isolation:isolate;padding-bot
 .dt-photo .dtbar>.dtghost{background:var(--color-surface);color:var(--color-on-surface);border:1px solid var(--color-disabled)}
 .dt-photo .dtbar>.dtprimary{background:var(--color-primary);color:var(--color-neutral);border:0}
 .dt-photo .dtbar .icon{width:20px;height:20px;stroke-width:1.6}
+body:has(.dt) .dtbar,.dt.dt-photo .dtbar{bottom:calc(var(--space-xl) + env(safe-area-inset-bottom))}
+body:has(.dt) .dtbar::before,.dt.dt-photo .dtbar::before{bottom:calc(-1 * var(--space-xl) - env(safe-area-inset-bottom))}
+.dt.dt-photo:not(.dt-no-actions) .dtsheet{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.dt.dt-photo .dtsheet{background:var(--color-surface)}}
 
 /* Home schedule: quiet header, readable event rows, compact deadline chips. */
@@ -3136,22 +3139,17 @@ html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:trans
 .dl-field.is-filled{color:var(--color-neutral)}
 .dl-field textarea{width:100%;height:16px;min-height:16px;margin:0;padding:0;border:0;outline:0;resize:none;overflow:hidden;background:transparent;color:var(--color-neutral);font:var(--type-body-sm);white-space:nowrap}
 .dl-field textarea::placeholder{color:color-mix(in srgb,var(--color-neutral) 72%,transparent)}
-.dl-field:focus-within{box-shadow:inset 0 0 0 2px var(--color-accent),inset 0 1px 0 rgba(255,255,255,.17),0 6px 16px rgba(0,0,0,.12)}
+.dl-field:focus-within{box-shadow:inset 0 0 0 1px rgba(255,255,255,.42),inset 0 1px 0 rgba(255,255,255,.17),0 6px 16px rgba(0,0,0,.12)}
 @media(hover:hover) and (pointer:fine){.dl-link-row .dl-paste:hover:not(:disabled){background:linear-gradient(135deg,rgba(255,255,255,.19),rgba(255,255,255,.04)),rgba(0,0,0,.84)}}
 .dl-file-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-body-sm)}
 .dl-zip-input{position:absolute;width:1px;height:1px;opacity:0;clip-path:inset(50%);pointer-events:none}
-.dl-field.is-photo{height:56px;gap:8px;border:0;border-radius:14px;background:var(--color-neutral);box-shadow:none}
-.dl-field.is-photo:focus-within{box-shadow:none}
-.dl-stage.is-input .dl-field.is-photo{color:var(--color-neutral);background:linear-gradient(135deg,rgba(255,255,255,.13),rgba(255,255,255,.02)),rgba(0,0,0,.88);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18),inset 0 1px 0 rgba(255,255,255,.17)}
-.dl-stage.is-input .dl-field.is-photo:focus-within{box-shadow:inset 0 0 0 2px var(--color-accent)}
+.dl-field.is-photo{gap:8px}
 .dl-stage.is-input .dl-field.is-photo .dl-field-icon{color:inherit}
 .dl-field-icon{flex:none;color:var(--stage-muted)}
 .dl-field-icon[hidden]{display:none}
 .dl-photo-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;font:var(--type-body-sm)}
 .dl-photo-thumb{flex:none;width:28px;height:28px;border-radius:50%;object-fit:cover}
-[data-theme="dark"] .dl-field.is-photo{background:var(--color-neutral);box-shadow:none}
-[data-theme="dark"] .dl-stage.is-input .dl-field.is-photo{color:var(--color-primary);background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.02)),rgba(0,0,0,.72);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18),inset 0 1px 0 rgba(255,255,255,.17)}
-[data-theme="dark"] .dl-link-row .dl-paste,[data-theme="dark"] .dl-field:not(.is-photo){background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.02)),rgba(0,0,0,.72);color:var(--color-primary)}
+[data-theme="dark"] .dl-link-row .dl-paste,[data-theme="dark"] .dl-field{background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.02)),rgba(0,0,0,.72);color:var(--color-primary)}
 @media(hover:hover) and (pointer:fine){[data-theme="dark"] .dl-link-row .dl-paste:hover:not(:disabled){background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.04)),rgba(0,0,0,.68)}}
 [data-theme="dark"] .dl-field textarea{color:var(--color-primary)}
 [data-theme="dark"] .dl-field textarea::placeholder{color:color-mix(in srgb,var(--color-primary) 72%,transparent)}
