@@ -243,7 +243,7 @@
       update();
       return;
     }
-    if (window.PinmapSaveProgress?.isRunning()) {
+    if (window.PinmapSaveProgress?.isActive()) {
       inputMode = null;
       update();
       return;
@@ -383,7 +383,7 @@
     const state = showSingle ? {kind:'single',source:single.kind,phase:single.phase,total:1,processed:single.phase === 'done' ? 1 : 0,
       entries:[{index:0,url:document.querySelector('#saveform #es-url')?.value || '',
         label:single.kind === 'capture' ? photoName || '캡처 이미지' : '',
-        status:single.phase === 'done' ? 'saved' : single.phase === 'failed' ? 'paused' : 'running'}],
+        status:single.phase === 'done' ? 'saved' : ['paused','failed'].includes(single.phase) ? 'paused' : 'running'}],
       error:single.error || ''} : batch ? {...batch,kind:'batch'} : null;
     const enteredProgress = inputMode && inputPending && state?.phase === 'running' &&
       (inputMode === 'photo' ? state.kind === 'single' && state.source === 'capture' :
@@ -422,19 +422,21 @@
     ring.classList.toggle('is-done', done);
     for (const check of stage.querySelectorAll('.t-success-check')) check.dataset.state = done ? 'in' : 'out';
     const error = get('.dl-error'); error.hidden = !state.error; error.textContent = state.error || '';
-    const zipJob = state.kind === 'batch' && state.source === 'zip';
+    const controllable = state.kind === 'single' || state.kind === 'batch';
     const transport = get('.dl-transport');
-    transport.hidden = !zipJob || state.phase === 'done';
-    transport.dataset.state = state.phase === 'paused' ? 'play' : 'pause';
-    transport.setAttribute('aria-label', state.phase === 'paused' ? 'ZIP 작업 재생' : 'ZIP 작업 일시정지');
-    get('#dl-btn').hidden = zipJob && state.phase !== 'done';
-    get('.dl-close').setAttribute('aria-label', zipJob ? 'ZIP 작업 삭제' : '진행창 접기');
-    button(state.kind === 'single' ? (state.phase === 'running' ? '진행 중' : '닫기')
-      : state.phase === 'paused' ? '이어하기' : state.phase === 'running' ? '일시정지' : '닫기',
-      state.kind === 'single' && state.phase === 'running');
+    transport.hidden = !controllable || state.phase === 'done';
+    transport.dataset.state = ['paused','failed'].includes(state.phase) ? 'play' : 'pause';
+    transport.setAttribute('aria-label', ['paused','failed'].includes(state.phase) ? '작업 재생' : '작업 일시정지');
+    get('#dl-btn').hidden = controllable && state.phase !== 'done';
+    get('.dl-close').setAttribute('aria-label', '작업 삭제');
+    button(state.phase === 'done' ? '닫기' : state.phase === 'paused' ? '이어하기' : '진행 중', state.phase === 'running');
   }
-  function deleteZipJob() {
-    window.PinmapZipImport?.forget();
+  let deleteSource = null;
+  function controlledJob() {
+    return current?.kind === 'single' ? window.PinmapSaveProgress : window.PinmapZipImport;
+  }
+  function deleteCurrentJob() {
+    (deleteSource === 'single' ? window.PinmapSaveProgress : window.PinmapZipImport)?.[deleteSource === 'single' ? 'clear' : 'forget']();
     inputDismissed = false;
     update();
     document.querySelector('.home-add-fab')?.focus({preventScroll:true});
@@ -444,30 +446,33 @@
     deletePending = false;
     resumeAfterDeleteDismiss = false;
     document.getElementById('sheet')?.close();
-    deleteZipJob();
+    deleteCurrentJob();
   };
   document.getElementById('sheet')?.addEventListener('close', () => {
     if (!deletePending) return;
     deletePending = false;
     if (!resumeAfterDeleteDismiss) return;
     resumeAfterDeleteDismiss = false;
-    void window.PinmapZipImport?.resume().catch(error => {
+    void (deleteSource === 'single' ? window.PinmapSaveProgress : window.PinmapZipImport)?.resume().catch(error => {
       const node = get('.dl-error');
       node.hidden = false;
       node.textContent = error.message;
     });
   });
   get('.dl-close').addEventListener('click', () => {
-    if (current?.kind !== 'batch' || current.source !== 'zip') { minimize(true,true); return; }
+    if (!current) return;
+    deleteSource = current.kind;
     resumeAfterDeleteDismiss = current.phase === 'running';
-    if (resumeAfterDeleteDismiss) window.PinmapZipImport?.pause();
+    if (resumeAfterDeleteDismiss) controlledJob()?.pause();
     deletePending = true;
-    confirmPop('ZIP 작업을 삭제할까요?', '진행 기록이 삭제돼요. 이미 저장된 콘텐츠는 그대로 남아요.', 'zipdeleteyes', '작업 삭제', '계속하기');
+    const subject = current.kind === 'single' ? current.source === 'capture' ? '캡처' : '링크' : current.source === 'zip' ? 'ZIP' : '링크';
+    confirmPop(`${subject} 작업을 삭제할까요?`, '진행 기록이 삭제돼요. 이미 저장된 콘텐츠는 그대로 남아요.', 'zipdeleteyes', '작업 삭제', '계속하기');
   });
   get('.dl-transport').addEventListener('click', () => {
-    if (current?.kind !== 'batch' || current.source !== 'zip') return;
-    if (current.phase === 'running') window.PinmapZipImport?.pause();
-    else if (current.phase === 'paused') void window.PinmapZipImport?.resume().catch(error => {
+    if (!current || current.phase === 'done') return;
+    const job = controlledJob();
+    if (current.phase === 'running') job?.pause();
+    else if (['paused','failed'].includes(current.phase)) void job?.resume().catch(error => {
       const node = get('.dl-error'); node.hidden = false; node.textContent = error.message;
     });
     update();
@@ -521,11 +526,7 @@
   });
   get('#dl-btn').addEventListener('click', () => {
     if (!current) return;
-    if (current.kind === 'batch') {
-      if (current.phase === 'running') window.PinmapZipImport.pause();
-      else if (current.phase === 'paused') void window.PinmapZipImport.resume().catch(error => { get('.dl-error').hidden = false; get('.dl-error').textContent = error.message; });
-      else window.PinmapZipImport.forget();
-    } else if (current.phase !== 'running') window.PinmapSaveProgress.clear();
+    if (current.phase === 'done') controlledJob()?.[current.kind === 'single' ? 'clear' : 'forget']();
     update();
   });
   window.addEventListener('pinmap:save-progress', update);
