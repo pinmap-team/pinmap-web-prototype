@@ -621,7 +621,7 @@ button[aria-busy="true"]>*{visibility:hidden}
 @keyframes t-badge-slide-in{from{transform:translate(var(--badge-offset-x),var(--badge-offset-y))}to{transform:translate(0,0)}}
 .main>.topbar .bellbtn .t-badge{position:absolute;inset:0;pointer-events:none;will-change:transform}
 .main>.topbar .bellbtn .t-badge[data-open="true"][data-motion="enter"]{animation:t-badge-slide-in var(--badge-slide-dur) var(--badge-slide-ease)}
-.main>.topbar .bellbtn .t-badge-dot{display:grid;place-items:center;transform-origin:center;transform:scale(1);opacity:1;filter:blur(0);transition:transform var(--badge-pop-dur) var(--badge-pop-ease),opacity var(--badge-fade-dur) var(--badge-pop-ease),filter var(--badge-pop-dur) var(--badge-pop-ease);will-change:transform,opacity,filter}
+.main>.topbar .bellbtn .t-badge-dot{display:grid;place-items:center;border:0!important;transform-origin:center;transform:scale(1);opacity:1;filter:blur(0);transition:transform var(--badge-pop-dur) var(--badge-pop-ease),opacity var(--badge-fade-dur) var(--badge-pop-ease),filter var(--badge-pop-dur) var(--badge-pop-ease);will-change:transform,opacity,filter}
 .main>.topbar .bellbtn .t-badge[data-open="false"] .t-badge-dot{transform:scale(0);opacity:0;filter:blur(var(--badge-blur));transition:transform var(--badge-pop-close-dur) var(--badge-close-ease),opacity var(--badge-fade-close-dur) var(--badge-close-ease),filter var(--badge-pop-close-dur) var(--badge-close-ease)}
 @media(prefers-reduced-motion:reduce){.main>.topbar .bellbtn .t-badge,.main>.topbar .bellbtn .t-badge-dot{animation:none!important;transition:none!important}}
 /* 2026-11-14: reference dock, expanded active capsule and outline icons. */
