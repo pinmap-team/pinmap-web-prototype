@@ -10,7 +10,7 @@
   };
   let navMaskSeq=0;
   const navGlyph=(name,active)=>{
-    if(name==='home')return solarIcon('home').replace('class="solar solar-home-linear icon"','class="solar solar-home-linear icon pm-nav-glyph"');
+    if(name==='home')return solarIcon(active?'homeBold':'home').replace(' icon"',' icon pm-nav-glyph"');
     const g=NAV_GLYPHS[name];
     if(!active)return `<svg class="icon pm-nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="${g.outline}${g.detail?' '+g.detail:''}"/></svg>`;
     const id=`pm-nav-cut-${name}-${++navMaskSeq}`;
