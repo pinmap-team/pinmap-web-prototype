@@ -336,6 +336,11 @@
     liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); if(searchOpen&&searchQuery&&!expandedKey)searchPlaces(searchQuery); });
     requestAnimationFrame(() => liveMap?.invalidateSize());
   }
+  // Account pages can finish loading after the map opens. Rebuild its pins and
+  // categories once the final set of saved places is available.
+  window.addEventListener('pinmap:account-loaded', () => {
+    if (page === 'map' && !detailId && liveMap) render();
+  });
   pages.map=content; // Register the active map renderer with the shared route policy.
   render = function() {
     categoryObserver?.disconnect();
