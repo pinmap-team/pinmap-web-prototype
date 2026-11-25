@@ -3035,7 +3035,8 @@ html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:trans
 [data-theme="dark"] .dl-card{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05));box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 1px 0 0 rgba(255,255,255,.22),0 12px 32px -6px rgba(0,0,0,.5)}
 .dl-stage.is-input .dl-card{color:var(--color-neutral);background:linear-gradient(135deg,rgba(255,255,255,.11),rgba(255,255,255,.02)),rgba(0,0,0,.82);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),inset 0 1px 0 rgba(255,255,255,.16),0 12px 32px -6px rgba(0,0,0,.28),0 1px 3px rgba(0,0,0,.12)}
 [data-theme="dark"] .dl-stage.is-input .dl-card{color:var(--color-primary);background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.02)),rgba(0,0,0,.72)}
-.dl-card.is-min{border-radius:32px}.dl-full{box-sizing:border-box;width:320px;max-width:100%;padding:16px;transform-origin:bottom right;transition:opacity var(--min-dur) var(--min-ease),filter var(--min-dur) var(--min-ease),transform var(--min-dur) var(--min-ease)}
+.dl-card.is-min{border-radius:32px}.dl-card.is-min.is-min-settled{overflow:visible}.dl-full{box-sizing:border-box;width:320px;max-width:100%;padding:16px;transform-origin:bottom right;transition:opacity var(--min-dur) var(--min-ease),filter var(--min-dur) var(--min-ease),transform var(--min-dur) var(--min-ease)}
+.dl-card.is-min.is-success{background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
 .dl-stage.is-min .dl-card{position:absolute;right:0;bottom:0}
 .dl-card.is-min .dl-full{position:absolute;bottom:0;right:0;opacity:0;filter:blur(var(--min-blur));transform:scale(.96);pointer-events:none}
 .dl-head{display:flex;align-items:center;gap:8px;padding:8px 8px 0}.dl-texts{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -3068,8 +3069,8 @@ html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:trans
 .dl-ring-track,.dl-ring-prog{fill:none;stroke-width:4}.dl-ring-track{stroke:rgba(0,0,0,.1)}[data-theme="dark"] .dl-ring-track{stroke:rgba(255,255,255,.14)}
 .dl-ring-prog{stroke:var(--check-green);stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100}
 .dl-ring-center{position:absolute;inset:0;display:grid;place-items:center}.dl-ring-center>span{grid-area:1/1;font:var(--type-body-sm);font-variant-numeric:tabular-nums;transition:opacity var(--min-dur) var(--min-ease),filter var(--min-dur) var(--min-ease),transform var(--min-dur) var(--min-ease)}
-.dl-ring-check{display:grid;place-items:center;color:var(--check-green);opacity:0;filter:blur(var(--min-blur));transform:scale(.25)}
-.dl-ring.is-done .dl-ring-pct{opacity:0;filter:blur(var(--min-blur));transform:scale(.5)}.dl-ring.is-done .dl-ring-check{opacity:1;filter:blur(0);transform:scale(1)}
+.dl-ring.is-done .dl-ring-svg{opacity:0}
+.dl-ring.is-done .dl-ring-pct{opacity:0;transition:none}
 /* Completion animates the supplied Success check in the minimized progress ring. */
 .dl-stage{--check-opacity-dur:500ms;--check-rotate-dur:500ms;--check-rotate-from:80deg;--check-bob-dur:500ms;--check-y-amount:40px;--check-blur-dur:500ms;--check-blur-from:10px;--check-path-dur:500ms;--check-path-delay:80ms;--check-ease-out:cubic-bezier(.22,1,.36,1);--check-ease-opacity:cubic-bezier(.22,1,.36,1);--check-ease-rotate:cubic-bezier(.22,1,.36,1);--check-ease-bob:cubic-bezier(.34,1.35,.64,1);--check-ease-path:cubic-bezier(.22,1,.36,1)}
 .dl-stage .t-success-check{display:inline-block;transform-origin:center;opacity:0;will-change:transform,opacity,filter}
@@ -3077,7 +3078,8 @@ html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:trans
 .dl-stage .t-success-check svg path{stroke-dasharray:var(--success-path-length,42);stroke-dashoffset:var(--success-path-length,42)}
 .dl-stage .t-success-check[data-state="in"]{animation:t-check-fade var(--check-opacity-dur) var(--check-ease-opacity) forwards,t-check-rotate var(--check-rotate-dur) var(--check-ease-rotate) forwards,t-check-blur var(--check-blur-dur) var(--check-ease-out) forwards,t-check-bob var(--check-bob-dur) var(--check-ease-bob) forwards}
 .dl-stage .t-success-check[data-state="in"] svg path{animation:t-check-draw var(--check-path-dur) var(--check-ease-path) var(--check-path-delay) forwards}
-.dl-ring-center>.dl-ring-check{display:grid;place-items:center;width:24px;height:24px}
+.dl-stage .dl-ring-success{position:absolute;inset:0;width:64px;height:64px;color:var(--check-green)}
+.dl-stage .dl-ring-success svg{width:64px;height:64px}
 @keyframes t-check-fade{from{opacity:0}to{opacity:1}}
 @keyframes t-check-rotate{from{transform:rotate(var(--check-rotate-from))}to{transform:rotate(0deg)}}
 @keyframes t-check-blur{from{filter:blur(var(--check-blur-from))}to{filter:blur(0)}}
