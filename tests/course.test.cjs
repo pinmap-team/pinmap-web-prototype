@@ -167,3 +167,32 @@ test('one saved post contributes two separately selectable course places',async(
   const saved=JSON.parse(a.storage.get('pinmap-courses-v1'));
   assert.deepEqual(saved[0].days[0].map(stop=>stop.id),['place:post-20:0','place:post-20:1']);
 });
+
+test('drawn map course preview shows each saved stop photo beside its route point',()=>{
+  const seed=[{id:'route-1',title:'성수 코스',date:'2026-10-11',days:[[{id:'place:1:0',time:'09:00'},{id:'place:4:0',time:'11:00'}]]}];
+  const a=app({'pinmap-courses-v1':JSON.stringify(seed)});
+  a.context.items[0].photo='https://example.com/first.jpg';
+  a.context.items[1].photo='https://example.com/second.jpg';
+  const icons=[];
+  const map={setView(){return this},fitBounds(){},getSize:()=>({x:158,y:150}),
+    latLngToContainerPoint:point=>({x:point[1]<127.045?35:120,y:point[1]<127.045?35:110}),
+    attributionControl:{remove(){}},remove(){}};
+  const layer=()=>({addTo(){}});
+  const L={map:()=>map,polyline:layer,circleMarker:layer,divIcon:options=>options,
+    marker:(point,options)=>{icons.push(options.icon);return layer()}};
+  a.context.L=L;a.context.window.L=L;
+  a.context.window.attachPinmapBasemap=()=>{};
+  a.context.document.querySelectorAll=selector=>selector==='[data-course-map]'?[{
+    classList:{contains:className=>className==='lm-drawn-course-map'},dataset:{courseMap:'route-1'}
+  }]:[];
+  a.context.window.mountCourseThumbnails();
+  assert.equal(icons.length,2);
+  assert(icons.every(icon=>icon.className==='course-preview-marker'));
+  assert.match(icons[0].html,/first\.jpg/);
+  assert.match(icons[1].html,/second\.jpg/);
+  icons.forEach((icon,index)=>{
+    const top=[35,110][index]-icon.iconAnchor[1];
+    assert(top>=4&&top+28<=146);
+    assert(Math.abs(icon.iconAnchor[1])>=9);
+  });
+});

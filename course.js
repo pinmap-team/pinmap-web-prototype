@@ -74,6 +74,14 @@
   // 지도 화면의 장소 핀과 같은 원형 사진 핀 + 순서 번호
   // 사진은 잘리지 않게 원 안에 전부 보이고(contain), 남는 자리는 같은 사진을 흐리게 채워요 (지도 화면 핀과 같은 방식)
   const photoPin=(place,index,size)=>{const src=esc(thumbnail(place));return `<span class="course-photo-pin is-${size}"><span class="course-photo-pin-img"><img class="course-photo-pin-back" src="${src}" alt=""><img class="course-photo-pin-front" src="${src}" alt=""></span><i>${index+1}</i></span>`;};
+  const previewPhoto=place=>`<span class="course-preview-photo"><img src="${esc(thumbnail(place))}" alt=""></span>`;
+  function previewPhotoAnchor(map,point,index){
+    const size=map.getSize(),pixel=map.latLngToContainerPoint(point),photo=28,gap=9;
+    const above=pixel.y-photo-gap,below=pixel.y+gap;
+    const top=index%2===0?(below+photo<=size.y-4?below:above):(above>=4?above:below);
+    const left=Math.max(4,Math.min(size.x-photo-4,pixel.x-photo/2));
+    return [pixel.x-left,pixel.y-top];
+  }
   // 코스의 장소(지도 핀 · 순서 카드)를 누르면 그 장소가 나온 게시물 상세로 이동해요. 뒤로 가면 코스로 돌아와요.
   const openStopDetail=(place,trigger)=>{const item=place?.sourceItem;if(!item||typeof openDetail!=='function')return;window.pmDetailPlace={id:place.id,index:place.locationIndex};openDetail(item.id,trigger);};
   pageName.course='코스 만들기';
@@ -149,7 +157,9 @@
         L.polyline(points.map(stop=>stop.point),{color:drawn?'#282828':cssVar('--color-on-surface'),weight:drawn?2.5:2,opacity:drawn?1:.8,lineJoin:'round',interactive:false}).addTo(map);
       }
       points.forEach(({point})=>L.circleMarker(point,{radius:drawn?4:2.5,weight:0,fillColor:drawn?'#282828':cssVar('--color-on-surface'),fillOpacity:1,interactive:false}).addTo(map));
-      if(!drawn)points.forEach(({point,index})=>L.marker(point,{interactive:false,keyboard:false,icon:L.divIcon({className:'course-photo-marker',html:photoPin(stops[index],index,'sm'),iconSize:[28,28],iconAnchor:[14,14]})}).addTo(map));
+      points.forEach(({point,index})=>L.marker(point,{interactive:false,keyboard:false,icon:L.divIcon(drawn?{
+        className:'course-preview-marker',html:previewPhoto(stops[index]),iconSize:[28,28],iconAnchor:previewPhotoAnchor(map,point,index)
+      }:{className:'course-photo-marker',html:photoPin(stops[index],index,'sm'),iconSize:[28,28],iconAnchor:[14,14]})}).addTo(map));
       window.attachPinmapBasemap(map,undefined,{places:stops.map(mapPlace)});
       map.attributionControl.remove();
     });
