@@ -111,6 +111,19 @@ test('a selected domestic Google Places coordinate uses Google for its attributi
   assert.equal(app.host.dataset.mapProvider,'google');
 });
 
+test('visible Google Places badges switch the background to Google and restore Naver when filtered out',async()=>{
+  const app=setup({defaultProvider:'naver',available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'});
+  const controller=app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'naver');
+  controller.setPlaces([{lat:37.5,lng:127,coordinateSource:'google_places'}]);
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'google');
+  controller.setPlaces([{lat:37.5,lng:127,coordinateSource:'naver'}]);
+  await flush();
+  assert.equal(app.host.dataset.mapProvider,'naver');
+});
+
 test('map center outside Korea also uses Google and returns on moving home',async()=>{
   const app=setup({defaultProvider:'naver',available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'});
   app.map.getCenter=()=>({lat:48.85,lng:2.35});
