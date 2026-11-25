@@ -25,7 +25,10 @@
     {id:13, lat:37.5447, lng:127.0557, kind:'event', image:'img/popup-store.jpg'}, // 성수 오브젝트 팝업 (예시 위치)
     {id:9, lat:37.7720, lng:128.9470, kind:'walk', image:'img/sea-room.jpg'}  // 바다 앞 작은 숙소 · 강릉 (예시 위치)
   ];
-  const mapCategories = () => [['all','전체'],...PinmapCategories.all.map(c=>[c.id,c.label])];
+  const mapCategories = () => {
+    const saved = new Set(savedPlaces().map(place=>place.categoryId));
+    return [['all','전체'],...PinmapCategories.all.filter(c=>saved.has(c.id)).map(c=>[c.id,c.label])];
+  };
   const categoryIcon = (kind,active=false) => kind==='all'?icon(active?'allBold':'all'):PinmapCategories.icon(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind),active);
   const localPhoto = kind => PM_ENV.development ? PM_ENV.placeholderImage : ({eat:'img/brunch.jpg',cafe:'img/cafe.jpg',event:'img/exhibit.jpg',walk:'img/park.jpg',shop:'img/lamp.jpg'})[kind] || 'img/park.jpg';
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
@@ -68,7 +71,7 @@
         <h1 class="lm-sr-only">지도에서 저장한 장소 찾기</h1>
         <form class="lm-drawn-search" id="lm-search" role="search">${icon('search')}<input name="q" type="search" enterkeyhint="search" aria-label="지도 저장 장소 검색" placeholder="근처 장소 검색" value="${safe(searchQuery)}" autocomplete="off" maxlength="80"><button type="button" class="lm-drawn-clear" data-lm="clear-search" aria-label="검색어 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button><button type="button" class="lm-drawn-avatar" data-page="my" aria-label="마이페이지">${avatarHtml('lm-map-avatar')}</button></form>
         <section class="cf-recent lm-recent" id="lm-recent" aria-label="최근 지도 검색어" ${searchOpen&&!searchQuery.trim()?'':'hidden'}>${mapRecentContent()}</section>
-        <div class="lm-categories" role="group" aria-label="지도 카테고리">${mapCategories().map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id,category===id)}</span><b>${safe(label)}</b></button>`).join('')}</div>
+        <div class="lm-categories" role="group" aria-label="지도 카테고리">${mapCategories().map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="prefchip ${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art${id==='all'?'':' pm-category-mask'}" ${id==='all'?'':`data-cat="${safe(id)}" aria-hidden="true" style="--pm-cat-icon:url('img/category/${safe(id)}-inactive.svg')"`}>${id==='all'?categoryIcon(id,category===id):''}</span><b>${safe(label)}</b></button>`).join('')}</div>
       </header>
       <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">${icon('info')}</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p data-map-credit>지도 연결 중</p></div></details>
       <div class="lm-status" role="status" hidden></div>
@@ -118,7 +121,7 @@
       if(selected)button.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});
       button.classList.toggle('selected',selected);
       button.setAttribute('aria-pressed',String(selected));
-      const art=button.querySelector('.lm-category-art');if(art)art.innerHTML=categoryIcon(button.dataset.lmCat,selected);
+      const art=button.querySelector('.lm-category-art');if(art&&button.dataset.lmCat==='all')art.innerHTML=categoryIcon('all',selected);
     });
     alignCategoryIndicator(bar);
   }
