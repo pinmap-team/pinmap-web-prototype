@@ -126,6 +126,10 @@
     const list = searchResults || savedPlaces();
     return list.filter(x => (category === 'all' || (x.categoryId || PinmapCategories.get(x.kind)?.id) === category) && (!favoritesOnly || x.favorite));
   }
+  function syncProviderPlaces(list=visiblePlaces()) {
+    const bounds=liveMap?.getBounds().pad(1);
+    mapProviderController?.setPlaces(bounds?list.filter(place=>bounds.contains([place.lat,place.lng])):list);
+  }
   const placeKey=place=>place.saved&&place.placeId?place.placeId:`search:${place.id}${place.locationIndex==null?'':':'+place.locationIndex}`;
   function markerIcon(place,expanded=false) {
     return L.divIcon({className:`lm-photo-marker lm-drawn-marker${expanded?' is-selected':''}`,
@@ -240,7 +244,7 @@
     host.innerHTML=`<section class="lm-sheet is-${sheetStage}" aria-label="지도 목록">
       <button type="button" class="lm-sheet-handle" aria-label="지도 목록 높이 조절" aria-expanded="${sheetStage!=='peek'}"><span></span></button>
       <div class="lm-drawn-tabs" role="tablist" aria-label="지도 목록 종류"><button type="button" role="tab" id="lm-tab-places" data-lm="show-places" aria-selected="${panelTab==='places'}" aria-controls="lm-panel-places">${icon('pin')}<span>근처 장소</span></button><button type="button" role="tab" id="lm-tab-courses" data-lm="show-courses" aria-selected="${panelTab==='courses'}" aria-controls="lm-panel-courses">${icon('route')}<span>코스</span></button></div>
-      <div class="lm-sheet-scroll"><section id="lm-panel-places" role="tabpanel" aria-labelledby="lm-tab-places" ${panelTab==='places'?'':'hidden'}><div class="lm-drawn-place-list">${list.length?list.map(place=>`<article class="lm-drawn-place-row${placeKey(place)===expandedKey?' is-selected':''}" data-place-key="${safe(placeKey(place))}">${PinmapPlacePhotos.markup(place.backendId,place.locationIndex,place.image||localPhoto(place.kind),'lm-drawn-place-photo')}<button type="button" class="lm-drawn-place-main" data-lm="open-place" data-place-key="${safe(placeKey(place))}" aria-label="${safe(place.title)} 상세 보기"><span class="lm-drawn-place-heading"><strong>${safe(place.title)}</strong><small>${safe(place.category||'장소')}</small></span><span class="lm-drawn-place-address">${safe(place.address||'주소 정보 없음')}</span><span class="lm-drawn-place-description">${safe(place.description||place.searchSummary||'')}</span></button>${favoriteButton(place)}</article>`).join(''):'<p class="lm-drawn-empty">이 근처에 저장한 장소가 없어요.</p>'}</div></section>
+      <div class="lm-sheet-scroll"><section id="lm-panel-places" role="tabpanel" aria-labelledby="lm-tab-places" ${panelTab==='places'?'':'hidden'}><div class="lm-drawn-place-list">${list.length?list.map(place=>`<article class="lm-drawn-place-row${placeKey(place)===expandedKey?' is-selected':''}" data-lm="select-place" data-place-key="${safe(placeKey(place))}">${PinmapPlacePhotos.markup(place.backendId,place.locationIndex,place.image||localPhoto(place.kind),'lm-drawn-place-photo')}<div class="lm-drawn-place-copy"><button type="button" class="lm-drawn-place-main" aria-label="${safe(place.title)} 지도에서 보기"><span class="lm-drawn-place-heading"><strong>${safe(place.title)}</strong><small>${safe(place.category||'장소')}</small></span></button><button type="button" class="lm-drawn-place-address" data-lm="open-place" data-place-key="${safe(placeKey(place))}" aria-label="${safe(place.title)} 상세 보기, ${safe(place.address||'주소 정보 없음')}">${safe(place.address||'주소 정보 없음')}</button><span class="lm-drawn-place-description">${safe(place.description||place.searchSummary||'')}</span></div>${favoriteButton(place)}</article>`).join(''):'<p class="lm-drawn-empty">이 근처에 저장한 장소가 없어요.</p>'}</div></section>
       <section id="lm-panel-courses" role="tabpanel" aria-labelledby="lm-tab-courses" ${panelTab==='courses'?'':'hidden'}><div class="lm-drawn-course-list">${courses.length?courses.map(saved=>`<button type="button" class="lm-drawn-course-card${saved.id===selectedCourseId?' is-selected':''}" data-lm="open-course" data-course-id="${safe(saved.id)}" aria-label="${safe(saved.title)}, 장소 ${saved.places.length}곳 코스 열기"><span class="lm-drawn-course-copy"><strong>${safe(saved.title)}</strong><small>${safe(saved.date.replace(/-/g,'/'))}</small><span class="lm-drawn-course-stops">${saved.places.slice(0,4).map(place=>`<span>${icon('pin')}${safe(place.title)}</span>`).join('')}</span></span><span class="lm-drawn-course-map course-map-pattern${saved.places.some(place=>place.lat!=null&&place.lng!=null)?'':' is-empty'}" data-course-map="${safe(saved.id)}" role="img" aria-label="${safe(saved.title)} 경로 미리보기"></span></button>`).join(''):'<div class="lm-drawn-empty"><p>아직 저장한 코스가 없어요.</p><button type="button" data-course-new>새 코스 만들기</button></div>'}</div></section></div>
     </section>`;
     bindSheetHandle(host.querySelector('.lm-sheet'));
@@ -307,12 +311,20 @@
       row?.scrollIntoView({behavior:'smooth',block:'nearest'});
     }
     const resultsPanel=$('#lm-search-results');if(resultsPanel)resultsPanel.hidden=true;
-    if(moveMap)liveMap.setView([place.lat,place.lng],Math.max(liveMap.getZoom(),15),{animate:true});
+    if(moveMap){
+      const zoom=Math.max(liveMap.getZoom(),15),size=liveMap.getSize();
+      const visibleTop=$('#app .lm-header')?.offsetHeight||132;
+      const visibleBottom=size.y-($('#lm-selected-place .lm-sheet')?.offsetHeight||383);
+      const badgeY=visibleBottom>visibleTop+80?(visibleTop+visibleBottom)/2:size.y/2;
+      const centerPoint=liveMap.project([place.lat,place.lng],zoom).add([0,size.y/2-badgeY]);
+      liveMap.setView(liveMap.unproject(centerPoint,zoom),zoom,{animate:true});
+    }
   }
   function markers() {
     if (!liveMap) return;
     clearSelection();markerEntries.clear();pinLayer.clearLayers();
     const list = visiblePlaces();
+    syncProviderPlaces(list);
     list.forEach(place => {
       const marker=L.marker([place.lat,place.lng],{title:place.title,icon:markerIcon(place),bubblingMouseEvents:false});
       const entry={place,marker};markerEntries.set(placeKey(place),entry);
@@ -329,7 +341,7 @@
     courseRouteLayer=L.layerGroup().addTo(liveMap);
     pinLayer = L.layerGroup().addTo(liveMap); markers(); drawLocation();
     locate({recenter:followLocation&&!mapLocationName&&!searchResults,automatic:true});
-    liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); if(searchOpen&&searchQuery&&!expandedKey)searchPlaces(searchQuery);else renderSheet(); });
+    liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); syncProviderPlaces(); if(searchOpen&&searchQuery&&!expandedKey)searchPlaces(searchQuery);else renderSheet(); });
     requestAnimationFrame(() => liveMap?.invalidateSize());
   }
   // Account pages can finish loading after the map opens. Rebuild its pins and

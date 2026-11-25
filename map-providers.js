@@ -105,6 +105,7 @@
     host.dataset.mapProvider = 'loading';
     let nativeMap = null, activeProvider = '', disposed = false, naverAuthObserver = null;
     let config = null, selectedPlace = null, requestId = 0, naverFailed = false;
+    let renderedPlaces = places;
 
     function showError(message) {
       if (disposed) return;
@@ -202,7 +203,7 @@
     async function refreshProvider() {
       if (!config || disposed) return;
       const id = ++requestId;
-      const target = needsGoogle(selectedPlace) || needsGoogle(map.getCenter()) || places.some(needsGoogle) ? 'google' : 'naver';
+      const target = needsGoogle(selectedPlace) || needsGoogle(map.getCenter()) || renderedPlaces.some(needsGoogle) ? 'google' : 'naver';
       const hasNaver = config.available?.naver && config.naverClientId && !naverFailed;
       const hasGoogle = config.available?.google && config.googleBrowserKey;
       const provider = target === 'google' ? 'google' : hasNaver ? 'naver' : 'google';
@@ -234,6 +235,7 @@
     return {
       get current() { return activeProvider || 'loading'; },
       selectPlace(place) { selectedPlace = place || null; refreshProvider(); },
+      setPlaces(nextPlaces) { renderedPlaces = Array.isArray(nextPlaces) ? nextPlaces : []; refreshProvider(); },
       setLocation() {}
     };
   }
