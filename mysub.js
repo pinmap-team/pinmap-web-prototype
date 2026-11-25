@@ -9,7 +9,7 @@ pages.profile = function(){
   return subHead('프로필 편집', 'account') + `
   <div class="pfedit">
     <div class="pfphoto">${avatarHtml('big')}
-      <label class="pfchange" aria-label="프로필 사진 변경">${icon('image')}<input type="file" id="avatarfile" accept="image/*" hidden></label>
+      <label class="pfchange" aria-label="프로필 사진 변경">${icon('galleryAdd')}<input type="file" id="avatarfile" accept="image/*" hidden></label>
     </div>
     <div class="pfbtns"><label class="tonal small" for="avatarfile">사진 변경</label>${settings.avatar ? '<button class="textbtn" data-action="avatarreset">기본 이미지로</button>' : ''}</div>
     <form id="profilepage" class="pfform">
