@@ -3003,7 +3003,7 @@ html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:trans
   --min-dur:450ms;--min-ease:cubic-bezier(.22,1,.36,1);--min-blur:4px;
   --acc-dur:250ms;--acc-ease:cubic-bezier(.22,1,.36,1);
   --press-scale:.97;--press-dur:150ms;--ease-smooth-out:cubic-bezier(.22,1,.36,1);
-  position:fixed;z-index:1001;right:24px;bottom:calc(100px + env(safe-area-inset-bottom));
+  position:fixed;z-index:1001;right:24px;bottom:calc(160px + env(safe-area-inset-bottom));
   box-sizing:border-box;width:320px;max-width:calc(100vw - 48px);height:auto;display:block;
   background:none;transition:width var(--min-dur) var(--min-ease),height var(--min-dur) var(--min-ease)
 }
