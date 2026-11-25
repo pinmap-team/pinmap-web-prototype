@@ -18,6 +18,8 @@ test('legacy labels share one category; empty saved categories remain hidden',()
  assert.equal(categories.of({category:'unknown label'}).id,'other');
  assert.match(categories.icon('카페',true),/cafe-active.svg/);
  assert.match(categories.icon('카페',false),/cafe-inactive.svg/);
+ assert.match(categories.chipIcon('카페',true),/cafe-active-dark.svg/);
+ assert.match(categories.chipIcon('카페',false),/cafe-inactive.svg/);
 });
 test('every backend category maps to its canonical label without inventing places or events',()=>{
  const source=fs.readFileSync('categories.js','utf8')+'\n'+fs.readFileSync('account-content.js','utf8').split('\nif (PM_ENV.requiresAuth)')[0];
