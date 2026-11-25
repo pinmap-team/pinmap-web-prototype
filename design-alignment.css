@@ -621,7 +621,7 @@ button[aria-busy="true"]>*{visibility:hidden}
 @keyframes t-badge-slide-in{from{transform:translate(var(--badge-offset-x),var(--badge-offset-y))}to{transform:translate(0,0)}}
 .main>.topbar .bellbtn .t-badge{position:absolute;inset:0;pointer-events:none;will-change:transform}
 .main>.topbar .bellbtn .t-badge[data-open="true"][data-motion="enter"]{animation:t-badge-slide-in var(--badge-slide-dur) var(--badge-slide-ease)}
-.main>.topbar .bellbtn .t-badge-dot{display:grid;place-items:center;border:0!important;transform-origin:center;transform:scale(1);opacity:1;filter:blur(0);transition:transform var(--badge-pop-dur) var(--badge-pop-ease),opacity var(--badge-fade-dur) var(--badge-pop-ease),filter var(--badge-pop-dur) var(--badge-pop-ease);will-change:transform,opacity,filter}
+.main>.topbar .bellbtn .t-badge-dot{display:grid;place-items:center;border:0!important;background:var(--color-error)!important;color:#fff!important;transform-origin:center;transform:scale(1);opacity:1;filter:blur(0);transition:transform var(--badge-pop-dur) var(--badge-pop-ease),opacity var(--badge-fade-dur) var(--badge-pop-ease),filter var(--badge-pop-dur) var(--badge-pop-ease);will-change:transform,opacity,filter}
 .main>.topbar .bellbtn .t-badge[data-open="false"] .t-badge-dot{transform:scale(0);opacity:0;filter:blur(var(--badge-blur));transition:transform var(--badge-pop-close-dur) var(--badge-close-ease),opacity var(--badge-fade-close-dur) var(--badge-close-ease),filter var(--badge-pop-close-dur) var(--badge-close-ease)}
 @media(prefers-reduced-motion:reduce){.main>.topbar .bellbtn .t-badge,.main>.topbar .bellbtn .t-badge-dot{animation:none!important;transition:none!important}}
 /* 2026-11-14: reference dock, expanded active capsule and outline icons. */
@@ -2602,8 +2602,8 @@ html body .homecategories .prefchip{padding-top:var(--space-xs)!important;paddin
 .cf-goo-menu[data-open="true"]{transform:translateY(-4px) rotate(-2.5deg) scale(1.025);transition-duration:300ms}
 .cf-goo-layer{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;will-change:transform}
 .cf-goo-folder{fill:var(--cf-goo-surface)}
-.cf-goo-blob{fill:var(--cf-goo-surface);transform:translate(0,0);transform-box:fill-box;transition:transform 250ms cubic-bezier(.22,1,.36,1);will-change:transform}
-.cf-goo-menu[data-open="true"] .cf-goo-blob{transition:transform 430ms cubic-bezier(.23,.65,.25,1)}
+.cf-goo-blob{fill:var(--cf-goo-surface);opacity:1;transform:translate(0,0);transform-box:fill-box;transition:transform 250ms cubic-bezier(.22,1,.36,1),opacity 100ms ease;will-change:transform}
+.cf-goo-menu[data-open="true"] .cf-goo-blob{opacity:0;transition:transform 430ms cubic-bezier(.23,.65,.25,1),opacity 100ms ease 330ms}
 .cf-goo-menu[data-open="true"] .cf-goo-blob.cf-goo-left,.cf-goo-menu[data-open="true"] .cf-goo-action.cf-goo-left{transform:translate(-32px,70px)}
 .cf-goo-menu[data-open="true"] .cf-goo-blob.cf-goo-right,.cf-goo-menu[data-open="true"] .cf-goo-action.cf-goo-right{transform:translate(32px,70px)}
 .cf-goo-action{position:absolute;width:54px;height:54px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:var(--color-on-surface);pointer-events:none;cursor:pointer;transform:translate(0,0);transition:transform 250ms cubic-bezier(.22,1,.36,1),background-color 80ms ease,filter 120ms ease;-webkit-tap-highlight-color:transparent}
@@ -2620,8 +2620,12 @@ html body .homecategories .prefchip{padding-top:var(--space-xs)!important;paddin
 .cf-goo-menu[data-open="true"] .cf-goo-action.cf-goo-right{background-color:var(--color-error);color:#fff}
 .cf-goo-action .cf-filled-pin,.cf-pinmark .cf-filled-pin{fill:currentColor!important;stroke:none!important}
 .cf-goo-action .cf-filled-pin path,.cf-pinmark .cf-filled-pin path{fill:currentColor!important;stroke:none!important}
+.cf-goo-action .cf-unpin-icon{fill:currentColor;stroke:none}
+.cf-goo-action .cf-unpin-gap,.cf-goo-action .cf-unpin-slash{fill:none;stroke-linecap:round}
+.cf-goo-action .cf-unpin-gap{stroke:#1e1e1e;stroke-width:5}
+.cf-goo-action .cf-unpin-slash{stroke:currentColor;stroke-width:2}
 .cf-goo-menu[data-open="true"] .cf-goo-action:hover{filter:brightness(1.12)}
-.cf-goo-action:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+.cf-goo-action:focus-visible{outline:0;filter:brightness(1.2)}
 @media(prefers-reduced-motion:reduce){.cf-menu-backdrop,.cf-menu-focus,.cf-goo-menu,.cf-goo-blob,.cf-goo-action,.cf-goo-action .icon{transition:none!important}}
 
 /* Keep the Shimmer text visible in the heading and across multi-line summaries. */
