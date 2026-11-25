@@ -13,7 +13,7 @@
           <input id="dl-zip-input" class="dl-zip-input" type="file" accept=".zip,application/zip" aria-label="Instagram ZIP 파일 선택" tabindex="-1"><input id="dl-photo-input" class="dl-zip-input" type="file" accept="image/png,image/jpeg,image/webp" aria-label="캡처 이미지 선택" tabindex="-1"></label>
         <button class="dl-btn dl-paste" id="dl-paste" type="button"><span class="t-text-swap" id="dl-paste-label">붙여넣기</span></button>
       </div><p class="dl-input-error" role="alert" hidden></p></div></div>
-      <div class="dl-body" data-open="true"><div class="dl-body-clip"><div class="dl-head"><span class="dl-success-check t-success-check" data-state="out" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M9 25l10 10L40 13" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="dl-texts"><span class="dl-title t-text-swap" id="dl-title"></span><span class="dl-sub" aria-live="polite"><span class="t-text-swap" id="dl-done">0</span>개 처리</span></div>
+      <div class="dl-body" data-open="true"><div class="dl-body-clip"><div class="dl-head"><div class="dl-texts"><span class="dl-title t-text-swap" id="dl-title"></span><span class="dl-sub" aria-live="polite"><span class="t-text-swap" id="dl-done">0</span>개 처리</span></div>
         <button class="dl-btn t-resize" id="dl-btn" type="button"><span class="t-text-swap" id="dl-btn-label"></span></button>
         <button class="dl-transport" id="dl-transport" type="button" hidden aria-label="일시정지" data-state="pause"><svg class="dl-pause-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><svg class="dl-play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg></button>
         <button class="dl-close" id="dl-close" type="button" aria-label="진행창 접기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" aria-hidden="true"><path d="M6 18 18 6M6 6l12 12"/></svg></button></div>
@@ -28,11 +28,11 @@
   const win = get('.dl-card'), full = get('.dl-full'), ring = get('.dl-ring');
   const linkPanel = get('.dl-link'), bodyPanel = get('.dl-body');
   const linkInput = get('#dl-link-input'), zipInput = get('#dl-zip-input'), photoInput = get('#dl-photo-input');
-  for (const path of stage.querySelectorAll('.t-success-check path')) {
-    path.style.setProperty('--success-path-length', String(Math.ceil(path.getTotalLength())));
-  }
+  const successCheck = get('.dl-ring-check');
+  const successPath = successCheck.querySelector('path');
+  successPath.style.setProperty('--success-path-length', String(Math.ceil(successPath.getTotalLength())));
   const rows = new Map();
-  let current = null, identity = '', minTimer = 0, inputMode = null, inputPending = false, inputDismissed = false;
+  let current = null, identity = '', minTimer = 0, successTimer = 0, inputMode = null, inputPending = false, inputDismissed = false;
   let deletePending = false, resumeAfterDeleteDismiss = false;
   let zipReadController = null;
   let inputMorphFrame = 0, inputMorphLayer = null;
@@ -79,6 +79,7 @@
     }, duration('--text-swap-dur', 150) + 20);
   }
   function minimize(min, focus = false) {
+    clearTimeout(successTimer);
     const rect = win.getBoundingClientRect();
     win.style.width = rect.width + 'px';
     win.style.height = rect.height + 'px';
@@ -93,6 +94,13 @@
     minTimer = setTimeout(() => {
       if (!min) { win.style.removeProperty('width'); win.style.removeProperty('height'); }
     }, duration('--min-dur', 450) + 40);
+    successCheck.dataset.state = 'out';
+    if (min && ring.classList.contains('is-done')) {
+      if (reduced()) successCheck.dataset.state = 'in';
+      else successTimer = setTimeout(() => {
+        if (stage.classList.contains('is-min') && ring.classList.contains('is-done')) successCheck.dataset.state = 'in';
+      }, duration('--min-dur', 450) * .55);
+    }
     if (focus) (min ? ring : get('.dl-close')).focus({preventScroll:true});
   }
   function setBadge(row, status) {
@@ -420,7 +428,7 @@
     get('.dl-ring-prog').style.strokeDashoffset = String(100 - percent);
     get('.dl-ring-pct').textContent = `${percent}%`;
     ring.classList.toggle('is-done', done);
-    for (const check of stage.querySelectorAll('.t-success-check')) check.dataset.state = done ? 'in' : 'out';
+    successCheck.dataset.state = done && stage.classList.contains('is-min') ? 'in' : 'out';
     const error = get('.dl-error'); error.hidden = !state.error; error.textContent = state.error || '';
     const controllable = state.kind === 'single' || state.kind === 'batch';
     const transport = get('.dl-transport');
