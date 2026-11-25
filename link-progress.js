@@ -21,18 +21,19 @@
       <ul class="dl-list"></ul><p class="dl-error" role="alert" hidden></p>
     </div></div></div><button class="dl-ring" id="dl-ring" type="button" aria-label="진행창 펼치기" tabindex="-1">
       <svg class="dl-ring-svg" viewBox="0 0 64 64" aria-hidden="true"><circle class="dl-ring-track" cx="32" cy="32" r="26"/><circle class="dl-ring-prog" id="dl-ring-prog" cx="32" cy="32" r="26" pathLength="100"/></svg>
-      <span class="dl-ring-center"><span class="dl-ring-pct" id="dl-ring-pct">0%</span><span class="dl-ring-check t-success-check" data-state="out" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M9 25l10 10L40 13" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+      <span class="dl-ring-center"><span class="dl-ring-pct" id="dl-ring-pct">0%</span></span>
+      <span class="dl-ring-success t-success-check" data-state="out" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="currentColor"/><path d="M23 33l6 6 12-14" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </button></div>`;
   document.body.append(stage);
   const get = selector => stage.querySelector(selector);
   const win = get('.dl-card'), full = get('.dl-full'), ring = get('.dl-ring');
   const linkPanel = get('.dl-link'), bodyPanel = get('.dl-body');
   const linkInput = get('#dl-link-input'), zipInput = get('#dl-zip-input'), photoInput = get('#dl-photo-input');
-  const successCheck = get('.dl-ring-check');
+  const successCheck = get('.dl-ring-success');
   const successPath = successCheck.querySelector('path');
   successPath.style.setProperty('--success-path-length', String(Math.ceil(successPath.getTotalLength())));
   const rows = new Map();
-  let current = null, identity = '', minTimer = 0, successTimer = 0, inputMode = null, inputPending = false, inputDismissed = false;
+  let current = null, identity = '', minTimer = 0, inputMode = null, inputPending = false, inputDismissed = false;
   let zipReadController = null;
   let inputMorphFrame = 0, inputMorphLayer = null;
   let inputCloseTimer = 0;
@@ -78,12 +79,12 @@
     }, duration('--text-swap-dur', 150) + 20);
   }
   function minimize(min, focus = false) {
-    clearTimeout(successTimer);
     const rect = win.getBoundingClientRect();
     win.style.width = rect.width + 'px';
     win.style.height = rect.height + 'px';
     void win.offsetWidth;
     win.classList.toggle('is-min', min);
+    win.classList.remove('is-min-settled');
     stage.classList.toggle('is-min', min);
     full.inert = min;
     ring.tabIndex = min ? 0 : -1;
@@ -94,16 +95,15 @@
     win.style.height = (min ? 64 : expandedHeight) + 'px';
     if (min) full.style.removeProperty('max-width');
     clearTimeout(minTimer);
-    minTimer = setTimeout(() => {
-      if (!min) { win.style.removeProperty('width'); win.style.removeProperty('height'); full.style.removeProperty('max-width'); }
-    }, duration('--min-dur', 450) + 40);
     successCheck.dataset.state = 'out';
-    if (min && ring.classList.contains('is-done')) {
-      if (reduced()) successCheck.dataset.state = 'in';
-      else successTimer = setTimeout(() => {
-        if (stage.classList.contains('is-min') && ring.classList.contains('is-done')) successCheck.dataset.state = 'in';
-      }, duration('--min-dur', 450) * .55);
-    }
+    const finish = () => {
+      if (min && stage.classList.contains('is-min')) {
+        win.classList.add('is-min-settled');
+        if (ring.classList.contains('is-done')) successCheck.dataset.state = 'in';
+      } else if (!min) { win.style.removeProperty('width'); win.style.removeProperty('height'); full.style.removeProperty('max-width'); }
+    };
+    if (reduced()) finish();
+    else minTimer = setTimeout(finish, duration('--min-dur', 450) + 40);
     if (focus) (min ? ring : get('.dl-close')).focus({preventScroll:true});
   }
   function setBadge(row, status) {
@@ -424,15 +424,16 @@
     linkPanel.dataset.open = inputMode ? 'true' : 'false';
     bodyPanel.dataset.open = inputMode ? 'false' : 'true';
     if (inputMode) return;
-    if (!state) { identity = ''; return; }
+    if (!state) { identity = ''; win.classList.remove('is-success'); return; }
     const nextIdentity = state.kind === 'single' ? `single:${single.started}` : `batch:${state.name}:${state.total}`;
     if (identity !== nextIdentity) {
       identity = nextIdentity;
       rows.clear(); get('.dl-list').replaceChildren();
-      win.classList.remove('is-min'); stage.classList.remove('is-min'); full.inert = false; ring.tabIndex = -1;
+      win.classList.remove('is-min', 'is-min-settled'); stage.classList.remove('is-min'); full.inert = false; ring.tabIndex = -1;
       win.style.removeProperty('width'); win.style.removeProperty('height');
     }
     const done = state.phase === 'done' && (state.kind === 'single' || state.saved > 0);
+    win.classList.toggle('is-success', done);
     const processed = Math.min(state.total, state.processed);
     const percent = state.phase === 'done' ? 100 : Math.round(processed / Math.max(1,state.total) * 100);
     const subject = state.source === 'capture' ? '캡처' : '링크';
@@ -448,7 +449,7 @@
     get('.dl-ring-prog').style.strokeDashoffset = String(100 - percent);
     get('.dl-ring-pct').textContent = `${percent}%`;
     ring.classList.toggle('is-done', done);
-    successCheck.dataset.state = done && stage.classList.contains('is-min') ? 'in' : 'out';
+    successCheck.dataset.state = done && win.classList.contains('is-min-settled') ? 'in' : 'out';
     const error = get('.dl-error'); error.hidden = !state.error; error.textContent = state.error || '';
     const controllable = state.kind === 'single' || state.kind === 'batch';
     const transport = get('.dl-transport');
