@@ -3166,8 +3166,6 @@ html body svg.solar:not(.solar-routing-2-bold):not(.solar-pin-bold):not(.solar-b
 html body svg.solar:not(.solar-routing-2-bold):not(.solar-pin-bold):not(.solar-bill-list-linear):not(.solar-home-bold):not(.solar-emoji-funny-square-bold):not(.solar-widget-bold) :is(path,circle,rect,line,polyline){fill:none!important;stroke:currentColor!important;stroke-width:1.5px!important}
 html body .dtsum.dtai-review .dtai-info-button svg{width:20px;height:20px;color:var(--color-secondary)}
 html body .dtsum.dtai-review .dtai-info-button>span{border:0}
-html body .cf-meta .cf-allmark{display:inline-flex;flex:none;align-self:center;color:var(--color-on-surface)}
-html body .cf-meta .cf-allmark svg{width:16px;height:16px}
 html body .dl-field-icon svg{width:20px;height:20px}
 html body .lm-map-credits summary svg{width:18px;height:18px;vertical-align:middle}
 html body .pm-theme-options button svg{width:20px;height:20px;margin-right:6px;vertical-align:middle}
@@ -3175,5 +3173,3 @@ html body .pm-theme-options button svg{width:20px;height:20px;margin-right:6px;v
 html body svg.solar-home-bold,html body svg.solar-home-bold>path{fill:currentColor!important;stroke:none!important}
 
 html body svg.solar-emoji-funny-square-bold,html body svg.solar-emoji-funny-square-bold :is(path,circle,rect),html body svg.solar-widget-bold,html body svg.solar-widget-bold :is(path,circle,rect){fill:currentColor!important;stroke:none!important}
-html body .cf-active-all-icon{display:inline-flex;vertical-align:middle;margin-right:var(--space-xs)}
-html body .cf-active-all-icon svg{width:24px;height:24px}
