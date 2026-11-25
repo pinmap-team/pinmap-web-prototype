@@ -41,3 +41,20 @@ test('custom folder deletion retains content, memo and saved time',()=>{
  vm.createContext(ctx);const a=source.indexOf('actions.cfdelfolderok = () => {'),b=source.indexOf('\n};',a)+3;vm.runInContext(source.slice(a,b),ctx);ctx.actions.cfdelfolderok();
  assert.deepEqual(Array.from(ctx.settings.customFolders),['가']);assert.equal(items.length,2);assert.equal(items[0].collection,'');assert.equal(items[0].memo,'메모');assert.equal(items[0].savedAt,'2026-11-01');assert.equal(items[1].collection,'가');
 });
+test('the all folder stays before pinned folders in the rendered collection grid',()=>{
+ const ctx={
+  items:[{collection:'내 폴더'}],collection:null,
+  cfQ:()=>'',cfOpenTitle:()=>'',cfMatches:()=>[{collection:'내 폴더'}],
+  cfCustom:()=>['내 폴더'],cfThumbs:()=>[],cfOrderFolders:folders=>folders,
+  cfFolderData:()=>[{id:'고정',title:'고정'},{id:'일반',title:'일반'}],
+  cfPinned:()=>['k:고정','c:내 폴더'],cfFolderKey:folder=>(folder.attr?'c:':'k:')+folder.id,
+  CF_ALL_FOLDER:{id:'전체 저장',title:'전체'},CF_EDGE:'',esc:value=>value,icon:()=>'',
+  CollectionFolder:folder=>`<folder data-id="${folder.id}"></folder>`,cfFolderToolbar:()=>''
+ };
+ vm.createContext(ctx);
+ const start=source.indexOf('const accountResultCards = function(){');
+ const end=source.indexOf('resultCards = function(){',start);
+ vm.runInContext(source.slice(start,end)+'\nthis.build=accountResultCards;',ctx);
+ const order=[...ctx.build().matchAll(/<folder data-id="([^"]+)"><\/folder>/g)].map(match=>match[1]);
+ assert.deepEqual(order,['전체 저장','고정','내 폴더','일반']);
+});
