@@ -2,7 +2,7 @@
 // 마이에서 누르는 기능은 아래에서 올라오는 시트 대신 새 페이지로 열리고, 왼쪽 위 ← 로 마이로 돌아가요.
 // 현재 위치 · 관심 키워드 · 알림 · 저장 · 위치/지도 · 저장하는 방법 · 앱 정보 · 핀맵 계정 설정
 
-const MY_PAGES = {settingspage:'설정', calexport:'캘린더로 내보내기', calsettings:'캘린더 설정', calweek:'한 주의 시작 요일', favorites:'즐겨찾기', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', themeset:'화면 모드', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리'};
+const MY_PAGES = {settingspage:'설정', calexport:'캘린더로 내보내기', calsettings:'캘린더 설정', calweek:'한 주의 시작 요일', favorites:'즐겨찾기', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리'};
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
 const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
@@ -18,7 +18,6 @@ pages.settingspage = () => myPage('설정', `<section class="mgroup my-section" 
   ${myRow('placesheet',icon('pin'),'위치 설정')}
   ${myRow('interests',icon('spark'),'관심 키워드 설정')}
   ${myRow('savesheet',icon('spark'),'저장 설정')}
-  ${myRow('appearance',myScreenModeIcon(),'화면 모드')}
   ${myRow('notisettings',icon('bell'),'알림 설정')}
   ${myRow('calsettings',icon('calendar'),'캘린더 설정')}
   ${myRow('account',icon('user'),'계정 관리')}
@@ -79,9 +78,6 @@ document.addEventListener('change',async event=>{
   if(!saved&&owner===window.PinmapAccountState?.userId&&settings.calendarWeekStart===input.value)settings.calendarWeekStart=previous;
   render();
 });
-// 2026-11-04: 화면 모드도 아래 시트 대신 페이지로 (내용은 PinmapTheme.show()와 같음)
-pages.themeset = () => { PinmapTheme.beginPreview(); return myPage('화면 모드', pageFromModal(() => PinmapTheme.show()), 'settingpage themepage'); };
-actions.appearance = () => go('themeset');
 Object.assign(actions, {
   notisheet: () => go('notiset'),
   notisettings: () => go('notiset'),
@@ -139,8 +135,8 @@ pages.favorites = () => {
   return myPage('즐겨찾기', list.length
     ? `<div class="fav-header"><p class="fav-count">${list.length}개</p><button type="button" class="cf-textbtn" data-action="${favSel?'favselectoff':'favselect'}">${favSel?'취소':'선택'}</button></div>
       <div class="fav-items">${posts.length?`<section class="fav-group"><h2 class="fav-group-title">게시물</h2>${posts.map(row).join('')}</section>`:''}${places.length?`<section class="fav-group"><h2 class="fav-group-title">장소</h2>${places.map(row).join('')}</section>`:''}</div>
-      ${favSel?`<div class="cf-selbar" role="toolbar" aria-label="선택한 즐겨찾기"><button type="button" class="cf-selall fav-selall" data-action="favselall">${list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택'}</button><span class="cf-selcount fav-selcount" aria-live="polite">${count?`${count}개 선택`:''}</span><button type="button" class="cf-seldel fav-remove" data-action="favremove" ${count&&!favRemoving?'':'disabled'}>${likeHeartIcon()}좋아요 취소</button></div>`:''}`
-    : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 게시물이나 장소가 없어요</h3><p class="muted">게시물 상세나 지도에서 별를 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="map">지도로 가기</button></div>`, `favpage${favSel?' cf-selecting':''}`);
+      ${favSel?`<div class="cf-selbar" role="toolbar" aria-label="선택한 즐겨찾기"><button type="button" class="cf-selall fav-selall" data-action="favselall">${list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택'}</button><span class="cf-selcount fav-selcount" aria-live="polite">${count?`${count}개 선택`:''}</span><button type="button" class="cf-seldel fav-remove" data-action="favremove" ${count&&!favRemoving?'':'disabled'}>${likeHeartIcon()}즐겨찾기 해제</button></div>`:''}`
+    : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 게시물이나 장소가 없어요</h3><p class="muted">게시물 상세나 지도에서 별을 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="map">지도로 가기</button></div>`, `favpage${favSel?' cf-selecting':''}`);
 };
 actions.favselect=()=>{favSel=new Set();render();};
 actions.favselectoff=()=>{favSel=null;render();};
@@ -386,10 +382,6 @@ Object.assign(actions, {
 
 /* ---------- 온보딩 다시 보기: 처음 온보딩과 따로 · 고른 관심사는 반영하지 않고 끝나면 마이로 ---------- */
 actions.intro = () => openOnboardingPreview();
-
-// Apply the previewed choice when leaving the theme page, including its back button.
-const goBeforeThemePreview = go;
-go = function(next){ if(page==='themeset'&&next!=='themeset')PinmapTheme.commitPreview();return goBeforeThemePreview.apply(this,arguments); };
 
 // 프로필 사진 버튼 밖의 카드를 누르면 계정 관리로 가요.
 document.addEventListener('click', e => {

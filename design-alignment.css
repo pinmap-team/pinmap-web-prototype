@@ -226,10 +226,6 @@ button[aria-busy="true"]>*{visibility:hidden}
 .recentrow .rcard small{font:var(--type-body-sm);color:var(--color-secondary)}
 .mainpick .picktext small{opacity:1}
 
-/* Appearance: same semantic roles and geometry in both modes. */
-.pm-theme-options{display:flex;gap:var(--space-sm);margin:var(--space-lg) 0}
-.pm-theme-options button{flex:1;min-height:48px;border:1px solid var(--color-border);border-radius:var(--rounded-md);background:var(--color-surface);color:var(--color-on-surface)}
-.pm-theme-options button[aria-pressed="true"]{background:var(--color-primary);color:var(--color-neutral);font-weight:var(--weight-bold)}
 :root[data-theme="dark"]{
  --t-glass:rgba(27,27,29,.78);--t-glass-strong:rgba(27,27,29,.94);--pm-glass:rgba(27,27,29,.78);--pm-glass-border:rgba(255,255,255,.14);
  --cf-back:var(--color-disabled);--cf-front:rgba(35,35,38,.72);--cf-front-solid:var(--color-surface);--cf-empty:var(--color-disabled);
@@ -618,6 +614,9 @@ button[aria-busy="true"]>*{visibility:hidden}
   -webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:0
 }
 .main>.topbar .bellbtn:hover{background:transparent!important;box-shadow:none!important}
+.main>.topbar .pm-theme-toggle{display:grid;place-items:center;flex:none;width:40px;height:40px;padding:0;border:0;background:transparent;color:var(--color-on-surface);cursor:pointer}
+.main>.topbar .pm-theme-toggle .icon{width:24px;height:24px}
+.main>.topbar .pm-theme-toggle:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px;border-radius:var(--rounded-sm)}
 @keyframes t-badge-slide-in{from{transform:translate(var(--badge-offset-x),var(--badge-offset-y))}to{transform:translate(0,0)}}
 .main>.topbar .bellbtn .t-badge{position:absolute;inset:0;pointer-events:none;will-change:transform}
 .main>.topbar .bellbtn .t-badge[data-open="true"][data-motion="enter"]{animation:t-badge-slide-in var(--badge-slide-dur) var(--badge-slide-ease)}
@@ -689,10 +688,6 @@ html body .bottomnav[hidden]{display:none!important}
 .address-edit-form :is(input,textarea),.address-edit-form :is(input,textarea):focus,.address-edit-form :is(input,textarea):focus-visible{outline:none!important;box-shadow:none!important}
 .address-edit-form :is(input,textarea):focus,.address-edit-form :is(input,textarea):focus-visible{border-color:var(--color-primary)!important}
 .address-edit-form .field:focus-within{outline:none!important;box-shadow:none!important}
-/* 2026-11-04 화면 모드 페이지: 설명 body-md(secondary), 선택 버튼 3개, 아래 안내 body-sm */
-.themepage>p.muted{margin:0 0 var(--space-lg);font:var(--type-body-md);color:var(--color-secondary)}
-.themepage .hint{font:var(--type-body-sm);color:var(--color-secondary);word-break:keep-all}
-
 /* Address management and search pages */
 .address-slide{animation:address-enter .18s ease-out}
 @keyframes address-enter{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
@@ -741,22 +736,6 @@ html body .bottomnav[hidden]{display:none!important}
 /* Phone illustration frame: requested dark gray, independent of app theme. */
 #onboarding .step2 .ob-slide .ob-phone{border-color:#333333}
 
-/* Theme preview shares the selected mode's existing semantic colors. */
-.pm-theme-preview{margin-top:var(--space-xl);padding:var(--space-lg);border:1px solid var(--color-disabled);border-radius:var(--rounded-md);background:var(--color-neutral);color:var(--color-on-surface);pointer-events:none}
-.pm-preview-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg);font:var(--type-body-md);font-weight:var(--weight-bold)}
-.pm-preview-header>span{display:flex;gap:var(--space-md)}
-.pm-theme-preview .icon{width:20px;height:20px}
-.pm-preview-card{overflow:hidden;border-radius:var(--rounded-md);background:var(--color-surface);box-shadow:var(--shadow-sm)}
-.pm-preview-card>img{display:block;width:100%;height:120px;object-fit:cover}
-.pm-preview-card>div{padding:var(--space-md)}
-.pm-theme-preview b{display:block;font:var(--type-label-md)}
-.pm-theme-preview small{display:block;margin-top:var(--space-xs);font:var(--type-body-sm);color:var(--color-secondary)}
-.pm-preview-list{margin-top:var(--space-lg)}
-.pm-preview-list>div{display:flex;gap:var(--space-md);align-items:center;margin-top:var(--space-sm);padding:var(--space-md);border-radius:var(--rounded-sm);background:var(--color-surface)}
-.pm-preview-list i{display:grid;place-items:center;color:var(--color-secondary)}
-.pm-preview-nav{display:flex;justify-content:space-around;padding:var(--space-md);margin-top:var(--space-lg);border-radius:var(--rounded-lg);background:var(--color-surface);color:var(--color-secondary)}
-.pm-preview-nav>.icon:first-child{color:var(--color-primary)}
-
 /* Replayed onboarding exposes the exit action even on the splash screen. */
 #onboarding .ob-screen.bare.ob-preview>.ob-top{display:flex;position:absolute;top:var(--space-lg);right:var(--space-xl);z-index:2}
 #onboarding .ob-screen.bare.ob-preview .ob-topleft{display:none}
@@ -785,10 +764,6 @@ body:has(.location-confirm) .bottomnav{display:none!important}
 
 .address-search-entry{width:100%;text-align:left;color:var(--color-secondary);font:var(--type-body-md);cursor:text}
 .address-search-entry>span{flex:1}
-
-/* Reuse the light token values inside a light preview on a dark settings page. */
-.pm-theme-preview[data-theme="light"]{--color-neutral:#F4F4F4;--color-surface:#FFFFFF;--color-on-surface:#333333;--color-secondary:#6C6C6C;--color-border:#6C6C6C;--color-primary:#333333;--color-primary-pressed:#4D4D4D;--color-disabled:#E8E8E8;--color-error:#D13D3D;--color-accent:#C6F5E1;color-scheme:light}
-.pm-theme-preview[data-theme="dark"]{color-scheme:dark}
 
 /* Authentication: simple introduction and a separate sign-in panel. */
 body.auth-body{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);place-items:center;margin:0;min-width:0;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--color-neutral);color:var(--color-on-surface);font:var(--type-body-md)}
@@ -3168,7 +3143,6 @@ html body .dtsum.dtai-review .dtai-info-button svg{width:20px;height:20px;color:
 html body .dtsum.dtai-review .dtai-info-button>span{border:0}
 html body .dl-field-icon svg{width:20px;height:20px}
 html body .lm-map-credits summary svg{width:18px;height:18px;vertical-align:middle}
-html body .pm-theme-options button svg{width:20px;height:20px;margin-right:6px;vertical-align:middle}
 
 html body svg.solar-home-bold,html body svg.solar-home-bold>path{fill:currentColor!important;stroke:none!important}
 
