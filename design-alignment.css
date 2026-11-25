@@ -3173,3 +3173,27 @@ html body .pm-theme-options button svg{width:20px;height:20px;margin-right:6px;v
 html body svg.solar-home-bold,html body svg.solar-home-bold>path{fill:currentColor!important;stroke:none!important}
 
 html body svg.solar-emoji-funny-square-bold,html body svg.solar-emoji-funny-square-bold :is(path,circle,rect),html body svg.solar-widget-bold,html body svg.solar-widget-bold :is(path,circle,rect){fill:currentColor!important;stroke:none!important}
+
+/* My content icons share one optical grid; the navigation dock uses its own grid. */
+html body .main:has(.myprofile) .mrow .mrico{width:28px!important;min-width:28px;height:28px;display:grid!important;place-items:center;flex:none}
+html body .main:has(.myprofile) .mrow .mrico svg.icon{display:block;width:24px!important;height:24px!important;stroke-width:1.5px!important}
+html body .main:has(.myprofile) .mrow .mrico svg.icon :is(path,circle,rect,line,polyline){stroke-width:1.5px!important}
+html body .main:has(.myprofile) .mrow[data-action="terms"] .mrico svg{transform:scale(1.35,1.1)}
+html body .main:has(.myprofile) .mrow[data-action="notice"] .mrico svg{transform:scaleY(1.12)}
+html body .main:has(.myprofile) .mrow>svg.icon:last-child,html body .main:has(.myprofile) .myprofile-go svg.icon{stroke-width:1.5px!important}
+html body .main:has(.myprofile) :is(.mrow>svg.icon:last-child,.myprofile-go svg.icon,.topbar .bellbtn svg.icon) :is(path,circle,rect,line){stroke-width:1.5px!important}
+html body .main:has(.myprofile) .topbar .bellbtn svg.icon{transform:scale(1.12)}
+html body .main:has(.myprofile) .my-quick .myq-ico{width:24px;height:24px;display:grid;place-items:center}
+html body .main:has(.myprofile) .my-quick .myq-ico svg{display:block;width:24px!important;height:24px!important}
+html body .main:has(.myprofile) .my-quick .myq-ico .pm-star{transform:scale(1.22);stroke-width:1.5px!important}
+html body .main:has(.myprofile) .my-quick .myq-ico .pm-star :is(path,circle,rect){stroke-width:1.5px!important}
+html body .main:has(.myprofile) .my-quick .myq-ico .solar-routing-2-bold{transform:scale(.94)}
+html body .main:has(.myprofile) .myprofile-photo .pavatar svg.icon,html body .main:has(.myprofile) .account-photo-edit svg.icon :is(path,circle,rect,line){stroke-width:1.5px!important}
+html body .main:has(.myprofile) .myprofile-photo .pavatar svg.icon :is(path,circle,rect,line){stroke-width:1.5px!important}
+html body .bottomnav .pm-nav-main .navitem .navicon{width:28px!important;height:28px!important;display:grid!important;place-items:center}
+html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph{display:block;width:26px!important;height:26px!important}
+html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph:not(.is-selected):not(.solar-home-bold) :is(path,circle,rect,line,polyline){stroke-width:1.7px!important}
+html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph.is-selected .pm-nav-fill{stroke:none!important}
+html body .bottomnav .pm-nav-main .navitem[data-page="map"] .navicon svg{transform:scale(1.1)}
+html body .bottomnav .pm-nav-main .navitem[data-page="library"] .navicon svg{transform:scale(1.1)}
+html body .bottomnav .pm-nav-main .navitem[data-page="my"] .navicon svg{transform:scale(1.16)}
