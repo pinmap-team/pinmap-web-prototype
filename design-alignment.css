@@ -2364,30 +2364,30 @@ html body .coursepage .cx-timeline .course-drag-placeholder{opacity:.3}
 html body .coursepage .course-drag-placeholder .cx-grip{background:transparent}
 /* 2026-11-24 (보정): 홈 카테고리 칩 아이콘 광학 정렬 — 아이콘마다 그림이 차지하는 영역이 달라서(컵 손잡이·받침 등) 실제 그림의 가운데를 칩 세로 가운데에 맞추고, 그림 면적이 비슷해 보이게 크기를 보정. 레이아웃 칸은 20px 그대로 */
 html body .homecategories .prefchip .pm-category-mask{width:24px!important;height:24px!important;margin:-2px;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="activity"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.77px,1.79px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="beauty"]{-webkit-mask-size:20.90px;mask-size:20.90px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(1.51px,0.12px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="cafe"]{-webkit-mask-size:18.76px;mask-size:18.76px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.82px,0.14px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="career"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.80px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="creative"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.09px,1.70px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="exhibition"]{-webkit-mask-size:20.66px;mask-size:20.66px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(1.66px,0.22px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="family"]{-webkit-mask-size:17.75px;mask-size:17.75px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(4.10px,0.95px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="fashion"]{-webkit-mask-size:17.30px;mask-size:17.30px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.36px,2.28px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="festival"]{-webkit-mask-size:17.30px;mask-size:17.30px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.36px,1.48px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="finance"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.72px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="fitness"]{-webkit-mask-size:19.00px;mask-size:19.00px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.51px,1.36px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="food"]{-webkit-mask-size:17.75px;mask-size:17.75px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.92px,1.84px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="humor"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.80px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="interior"]{-webkit-mask-size:19.33px;mask-size:19.33px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.44px,1.17px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="learning"]{-webkit-mask-size:18.54px;mask-size:18.54px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.74px,0.96px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="life"]{-webkit-mask-size:19.60px;mask-size:19.60px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.21px,0.80px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="media"]{-webkit-mask-size:17.30px;mask-size:17.30px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.36px,1.57px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="nature"]{-webkit-mask-size:19.33px;mask-size:19.33px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.35px,1.33px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="other"]{-webkit-mask-size:18.94px;mask-size:18.94px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.54px,1.68px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="pets"]{-webkit-mask-size:17.51px;mask-size:17.51px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.95px,2.33px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="recipe"]{-webkit-mask-size:17.28px;mask-size:17.28px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(4.21px,1.97px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="stay"]{-webkit-mask-size:18.76px;mask-size:18.76px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.80px,0.94px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="tech"]{-webkit-mask-size:20.90px;mask-size:20.90px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(1.56px,0.22px)}
-html body :is(.homecategories,.lm-drawn-map .lm-categories) .pm-category-mask[data-cat="travel"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.75px)}
+html body .homecategories .pm-category-mask[data-cat="activity"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.77px,1.79px)}
+html body .homecategories .pm-category-mask[data-cat="beauty"]{-webkit-mask-size:20.90px;mask-size:20.90px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(1.51px,0.12px)}
+html body .homecategories .pm-category-mask[data-cat="cafe"]{-webkit-mask-size:18.76px;mask-size:18.76px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.82px,0.14px)}
+html body .homecategories .pm-category-mask[data-cat="career"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.80px)}
+html body .homecategories .pm-category-mask[data-cat="creative"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.09px,1.70px)}
+html body .homecategories .pm-category-mask[data-cat="exhibition"]{-webkit-mask-size:20.66px;mask-size:20.66px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(1.66px,0.22px)}
+html body .homecategories .pm-category-mask[data-cat="family"]{-webkit-mask-size:17.75px;mask-size:17.75px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(4.10px,0.95px)}
+html body .homecategories .pm-category-mask[data-cat="fashion"]{-webkit-mask-size:17.30px;mask-size:17.30px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.36px,2.28px)}
+html body .homecategories .pm-category-mask[data-cat="festival"]{-webkit-mask-size:17.30px;mask-size:17.30px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.36px,1.48px)}
+html body .homecategories .pm-category-mask[data-cat="finance"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.72px)}
+html body .homecategories .pm-category-mask[data-cat="fitness"]{-webkit-mask-size:19.00px;mask-size:19.00px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.51px,1.36px)}
+html body .homecategories .pm-category-mask[data-cat="food"]{-webkit-mask-size:17.75px;mask-size:17.75px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.92px,1.84px)}
+html body .homecategories .pm-category-mask[data-cat="humor"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.80px)}
+html body .homecategories .pm-category-mask[data-cat="interior"]{-webkit-mask-size:19.33px;mask-size:19.33px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.44px,1.17px)}
+html body .homecategories .pm-category-mask[data-cat="learning"]{-webkit-mask-size:18.54px;mask-size:18.54px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.74px,0.96px)}
+html body .homecategories .pm-category-mask[data-cat="life"]{-webkit-mask-size:19.60px;mask-size:19.60px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.21px,0.80px)}
+html body .homecategories .pm-category-mask[data-cat="media"]{-webkit-mask-size:17.30px;mask-size:17.30px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.36px,1.57px)}
+html body .homecategories .pm-category-mask[data-cat="nature"]{-webkit-mask-size:19.33px;mask-size:19.33px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.35px,1.33px)}
+html body .homecategories .pm-category-mask[data-cat="other"]{-webkit-mask-size:18.94px;mask-size:18.94px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.54px,1.68px)}
+html body .homecategories .pm-category-mask[data-cat="pets"]{-webkit-mask-size:17.51px;mask-size:17.51px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.95px,2.33px)}
+html body .homecategories .pm-category-mask[data-cat="recipe"]{-webkit-mask-size:17.28px;mask-size:17.28px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(4.21px,1.97px)}
+html body .homecategories .pm-category-mask[data-cat="stay"]{-webkit-mask-size:18.76px;mask-size:18.76px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.80px,0.94px)}
+html body .homecategories .pm-category-mask[data-cat="tech"]{-webkit-mask-size:20.90px;mask-size:20.90px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(1.56px,0.22px)}
+html body .homecategories .pm-category-mask[data-cat="travel"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.75px)}
 /* 한글 글자 획이 줄 상자 위쪽에 몰려 칩 가운데보다 약 2px 높게 보여서, 칩 안쪽 위 여백 space-xs로 글자와 아이콘을 함께 칩 세로 가운데로 */
 html body .homecategories .prefchip{padding-top:var(--space-xs)!important;padding-bottom:0!important}
 
@@ -3214,15 +3214,13 @@ html body .lm-drawn-map .lm-drawn-clear[hidden]{display:none!important}
 html body .lm-drawn-map .lm-drawn-clear svg{width:16px;height:16px}
 html body .lm-drawn-map .lm-header .lm-categories{position:absolute;left:17px;right:17px;top:104px;height:32px;display:flex;justify-content:flex-start;gap:8px;margin:0!important;padding:0!important;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;pointer-events:auto}
 html body .lm-drawn-map .lm-header .lm-categories::-webkit-scrollbar{display:none}
-html body .lm-drawn-map .lm-header .lm-categories .prefchip{flex:none;width:max-content;min-width:0;min-height:32px;height:32px;display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:var(--space-xs);margin:0;padding:var(--space-xs) var(--space-md) 0!important;border:0!important;border-radius:999px!important;background:var(--color-surface)!important;box-shadow:0 0 20px rgba(0,0,0,.1)!important;color:var(--color-icon-muted)!important;font:var(--type-label-md);white-space:nowrap}
+html body .lm-drawn-map .lm-header .lm-categories .prefchip{flex:none;width:max-content;min-width:0;min-height:32px;height:32px;display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:var(--space-xs);margin:0;padding:0 var(--space-md)!important;border:0!important;border-radius:999px!important;background:var(--color-surface)!important;box-shadow:0 0 20px rgba(0,0,0,.1)!important;color:var(--color-icon-muted)!important;font:var(--type-label-md);white-space:nowrap}
 html body .lm-drawn-map .lm-header .lm-categories .prefchip.selected{background:#282828!important;color:#fff!important}
 html body .lm-drawn-map .lm-header .lm-categories .prefchip.selected .lm-category-art{color:#fff!important}
 html body .lm-drawn-map .lm-header .lm-categories .lm-category-art{flex:none;width:20px;height:20px;display:grid;place-items:center;color:inherit}
-html body .lm-drawn-map .lm-header .lm-categories .lm-category-art svg{display:block;width:20px!important;height:20px!important;transform:none!important}
-html body .lm-drawn-map .lm-header .lm-categories .pm-category-mask{display:inline-block;width:24px!important;height:24px!important;margin:-2px;background-color:var(--color-icon-muted);-webkit-mask-image:var(--pm-cat-icon);mask-image:var(--pm-cat-icon);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
-html body .lm-drawn-map .lm-header .lm-categories .prefchip.selected .pm-category-mask{background-color:#fff}
+html body .lm-drawn-map .lm-header .lm-categories .lm-category-art :is(svg,img.pm-category-icon){display:block;width:20px!important;height:20px!important;transform:none!important}
+html body .lm-drawn-map .lm-header .lm-categories .prefchip.selected img.pm-category-icon{filter:contrast(1.3)}
 html body .lm-drawn-map .lm-header .lm-categories .prefchip:not(.selected):is(:hover,:focus-visible){color:var(--color-icon-hover)!important}
-html body .lm-drawn-map .lm-header .lm-categories .prefchip:not(.selected):is(:hover,:focus-visible) .pm-category-mask{background-color:var(--color-icon-hover)}
 html body .lm-drawn-map .lm-header .lm-categories .prefchip b{display:block;min-height:20px;font:var(--type-label-md)!important;line-height:20px!important;letter-spacing:0;color:inherit;text-decoration:none;white-space:nowrap}
 html body .lm-drawn-map.is-searching .lm-header .lm-categories{visibility:hidden;pointer-events:none}
 html body .lm-drawn-map .lm-recent,html body .lm-drawn-map .lm-search-results{position:absolute;left:17px;right:16px;top:101px;z-index:615;max-height:min(440px,50dvh);border:0;border-radius:20px;background:#fff;box-shadow:0 4px 15px rgba(0,0,0,.1)}
