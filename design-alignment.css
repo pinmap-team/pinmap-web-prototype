@@ -1891,7 +1891,7 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 
 /* 2026-11-23 홈 카테고리: 최대 2줄, 넘치면 줄마다 옆으로 밀어서 보기 */
 .homecategories,.homecategories.two-rows,.chiprows.homecategories{display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:0!important;row-gap:0!important;overflow:visible!important;grid-template-rows:none}
-.homecategories .hc-row{display:flex;flex-wrap:nowrap;align-items:center;gap:var(--space-sm);overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;margin-inline:calc(-1 * var(--gutter,var(--space-xl)));padding:6px var(--gutter,var(--space-xl))}
+.homecategories .hc-row{display:flex;flex-wrap:nowrap;align-items:center;gap:var(--space-sm);overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;margin:-14px calc(-1 * max(var(--gutter,var(--space-xl)),20px));padding:20px max(var(--gutter,var(--space-xl)),20px)}
 .homecategories .hc-row::-webkit-scrollbar{display:none}
 .homecategories .hc-row .prefchip{flex:none}
 
@@ -2128,10 +2128,11 @@ html body #onboarding .ob-screen.step3 .ob-groupcard{align-content:center!import
 html body .homecategories .prefchip img.pm-category-icon{width:20px!important;height:20px!important}
 /* 2026-11-24: 온보딩 2/2 설명과 카드 사이 space-2xl(32px) */
 html body #onboarding .ob-screen.step3 .ob-groupcards{padding-top:var(--space-2xl)!important}
-/* 2026-11-24: 홈 카테고리 칩 아이콘 — SVG를 mask로 써서 토큰 색으로 칠함(기본 icon-muted, 마우스 올림·포커스 icon-hover) */
-html body .homecategories .prefchip{box-shadow:none!important}
-html body .homecategories .prefchip .pm-category-mask{display:inline-block;flex:none;width:20px;height:20px;vertical-align:middle;background-color:var(--color-icon-muted);-webkit-mask:var(--pm-cat-icon) center/contain no-repeat;mask:var(--pm-cat-icon) center/contain no-repeat;transition:background-color .15s ease}
-html body .homecategories .prefchip:is(:hover,:focus-visible) .pm-category-mask{background-color:var(--color-icon-hover)}
+/* 홈과 지도 카테고리 칩은 같은 원본 SVG와 그림자를 사용한다. */
+html body .homecategories .prefchip{box-shadow:0 0 20px rgba(0,0,0,.1)!important}
+html body .homecategories .pm-home-category-art{display:grid;place-items:center;flex:none;width:20px;height:20px}
+html body .homecategories .pm-home-category-art img.pm-category-icon{display:block;width:20px!important;height:20px!important;transform:none!important}
+html body .homecategories .prefchip b{display:block;min-height:20px;font:var(--type-label-md)!important;line-height:20px!important;letter-spacing:0;color:inherit;text-decoration:none;white-space:nowrap}
 /* 2026-11-24: 스낵바 — 화면 가운데, 좌우 여백 space-2xl */
 html body #snackbar{top:50%!important;bottom:auto!important;padding:var(--space-lg) var(--space-2xl)!important;transform:translate(-50%,-50%) scale(.96)!important;opacity:0;transition:opacity .2s ease,transform .2s ease,visibility .2s}
 html body #snackbar.show{transform:translate(-50%,-50%)!important;opacity:1}
@@ -2362,34 +2363,8 @@ html body .coursepage .cx-timeline.course-drag-ghost .course-row::after{display:
 html body .coursepage .cx-timeline.course-drag-ghost .cx-stop{box-shadow:var(--shadow-md);transform:scale(1.02)}
 html body .coursepage .cx-timeline .course-drag-placeholder{opacity:.3}
 html body .coursepage .course-drag-placeholder .cx-grip{background:transparent}
-/* 2026-11-24 (보정): 홈 카테고리 칩 아이콘 광학 정렬 — 아이콘마다 그림이 차지하는 영역이 달라서(컵 손잡이·받침 등) 실제 그림의 가운데를 칩 세로 가운데에 맞추고, 그림 면적이 비슷해 보이게 크기를 보정. 레이아웃 칸은 20px 그대로 */
-html body .homecategories .prefchip .pm-category-mask{width:24px!important;height:24px!important;margin:-2px;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
-html body .homecategories .pm-category-mask[data-cat="activity"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.77px,1.79px)}
-html body .homecategories .pm-category-mask[data-cat="beauty"]{-webkit-mask-size:20.90px;mask-size:20.90px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(1.51px,0.12px)}
-html body .homecategories .pm-category-mask[data-cat="cafe"]{-webkit-mask-size:18.76px;mask-size:18.76px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.82px,0.14px)}
-html body .homecategories .pm-category-mask[data-cat="career"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.80px)}
-html body .homecategories .pm-category-mask[data-cat="creative"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.09px,1.70px)}
-html body .homecategories .pm-category-mask[data-cat="exhibition"]{-webkit-mask-size:20.66px;mask-size:20.66px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(1.66px,0.22px)}
-html body .homecategories .pm-category-mask[data-cat="family"]{-webkit-mask-size:17.75px;mask-size:17.75px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(4.10px,0.95px)}
-html body .homecategories .pm-category-mask[data-cat="fashion"]{-webkit-mask-size:17.30px;mask-size:17.30px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.36px,2.28px)}
-html body .homecategories .pm-category-mask[data-cat="festival"]{-webkit-mask-size:17.30px;mask-size:17.30px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.36px,1.48px)}
-html body .homecategories .pm-category-mask[data-cat="finance"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.72px)}
-html body .homecategories .pm-category-mask[data-cat="fitness"]{-webkit-mask-size:19.00px;mask-size:19.00px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.51px,1.36px)}
-html body .homecategories .pm-category-mask[data-cat="food"]{-webkit-mask-size:17.75px;mask-size:17.75px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.92px,1.84px)}
-html body .homecategories .pm-category-mask[data-cat="humor"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.80px)}
-html body .homecategories .pm-category-mask[data-cat="interior"]{-webkit-mask-size:19.33px;mask-size:19.33px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.44px,1.17px)}
-html body .homecategories .pm-category-mask[data-cat="learning"]{-webkit-mask-size:18.54px;mask-size:18.54px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.74px,0.96px)}
-html body .homecategories .pm-category-mask[data-cat="life"]{-webkit-mask-size:19.60px;mask-size:19.60px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.21px,0.80px)}
-html body .homecategories .pm-category-mask[data-cat="media"]{-webkit-mask-size:17.30px;mask-size:17.30px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(3.36px,1.57px)}
-html body .homecategories .pm-category-mask[data-cat="nature"]{-webkit-mask-size:19.33px;mask-size:19.33px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.35px,1.33px)}
-html body .homecategories .pm-category-mask[data-cat="other"]{-webkit-mask-size:18.94px;mask-size:18.94px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.54px,1.68px)}
-html body .homecategories .pm-category-mask[data-cat="pets"]{-webkit-mask-size:17.51px;mask-size:17.51px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.95px,2.33px)}
-html body .homecategories .pm-category-mask[data-cat="recipe"]{-webkit-mask-size:17.28px;mask-size:17.28px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(4.21px,1.97px)}
-html body .homecategories .pm-category-mask[data-cat="stay"]{-webkit-mask-size:18.76px;mask-size:18.76px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.80px,0.94px)}
-html body .homecategories .pm-category-mask[data-cat="tech"]{-webkit-mask-size:20.90px;mask-size:20.90px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(1.56px,0.22px)}
-html body .homecategories .pm-category-mask[data-cat="travel"]{-webkit-mask-size:18.23px;mask-size:18.23px;-webkit-mask-position:0 0;mask-position:0 0;transform:translate(2.89px,1.75px)}
-/* 한글 글자 획이 줄 상자 위쪽에 몰려 칩 가운데보다 약 2px 높게 보여서, 칩 안쪽 위 여백 space-xs로 글자와 아이콘을 함께 칩 세로 가운데로 */
-html body .homecategories .prefchip{padding-top:var(--space-xs)!important;padding-bottom:0!important}
+/* 아이콘과 글자의 20px 상자 중심을 32px 칩의 중심에 맞춘다. */
+html body .homecategories .prefchip{padding-top:0!important;padding-bottom:0!important}
 
 /* transitions.dev Pro Gooey plus menu: source motion and SVG geometry, anchored to Pinmap's centre nav action. */
 .t-goo-anchor{
@@ -2755,7 +2730,6 @@ html body .calspan.tone-3{background:color-mix(in srgb,var(--color-accent) 20%,t
 
 /* 2026-11-24: 홈 카테고리 칩 — 글자도 아이콘과 같은 색(기본 icon-muted, 마우스 올림·포커스 icon-hover) */
 html body .homecategories .prefchip{color:var(--color-icon-muted)!important;transition:color .15s}
-html body .homecategories .prefchip .pm-category-mask{transition:background-color .15s}
 html body .homecategories .prefchip:is(:hover,:focus-visible){color:var(--color-icon-hover)!important}
 html body .homecategories .prefchip:is(:hover,:focus-visible) *{color:inherit!important}
 
@@ -3200,7 +3174,7 @@ html body .bottomnav svg .pm-nav-fill,html body .main:has(.myprofile) svg.solar-
 html body .lm-drawn-map{--lm-drawn-sheet-height:383px;background:#f5f5f5;color:#282828}
 html body .lm-drawn-map .lm-header{position:absolute;inset:0 0 auto!important;z-index:600;width:100%;height:132px;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;pointer-events:none}
 html body .lm-drawn-map .lm-header::before{content:'';position:absolute;inset:0 0 auto;height:79px;background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,0));pointer-events:none}
-html body .lm-drawn-map .lm-drawn-search{position:absolute;left:17px;right:16px;top:40px;height:53px;display:flex;align-items:center;gap:13px;padding:0 9px 0 17px;border:0;border-radius:30px;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.1);pointer-events:auto}
+html body .lm-drawn-map .lm-drawn-search{position:absolute;z-index:1;left:17px;right:16px;top:40px;height:53px;display:flex;align-items:center;gap:13px;padding:0 9px 0 17px;border:0;border-radius:30px;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.1);pointer-events:auto}
 html body .lm-drawn-map .lm-drawn-search>.icon{flex:none;width:24px;height:24px;color:#858b95;stroke-width:1.7}
 html body .lm-drawn-map .lm-drawn-search input{flex:1;min-width:0;width:100%;height:100%;padding:0!important;border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;font:400 18px/24px var(--font-family);color:#282828}
 html body .lm-drawn-map .lm-drawn-search input::placeholder{color:#858b95;opacity:1}
@@ -3212,7 +3186,7 @@ html body .lm-drawn-map .lm-drawn-avatar .pavatar svg{display:block;width:23px;h
 html body .lm-drawn-map .lm-drawn-clear{flex:none;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:#f0f2f4!important;color:#282828;display:grid;place-items:center}
 html body .lm-drawn-map .lm-drawn-clear[hidden]{display:none!important}
 html body .lm-drawn-map .lm-drawn-clear svg{width:16px;height:16px}
-html body .lm-drawn-map .lm-header .lm-categories{position:absolute;left:17px;right:17px;top:104px;height:32px;display:flex;justify-content:flex-start;gap:8px;margin:0!important;padding:0!important;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;pointer-events:auto}
+html body .lm-drawn-map .lm-header .lm-categories{position:absolute;left:-3px;right:-3px;top:84px;height:72px;display:flex;justify-content:flex-start;gap:8px;margin:0!important;padding:20px!important;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;pointer-events:auto}
 html body .lm-drawn-map .lm-header .lm-categories::-webkit-scrollbar{display:none}
 html body .lm-drawn-map .lm-header .lm-categories .prefchip{flex:none;width:max-content;min-width:0;min-height:32px;height:32px;display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:var(--space-xs);margin:0;padding:0 var(--space-md)!important;border:0!important;border-radius:999px!important;background:var(--color-surface)!important;box-shadow:0 0 20px rgba(0,0,0,.1)!important;color:var(--color-icon-muted)!important;font:var(--type-label-md);white-space:nowrap}
 html body .lm-drawn-map .lm-header .lm-categories .prefchip.selected{background:#282828!important;color:#fff!important}
@@ -3282,7 +3256,7 @@ html body .lm-drawn-map .lm-drawn-marker-label{display:block;max-width:86px;over
 html body .lm-drawn-map .lm-drawn-marker.is-selected .lm-drawn-marker-disc{transform:translateY(-6px) scale(1.08)}
 html body .lm-drawn-map .leaflet-control-attribution{margin-bottom:calc(var(--lm-drawn-sheet-height) + 1px)!important;font-size:8px!important}
 html body .lm-drawn-map .lm-map-credits{display:none}
-@media(max-width:360px){html body .lm-drawn-map .lm-header .lm-categories{left:12px;right:12px}html body .lm-drawn-map .lm-drawn-search{left:12px;right:12px}html body .lm-drawn-map .lm-drawn-place-heading small{display:none}}
+@media(max-width:360px){html body .lm-drawn-map .lm-header .lm-categories{left:-8px;right:-8px}html body .lm-drawn-map .lm-drawn-search{left:12px;right:12px}html body .lm-drawn-map .lm-drawn-place-heading small{display:none}}
 @media(prefers-reduced-motion:reduce){html body .lm-drawn-map .lm-drawn-marker-disc{transition:none}}
 html[data-theme="dark"] body .lm-drawn-map{background:#f5f5f5!important;color:#282828!important}
 html[data-theme="dark"] body .lm-drawn-map :is(.lm-drawn-search,.lm-recent,.lm-search-results){background:#fff!important;color:#282828!important}
