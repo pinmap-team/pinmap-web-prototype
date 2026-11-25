@@ -16,7 +16,7 @@ Object.assign(paths, {
 // 칩과 폴더에 쓰는 카테고리 (순서 = 화면 순서)
 const CF_FOLDERS = PinmapCategories.all.map(c=>({id:c.label,icon:c.id}));
 function cfCategories(){return CF_FOLDERS;}
-const CF_ALL_FOLDER = {id:'전체 저장', title:'전체', icon:'all'};
+const CF_ALL_FOLDER = {id:'전체 저장', title:'전체', icon:'bookmark'};
 function folderOf(x){return PinmapCategories.of(x).label;}
 // 다른 화면에서 넘어온 필터(예: 홈의 '맛집·카페')도 폴더로 바꿔요
 const CF_ALIAS = {};
@@ -67,7 +67,7 @@ function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected 
       <svg class="cf-shade" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
       <span class="cf-front"></span>
       <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
-      <span class="cf-meta">${pinned ? `<span class="cf-pinmark" aria-hidden="true">${cfFilledPinIcon()}</span>` : ''}${id===CF_ALL_FOLDER.id?`<span class="cf-allmark" aria-hidden="true">${icon('all')}</span>`:''}<span class="cf-title">${esc(title)}</span><span class="cf-count">${count}<span class="sr">개 저장된 폴더${pinned ? ', 상단 고정됨' : ''}</span></span></span>
+      <span class="cf-meta">${pinned ? `<span class="cf-pinmark" aria-hidden="true">${cfFilledPinIcon()}</span>` : ''}<span class="cf-title">${esc(title)}</span><span class="cf-count">${count}<span class="sr">개 저장된 폴더${pinned ? ', 상단 고정됨' : ''}</span></span></span>
     </span>
   </button>`;
 }
@@ -291,7 +291,7 @@ pages.library = function(){
     </div>` : '';
   return `<div class="libpage cfpage ${open ? 'cf-infolder' : ''} ${cfSel ? 'cf-selecting' : ''}">${CF_DEFS}
     <div class="cf-search-header">
-    <div class="libhead cf-fhead${back ? ' hasback' : ''}">${back}<h1>${open===CF_ALL_FOLDER.title?`<span class="cf-active-all-icon" aria-hidden="true">${icon('allBold')}</span>`:''}${esc(open || '컬렉션')}</h1>${open ? `<span class="cf-hcount" aria-label="저장 ${cfTotal()}개">${cfTotal()}</span>` : ''}${collection && cfCustom().includes(collection) && !cfSel ? `<button type="button" class="cf-delfolder" data-action="cfdelfolder" aria-label="‘${esc(collection)}’ 폴더 삭제">${icon('trash')}</button>` : ''}</div>
+    <div class="libhead cf-fhead${back ? ' hasback' : ''}">${back}<h1>${esc(open || '컬렉션')}</h1>${open ? `<span class="cf-hcount" aria-label="저장 ${cfTotal()}개">${cfTotal()}</span>` : ''}${collection && cfCustom().includes(collection) && !cfSel ? `<button type="button" class="cf-delfolder" data-action="cfdelfolder" aria-label="‘${esc(collection)}’ 폴더 삭제">${icon('trash')}</button>` : ''}</div>
       <div class="cf-search-row${cfSearchOpen?' is-open':''}" id="cf-search-row" aria-hidden="${!cfSearchOpen}" ${cfSearchOpen?'':'inert'}>
         <label class="libsearch"><input id="search" type="search" enterkeyhint="search" aria-label="${esc(ph)}" placeholder="${esc(ph)}" value="${esc(query)}" autocomplete="off" maxlength="80" ${cfSearchOpen?'':'tabindex="-1"'}></label>
       </div>
