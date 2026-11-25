@@ -132,6 +132,18 @@
     win.style.removeProperty('opacity');
     stage.style.removeProperty('pointer-events');
   }
+  function drawLiquidNeck(path, ax, ay, ar, bx, by, br, radius) {
+    const dx = bx - ax, dy = by - ay, distance = Math.hypot(dx, dy);
+    const gap = distance - ar - br, maxGap = radius * 1.3;
+    if (distance < 1 || ar < 1 || br < 1 || gap < 0 || gap >= maxGap) { path.setAttribute('d', ''); return; }
+    const ux = dx / distance, uy = dy / distance, px = -uy, py = ux;
+    const thickness = Math.min(ar, br) * .42 * (1 - gap / maxGap);
+    const aX = ax + ux * ar * .7, aY = ay + uy * ar * .7;
+    const bX = bx - ux * br * .7, bY = by - uy * br * .7;
+    const c1X = ax + ux * (ar + gap * .35), c1Y = ay + uy * (ar + gap * .35);
+    const c2X = bx - ux * (br + gap * .35), c2Y = by - uy * (br + gap * .35);
+    path.setAttribute('d', `M${aX + px * thickness},${aY + py * thickness} C${c1X + px * thickness * .6},${c1Y + py * thickness * .6} ${c2X + px * thickness * .6},${c2Y + py * thickness * .6} ${bX + px * thickness},${bY + py * thickness} L${bX - px * thickness},${bY - py * thickness} C${c2X - px * thickness * .6},${c2Y - py * thickness * .6} ${c1X - px * thickness * .6},${c1Y - py * thickness * .6} ${aX - px * thickness},${aY - py * thickness} Z`);
+  }
   function animateInputFrom(origin) {
     if (!origin?.width || reduced()) return;
     stopInputMorph();
@@ -141,12 +153,13 @@
     svg.setAttribute('class', 'dl-goo-morph');
     svg.setAttribute('viewBox', `0 0 ${innerWidth} ${innerHeight}`);
     svg.setAttribute('aria-hidden', 'true');
-    svg.innerHTML = `<defs><filter id="dl-input-goo-filter" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur"/><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -7.8" result="goo"/><feComposite in="SourceGraphic" in2="goo" operator="atop"/></filter></defs><g filter="url(#dl-input-goo-filter)"><circle class="dl-goo-source"/><circle class="dl-goo-drop"/><rect class="dl-goo-card"/></g>`;
+    svg.innerHTML = `<g><path class="dl-goo-neck"/><circle class="dl-goo-source"/><circle class="dl-goo-drop"/><rect class="dl-goo-card"/></g>`;
     document.body.append(svg);
     inputMorphLayer = svg;
     const source = svg.querySelector('.dl-goo-source');
     const drop = svg.querySelector('.dl-goo-drop');
     const card = svg.querySelector('.dl-goo-card');
+    const neck = svg.querySelector('.dl-goo-neck');
     const cx = origin.left + origin.width / 2, cy = origin.top + origin.height / 2;
     const radius = Math.min(origin.width, origin.height) / 2;
     const landingX = Math.max(target.left + radius, Math.min(cx, target.right - radius));
@@ -170,6 +183,7 @@
       drop.setAttribute('cx', dropX);
       drop.setAttribute('cy', dropY);
       drop.setAttribute('r', Math.max(0, dropRadius));
+      drawLiquidNeck(neck, cx, cy, sourceRadius, dropX, dropY, dropRadius, radius);
       card.setAttribute('x', lerp(dropX - radius, target.left, grow));
       card.setAttribute('y', lerp(dropY - radius, target.top, grow));
       card.setAttribute('width', Math.max(0, lerp(radius * 2, target.width, grow)));
@@ -180,6 +194,7 @@
       source.style.fill = fill;
       drop.style.fill = fill;
       card.style.fill = fill;
+      neck.style.fill = fill;
       win.style.opacity = String(smooth(Math.max(0, Math.min(1, (t - .68) / .28))));
       svg.style.opacity = String(1 - smooth(Math.max(0, Math.min(1, (t - .75) / .25))));
       if (t < 1) inputMorphFrame = requestAnimationFrame(frame);
@@ -196,12 +211,13 @@
     svg.setAttribute('class', 'dl-goo-morph');
     svg.setAttribute('viewBox', `0 0 ${innerWidth} ${innerHeight}`);
     svg.setAttribute('aria-hidden', 'true');
-    svg.innerHTML = `<defs><filter id="dl-input-goo-filter" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur"/><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0 0  0 0 0 20 -7.8" result="goo"/><feComposite in="SourceGraphic" in2="goo" operator="atop"/></filter></defs><g filter="url(#dl-input-goo-filter)"><circle class="dl-goo-source"/><circle class="dl-goo-drop"/><rect class="dl-goo-card"/></g>`;
+    svg.innerHTML = `<g><path class="dl-goo-neck"/><circle class="dl-goo-source"/><circle class="dl-goo-drop"/><rect class="dl-goo-card"/></g>`;
     document.body.append(svg);
     inputMorphLayer = svg;
     const source = svg.querySelector('.dl-goo-source');
     const drop = svg.querySelector('.dl-goo-drop');
     const card = svg.querySelector('.dl-goo-card');
+    const neck = svg.querySelector('.dl-goo-neck');
     const cx = origin.left + origin.width / 2, cy = origin.top + origin.height / 2;
     const radius = Math.min(origin.width, origin.height) / 2;
     const landingX = Math.max(target.left + radius, Math.min(cx, target.right - radius));
@@ -221,6 +237,7 @@
       source.setAttribute('r', Math.max(0, radius * (1 - smooth(clamp((u - .2) / .42)))));
       drop.setAttribute('cx', dropX); drop.setAttribute('cy', dropY);
       drop.setAttribute('r', Math.max(0, radius * (1 - smooth(clamp((u - .5) / .42)))));
+      drawLiquidNeck(neck, cx, cy, +source.getAttribute('r'), dropX, dropY, +drop.getAttribute('r'), radius);
       card.setAttribute('x', lerp(dropX - radius, target.left, grow));
       card.setAttribute('y', lerp(dropY - radius, target.top, grow));
       card.setAttribute('width', Math.max(0, lerp(radius * 2, target.width, grow)));
@@ -228,7 +245,7 @@
       card.setAttribute('rx', lerp(radius, 24, grow));
       const surfaceMix = Math.round(smooth(clamp((u - .3) / .5)) * 100);
       const fill = `color-mix(in srgb, var(--color-primary) ${100 - surfaceMix}%, black ${surfaceMix}%)`;
-      source.style.fill = fill; drop.style.fill = fill; card.style.fill = fill;
+      source.style.fill = fill; drop.style.fill = fill; card.style.fill = fill; neck.style.fill = fill;
       win.style.opacity = String(1 - smooth(clamp(t / .22)));
       svg.style.opacity = String(smooth(clamp(t / .18)) * (1 - smooth(clamp((t - .82) / .18))));
       if (t < 1) inputMorphFrame = requestAnimationFrame(frame);
