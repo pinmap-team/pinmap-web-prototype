@@ -28,7 +28,7 @@ const solarPinIcon = (extraClass='') => `<svg xmlns="http://www.w3.org/2000/svg"
 const icon = n => SOLAR_ICONS[n] || `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n]||paths.bookmark}"/></svg>`;
 // Keep the original pointed map star as the shared favorite shape.
 // The old function name stays for existing callers across map, detail, collections, and My.
-const likeHeartIcon = () => `<svg class="icon lm-like-heart pm-star" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path class="pm-star-line" d="${paths.star}" fill="none" stroke="currentColor"/><path class="pm-star-fill" d="${paths.star}" fill="currentColor" stroke="currentColor"/></svg>`;
+const likeHeartIcon = () => `<svg class="icon lm-like-heart pm-star t-like-heart" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path class="pm-star-line" d="${paths.star}" fill="none" stroke="currentColor"/><path class="pm-star-fill" d="${paths.star}" fill="currentColor" stroke="currentColor"/></svg>`;
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ---------- 콘텐츠 유형 (저장 카테고리) ---------- */

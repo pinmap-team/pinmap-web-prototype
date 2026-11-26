@@ -1512,25 +1512,24 @@ html,body{overscroll-behavior-y:contain}
 .cfpage .cf-itemmeta{display:flex;margin-top:var(--space-xs)}
 .cfpage .cf-saved-time{top:var(--space-sm);right:var(--space-sm);padding:var(--space-xs) var(--space-sm)}
 
-/* Bencho Like's Lucide heart and Bloom, without its pill or count. */
-:is(.live-map,.dt-photo) .lm-heart-motion{position:relative;isolation:isolate;-webkit-tap-highlight-color:transparent}
-:is(.live-map,.dt-photo) .lm-heart-motion:active{scale:.96;transition:scale .22s cubic-bezier(.22,1,.36,1)}
+/* Like button recipe, adapted to the existing pointed star and Pinmap colors. */
+.t-like{--like-fill:150ms;--like-pop:350ms;--like-release:240ms;--like-particle-dur:600ms;--like-particle-dist:20px;--like-particle-size:2.5px;--like-pop-ease:cubic-bezier(.34,1.96,.64,1);--like-ease:cubic-bezier(.22,1,.36,1);position:relative;isolation:isolate;-webkit-tap-highlight-color:transparent}
+.t-like:active{scale:.96;transition:scale var(--like-release) var(--like-ease)}
 :is(.live-map,.dt-photo) button.lm-heart-motion{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .dt.dt-photo .dttop button.dtbtn.dtfavorite.lm-heart-motion{border:1px solid rgba(255,255,255,.2)!important;border-radius:50%;background:rgba(17,17,17,.22)!important;-webkit-backdrop-filter:blur(16px)!important;backdrop-filter:blur(16px)!important;box-shadow:none!important}
-:is(.live-map,.dt-photo) .lm-heart-motion .lm-heart-glyph{position:relative;z-index:1;display:grid;place-items:center;width:20px;height:20px}
-:is(.live-map,.dt-photo) .lm-heart-motion .lm-heart-glyph .lm-like-heart{width:20px;height:20px;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-:is(.live-map,.dt-photo) button.lm-heart-motion.is-active{color:#e5484d!important}
-:is(.live-map,.dt-photo) .lm-heart-motion.is-bursting .lm-heart-glyph{animation:pinmap-heart-return .76s cubic-bezier(.3,1.6,.4,1) both}
-@keyframes pinmap-heart-return{0%,28%{scale:0}62%{scale:1.25}100%{scale:1}}
-:is(.live-map,.dt-photo) .lm-heart-burst{position:absolute;top:50%;left:50%;pointer-events:none}
-:is(.live-map,.dt-photo) .lm-heart-bloom{box-sizing:border-box;position:absolute;top:-17px;left:-17px;width:34px;height:34px;border:17px solid #cc8ef5;border-radius:50%;animation:pinmap-heart-bloom .56s cubic-bezier(.25,.8,.35,1) both}
-@keyframes pinmap-heart-bloom{0%{border-width:17px;border-color:#e5484d;scale:.15}40%{border-width:17px;border-color:#cc8ef5;scale:1}75%{opacity:1;border-width:2px}100%{opacity:0;border-width:0;scale:1.12}}
-:is(.live-map,.dt-photo) .lm-heart-spoke{position:absolute;top:0;left:0;rotate:var(--angle)}
-:is(.live-map,.dt-photo) .lm-heart-spoke i{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;animation:pinmap-heart-dot .62s cubic-bezier(.2,.8,.3,1) .2s both}
-:is(.live-map,.dt-photo) .lm-heart-spoke i:first-child{--side:-4px;--far:0px}
-:is(.live-map,.dt-photo) .lm-heart-spoke i:last-child{--side:4px;--far:-5px;width:4px;height:4px;margin:-2px 0 0 -2px}
-@keyframes pinmap-heart-dot{0%{translate:12px var(--side);opacity:0;scale:1}12%{opacity:1}100%{translate:calc(25px + var(--far)) calc(var(--side)*1.6);opacity:1;scale:0}}
-@media(prefers-reduced-motion:reduce){:is(.live-map,.dt-photo) .lm-heart-motion:active{scale:1;transition:none}:is(.live-map,.dt-photo) .lm-heart-motion.is-bursting .lm-heart-glyph,:is(.live-map,.dt-photo) .lm-heart-bloom,:is(.live-map,.dt-photo) .lm-heart-spoke i{animation:none}:is(.live-map,.dt-photo) .lm-heart-burst{display:none}}
+.t-like .t-like-icon{position:relative;z-index:1;display:grid;place-items:center;width:20px;height:20px}
+.t-like .t-like-heart{width:20px;height:20px;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+html body .t-like .pm-star .pm-star-line,html body .t-like .pm-star .pm-star-fill{display:inline;transition:opacity var(--like-fill) var(--like-ease)}
+.t-like .pm-star .pm-star-fill,.t-like[data-liked="true"] .pm-star .pm-star-line{opacity:0}
+.t-like[data-liked="true"] .pm-star .pm-star-fill{opacity:1}
+.t-like.is-bursting .t-like-icon{animation:t-like-pop var(--like-pop) var(--like-pop-ease) both}
+.t-like.is-unfavoriting .t-like-icon{animation:t-like-release var(--like-release) var(--like-ease) both}
+@keyframes t-like-pop{0%{transform:scale(1)}30%{transform:scale(.82)}100%{transform:scale(1)}}
+@keyframes t-like-release{0%{transform:scale(1)}45%{transform:scale(.88)}100%{transform:scale(1)}}
+.t-like .t-like-particles{position:absolute;top:50%;left:50%;z-index:0;width:0;height:0;pointer-events:none}
+.t-like .t-like-particles i{position:absolute;top:calc(var(--like-particle-size)/-2);left:calc(var(--like-particle-size)/-2);width:var(--like-particle-size);height:var(--like-particle-size);border-radius:50%;background:currentColor;animation:t-like-burst var(--like-particle-dur) ease-out var(--pdelay,0ms) both}
+@keyframes t-like-burst{0%{opacity:0;transform:translate(0,0) scale(.4)}20%{opacity:1;transform:translate(calc(var(--px)*.25),calc(var(--py)*.25)) scale(1)}100%{opacity:0;transform:translate(var(--px),var(--py)) scale(var(--p-end-scale,.6))}}
+@media(prefers-reduced-motion:reduce){.t-like:active{scale:1;transition:none}.t-like.is-bursting .t-like-icon,.t-like.is-unfavoriting .t-like-icon,.t-like .t-like-particles i{animation:none}.t-like .t-like-particles{display:none}html body .t-like .pm-star .pm-star-line,html body .t-like .pm-star .pm-star-fill{transition:none}}
 .cfpage .cf-itemtext h3,.cfpage .cf-itemdesc,.cfpage .cf-itemmeta{color:#fff!important;text-shadow:0 1px 5px #0009}
 
 /* FAQ: 한 장의 패널이 열린 질문으로 이동하고 답변 높이에 맞춰집니다. */
@@ -1947,14 +1946,12 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .layout .main:has(.strip){padding-top:var(--space-2xl)!important}
 [data-theme="dark"] .layout .main .strip{background:var(--color-surface)!important}
 
-/* 2026-11-26 즐겨찾기 별: 원래 지도 paths.star 뾰족한 경로, 기본 Outline·선택 Fill, 기존 모션 유지 */
+/* 2026-11-26 즐겨찾기 별: 원래 지도 paths.star 뾰족한 경로, 기본 Outline·선택 Fill */
 .pm-star .pm-star-fill{display:none}
 .is-active .pm-star .pm-star-line{display:none}
 .is-active .pm-star .pm-star-fill{display:inline}
 :is(.live-map,.dt-photo) button.lm-heart-motion.is-active,.dt-extraction-heart.is-active{color:var(--color-on-surface)!important}
 .dt.dt-photo .dttop button.dtbtn.dtfavorite.lm-heart-motion.is-active{color:#fff!important}
-:is(.live-map,.dt-photo) .lm-heart-bloom{border-color:var(--color-accent)}
-@keyframes pinmap-heart-bloom{0%{border-width:17px;border-color:var(--color-accent);scale:.15}40%{border-width:17px;border-color:var(--color-accent);scale:1}75%{opacity:1;border-width:2px}100%{opacity:0;border-width:0;scale:1.12}}
 
 /* 하단 네비 가운데 추가 버튼 자리 */
 .bottomnav{overflow:visible!important}
@@ -2206,18 +2203,6 @@ html[data-theme="dark"] body .calspan em{color:var(--color-neutral)}
 /* 2026-11-24: 폴더 안 콘텐츠 카드의 즐겨찾기 별 = 상세 상단 별과 같은 형태(44px 유리 원형)·같은 모션 */
 html body .cf-item .cf-fav.lm-heart-motion{position:absolute;top:var(--space-sm);right:var(--space-sm);z-index:2;isolation:isolate;display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid rgba(255,255,255,.2)!important;border-radius:50%;background:rgba(17,17,17,.22)!important;color:#fff!important;-webkit-backdrop-filter:blur(16px)!important;backdrop-filter:blur(16px)!important;box-shadow:none!important;-webkit-tap-highlight-color:transparent}
 html body .cf-item .cf-fav.lm-heart-motion::after{inset:-2px}
-html body .cf-item .cf-fav.lm-heart-motion:active{scale:.96;transition:scale .22s cubic-bezier(.22,1,.36,1)}
-html body .cf-item .cf-fav .lm-heart-glyph{position:relative;z-index:1;display:grid;place-items:center;width:20px;height:20px}
-html body .cf-item .cf-fav .lm-heart-glyph .lm-like-heart{width:20px!important;height:20px!important;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-html body .cf-item .cf-fav.is-active .icon{fill:currentColor}
-html body .cf-item .cf-fav.is-bursting .lm-heart-glyph{animation:pinmap-heart-return .76s cubic-bezier(.3,1.6,.4,1) both}
-html body .cf-item .cf-fav .lm-heart-burst{position:absolute;top:50%;left:50%;pointer-events:none}
-html body .cf-item .cf-fav .lm-heart-bloom{box-sizing:border-box;position:absolute;top:-17px;left:-17px;width:34px;height:34px;border:17px solid var(--color-accent);border-radius:50%;animation:pinmap-heart-bloom .56s cubic-bezier(.25,.8,.35,1) both}
-html body .cf-item .cf-fav .lm-heart-spoke{position:absolute;top:0;left:0;rotate:var(--angle)}
-html body .cf-item .cf-fav .lm-heart-spoke i{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;animation:pinmap-heart-dot .62s cubic-bezier(.2,.8,.3,1) .2s both}
-html body .cf-item .cf-fav .lm-heart-spoke i:first-child{--side:-4px;--far:0px}
-html body .cf-item .cf-fav .lm-heart-spoke i:last-child{--side:4px;--far:-5px;width:4px;height:4px;margin:-2px 0 0 -2px}
-@media(prefers-reduced-motion:reduce){html body .cf-item .cf-fav.lm-heart-motion:active{scale:1;transition:none}html body .cf-item .cf-fav.is-bursting .lm-heart-glyph,html body .cf-item .cf-fav .lm-heart-bloom,html body .cf-item .cf-fav .lm-heart-spoke i{animation:none}html body .cf-item .cf-fav .lm-heart-burst{display:none}}
 /* 2026-11-24: 폴더 안 카드 사진 가장자리의 검은 선 제거 — 사진이 카드를 꽉 채우므로 뒤의 흐린·어두운 사진 레이어는 쓰지 않아요 */
 html body .cf-item .cf-itemback{display:none!important}
 html body .cf-item .cf-itemimg{background:transparent}
