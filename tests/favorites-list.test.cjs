@@ -19,6 +19,7 @@ test('favorites show three per group, expand separately, and use source covers f
   vm.createContext(context);
   vm.runInContext(fs.readFileSync('mypages.js','utf8'),context);
   let html=context.pages.favorites();
+  assert.equal((html.match(/class="fav-group-list"/g)||[]).length,2);
   assert.equal((html.match(/class="lm-drawn-place-row fav-row/g)||[]).length,6);
   assert.equal((html.match(/data-fav-more=/g)||[]).length,2);
   assert.ok(!html.includes('8개'));
