@@ -163,12 +163,16 @@
     });
     alignCategoryIndicator(bar);
   }
-  function visiblePlaces() {
+  function providerPlaces() {
     const list = searchResults || savedPlaces();
-    return list.filter(x => (category === 'all' || (x.categoryId || PinmapCategories.get(x.kind)?.id) === category) && (!favoritesOnly || x.favorite));
+    return list.filter(x => category === 'all' || (x.categoryId || PinmapCategories.get(x.kind)?.id) === category);
   }
-  function syncProviderPlaces(list=visiblePlaces()) {
+  function visiblePlaces() {
+    return providerPlaces().filter(x => !favoritesOnly || x.favorite);
+  }
+  function syncProviderPlaces() {
     const bounds=liveMap?.getBounds().pad(1);
+    const list=providerPlaces();
     mapProviderController?.setPlaces(bounds?list.filter(place=>bounds.contains([place.lat,place.lng])):list);
   }
   const placeKey=place=>place.saved&&place.placeId?place.placeId:`search:${place.id}${place.locationIndex==null?'':':'+place.locationIndex}`;
@@ -400,7 +404,7 @@
     if (!liveMap) return;
     clearSelection();markerEntries.clear();pinLayer.clearLayers();clusterMarkers=[];
     const list = visiblePlaces();
-    syncProviderPlaces(list);
+    syncProviderPlaces();
     list.forEach(place => {
       const marker=L.marker([place.lat,place.lng],{title:place.title,icon:markerIcon(place),bubblingMouseEvents:false});
       const entry={place,marker};markerEntries.set(placeKey(place),entry);
