@@ -3,6 +3,7 @@
   const originalRender = render;
   let categoryObserver;
   let liveMap, pinLayer, locationMarker, locationHeadingMarker, placeController, mapProviderController, courseRouteLayer;
+  let clusterMarkers=[];
   let expandedKey=null, sheetStage='half', sheetDrag=null, suppressSheetClickUntil=0;
   let mapLocationName=null, searchOpen=false, panelTab='places', favoritesOnly=false, selectedCourseId=null;
   // 2026-11-24: 목록 아이콘 왼쪽 점은 선이 아니라 칠한 원(Figma Icon / list).
@@ -80,7 +81,7 @@
       <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">${icon('info')}</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p data-map-credit>지도 연결 중</p></div></details>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" role="status" aria-live="polite" hidden></div>
-      <div class="lm-drawn-actions"><button type="button" class="lm-drawn-favorites${favoritesOnly?' is-active':''}" data-lm="favorite-filter" aria-label="즐겨찾기 장소만 보기" aria-pressed="${favoritesOnly}">${icon('star')}</button>${round('현재 위치로 이동','target')}</div>
+      <div class="lm-drawn-actions"><button type="button" class="lm-drawn-favorites${favoritesOnly?' is-active':''}" data-lm="favorite-filter" aria-label="즐겨찾기 장소만 보기" aria-pressed="${favoritesOnly}">${likeHeartIcon()}</button>${round('현재 위치로 이동','target')}</div>
       <div class="lm-list-scrim" data-lm="close-list" hidden></div><section class="lm-list-sheet" id="lm-list-sheet" role="dialog" aria-label="저장한 장소 목록" hidden></section>
       <section class="lm-selected-host" id="lm-selected-place" aria-label="이 근방 저장된 장소"></section></section>`;
   }
@@ -97,14 +98,29 @@
     syncMarkerVisibility(state.current);
   }
   function syncMarkerVisibility(provider=mapProviderController?.current) {
-    if(!pinLayer)return;
+    if(!pinLayer||!liveMap)return;
+    clusterMarkers.forEach(marker=>pinLayer.removeLayer(marker));
+    clusterMarkers=[];
+    const eligible=[...markerEntries.values()].filter(entry=>provider==='google'||!/^google_places$/i.test(entry.place.coordinateSource||''));
+    const selected=eligible.filter(entry=>placeKey(entry.place)===expandedKey);
+    const groups=PinmapMapClusters.group(eligible.filter(entry=>placeKey(entry.place)!==expandedKey),entry=>liveMap.latLngToLayerPoint([entry.place.lat,entry.place.lng]));
+    const visible=new Set([...selected,...groups.filter(group=>group.length===1).flat()]);
     for(const entry of markerEntries.values()){
-      const allowed=provider==='google'||!/^google_places$/i.test(entry.place.coordinateSource||'');
-      if(allowed&&!pinLayer.hasLayer(entry.marker)){
-        entry.marker.addTo(pinLayer);
+      if(visible.has(entry)){
+        if(!pinLayer.hasLayer(entry.marker))entry.marker.addTo(pinLayer);
         updateMarker(entry,placeKey(entry.place)===expandedKey);
-      }
-      else if(!allowed&&pinLayer.hasLayer(entry.marker))pinLayer.removeLayer(entry.marker);
+      }else if(pinLayer.hasLayer(entry.marker))pinLayer.removeLayer(entry.marker);
+    }
+    for(const group of groups){
+      if(group.length<2)continue;
+      const point=[group.reduce((sum,entry)=>sum+entry.place.lat,0)/group.length,group.reduce((sum,entry)=>sum+entry.place.lng,0)/group.length];
+      const marker=L.marker(point,{title:`저장한 장소 ${group.length}곳, 지도 확대`,icon:clusterIcon(group),bubblingMouseEvents:false});
+      marker.on('click',()=>{
+        if(liveMap.getZoom()<18)liveMap.flyTo(point,Math.min(liveMap.getZoom()+2,18),{duration:.45});
+        else expandPlace(group[0].place,true,false);
+      });
+      marker.addTo(pinLayer);
+      clusterMarkers.push(marker);
     }
   }
   function alignCategoryIndicator(bar) {
@@ -143,6 +159,11 @@
     return L.divIcon({className:`lm-photo-marker lm-drawn-marker${expanded?' is-selected':''}`,
       html:`<span class="lm-drawn-marker-body"><span class="lm-drawn-marker-disc">${categoryIcon(place.categoryId||place.kind,true)}</span><span class="lm-drawn-marker-label">${safe(place.title)}</span></span>`,
       iconSize:[86,64],iconAnchor:[43,18]});
+  }
+  function clusterIcon(group) {
+    const count=group.length;
+    const content=count>=4?`+${count}`:group.map(entry=>categoryIcon(entry.place.categoryId||entry.place.kind,true)).join('');
+    return L.divIcon({className:'lm-drawn-cluster',html:`<span class="lm-drawn-cluster-disc" data-count="${count}">${content}</span>`,iconSize:[34,34],iconAnchor:[17,17]});
   }
   function updateMarker(entry,expanded) {
     // Keep the existing photo/SVG nodes and Leaflet anchor so CSS can interpolate.
@@ -212,7 +233,7 @@
       setSheetStage(stages[Math.max(0,Math.min(stages.length-1,stages.indexOf(sheetStage)+(event.key==='ArrowUp'?1:-1)))]);
     });
   }
-  const favoriteButton = place => place.saved ? `<button type="button" class="lm-carousel-heart${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 장소 즐겨찾기">${icon('star')}</button>` : '';
+  const favoriteButton = place => place.saved ? `<button type="button" class="lm-carousel-heart lm-heart-motion${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>` : '';
   function playHeartMotion(button, liked) {
     button.querySelector('.lm-heart-burst')?.remove();
     button.classList.remove('is-bursting');
@@ -251,14 +272,44 @@
     host.setAttribute('aria-label','근처 장소와 코스');
     host.innerHTML=`<section class="lm-sheet is-${sheetStage}" aria-label="지도 목록">
       <button type="button" class="lm-sheet-handle" aria-label="지도 목록 높이 조절" aria-expanded="${sheetStage!=='peek'}"><span></span></button>
-      <div class="lm-drawn-tabs" role="tablist" aria-label="지도 목록 종류"><button type="button" role="tab" id="lm-tab-places" data-lm="show-places" aria-selected="${panelTab==='places'}" aria-controls="lm-panel-places">${placeTabIcon(panelTab==='places')}<span>근처 장소</span></button><button type="button" role="tab" id="lm-tab-courses" data-lm="show-courses" aria-selected="${panelTab==='courses'}" aria-controls="lm-panel-courses">${icon('route')}<span>코스</span></button></div>
-      <div class="lm-sheet-scroll"><section id="lm-panel-places" role="tabpanel" aria-labelledby="lm-tab-places" ${panelTab==='places'?'':'hidden'}><div class="lm-drawn-place-list">${list.length?list.map(place=>`<article class="lm-drawn-place-row${placeKey(place)===expandedKey?' is-selected':''}" data-lm="select-place" data-place-key="${safe(placeKey(place))}">${PinmapPlacePhotos.markup(place.backendId,place.locationIndex,place.image||localPhoto(place.kind),'lm-drawn-place-photo')}<div class="lm-drawn-place-copy"><button type="button" class="lm-drawn-place-main" aria-label="${safe(place.title)} 지도에서 보기"><span class="lm-drawn-place-heading"><strong>${safe(place.title)}</strong><small>${safe(place.category||'장소')}</small></span></button><button type="button" class="lm-drawn-place-address" data-lm="open-place" data-place-key="${safe(placeKey(place))}" aria-label="${safe(place.title)} 상세 보기, ${safe(place.address||'주소 정보 없음')}">${safe(place.address||'주소 정보 없음')}</button><span class="lm-drawn-place-description">${safe(place.description||place.searchSummary||'')}</span></div>${favoriteButton(place)}</article>`).join(''):'<p class="lm-drawn-empty">이 근처에 저장한 장소가 없어요.</p>'}</div></section>
-      <section id="lm-panel-courses" role="tabpanel" aria-labelledby="lm-tab-courses" ${panelTab==='courses'?'':'hidden'}><div class="lm-drawn-course-list">${courses.length?courses.map(saved=>`<button type="button" class="lm-drawn-course-card${saved.id===selectedCourseId?' is-selected':''}" data-lm="open-course" data-course-id="${safe(saved.id)}" aria-label="${safe(saved.title)}, 장소 ${saved.places.length}곳 코스 열기"><span class="lm-drawn-course-copy"><strong>${safe(saved.title)}</strong><small>${safe(saved.date.replace(/-/g,'/'))}</small><span class="lm-drawn-course-stops">${saved.places.slice(0,4).map(place=>`<span>${icon('pin')}${safe(place.title)}</span>`).join('')}</span></span><span class="lm-drawn-course-map course-map-pattern${saved.places.some(place=>place.lat!=null&&place.lng!=null)?'':' is-empty'}" data-course-map="${safe(saved.id)}" role="img" aria-label="${safe(saved.title)} 경로 미리보기"></span></button>`).join(''):'<div class="lm-drawn-empty"><p>아직 저장한 코스가 없어요.</p><button type="button" data-course-new>새 코스 만들기</button></div>'}</div></section></div>
+      <div class="lm-drawn-tabs t-tabs" role="tablist" aria-label="지도 목록 종류"><span class="lm-drawn-tab-pill t-tabs-pill" aria-hidden="true"></span><button type="button" class="t-tab" role="tab" id="lm-tab-places" data-lm="show-places" aria-selected="${panelTab==='places'}" aria-controls="lm-panel-places">${placeTabIcon(panelTab==='places')}<span>근처 장소</span></button><button type="button" class="t-tab" role="tab" id="lm-tab-courses" data-lm="show-courses" aria-selected="${panelTab==='courses'}" aria-controls="lm-panel-courses">${icon('route')}<span>코스</span></button></div>
+      <div class="lm-sheet-scroll t-page-slide" data-tab="${panelTab}" data-page="${panelTab==='places'?'1':'2'}"><section id="lm-panel-places" class="t-page" data-page-id="1" role="tabpanel" aria-labelledby="lm-tab-places" aria-hidden="${panelTab!=='places'}" ${panelTab==='places'?'':'inert'}><div class="lm-drawn-place-list">${list.length?list.map(place=>`<article class="lm-drawn-place-row${placeKey(place)===expandedKey?' is-selected':''}" data-lm="select-place" data-place-key="${safe(placeKey(place))}">${PinmapPlacePhotos.markup(place.backendId,place.locationIndex,place.image||localPhoto(place.kind),'lm-drawn-place-photo')}<div class="lm-drawn-place-copy"><button type="button" class="lm-drawn-place-main" aria-label="${safe(place.title)} 지도에서 보기"><span class="lm-drawn-place-heading"><strong>${safe(place.title)}</strong><small>${safe(place.category||'장소')}</small></span></button><button type="button" class="lm-drawn-place-address" data-lm="open-place" data-place-key="${safe(placeKey(place))}" aria-label="${safe(place.title)} 상세 보기, ${safe(place.address||'주소 정보 없음')}">${safe(place.address||'주소 정보 없음')}</button><span class="lm-drawn-place-description">${safe(place.description||place.searchSummary||'')}</span></div>${favoriteButton(place)}</article>`).join(''):'<p class="lm-drawn-empty">이 근처에 저장한 장소가 없어요.</p>'}</div></section>
+      <section id="lm-panel-courses" class="t-page" data-page-id="2" role="tabpanel" aria-labelledby="lm-tab-courses" aria-hidden="${panelTab!=='courses'}" ${panelTab==='courses'?'':'inert'}><div class="lm-drawn-course-list">${courses.length?courses.map(saved=>`<button type="button" class="lm-drawn-course-card${saved.id===selectedCourseId?' is-selected':''}" data-lm="open-course" data-course-id="${safe(saved.id)}" aria-label="${safe(saved.title)}, 장소 ${saved.places.length}곳 코스 열기"><span class="lm-drawn-course-copy"><strong>${safe(saved.title)}</strong><small>${safe(saved.date.replace(/-/g,'/'))}</small><span class="lm-drawn-course-stops">${saved.places.slice(0,4).map(place=>`<span>${icon('pin')}${safe(place.title)}</span>`).join('')}</span></span><span class="lm-drawn-course-map course-map-pattern${saved.places.some(place=>place.lat!=null&&place.lng!=null)?'':' is-empty'}" data-course-map="${safe(saved.id)}" role="img" aria-label="${safe(saved.title)} 경로 미리보기"></span></button>`).join(''):'<div class="lm-drawn-empty"><p>아직 저장한 코스가 없어요.</p><button type="button" data-course-new>새 코스 만들기</button></div>'}</div></section></div>
     </section>`;
     bindSheetHandle(host.querySelector('.lm-sheet'));
+    syncTabPill(false);
     if(panelTab==='courses')requestAnimationFrame(()=>window.mountCourseThumbnails?.());
     renderCourseRoute();
   }
+  function syncTabPill(animate=true){
+    const bar=$('#lm-selected-place .lm-drawn-tabs'),pill=bar?.querySelector('.lm-drawn-tab-pill');
+    const active=bar?.querySelector('[aria-selected="true"]');
+    if(!pill||!active)return;
+    if(!animate)pill.style.transition='none';
+    pill.style.width=`${active.offsetWidth}px`;
+    pill.style.transform=`translateX(${active.offsetLeft}px)`;
+    if(!animate){void pill.offsetWidth;pill.style.removeProperty('transition');}
+  }
+  function switchPanelTab(next){
+    if(next===panelTab)return;
+    panelTab=next;
+    const scroll=$('#lm-selected-place .lm-sheet-scroll');
+    if(!scroll){renderSheet();return;}
+    scroll.dataset.tab=next;
+    scroll.dataset.page=next==='places'?'1':'2';
+    for(const tab of ['places','courses']){
+      const selected=tab===next,button=$(`#lm-tab-${tab}`),panel=$(`#lm-panel-${tab}`);
+      button?.setAttribute('aria-selected',String(selected));
+      panel?.setAttribute('aria-hidden',String(!selected));
+      if(panel)panel.inert=!selected;
+    }
+    $('#lm-tab-places')?.querySelector('.lm-place-tab-icon')?.replaceWith((()=>{const template=document.createElement('template');template.innerHTML=placeTabIcon(next==='places');return template.content.firstChild;})());
+    syncTabPill();
+    renderCourseRoute();
+    if(next==='courses')requestAnimationFrame(()=>window.mountCourseThumbnails?.());
+    else window.setTimeout(()=>{if(panelTab==='places')window.unmountCourseThumbnails?.();},250);
+  }
+  window.addEventListener('resize',()=>{if(page==='map')syncTabPill(false);});
   function renderCourseRoute() {
     if(!liveMap||!courseRouteLayer)return;
     courseRouteLayer.clearLayers();
@@ -311,7 +362,7 @@
   });
   function expandPlace(place,moveMap=true,scrollCard=true) {
     const key=placeKey(place),entry=markerEntries.get(key);if(!entry)return;
-    if(expandedKey!==key){clearSelection(false);expandedKey=key;updateMarker(entry,true);window.PinmapFx?.landCard(key);}
+    if(expandedKey!==key){clearSelection(false);expandedKey=key;syncMarkerVisibility();updateMarker(entry,true);window.PinmapFx?.landCard(key);}
     mapProviderController?.selectPlace(place);
     document.querySelectorAll('.lm-drawn-place-row').forEach(row=>row.classList.toggle('is-selected',row.dataset.placeKey===key));
     if(scrollCard){
@@ -330,7 +381,7 @@
   }
   function markers() {
     if (!liveMap) return;
-    clearSelection();markerEntries.clear();pinLayer.clearLayers();
+    clearSelection();markerEntries.clear();pinLayer.clearLayers();clusterMarkers=[];
     const list = visiblePlaces();
     syncProviderPlaces(list);
     list.forEach(place => {
@@ -349,7 +400,7 @@
     courseRouteLayer=L.layerGroup().addTo(liveMap);
     pinLayer = L.layerGroup().addTo(liveMap); markers(); drawLocation();
     locate({recenter:followLocation&&!mapLocationName&&!searchResults,automatic:true});
-    liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); syncProviderPlaces(); if(searchOpen&&searchQuery&&!expandedKey)searchPlaces(searchQuery);else renderSheet(); });
+    liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); syncProviderPlaces();syncMarkerVisibility(); if(searchOpen&&searchQuery&&!expandedKey)searchPlaces(searchQuery);else renderSheet(); });
     requestAnimationFrame(() => liveMap?.invalidateSize());
   }
   // Account pages can finish loading after the map opens. Rebuild its pins and
@@ -475,8 +526,8 @@
     if(cat){selectCategory(cat.dataset.lmCat);markers();showResults();return;}
     const button=event.target.closest('[data-lm]'); if(!button)return;
     switch(button.dataset.lm){
-      case 'show-places':panelTab='places';renderSheet();break;
-      case 'show-courses':panelTab='courses';renderSheet();break;
+      case 'show-places':switchPanelTab('places');break;
+      case 'show-courses':switchPanelTab('courses');break;
       case 'open-course':selectedCourseId=button.dataset.courseId;window.PinmapCourses?.open?.(selectedCourseId);break;
       case 'favorite-filter':favoritesOnly=!favoritesOnly;button.classList.toggle('is-active',favoritesOnly);button.setAttribute('aria-pressed',String(favoritesOnly));markers();break;
       case 'clear-search':{const input=$('#lm-search input');input.value='';button.hidden=true;searchPlaces('');input.focus();break;}
@@ -509,13 +560,13 @@
         searchResults?.forEach(result=>{if(result.placeId===item.id)result.favorite=favorite;});
         for(const entry of markerEntries.values())if(entry.place?.placeId===item.id)entry.place.favorite=favorite;
         document.querySelectorAll('.lm-carousel-heart').forEach(node=>{if(node.dataset.placeKey!==item.id)return;node.classList.toggle('is-active',favorite);node.setAttribute('aria-pressed',String(favorite));if(node.classList.contains('lm-heart-motion'))playHeartMotion(node,favorite);});
-        if(favoritesOnly)markers();else renderSheet();
+        if(favoritesOnly)markers();
         toast(favorite?'장소를 즐겨찾기에 추가했어요.':'장소 즐겨찾기를 취소했어요.');
         break;
       }
       case 'select-place':{const place=markerEntries.get(button.dataset.placeKey)?.place;if(place)expandPlace(place);break;}
       case 'focus-address':{if(button.closest('.just-dragged'))break;const place=markerEntries.get(button.dataset.placeKey)?.place;if(place)expandPlace(place,true,false);break;}
-      case 'close-place':clearSelection();renderSheet();break;
+      case 'close-place':clearSelection();syncMarkerVisibility();renderSheet();break;
       case 'open-place':{if(button.closest('.just-dragged'))break;const place=markerEntries.get(button.dataset.placeKey)?.place;if(!place)break;window.pmDetailPlace={id:place.id,index:place.locationIndex};openDetail(place.id,button);break;}
     }
   });
