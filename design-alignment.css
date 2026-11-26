@@ -3221,8 +3221,8 @@ html body .lm-drawn-map .lm-sheet-scroll{--page-slide-dur:250ms;--page-fade-dur:
 html body .lm-drawn-map .lm-sheet-scroll>section{position:absolute;inset:0;overflow-y:auto;padding-bottom:100px;overscroll-behavior:contain;transition:opacity var(--page-fade-dur) var(--page-fade-ease),transform var(--page-slide-dur) var(--page-slide-ease),filter var(--page-slide-dur) var(--page-slide-ease)}
 html body .lm-drawn-map .lm-sheet-scroll #lm-panel-places{--t-page-from-x:calc(var(--page-slide-distance) * -1)}
 html body .lm-drawn-map .lm-sheet-scroll #lm-panel-courses{--t-page-from-x:var(--page-slide-distance)}
-html body .lm-drawn-map .lm-sheet-scroll[data-tab="places"] #lm-panel-courses,html body .lm-drawn-map .lm-sheet-scroll[data-tab="courses"] #lm-panel-places{opacity:0;filter:blur(calc(var(--page-blur) * var(--page-exit-enabled)));transform:translateX(calc(var(--t-page-from-x) * var(--page-exit-enabled)));pointer-events:none}
-html body .lm-drawn-map .lm-sheet-scroll[data-tab="places"] #lm-panel-places,html body .lm-drawn-map .lm-sheet-scroll[data-tab="courses"] #lm-panel-courses{transition-delay:var(--page-stagger)}
+html body .lm-drawn-map .lm-sheet-scroll[data-map-panel="places"] #lm-panel-courses,html body .lm-drawn-map .lm-sheet-scroll[data-map-panel="courses"] #lm-panel-places{opacity:0;filter:blur(calc(var(--page-blur) * var(--page-exit-enabled)));transform:translateX(calc(var(--t-page-from-x) * var(--page-exit-enabled)));pointer-events:none}
+html body .lm-drawn-map .lm-sheet-scroll[data-map-panel="places"] #lm-panel-places,html body .lm-drawn-map .lm-sheet-scroll[data-map-panel="courses"] #lm-panel-courses{transition-delay:var(--page-stagger)}
 html body .lm-drawn-map .lm-drawn-place-list{padding:6px 17px 0}
 html body .lm-drawn-map .lm-drawn-place-row{position:relative;display:flex;align-items:flex-start;gap:18px;min-height:119px;padding:14px 13px;border-bottom:1px solid #e4e4e4}
 html body .lm-drawn-map .lm-drawn-place-row{transition:background-color var(--page-slide-dur) var(--page-slide-ease)}
