@@ -136,10 +136,10 @@ pages.favorites = () => {
     </article>`;
   };
   const posts=list.filter(entry=>entry.kind==='post'),places=list.filter(entry=>entry.kind==='place');
-  const group=(entries,kind,label)=>entries.length?`<section class="fav-group"><h2 class="fav-group-title">${label}</h2>${(favExpanded[kind]?entries:entries.slice(0,3)).map(row).join('')}${entries.length>3?`<button type="button" class="fav-more" data-fav-more="${kind}" aria-expanded="${favExpanded[kind]}">${favExpanded[kind]?'접기':'더보기'}</button>`:''}</section>`:'';
+  const selectButton=`<button type="button" class="cf-textbtn" data-action="${favSel?'favselectoff':'favselect'}">${favSel?'취소':'선택'}</button>`;
+  const group=(entries,kind,label,first=false)=>entries.length?`<section class="fav-group"><div class="fav-group-head"><h2 class="fav-group-title">${label}</h2>${first?selectButton:''}</div>${(favExpanded[kind]?entries:entries.slice(0,3)).map(row).join('')}${entries.length>3?`<button type="button" class="fav-more" data-fav-more="${kind}" aria-expanded="${favExpanded[kind]}">${favExpanded[kind]?'접기':'더보기'}</button>`:''}</section>`:'';
   return myPage('즐겨찾기', list.length
-    ? `<div class="fav-header"><button type="button" class="cf-textbtn" data-action="${favSel?'favselectoff':'favselect'}">${favSel?'취소':'선택'}</button></div>
-      <div class="fav-items">${group(posts,'post','게시물')}${group(places,'place','장소')}</div>
+    ? `<div class="fav-items">${group(posts,'post','게시물',!!posts.length)}${group(places,'place','장소',!posts.length)}</div>
       ${favSel?`<div class="cf-selbar" role="toolbar" aria-label="선택한 즐겨찾기"><button type="button" class="cf-selall fav-selall" data-action="favselall">${list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택'}</button><span class="cf-selcount fav-selcount" aria-live="polite">${count?`${count}개 선택`:''}</span><button type="button" class="cf-seldel fav-remove" data-action="favremove" ${count&&!favRemoving?'':'disabled'}>${likeHeartIcon()}즐겨찾기 해제</button></div>`:''}`
     : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 게시물이나 장소가 없어요</h3><p class="muted">게시물 상세나 지도에서 별을 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="map">지도로 가기</button></div>`, `favpage${favSel?' cf-selecting':''}`);
 };
