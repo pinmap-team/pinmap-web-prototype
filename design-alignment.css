@@ -999,9 +999,9 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .favpage .fav-unlocated-thumb{display:grid;place-items:center;color:var(--color-secondary)}
 .favpage .fav-unlocated-thumb .icon{width:24px;height:24px}
 .favpage .fav-header{display:flex;align-items:center;justify-content:flex-end;margin-bottom:var(--space-md)}
-.favpage .fav-more{justify-self:center;min-width:88px;min-height:44px;padding:0 var(--space-lg);border:0;border-radius:var(--rounded-md);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-label-md)}
+.favpage .fav-more{justify-self:center;min-width:88px;min-height:44px;padding:0 var(--space-lg);border:0;background:transparent;color:var(--color-on-surface);font:var(--type-label-md)}
 .favpage .fav-remove .icon{fill:currentColor}
-.favpage .fav-choice{position:absolute;top:12px;right:12px;width:24px;height:24px;display:grid;place-items:center;border:1.5px solid var(--color-border);border-radius:50%;color:transparent}
+.favpage .fav-choice{position:absolute;top:50%;right:12px;transform:translateY(-50%);width:24px;height:24px;display:grid;place-items:center;border:1.5px solid var(--color-border);border-radius:50%;color:transparent}
 .favpage .fav-choice .icon{width:14px;height:14px;stroke-width:3}
 .favpage .fav-row.on{outline:2px solid var(--color-primary);outline-offset:0}
 .favpage .fav-row.on .fav-choice{background:var(--color-primary);border-color:var(--color-primary);color:var(--color-neutral)}
