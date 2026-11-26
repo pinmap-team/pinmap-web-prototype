@@ -996,7 +996,6 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .favpage .fav-items{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-lg)}
 .favpage .fav-group{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-sm);min-width:0}
 .favpage .fav-group-list{min-width:0}
-.favpage .fav-group-list:not(.is-posts){display:grid;gap:var(--space-sm)}
 .favpage .fav-group-head{position:relative;min-height:20px;margin-bottom:var(--space-xs)}
 .favpage .fav-group-head .cf-textbtn{position:absolute;top:50%;right:0;transform:translateY(-50%);min-height:44px}
 .favpage .fav-group-title{margin:0;font:var(--type-label-md);color:var(--color-on-surface)}
@@ -3227,9 +3226,9 @@ html body .lm-drawn-map .lm-drawn-place-row .lm-carousel-heart svg{width:20px;he
 /* Favorites use the same place-list geometry and content hierarchy as the map sheet. */
 html body .favpage .fav-group-title{margin:0 13px}
 html body .favpage .fav-row{position:relative;display:flex;align-items:flex-start;gap:18px;min-width:0;min-height:119px;padding:14px 13px;border:0;border-radius:var(--rounded-lg);background:var(--color-surface);box-shadow:none;color:var(--color-on-surface);cursor:pointer}
-html body .favpage .fav-group-list.is-posts{overflow:hidden;border-radius:var(--rounded-lg);background:var(--color-surface)}
-html body .favpage .fav-group-list.is-posts .fav-row{border-bottom:1px solid var(--color-disabled);border-radius:0;background:transparent}
-html body .favpage .fav-group-list.is-posts .fav-row:last-child{border-bottom:0}
+html body .favpage .fav-group-list{overflow:hidden;border-radius:var(--rounded-lg);background:var(--color-surface)}
+html body .favpage .fav-group-list .fav-row{border-bottom:1px solid var(--color-disabled);border-radius:0;background:transparent}
+html body .favpage .fav-group-list .fav-row:last-child{border-bottom:0}
 html body .favpage .fav-row.on{outline:2px solid var(--color-primary);outline-offset:-2px}
 html body .favpage .lm-drawn-place-photo{flex:none;display:block;width:91px;height:91px;margin:0;overflow:hidden;border-radius:10px;background:#f0f2f4}
 html body .favpage .lm-drawn-place-photo img{display:block;width:100%;height:100%;object-fit:cover}
