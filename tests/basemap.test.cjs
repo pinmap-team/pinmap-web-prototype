@@ -3,12 +3,12 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 
-function setup(config,{naverAvailable=true,naverReadyAfterCallback=false}={}){
+function setup(config,{naverAvailable=true,naverReadyAfterCallback=false,mainMap=false}={}){
   const elements=[];
   const element=tag=>({tag,style:{},dataset:{},children:[],setAttribute(){},remove(){},prepend(child){this.children.unshift(child)},append(child){this.children.push(child)},replaceChildren(...children){this.children=children},querySelector(selector){return selector==='.pm-map-error'?this.children.find(child=>child.className==='pm-map-error')||null:null}});
   const host=element('div');
   host.getBoundingClientRect=()=>({top:0,width:402,height:874});
-  host.closest=()=>null;
+  host.closest=selector=>mainMap&&['.lm-drawn-map','.live-map'].includes(selector)?{querySelector:()=>null}:null;
   const mapListeners={};
   const map={getContainer:()=>host,getCenter:()=>({lat:37.5,lng:127}),getZoom:()=>14,containerPointToLatLng:()=>({lat:37.5,lng:127}),on(name,handler){mapListeners[name]=handler}};
   const listeners={};
@@ -86,6 +86,69 @@ test('map button can switch a Korean view between Naver and Google without reset
   assert.equal(controller.setPreferredProvider('naver').current,'naver');
   await flush();
   assert.equal(controller.current,'naver');
+});
+
+test('main map changes provider only through its switch, not place selection, filtering or panning',async()=>{
+  const app=setup({available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'},{mainMap:true});
+  const controller=app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  assert.equal(controller.current,'naver');
+  const googlePlace={lat:37.5,lng:127,coordinateSource:'google_places'};
+  controller.setPlaces([googlePlace]);
+  controller.selectPlace(googlePlace);
+  controller.setPlaces([]);
+  await flush();
+  assert.equal(controller.current,'naver');
+  app.map.getCenter=()=>({lat:35.68,lng:139.69});
+  app.mapListeners.moveend();
+  await flush();
+  assert.equal(controller.current,'naver');
+  assert.equal(controller.setPreferredProvider('google').current,'google');
+  await flush();
+  assert.equal(controller.current,'google');
+  app.map.getCenter=()=>({lat:37.5,lng:127});
+  controller.selectPlace(googlePlace);
+  assert.equal(controller.setPreferredProvider('naver').current,'naver');
+  await flush();
+  assert.equal(controller.current,'naver');
+  assert.equal(controller.setPreferredProvider('google').current,'google');
+  await flush();
+  app.map.getCenter=()=>({lat:37.5,lng:127});
+  controller.selectPlace(null);
+  controller.setPlaces([{lat:37.5,lng:127,coordinateSource:'naver'}]);
+  app.mapListeners.moveend();
+  await flush();
+  assert.equal(controller.current,'google');
+  assert.equal(controller.setPreferredProvider('naver').current,'naver');
+  await flush();
+  assert.equal(controller.current,'naver');
+});
+
+test('main map sends the same latitude and longitude to both base map providers',async()=>{
+  const point={lat:37.5445,lng:127.044};
+  const app=setup({available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'},{mainMap:true});
+  app.map.getCenter=()=>point;
+  app.map.containerPointToLatLng=()=>point;
+  const controller=app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  assert.equal(app.getNaverOptions().center.lat,point.lat);
+  assert.equal(app.getNaverOptions().center.lng,point.lng);
+  controller.setPreferredProvider('google');
+  await flush();
+  assert.equal(app.getGoogleOptions().center.lat,point.lat);
+  assert.equal(app.getGoogleOptions().center.lng,point.lng);
+  assert.equal(app.cameraMoves.at(-1).center.lat,point.lat);
+  assert.equal(app.cameraMoves.at(-1).center.lng,point.lng);
+});
+
+test('main map restores a user-selected provider after its view remounts',async()=>{
+  const app=setup({available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'},{mainMap:true});
+  const controller=app.window.PinmapMapProviders.attach(app.map,undefined,{preferredProvider:'google'});
+  await flush();
+  assert.equal(controller.current,'google');
+  controller.setPlaces([{lat:37.5,lng:127,coordinateSource:'naver'}]);
+  await flush();
+  assert.equal(controller.current,'google');
 });
 
 test('manual Naver cannot override the required Google map for an overseas place',async()=>{

@@ -5,7 +5,7 @@
   let liveMap, pinLayer, locationMarker, locationHeadingMarker, placeController, mapProviderController, courseRouteLayer;
   let clusterMarkers=[];
   let expandedKey=null, sheetStage='half', sheetDrag=null, suppressSheetClickUntil=0;
-  let mapLocationName=null, searchOpen=false, panelTab='places', favoritesOnly=false, selectedCourseId=null;
+  let mapLocationName=null, searchOpen=false, panelTab='places', favoritesOnly=false, selectedCourseId=null, preferredMapProvider='';
   // 2026-11-24: 목록 아이콘 왼쪽 점은 선이 아니라 칠한 원(Figma Icon / list).
   const listIcon=()=>`<svg class="icon pm-list-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11 M9 12h11 M9 18h11"/><circle class="pm-list-dot" cx="4.5" cy="6" r="1.3"/><circle class="pm-list-dot" cx="4.5" cy="12" r="1.3"/><circle class="pm-list-dot" cx="4.5" cy="18" r="1.3"/></svg>`;
   let listOpen=false, listGesture=null; // 2026-11-10 목록 시트 · 직접 핀 찍기
@@ -112,13 +112,13 @@
       notice.textContent='';
       notice.hidden=true;
     }
-    syncMarkerVisibility(state.current,state.manual);
+    syncMarkerVisibility(state.current);
   }
-  function syncMarkerVisibility(provider=mapProviderController?.current,manual=mapProviderController?.manual) {
+  function syncMarkerVisibility(provider=mapProviderController?.current) {
     if(!pinLayer||!liveMap)return;
     clusterMarkers.forEach(marker=>pinLayer.removeLayer(marker));
     clusterMarkers=[];
-    const eligible=[...markerEntries.values()].filter(entry=>provider==='google'||manual||!/^google_places$/i.test(entry.place.coordinateSource||''));
+    const eligible=[...markerEntries.values()].filter(entry=>provider==='google'||!/^google_places$/i.test(entry.place.coordinateSource||''));
     const selected=eligible.filter(entry=>placeKey(entry.place)===expandedKey);
     const groups=PinmapMapClusters.group(eligible.filter(entry=>placeKey(entry.place)!==expandedKey),entry=>liveMap.latLngToLayerPoint([entry.place.lat,entry.place.lng]));
     const visible=new Set([...selected,...groups.filter(group=>group.length===1).flat()]);
@@ -382,6 +382,10 @@
     else if(searchOpen){searchOpen=false;$('#app .live-map')?.classList.remove('is-searching');$('#lm-search input')?.blur();refreshRecentSearches();}
   });
   function expandPlace(place,moveMap=true,scrollCard=true) {
+    if(mapProviderController?.current==='naver' && /^google_places$/i.test(place.coordinateSource||'')){
+      toast('구글에서 확인한 장소예요. 오른쪽 G 버튼으로 지도를 바꿔 주세요.');
+      return;
+    }
     const key=placeKey(place),entry=markerEntries.get(key);if(!entry)return;
     if(expandedKey!==key){clearSelection(false);expandedKey=key;syncMarkerVisibility();updateMarker(entry,true);window.PinmapFx?.landCard(key);}
     mapProviderController?.selectPlace(place);
@@ -417,7 +421,7 @@
   function mount(followLocation=true) {
     if (!window.L) { status('지도 라이브러리를 불러오지 못했어요.'); return; }
     liveMap = L.map('live-map-canvas',{zoomControl:false,zoomAnimation:false}).setView(center,zoom);
-    mapProviderController=window.attachPinmapBasemap(liveMap,updateMapState);
+    mapProviderController=window.attachPinmapBasemap(liveMap,updateMapState,{preferredProvider:preferredMapProvider});
     courseRouteLayer=L.layerGroup().addTo(liveMap);
     pinLayer = L.layerGroup().addTo(liveMap); markers(); drawLocation();
     locate({recenter:followLocation&&!mapLocationName&&!searchResults,automatic:true});
@@ -555,6 +559,10 @@
         const current=mapProviderController?.current;
         const result=mapProviderController?.setPreferredProvider(current==='naver'?'google':'naver');
         if(result?.error)toast(result.error);
+        else if(result?.current){
+          preferredMapProvider=result.current;
+          if(result.current==='naver' && /^google_places$/i.test(markerEntries.get(expandedKey)?.place?.coordinateSource||''))clearSelection();
+        }
         break;
       }
       case 'clear-search':{const input=$('#lm-search input');input.value='';button.hidden=true;searchPlaces('');input.focus();break;}
