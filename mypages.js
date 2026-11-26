@@ -97,6 +97,7 @@ document.addEventListener('click', e => {
 
 /* ---------- 즐겨찾기 ---------- */
 let favSel = null, favRemoving = false;
+const favExpanded={post:false,place:false};
 const favoriteItems = () => [
   ...items.filter(item=>item.favorite).map(item=>({
     id:`post:${item.backendId??item.id}`,backendId:item.backendId??String(item.id),kind:'post',
@@ -125,18 +126,20 @@ pages.favorites = () => {
     const isPlace=x.kind==='place';
     const description = x.desc || x.memo || '';
     const on=favSel?.has(x.id);
-    const thumb=x.unlocated?icon('pin'):isPlace&&x.photo?`<img src="${esc(x.photo)}" alt="" loading="lazy">`:libThumb(x.sourceItem);
+    const placePhoto=isPlace?(x.unlocated?libPhoto(x.sourceItem):x.photo||libPhoto(x.sourceItem)):'';
+    const thumb=isPlace?(placePhoto?`<img src="${esc(placePhoto)}" alt="" loading="lazy">`:icon('pin')):libThumb(x.sourceItem);
     const address=isPlace&&x.address?`<span class="lm-drawn-place-address">${esc(x.address)}</span>`:'';
     return `<article class="lm-drawn-place-row fav-row${on?' on':''}" ${favSel?'':`data-detail="${esc(x.sourceId)}"`} data-favitem="${esc(x.id)}" data-fav-kind="${x.kind}" ${isPlace&&!x.unlocated?`data-fav-place-index="${x.locationIndex}"`:''}>
-      <span class="lm-drawn-place-photo${x.unlocated?' fav-unlocated-thumb':''}">${thumb}</span>
+      <span class="lm-drawn-place-photo${isPlace&&!placePhoto?' fav-unlocated-thumb':''}">${thumb}</span>
       <span class="lm-drawn-place-copy"><button type="button" class="lm-drawn-place-main fav-main" ${favSel?`role="checkbox" aria-checked="${!!on}"`:''} aria-label="${esc(x.title)} ${isPlace?'장소':'게시물'}${favSel?' 선택':' 상세 보기'}"><span class="lm-drawn-place-heading"><strong>${esc(x.title)}</strong><small>${esc(x.category||x.type||(isPlace?'장소':'게시물'))}</small></span>${address}${description?`<span class="lm-drawn-place-description">${esc(description)}</span>`:''}</button></span>
       ${favSel?`<span class="fav-choice" aria-hidden="true">${icon('check')}</span>`:`<button type="button" class="lm-carousel-heart lm-heart-motion t-like is-active fav-star" data-fav-toggle="${esc(x.id)}" data-liked="true" aria-pressed="true" aria-label="${esc(x.title)} 즐겨찾기 해제"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button>`}
     </article>`;
   };
   const posts=list.filter(entry=>entry.kind==='post'),places=list.filter(entry=>entry.kind==='place');
+  const group=(entries,kind,label)=>entries.length?`<section class="fav-group"><h2 class="fav-group-title">${label}</h2>${(favExpanded[kind]?entries:entries.slice(0,3)).map(row).join('')}${entries.length>3?`<button type="button" class="fav-more" data-fav-more="${kind}" aria-expanded="${favExpanded[kind]}">${favExpanded[kind]?'접기':'더보기'}</button>`:''}</section>`:'';
   return myPage('즐겨찾기', list.length
-    ? `<div class="fav-header"><p class="fav-count">${list.length}개</p><button type="button" class="cf-textbtn" data-action="${favSel?'favselectoff':'favselect'}">${favSel?'취소':'선택'}</button></div>
-      <div class="fav-items">${posts.length?`<section class="fav-group"><h2 class="fav-group-title">게시물</h2>${posts.map(row).join('')}</section>`:''}${places.length?`<section class="fav-group"><h2 class="fav-group-title">장소</h2>${places.map(row).join('')}</section>`:''}</div>
+    ? `<div class="fav-header"><button type="button" class="cf-textbtn" data-action="${favSel?'favselectoff':'favselect'}">${favSel?'취소':'선택'}</button></div>
+      <div class="fav-items">${group(posts,'post','게시물')}${group(places,'place','장소')}</div>
       ${favSel?`<div class="cf-selbar" role="toolbar" aria-label="선택한 즐겨찾기"><button type="button" class="cf-selall fav-selall" data-action="favselall">${list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택'}</button><span class="cf-selcount fav-selcount" aria-live="polite">${count?`${count}개 선택`:''}</span><button type="button" class="cf-seldel fav-remove" data-action="favremove" ${count&&!favRemoving?'':'disabled'}>${likeHeartIcon()}즐겨찾기 해제</button></div>`:''}`
     : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 게시물이나 장소가 없어요</h3><p class="muted">게시물 상세나 지도에서 별을 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="map">지도로 가기</button></div>`, `favpage${favSel?' cf-selecting':''}`);
 };
@@ -160,6 +163,15 @@ actions.favremove=async()=>{
 };
 document.addEventListener('click',event=>{
   if(page!=='favorites')return;
+  const more=event.target.closest('[data-fav-more]');
+  if(more){
+    event.stopPropagation();
+    const kind=more.dataset.favMore;
+    if(kind!=='post'&&kind!=='place')return;
+    favExpanded[kind]=!favExpanded[kind];render();
+    document.querySelector(`[data-fav-more="${kind}"]`)?.focus({preventScroll:true});
+    return;
+  }
   const star=event.target.closest('[data-fav-toggle]');
   if(star&&!favSel){
     event.stopPropagation();
