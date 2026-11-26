@@ -26,8 +26,6 @@ function notifications(){
     const near = readyPlaces().filter(x => distanceOf(x) < 999).sort((a,b) => distanceOf(a)-distanceOf(b));
     if (near.length) list.push({id:'near', emoji:'📍', title:`${settings.placeLabels?.[mainPlace()]||mainPlace()||'선택한 지역'} 주변 저장 장소 ${near.length}곳`, body:`${near[0].title} 외, 선택한 지역에 저장한 장소예요.`, time:'저장한 지역 기준', page:'map'});
   }
-  const pending = items.filter(x => isPlace(x) && (x.pending || !x.address));
-  if (pending.length) list.push({id:'pending', emoji:'🔎', title:`장소 확인이 필요한 콘텐츠 ${pending.length}개`, body:'AI가 위치를 확정하지 못했어요. 주소를 확인해 주세요.', time:'위치 확인 필요', detail:pending[0].id});
   if (settings.notiReminder && items.length) {
     const old = items[items.length-1];
     list.push({id:'remind-'+(old.backendId??old.id), emoji:'🔖', title:'잊고 있던 저장, 다시 볼까요?', body:`${old.title}, ${savedAgo(old)} 저장`, time:savedAgo(old), detail:old.id});

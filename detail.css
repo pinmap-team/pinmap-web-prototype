@@ -366,7 +366,6 @@ body.dtscrolled:has(.dt)::before{content:"";position:fixed;inset:0 0 auto;height
 .dt-extraction li div{display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm)}
 .dt-extraction li strong{font:var(--type-label-md);color:var(--color-on-surface)}
 .dt-extraction li span{flex:none;color:var(--color-secondary);font:var(--type-body-sm)}
-.dt-extraction li .dt-extraction-pending{color:var(--color-error)}
 .dt-extraction li p{margin:var(--space-xs) 0 0;color:var(--color-secondary);font:var(--type-body-sm)}
 .dt-extraction li.dt-extraction-place{display:flex;align-items:center;gap:var(--space-md)}
 .dt-extraction-photo{flex:none;width:68px;height:68px;border-radius:var(--rounded-sm);background:var(--color-surface)}

@@ -65,6 +65,19 @@ test('event-only account content keeps schedules separate from map pins', () => 
   assert.equal(item.events[0].end_date, '2027-04-11');
 });
 
+test('a broad region remains saved without a misleading review state or map pin', () => {
+  const source=accountSource.split('\nif (PM_ENV.requiresAuth)')[0];
+  const record={...eventRecord,content_kind:'place',status:'extracted',events:[],
+    places:[{name:'물의집',address:'경기 양평',needs_review:false}],map_locations:[]};
+  const item=vm.runInNewContext(`${source}\npinmapAccountItem(record, 7)`,
+    {record,PinmapCategories:require('../categories.js')});
+  assert.equal(item.extractionPlaces[0].address,'경기 양평');
+  assert.equal(item.extractionPlaces[0].hasCoordinates,false);
+  assert.equal(item.extractionPlaces[0].needsReview,false);
+  assert.equal(item.mapLocations.length,0);
+  assert.doesNotMatch(item.extractionPlaces[0].reason,/확인 필요/);
+});
+
 test('summary-only account content uses AI category without creating a place or schedule', () => {
   const source=accountSource.split('\nif (PM_ENV.requiresAuth)')[0];
   for(const [category,type] of [['travel','여행'],['shopping','쇼핑'],['recipe','레시피'],['lifestyle','생활 정보']]) {
