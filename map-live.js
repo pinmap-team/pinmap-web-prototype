@@ -91,16 +91,17 @@
     const credit=$('#app [data-map-credit]');
     const toggle=$('#app .lm-drawn-provider');
     if(toggle && ['google','naver'].includes(state.current)){
-      const next=state.current==='naver'?'구글':'네이버';
-      if(toggle.dataset.provider!==state.current){
+      const targetProvider=state.current==='naver'?'google':'naver';
+      const next=targetProvider==='google'?'구글':'네이버';
+      if(toggle.dataset.provider!==targetProvider){
         const logo=document.createElement('img');
-        logo.className=`lm-provider-logo lm-provider-logo-${state.current}`;
-        logo.src=state.current==='naver'?'img/naver-n-logo.png':'img/google-g-logo.png';
+        logo.className=`lm-provider-logo lm-provider-logo-${targetProvider}`;
+        logo.src=targetProvider==='naver'?'img/naver-n-logo.png':'img/google-g-logo.png';
         logo.alt='';
-        logo.width=state.current==='naver'?28:20;
-        logo.height=state.current==='naver'?28:20;
+        logo.width=targetProvider==='naver'?28:20;
+        logo.height=targetProvider==='naver'?28:20;
         toggle.querySelector('.lm-provider-mark').replaceChildren(logo);
-        toggle.dataset.provider=state.current;
+        toggle.dataset.provider=targetProvider;
       }
       toggle.setAttribute('aria-label',`${next} 지도로 전환`);
       toggle.title=`현재 ${state.current==='naver'?'네이버':'구글'} 지도 · ${next} 지도로 전환`;
@@ -162,12 +163,16 @@
     });
     alignCategoryIndicator(bar);
   }
-  function visiblePlaces() {
+  function providerPlaces() {
     const list = searchResults || savedPlaces();
-    return list.filter(x => (category === 'all' || (x.categoryId || PinmapCategories.get(x.kind)?.id) === category) && (!favoritesOnly || x.favorite));
+    return list.filter(x => category === 'all' || (x.categoryId || PinmapCategories.get(x.kind)?.id) === category);
   }
-  function syncProviderPlaces(list=visiblePlaces()) {
+  function visiblePlaces() {
+    return providerPlaces().filter(x => !favoritesOnly || x.favorite);
+  }
+  function syncProviderPlaces() {
     const bounds=liveMap?.getBounds().pad(1);
+    const list=providerPlaces();
     mapProviderController?.setPlaces(bounds?list.filter(place=>bounds.contains([place.lat,place.lng])):list);
   }
   const placeKey=place=>place.saved&&place.placeId?place.placeId:`search:${place.id}${place.locationIndex==null?'':':'+place.locationIndex}`;
@@ -399,7 +404,7 @@
     if (!liveMap) return;
     clearSelection();markerEntries.clear();pinLayer.clearLayers();clusterMarkers=[];
     const list = visiblePlaces();
-    syncProviderPlaces(list);
+    syncProviderPlaces();
     list.forEach(place => {
       const marker=L.marker([place.lat,place.lng],{title:place.title,icon:markerIcon(place),bubblingMouseEvents:false});
       const entry={place,marker};markerEntries.set(placeKey(place),entry);
