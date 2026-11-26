@@ -97,8 +97,8 @@
         logo.className=`lm-provider-logo lm-provider-logo-${state.current}`;
         logo.src=state.current==='naver'?'img/naver-n-logo.png':'img/google-g-logo.png';
         logo.alt='';
-        logo.width=state.current==='naver'?32:20;
-        logo.height=state.current==='naver'?32:20;
+        logo.width=state.current==='naver'?28:20;
+        logo.height=state.current==='naver'?28:20;
         toggle.querySelector('.lm-provider-mark').replaceChildren(logo);
         toggle.dataset.provider=state.current;
       }
