@@ -19,7 +19,7 @@ function pinmapAccountItem(record, id) {
       not_found:'지도에서 같은 이름의 장소를 찾지 못했어요.',
       ambiguous:'동명이점이 있어 위치를 확정하지 못했어요.',
       lookup_failed:'지도 검색에 실패했어요.'
-    }[place?.map_lookup?.status] || (place?.address ? '주소의 정확한 위치를 확인하지 못했어요.' : '장소 주소를 확인하지 못했어요.'));
+    }[place?.map_lookup?.status] || (place?.address ? '지도에 표시할 정확한 위치 정보가 없어요.' : '게시물에서 장소 주소를 찾지 못했어요.'));
     return {name:text(place.name, 120) || '이름 확인 필요', address:text(place.address),
       hasCoordinates, reason, needsReview:!!place.needs_review};
   });

@@ -156,7 +156,7 @@ function cfMetaLine(x){
   let ic = '';
   if (isPlace(x)) {
     ic = 'pin';
-    if (x.pending) parts.push('위치 확인 필요');
+    if (x.pending) { if (libArea(x)) parts.push(libArea(x)); }
     else { if (libArea(x)) parts.push(libArea(x)); if (x.distance) parts.push(x.distance); }
   } else if (x.type === '쇼핑') {
     if (x.price) parts.push(x.price.replace(/, (예시|참고) 가격/, ''));
@@ -164,7 +164,7 @@ function cfMetaLine(x){
   } else if (x.type === '레시피' && x.recipe) { ic = 'clock'; parts.push(x.recipe.split(', ')[0]); }
   if (x.deadline) parts.push(x.deadline);
   if (!parts.length) return '';
-  return `<p class="cf-itemmeta${x.pending ? ' warn' : ''}">${ic ? icon(ic) : ''}<span>${parts.map(esc).join('<i aria-hidden="true">, </i>')}</span></p>`;
+  return `<p class="cf-itemmeta">${ic ? icon(ic) : ''}<span>${parts.map(esc).join('<i aria-hidden="true">, </i>')}</span></p>`;
 }
 function cfItem(x){
   const on = cfSel?.has(x.id);

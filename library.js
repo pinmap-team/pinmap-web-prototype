@@ -32,7 +32,7 @@ function libSub(x){
 const libMetaLine = (ic, text, cls='') => `<p class="libmeta m-${ic} ${cls}">${icon(ic)}<span>${esc(text)}</span></p>`;
 function libMeta(x){
   if (isPlace(x)) {
-    if (x.pending) return libMetaLine('pin', '위치 확인 필요', 'warn');
+    if (x.pending) return '';
     return x.distance ? libMetaLine('pin', x.distance) : '';
   }
   if (x.type === '쇼핑' && x.price) return libMetaLine('bookmark', x.price.replace(/, (예시|참고) 가격/,''));
