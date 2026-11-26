@@ -123,13 +123,15 @@ pages.favorites = () => {
   const count=favSel?.size||0;
   const row = x => {
     const isPlace=x.kind==='place';
-    const description = x.desc || x.memo;
+    const description = x.desc || x.memo || '';
     const on=favSel?.has(x.id);
-    return `<button type="button" class="calrow fav-row${on?' on':''}" ${favSel?`role="checkbox" aria-checked="${!!on}"`:`data-detail="${x.sourceId}"`} data-favitem="${esc(x.id)}" data-fav-kind="${x.kind}" ${isPlace&&!x.unlocated?`data-fav-place-index="${x.locationIndex}"`:''} aria-label="${esc(x.title)} ${isPlace?'장소':'게시물'}${favSel?' 선택':' 상세 보기'}">
-    <span class="calthumb${x.unlocated?' fav-unlocated-thumb':''}">${x.unlocated?icon('pin'):isPlace&&x.photo?`<img src="${esc(x.photo)}" alt="">`:libThumb(x.sourceItem)}</span>
-    <span class="caltext fav-text"><b>${esc(x.title)}</b>${description ? `<small class="fav-desc">${esc(description)}</small>` : ''}</span>
-    ${favSel?`<span class="fav-choice" aria-hidden="true">${icon('check')}</span>`:''}
-  </button>`;
+    const thumb=x.unlocated?icon('pin'):isPlace&&x.photo?`<img src="${esc(x.photo)}" alt="" loading="lazy">`:libThumb(x.sourceItem);
+    const address=isPlace&&x.address?`<span class="lm-drawn-place-address">${esc(x.address)}</span>`:'';
+    return `<article class="lm-drawn-place-row fav-row${on?' on':''}" ${favSel?'':`data-detail="${esc(x.sourceId)}"`} data-favitem="${esc(x.id)}" data-fav-kind="${x.kind}" ${isPlace&&!x.unlocated?`data-fav-place-index="${x.locationIndex}"`:''}>
+      <span class="lm-drawn-place-photo${x.unlocated?' fav-unlocated-thumb':''}">${thumb}</span>
+      <span class="lm-drawn-place-copy"><button type="button" class="lm-drawn-place-main fav-main" ${favSel?`role="checkbox" aria-checked="${!!on}"`:''} aria-label="${esc(x.title)} ${isPlace?'장소':'게시물'}${favSel?' 선택':' 상세 보기'}"><span class="lm-drawn-place-heading"><strong>${esc(x.title)}</strong><small>${esc(x.category||x.type||(isPlace?'장소':'게시물'))}</small></span>${address}${description?`<span class="lm-drawn-place-description">${esc(description)}</span>`:''}</button></span>
+      ${favSel?`<span class="fav-choice" aria-hidden="true">${icon('check')}</span>`:`<button type="button" class="lm-carousel-heart lm-heart-motion t-like is-active fav-star" data-fav-toggle="${esc(x.id)}" data-liked="true" aria-pressed="true" aria-label="${esc(x.title)} 즐겨찾기 해제"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button>`}
+    </article>`;
   };
   const posts=list.filter(entry=>entry.kind==='post'),places=list.filter(entry=>entry.kind==='place');
   return myPage('즐겨찾기', list.length
@@ -158,6 +160,13 @@ actions.favremove=async()=>{
 };
 document.addEventListener('click',event=>{
   if(page!=='favorites')return;
+  const star=event.target.closest('[data-fav-toggle]');
+  if(star&&!favSel){
+    event.stopPropagation();
+    const item=favoriteItems().find(entry=>entry.id===star.dataset.favToggle);
+    if(item&&PinmapFavorites.toggle(item)!==null){render();toast('즐겨찾기에서 뺐어요.');}
+    return;
+  }
   const card=event.target.closest('[data-favitem]');
   if(card&&!favSel){window.pmDetailPlace=card.dataset.favKind==='place'&&card.dataset.favPlaceIndex!=null?{id:Number(card.dataset.detail),index:Number(card.dataset.favPlaceIndex)}:null;return;}
   if(!favSel)return;
@@ -167,7 +176,7 @@ document.addEventListener('click',event=>{
     const id=card.dataset.favitem;
     favSel.has(id)?favSel.delete(id):favSel.add(id);
     card.classList.toggle('on',favSel.has(id));
-    card.setAttribute('aria-checked',String(favSel.has(id)));
+    card.querySelector('.fav-main')?.setAttribute('aria-checked',String(favSel.has(id)));
     favSyncSelection();
   }else if(event.target.closest('[data-page]'))favSel=null;
 },true);

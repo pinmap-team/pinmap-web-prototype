@@ -994,20 +994,14 @@ html.auth-pending #app{visibility:hidden;pointer-events:none}
 .my-quick .myq-card{padding:var(--space-md)}
 .my-quick .myq-card b{word-break:keep-all}
 .favpage .fav-count{margin:0 0 var(--space-md);font:var(--type-body-sm);color:var(--color-secondary)}
-.favpage .fav-items{display:grid;gap:var(--space-md)}
-.favpage .fav-group{display:grid;gap:var(--space-sm)}
+.favpage .fav-items{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-lg)}
+.favpage .fav-group{display:grid;grid-template-columns:minmax(0,1fr);gap:0;min-width:0}
 .favpage .fav-group-title{margin:0;font:var(--type-label-md);color:var(--color-on-surface)}
-.favpage .fav-row{min-height:96px;gap:var(--space-lg);padding:var(--space-lg);color:var(--color-on-surface);position:relative}
-.favpage .fav-row .calthumb{width:96px;height:96px;aspect-ratio:1;overflow:hidden}
-.favpage .fav-row .calthumb>img{width:100%;height:100%;object-fit:cover}
 .favpage .fav-unlocated-thumb{display:grid;place-items:center;color:var(--color-secondary)}
 .favpage .fav-unlocated-thumb .icon{width:24px;height:24px}
-.favpage .fav-text{gap:var(--space-xs)}
-.favpage .fav-text .fav-desc{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;white-space:normal;line-height:1.45;color:var(--color-secondary)}
 .favpage .fav-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md)}
 .favpage .fav-header .fav-count{margin:0}
 .favpage .fav-remove .icon{fill:currentColor}
-.favpage.cf-selecting .fav-row{padding-right:48px}
 .favpage .fav-choice{position:absolute;top:12px;right:12px;width:24px;height:24px;display:grid;place-items:center;border:1.5px solid var(--color-border);border-radius:50%;color:transparent}
 .favpage .fav-choice .icon{width:14px;height:14px;stroke-width:3}
 .favpage .fav-row.on{outline:2px solid var(--color-primary);outline-offset:0}
@@ -3228,6 +3222,23 @@ html body .lm-drawn-map .lm-drawn-place-address{display:block;overflow:hidden;te
 html body .lm-drawn-map .lm-drawn-place-description{display:-webkit-box;overflow:hidden;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-top:12px;color:#2e2e2e;font:400 12px/17px var(--font-family)}
 html body .lm-drawn-map .lm-drawn-place-row .lm-carousel-heart{position:absolute;top:20px;right:12px;width:28px;height:28px;display:grid;place-items:center;padding:0!important;color:#282828;background:transparent!important;border:0!important;box-shadow:none!important}
 html body .lm-drawn-map .lm-drawn-place-row .lm-carousel-heart svg{width:20px;height:20px;color:#282828}
+/* Favorites use the same place-list geometry and content hierarchy as the map sheet. */
+html body .favpage .fav-group-title{margin:0 13px 6px}
+html body .favpage .fav-row{position:relative;display:flex;align-items:flex-start;gap:18px;min-width:0;min-height:119px;padding:14px 13px;border:0;border-bottom:1px solid #e4e4e4;border-radius:0;background:var(--color-surface);box-shadow:none;color:var(--color-on-surface);cursor:pointer}
+html body .favpage .fav-row:last-child{border-bottom:0}
+html body .favpage .fav-row.on{outline:2px solid var(--color-primary);outline-offset:-2px}
+html body .favpage .lm-drawn-place-photo{flex:none;display:block;width:91px;height:91px;margin:0;overflow:hidden;border-radius:10px;background:#f0f2f4}
+html body .favpage .lm-drawn-place-photo img{display:block;width:100%;height:100%;object-fit:cover}
+html body .favpage .lm-drawn-place-copy{flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch;padding:1px 31px 0 0}
+html body .favpage .lm-drawn-place-main{display:block;min-width:0;width:100%;margin:0;padding:0;border:0;background:transparent;color:var(--color-on-surface);text-align:left;cursor:pointer}
+html body .favpage .lm-drawn-place-heading{display:flex;align-items:baseline;gap:8px;min-width:0;white-space:nowrap}
+html body .favpage .lm-drawn-place-heading strong{min-width:0;overflow:hidden;text-overflow:ellipsis;font:700 14px/20px var(--font-family)}
+html body .favpage .lm-drawn-place-heading small{flex:none;max-width:42%;overflow:hidden;text-overflow:ellipsis;color:var(--color-secondary);font:400 12px/16px var(--font-family)}
+html body .favpage .lm-drawn-place-address{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;margin-top:2px;color:var(--color-on-surface);font:700 12px/17px var(--font-family);text-decoration:underline;text-underline-offset:2px}
+html body .favpage .lm-drawn-place-description{display:-webkit-box;overflow:hidden;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-top:12px;color:var(--color-on-surface);font:400 12px/17px var(--font-family)}
+html body .favpage .fav-row .fav-star{position:absolute;top:20px;right:12px;width:28px;height:28px;display:grid;place-items:center;padding:0;border:0;background:transparent;box-shadow:none;color:var(--color-on-surface)}
+html body .favpage .fav-row .fav-star svg{width:20px;height:20px}
+html body .favpage.cf-selecting .fav-row .lm-drawn-place-copy{padding-right:31px}
 html body .lm-drawn-map .lm-drawn-course-list{display:grid;gap:15px;padding:25px 17px 24px}
 html body .lm-drawn-map .lm-drawn-course-card{position:relative;display:block;width:100%;height:174px;min-height:174px;padding:0!important;overflow:hidden;text-align:left;border:0!important;border-radius:10px!important;background:#fff!important;box-shadow:0 4px 15px rgba(0,0,0,.1)!important;transition:transform var(--page-slide-dur) var(--page-slide-ease),box-shadow var(--page-slide-dur) var(--page-slide-ease)}
 html body .lm-drawn-map .lm-drawn-course-card:active{transform:scale(.985)}
