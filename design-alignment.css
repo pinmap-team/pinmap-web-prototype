@@ -3187,7 +3187,7 @@ html body .lm-drawn-map .lm-recent,html body .lm-drawn-map .lm-search-results{po
 html body .lm-drawn-map .lm-status{top:144px;left:17px;right:16px}
 html body .lm-drawn-map .lm-drawn-actions{position:absolute;z-index:650;right:28px;bottom:calc(var(--lm-drawn-sheet-height) + 25px);display:flex;flex-direction:column;gap:10px}
 html body .lm-drawn-map .lm-drawn-actions>button{width:36px;height:36px;min-width:36px;min-height:36px;display:grid;place-items:center;padding:0;border:0!important;border-radius:50%;background:#fff!important;color:#282828;box-shadow:0 0 10px rgba(0,0,0,.1)!important}
-html body .lm-drawn-map .lm-drawn-actions>button.lm-drawn-provider[data-provider="naver"]{background:#0fcd00!important}
+html body .lm-drawn-map .lm-drawn-actions>button.lm-drawn-provider[data-provider="naver"]{background:#0fcd00!important;overflow:hidden}
 html body .lm-drawn-map .lm-drawn-actions svg{width:20px;height:20px}
 html body .lm-drawn-map .lm-drawn-actions .lm-provider-mark{display:grid;place-items:center;width:32px;height:32px}
 html body .lm-drawn-map .lm-drawn-actions .lm-provider-logo{display:block;width:20px;height:20px;object-fit:contain}
