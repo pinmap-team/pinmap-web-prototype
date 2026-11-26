@@ -81,7 +81,7 @@
       <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">${icon('info')}</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p data-map-credit>지도 연결 중</p></div></details>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" role="status" aria-live="polite" hidden></div>
-      <div class="lm-drawn-actions"><button type="button" class="lm-drawn-provider" data-lm="map-provider" aria-label="지도 종류 전환" title="지도 종류 전환"><span aria-hidden="true">${icon('map')}</span></button><button type="button" class="lm-drawn-favorites lm-heart-motion t-like${favoritesOnly?' is-active':''}" data-lm="favorite-filter" data-liked="${favoritesOnly}" aria-label="즐겨찾기 장소만 보기" aria-pressed="${favoritesOnly}"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button>${round('현재 위치로 이동','target')}</div>
+      <div class="lm-drawn-actions"><button type="button" class="lm-drawn-provider" data-lm="map-provider" aria-label="지도 종류 전환" title="지도 종류 전환"><span class="lm-provider-mark" aria-hidden="true">${icon('map')}</span></button><button type="button" class="lm-drawn-favorites lm-heart-motion t-like${favoritesOnly?' is-active':''}" data-lm="favorite-filter" data-liked="${favoritesOnly}" aria-label="즐겨찾기 장소만 보기" aria-pressed="${favoritesOnly}"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button>${round('현재 위치로 이동','target')}</div>
       <div class="lm-list-scrim" data-lm="close-list" hidden></div><section class="lm-list-sheet" id="lm-list-sheet" role="dialog" aria-label="저장한 장소 목록" hidden></section>
       <section class="lm-selected-host" id="lm-selected-place" aria-label="이 근방 저장된 장소"></section></section>`;
   }
@@ -92,7 +92,16 @@
     const toggle=$('#app .lm-drawn-provider');
     if(toggle && ['google','naver'].includes(state.current)){
       const next=state.current==='naver'?'구글':'네이버';
-      toggle.querySelector('span').textContent=state.current==='naver'?'N':'G';
+      if(toggle.dataset.provider!==state.current){
+        const logo=document.createElement('img');
+        logo.className=`lm-provider-logo lm-provider-logo-${state.current}`;
+        logo.src=`img/${state.current}-maps-logo.png`;
+        logo.alt='';
+        logo.width=28;
+        logo.height=28;
+        toggle.querySelector('.lm-provider-mark').replaceChildren(logo);
+        toggle.dataset.provider=state.current;
+      }
       toggle.setAttribute('aria-label',`${next} 지도로 전환`);
       toggle.title=`현재 ${state.current==='naver'?'네이버':'구글'} 지도 · ${next} 지도로 전환`;
     }
