@@ -2428,3 +2428,12 @@ Figma의 colors/accent 변수(VariableID:1393:207), 선택 카드·관심 키워
 - 근거: 사용자 요청과 네이버 지도 사이트의 공식 아이콘(`https://ssl.pstatic.net/static/maps/assets/icons/android-icon-192x192.png`), Google 제품 이미지(`https://www.gstatic.com/images/branding/product/2x/maps_96dp.png`). 색상이나 형태를 새로 그리지 않는다.
 - 판정: 로컬 로그인 앱의 402px 지도에서 Google Maps 원본이 정상 로드되고 20×20px로 버튼 x338·y338·36×36px의 중앙에 놓인 것을 확인했다. 넓은 화면에서도 402px 프레임 안의 같은 위치를 유지한다. 네이버 원본은 별도로 열어 형태·원본 비율을 확인했으며, 로컬호스트의 네이버 지도 인증 제한 때문에 전환 후 화면은 확인하지 못했다. 자동 검사 170개가 통과했고 공통 토큰은 변경하지 않았다.
 - 수정내용: `map-live.js`, `design-alignment.css`, 지도 계약, 공식 PNG 자산, 정적 자산 버전.
+
+### 2026-11-26 지도 제공자 G/N 로고로 수정
+
+- 규칙: 지도 전환 버튼은 현재 제공자를 Google 컬러 G 또는 NAVER 흰 N·녹색 바탕의 공식 로고로 나타낸다. 지도 서비스의 핀 그림은 사용하지 않는다.
+- 적용 전: Google Maps와 NAVER Maps의 핀 모양 제품 아이콘이 버튼에 표시됐다.
+- 적용 후: 버튼의 20×20px 중앙 상자에 각 브랜드의 G/N 원본 PNG를 비율과 색 변경 없이 넣고, 지도 전환 이름·버튼 36×36px·위치는 유지한다.
+- 근거: 사용자가 Google의 G와 네이버의 N 로고를 지정했다. 원본은 Google 개발자 공식 자료(`https://developers.google.com/static/identity/images/g-logo.png`)와 네이버 포털이 제공하는 공식 아이콘(`https://s.pstatic.net/static/www/nFavicon96.png`)이다.
+- 판정: 로컬 로그인 앱의 402px 지도와 넓은 화면의 중앙 402px 프레임에서 G 원본이 로드되고 x346·y346, 20×20px로 버튼 중앙에 놓였다. 네이버 N 원본 파일을 별도로 열어 색과 형태를 확인했다. 로컬호스트에서는 네이버 지도 인증이 제한되어 전환 상태의 N 로고는 공개 배포 후 확인한다. 자동 검사 170개가 통과했고 새 디자인 토큰은 없다.
+- 수정내용: `map-live.js`, `design-alignment.css`, 지도 계약, 공식 PNG 자산, 정적 자산 버전.

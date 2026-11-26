@@ -95,10 +95,10 @@
       if(toggle.dataset.provider!==state.current){
         const logo=document.createElement('img');
         logo.className=`lm-provider-logo lm-provider-logo-${state.current}`;
-        logo.src=`img/${state.current}-maps-logo.png`;
+        logo.src=state.current==='naver'?'img/naver-n-logo.png':'img/google-g-logo.png';
         logo.alt='';
-        logo.width=28;
-        logo.height=28;
+        logo.width=20;
+        logo.height=20;
         toggle.querySelector('.lm-provider-mark').replaceChildren(logo);
         toggle.dataset.provider=state.current;
       }
