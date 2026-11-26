@@ -91,16 +91,17 @@
     const credit=$('#app [data-map-credit]');
     const toggle=$('#app .lm-drawn-provider');
     if(toggle && ['google','naver'].includes(state.current)){
-      const next=state.current==='naver'?'구글':'네이버';
-      if(toggle.dataset.provider!==state.current){
+      const targetProvider=state.current==='naver'?'google':'naver';
+      const next=targetProvider==='google'?'구글':'네이버';
+      if(toggle.dataset.provider!==targetProvider){
         const logo=document.createElement('img');
-        logo.className=`lm-provider-logo lm-provider-logo-${state.current}`;
-        logo.src=state.current==='naver'?'img/naver-n-logo.png':'img/google-g-logo.png';
+        logo.className=`lm-provider-logo lm-provider-logo-${targetProvider}`;
+        logo.src=targetProvider==='naver'?'img/naver-n-logo.png':'img/google-g-logo.png';
         logo.alt='';
-        logo.width=state.current==='naver'?28:20;
-        logo.height=state.current==='naver'?28:20;
+        logo.width=targetProvider==='naver'?28:20;
+        logo.height=targetProvider==='naver'?28:20;
         toggle.querySelector('.lm-provider-mark').replaceChildren(logo);
-        toggle.dataset.provider=state.current;
+        toggle.dataset.provider=targetProvider;
       }
       toggle.setAttribute('aria-label',`${next} 지도로 전환`);
       toggle.title=`현재 ${state.current==='naver'?'네이버':'구글'} 지도 · ${next} 지도로 전환`;
