@@ -170,7 +170,7 @@ function cfItem(x){
   const on = cfSel?.has(x.id);
   const role = cfSel ? `role="checkbox" aria-checked="${!!on}"` : `role="button" data-detail="${x.id}"`;
   return `<div class="cf-item${on ? ' on' : ''}" tabindex="0" ${role} data-cfitem="${x.id}" aria-label="${esc(x.title)}${cfSel ? '' : ' 상세 보기'}">
-    <div class="cf-itemimg">${libPhoto(x) ? `<span class="cf-itemback" aria-hidden="true"><img src="${esc(libPhoto(x))}" alt="" loading="lazy"></span>` : ''}${libThumb(x)}${cfSel ? `<span class="cf-check cf-glass" aria-hidden="true">${icon('check')}</span>` : `<button type="button" class="cf-fav lm-heart-motion${x.favorite ? ' is-active' : ''}" data-cf-fav="${x.id}" aria-pressed="${!!x.favorite}" aria-label="${esc(x.title)} 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon(!!x.favorite)}</span></button>`}</div>
+    <div class="cf-itemimg">${libPhoto(x) ? `<span class="cf-itemback" aria-hidden="true"><img src="${esc(libPhoto(x))}" alt="" loading="lazy"></span>` : ''}${libThumb(x)}${cfSel ? `<span class="cf-check cf-glass" aria-hidden="true">${icon('check')}</span>` : `<button type="button" class="cf-fav lm-heart-motion t-like${x.favorite ? ' is-active' : ''}" data-cf-fav="${x.id}" data-liked="${!!x.favorite}" aria-pressed="${!!x.favorite}" aria-label="${esc(x.title)} 즐겨찾기"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon(!!x.favorite)}</span></button>`}</div>
     <div class="cf-itembody">
       <div class="cf-itemtext"><h3>${esc(x.title)}</h3><p class="cf-itemdesc">${esc(x.desc || x.memo || '')}</p>${cfMetaLine(x)}</div>
     </div>

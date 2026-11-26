@@ -81,7 +81,7 @@
       <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">${icon('info')}</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p data-map-credit>지도 연결 중</p></div></details>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" role="status" aria-live="polite" hidden></div>
-      <div class="lm-drawn-actions"><button type="button" class="lm-drawn-favorites${favoritesOnly?' is-active':''}" data-lm="favorite-filter" aria-label="즐겨찾기 장소만 보기" aria-pressed="${favoritesOnly}">${likeHeartIcon()}</button>${round('현재 위치로 이동','target')}</div>
+      <div class="lm-drawn-actions"><button type="button" class="lm-drawn-favorites lm-heart-motion t-like${favoritesOnly?' is-active':''}" data-lm="favorite-filter" data-liked="${favoritesOnly}" aria-label="즐겨찾기 장소만 보기" aria-pressed="${favoritesOnly}"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button>${round('현재 위치로 이동','target')}</div>
       <div class="lm-list-scrim" data-lm="close-list" hidden></div><section class="lm-list-sheet" id="lm-list-sheet" role="dialog" aria-label="저장한 장소 목록" hidden></section>
       <section class="lm-selected-host" id="lm-selected-place" aria-label="이 근방 저장된 장소"></section></section>`;
   }
@@ -233,33 +233,34 @@
       setSheetStage(stages[Math.max(0,Math.min(stages.length-1,stages.indexOf(sheetStage)+(event.key==='ArrowUp'?1:-1)))]);
     });
   }
-  const favoriteButton = place => place.saved ? `<button type="button" class="lm-carousel-heart lm-heart-motion${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 장소 즐겨찾기"><span class="lm-heart-glyph">${likeHeartIcon()}</span></button>` : '';
+  const favoriteButton = place => place.saved ? `<button type="button" class="lm-carousel-heart lm-heart-motion t-like${place.favorite?' is-active':''}" data-lm="toggle-favorite" data-place-key="${safe(placeKey(place))}" data-liked="${!!place.favorite}" aria-pressed="${!!place.favorite}" aria-label="${safe(place.title)} 장소 즐겨찾기"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button>` : '';
   function playHeartMotion(button, liked) {
+    button.dataset.liked=String(liked);
     button.querySelector('.lm-heart-burst')?.remove();
-    button.classList.remove('is-bursting');
-    if(!liked || window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-    const burst=document.createElement('span');
-    burst.className='lm-heart-burst';
-    burst.setAttribute('aria-hidden','true');
-    const bloom=document.createElement('span');
-    bloom.className='lm-heart-bloom';
-    burst.append(bloom);
-    const colors=['#f48ea7','#cc8ef5','#8ce8c3','#91d2fa','#f5a524','#e5484d','#9fc7fa'];
-    for(let index=0;index<7;index++){
-      const spoke=document.createElement('span');
-      spoke.className='lm-heart-spoke';
-      spoke.style.setProperty('--angle',`${index*360/7-90}deg`);
-      for(const color of [colors[index],colors[(index+3)%colors.length]]){
-        const dot=document.createElement('i');
-        dot.style.background=color;
-        spoke.append(dot);
-      }
-      burst.append(spoke);
+    button.classList.remove('is-bursting','is-unfavoriting');
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    // Restart the icon motion when the same star is tapped again before it finishes.
+    void button.offsetWidth;
+    if(!liked){
+      button.classList.add('is-unfavoriting');
+      window.setTimeout(()=>button.classList.remove('is-unfavoriting'),240);
+      return;
     }
-    burst.style.setProperty('--fly','.5');
+    const burst=document.createElement('span');
+    burst.className='lm-heart-burst t-like-particles';
+    burst.setAttribute('aria-hidden','true');
+    for(let index=0;index<8;index++){
+      const dot=document.createElement('i');
+      const angle=(index*45-90)*Math.PI/180;
+      const distance=20+(index%3-1)*3;
+      dot.style.setProperty('--px',`${Math.round(Math.cos(angle)*distance)}px`);
+      dot.style.setProperty('--py',`${Math.round(Math.sin(angle)*distance)}px`);
+      dot.style.setProperty('--pdelay',`${index%2*25}ms`);
+      burst.append(dot);
+    }
     button.append(burst);
     button.classList.add('is-bursting');
-    window.setTimeout(()=>{if(!burst.isConnected)return;burst.remove();button.classList.remove('is-bursting');},830);
+    window.setTimeout(()=>{if(!burst.isConnected)return;burst.remove();button.classList.remove('is-bursting');},650);
   }
   window.PinmapHeartMotion = playHeartMotion;
   function renderSheet() {
@@ -528,7 +529,7 @@
       case 'show-places':switchPanelTab('places');break;
       case 'show-courses':switchPanelTab('courses');break;
       case 'open-course':selectedCourseId=button.dataset.courseId;window.PinmapCourses?.open?.(selectedCourseId);break;
-      case 'favorite-filter':favoritesOnly=!favoritesOnly;button.classList.toggle('is-active',favoritesOnly);button.setAttribute('aria-pressed',String(favoritesOnly));markers();break;
+      case 'favorite-filter':favoritesOnly=!favoritesOnly;button.classList.toggle('is-active',favoritesOnly);button.setAttribute('aria-pressed',String(favoritesOnly));playHeartMotion(button,favoritesOnly);markers();break;
       case 'clear-search':{const input=$('#lm-search input');input.value='';button.hidden=true;searchPlaces('');input.focus();break;}
       case 'open-list':if(Date.now()<suppressSheetClickUntil)break;setList(!listOpen);break;
       case 'close-list':if(Date.now()<suppressSheetClickUntil)break;setList(false);break;
