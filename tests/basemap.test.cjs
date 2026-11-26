@@ -71,6 +71,50 @@ test('Naver is the background when a current browser client ID is configured',as
   assert.equal(app.naverMoves.at(-2).center.lat,37.6);
 });
 
+test('map button can switch a Korean view between Naver and Google without resetting its camera',async()=>{
+  const app=setup({available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'});
+  const controller=app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  assert.equal(controller.current,'naver');
+  assert.equal(controller.setPreferredProvider('google').current,'google');
+  await flush();
+  assert.equal(controller.current,'google');
+  assert.equal(app.getGoogleOptions().zoom,14);
+  app.mapListeners.moveend();
+  await flush();
+  assert.equal(controller.current,'google');
+  assert.equal(controller.setPreferredProvider('naver').current,'naver');
+  await flush();
+  assert.equal(controller.current,'naver');
+});
+
+test('manual Naver cannot override the required Google map for an overseas place',async()=>{
+  const app=setup({available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'});
+  const controller=app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  controller.selectPlace({lat:35.68,lng:139.69});
+  await flush();
+  assert.equal(controller.current,'google');
+  assert.match(controller.setPreferredProvider('naver').error,/구글 지도/);
+  assert.equal(controller.current,'google');
+});
+
+test('manual Naver takes precedence over automatic Google selection for other visible Korean places',async()=>{
+  const app=setup({available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'});
+  const controller=app.window.PinmapMapProviders.attach(app.map);
+  await flush();
+  controller.setPlaces([{lat:37.5,lng:127,coordinateSource:'google_places'}]);
+  await flush();
+  assert.equal(controller.current,'google');
+  controller.setPreferredProvider('naver');
+  await flush();
+  assert.equal(controller.current,'naver');
+  assert.equal(controller.manual,true);
+  app.mapListeners.moveend();
+  await flush();
+  assert.equal(controller.current,'naver');
+});
+
 test('Naver stays the default when its callback precedes the map constructor',async()=>{
   const app=setup({defaultProvider:'naver',available:{google:true,naver:true},googleBrowserKey:'google-test',naverClientId:'naver-test'},{naverReadyAfterCallback:true});
   app.window.PinmapMapProviders.attach(app.map);

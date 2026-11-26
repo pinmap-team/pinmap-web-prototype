@@ -81,7 +81,7 @@
       <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">${icon('info')}</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p data-map-credit>지도 연결 중</p></div></details>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" role="status" aria-live="polite" hidden></div>
-      <div class="lm-drawn-actions"><button type="button" class="lm-drawn-favorites lm-heart-motion t-like${favoritesOnly?' is-active':''}" data-lm="favorite-filter" data-liked="${favoritesOnly}" aria-label="즐겨찾기 장소만 보기" aria-pressed="${favoritesOnly}"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button>${round('현재 위치로 이동','target')}</div>
+      <div class="lm-drawn-actions"><button type="button" class="lm-drawn-provider" data-lm="map-provider" aria-label="지도 종류 전환" title="지도 종류 전환"><span aria-hidden="true">${icon('map')}</span></button><button type="button" class="lm-drawn-favorites lm-heart-motion t-like${favoritesOnly?' is-active':''}" data-lm="favorite-filter" data-liked="${favoritesOnly}" aria-label="즐겨찾기 장소만 보기" aria-pressed="${favoritesOnly}"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button>${round('현재 위치로 이동','target')}</div>
       <div class="lm-list-scrim" data-lm="close-list" hidden></div><section class="lm-list-sheet" id="lm-list-sheet" role="dialog" aria-label="저장한 장소 목록" hidden></section>
       <section class="lm-selected-host" id="lm-selected-place" aria-label="이 근방 저장된 장소"></section></section>`;
   }
@@ -89,19 +89,26 @@
   function updateMapState(state) {
     const notice=$('#app .lm-status');
     const credit=$('#app [data-map-credit]');
+    const toggle=$('#app .lm-drawn-provider');
+    if(toggle && ['google','naver'].includes(state.current)){
+      const next=state.current==='naver'?'구글':'네이버';
+      toggle.querySelector('span').textContent=state.current==='naver'?'N':'G';
+      toggle.setAttribute('aria-label',`${next} 지도로 전환`);
+      toggle.title=`현재 ${state.current==='naver'?'네이버':'구글'} 지도 · ${next} 지도로 전환`;
+    }
     if(credit&&['google','naver'].includes(state.current))credit.textContent=`지도 © ${state.current==='naver'?'NAVER':'Google'}`;
     if(state.error&&notice){notice.textContent=state.error;notice.hidden=false;}
     else if(notice && /^(구글 지도|네이버 지도|지도 설정|지도 연결)/.test(notice.textContent)){
       notice.textContent='';
       notice.hidden=true;
     }
-    syncMarkerVisibility(state.current);
+    syncMarkerVisibility(state.current,state.manual);
   }
-  function syncMarkerVisibility(provider=mapProviderController?.current) {
+  function syncMarkerVisibility(provider=mapProviderController?.current,manual=mapProviderController?.manual) {
     if(!pinLayer||!liveMap)return;
     clusterMarkers.forEach(marker=>pinLayer.removeLayer(marker));
     clusterMarkers=[];
-    const eligible=[...markerEntries.values()].filter(entry=>provider==='google'||!/^google_places$/i.test(entry.place.coordinateSource||''));
+    const eligible=[...markerEntries.values()].filter(entry=>provider==='google'||manual||!/^google_places$/i.test(entry.place.coordinateSource||''));
     const selected=eligible.filter(entry=>placeKey(entry.place)===expandedKey);
     const groups=PinmapMapClusters.group(eligible.filter(entry=>placeKey(entry.place)!==expandedKey),entry=>liveMap.latLngToLayerPoint([entry.place.lat,entry.place.lng]));
     const visible=new Set([...selected,...groups.filter(group=>group.length===1).flat()]);
@@ -162,7 +169,7 @@
   }
   function clusterIcon(group) {
     const count=group.length;
-    const content=count>=4?`+${count}`:group.map(entry=>categoryIcon(entry.place.categoryId||entry.place.kind,true)).join('');
+    const content=`+${count}`;
     return L.divIcon({className:'lm-drawn-cluster',html:`<span class="lm-drawn-cluster-disc" data-count="${count}">${content}</span>`,iconSize:[34,34],iconAnchor:[17,17]});
   }
   function updateMarker(entry,expanded) {
@@ -530,6 +537,12 @@
       case 'show-courses':switchPanelTab('courses');break;
       case 'open-course':selectedCourseId=button.dataset.courseId;window.PinmapCourses?.open?.(selectedCourseId);break;
       case 'favorite-filter':favoritesOnly=!favoritesOnly;button.classList.toggle('is-active',favoritesOnly);button.setAttribute('aria-pressed',String(favoritesOnly));playHeartMotion(button,favoritesOnly);markers();break;
+      case 'map-provider':{
+        const current=mapProviderController?.current;
+        const result=mapProviderController?.setPreferredProvider(current==='naver'?'google':'naver');
+        if(result?.error)toast(result.error);
+        break;
+      }
       case 'clear-search':{const input=$('#lm-search input');input.value='';button.hidden=true;searchPlaces('');input.focus();break;}
       case 'open-list':if(Date.now()<suppressSheetClickUntil)break;setList(!listOpen);break;
       case 'close-list':if(Date.now()<suppressSheetClickUntil)break;setList(false);break;

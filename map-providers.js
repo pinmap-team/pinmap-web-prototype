@@ -104,7 +104,7 @@
     host.prepend(nativeHost);
     host.dataset.mapProvider = 'loading';
     let nativeMap = null, activeProvider = '', disposed = false, naverAuthObserver = null;
-    let config = null, selectedPlace = null, requestId = 0, naverFailed = false;
+    let config = null, selectedPlace = null, requestId = 0, naverFailed = false, manualProvider = '';
     let renderedPlaces = places;
 
     function showError(message) {
@@ -187,7 +187,7 @@
       delete host.dataset.mapError;
       host.querySelector('.pm-map-error')?.remove();
       sync();
-      onChange?.({current: provider});
+      onChange?.({current: provider, manual: manualProvider === provider});
       if (provider === 'naver' && typeof MutationObserver === 'function') {
         naverAuthObserver?.disconnect();
         naverAuthObserver = new MutationObserver(() => {
@@ -203,11 +203,12 @@
     async function refreshProvider() {
       if (!config || disposed) return;
       const id = ++requestId;
-      const target = needsGoogle(selectedPlace) || needsGoogle(map.getCenter()) || renderedPlaces.some(needsGoogle) ? 'google' : 'naver';
+      const forcedGoogle = needsGoogle(selectedPlace) || needsGoogle(map.getCenter());
+      const target = forcedGoogle || (!manualProvider && renderedPlaces.some(needsGoogle)) ? 'google' : manualProvider || 'naver';
       const hasNaver = config.available?.naver && config.naverClientId && !naverFailed;
       const hasGoogle = config.available?.google && config.googleBrowserKey;
       const provider = target === 'google' ? 'google' : hasNaver ? 'naver' : 'google';
-      if (provider === activeProvider && nativeMap) { sync(); return; }
+      if (provider === activeProvider && nativeMap) { sync(); onChange?.({current: provider, manual: manualProvider === provider}); return; }
       if ((provider === 'google' && !hasGoogle) || (provider === 'naver' && !hasNaver)) {
         showError(target === 'google' ? '해외 장소에 필요한 구글 지도 설정을 확인해 주세요.' : '지도 설정을 확인해 주세요.');
         return;
@@ -234,6 +235,20 @@
 
     return {
       get current() { return activeProvider || 'loading'; },
+      get manual() { return manualProvider === activeProvider; },
+      setPreferredProvider(provider) {
+        if (!['google', 'naver'].includes(provider)) return {error: '지도 종류를 확인해 주세요.'};
+        if (!config) return {error: '지도를 연결한 뒤 다시 눌러 주세요.'};
+        if (provider === 'naver' && (needsGoogle(selectedPlace) || needsGoogle(map.getCenter())))
+          return {error: '해외 위치와 구글 지도에서 확인한 장소는 구글 지도로 표시해요.'};
+        if (provider === 'naver' && (!config.available?.naver || !config.naverClientId || naverFailed))
+          return {error: '네이버 지도 연결을 확인해 주세요.'};
+        if (provider === 'google' && (!config.available?.google || !config.googleBrowserKey))
+          return {error: '구글 지도 연결을 확인해 주세요.'};
+        manualProvider = provider;
+        refreshProvider();
+        return {current: provider};
+      },
       selectPlace(place) { selectedPlace = place || null; refreshProvider(); },
       setPlaces(nextPlaces) { renderedPlaces = Array.isArray(nextPlaces) ? nextPlaces : []; refreshProvider(); },
       setLocation() {}
