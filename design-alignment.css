@@ -1947,7 +1947,7 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .layout .main:has(.strip){padding-top:var(--space-2xl)!important}
 [data-theme="dark"] .layout .main .strip{background:var(--color-surface)!important}
 
-/* 2026-11-23 즐겨찾기 별 (Figma Pinmap / Companion / star): 기본 Outline, 선택 Fill, 기존 하트 모션 유지 */
+/* 2026-11-26 즐겨찾기 별: 원래 지도 paths.star 뾰족한 경로, 기본 Outline·선택 Fill, 기존 모션 유지 */
 .pm-star .pm-star-fill{display:none}
 .is-active .pm-star .pm-star-line{display:none}
 .is-active .pm-star .pm-star-fill{display:inline}
