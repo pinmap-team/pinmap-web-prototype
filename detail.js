@@ -274,7 +274,6 @@ function editSheet(){
   esCounts();
 }
 actions.edit = editSheet;
-paths.star = 'm12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z';
 paths.grid = 'M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h6v6h-6z';
 paths.text = 'M5 6V4h14v2 M12 4v16 M9 20h6';
 const esCounts = () => document.querySelectorAll('.esform .escount').forEach(c => {
