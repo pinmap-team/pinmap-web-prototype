@@ -95,8 +95,9 @@
   };
   const needsGoogle = place => Boolean(place && (!isKoreanCoordinate(place) || /^google_places$/i.test(place.coordinateSource || '')));
 
-  function attach(map, onChange, {places = []} = {}) {
+  function attach(map, onChange, {places = [], preferredProvider = ''} = {}) {
     const host = map.getContainer();
+    const userControlled = Boolean(host.closest('.lm-drawn-map'));
     const header = host.closest('.live-map')?.querySelector('.lm-header');
     const nativeHost = document.createElement('div');
     nativeHost.className = 'pm-native-map';
@@ -104,7 +105,8 @@
     host.prepend(nativeHost);
     host.dataset.mapProvider = 'loading';
     let nativeMap = null, activeProvider = '', disposed = false, naverAuthObserver = null;
-    let config = null, selectedPlace = null, requestId = 0, naverFailed = false, manualProvider = '';
+    let config = null, selectedPlace = null, requestId = 0, naverFailed = false;
+    let manualProvider = ['google', 'naver'].includes(preferredProvider) ? preferredProvider : '';
     let renderedPlaces = places;
 
     function showError(message) {
@@ -144,7 +146,7 @@
     const onFailure = message => { if (activeProvider === 'google') showError(message); };
     failureListeners.add(onFailure);
     map.on('move zoom resize', sync);
-    map.on('moveend', refreshProvider);
+    map.on('moveend', userControlled ? sync : refreshProvider);
     // Search collapses the header without moving Leaflet. Keep Google's top edge aligned.
     const headerObserver = header && new ResizeObserver(sync);
     if (headerObserver) headerObserver.observe(header);
@@ -204,7 +206,9 @@
       if (!config || disposed) return;
       const id = ++requestId;
       const forcedGoogle = needsGoogle(selectedPlace) || needsGoogle(map.getCenter());
-      const target = forcedGoogle || (!manualProvider && renderedPlaces.some(needsGoogle)) ? 'google' : manualProvider || 'naver';
+      const target = userControlled
+        ? manualProvider || activeProvider || (needsGoogle(map.getCenter()) ? 'google' : 'naver')
+        : (forcedGoogle || (!manualProvider && renderedPlaces.some(needsGoogle)) ? 'google' : manualProvider || 'naver');
       const hasNaver = config.available?.naver && config.naverClientId && !naverFailed;
       const hasGoogle = config.available?.google && config.googleBrowserKey;
       const provider = target === 'google' ? 'google' : hasNaver ? 'naver' : 'google';
@@ -239,7 +243,7 @@
       setPreferredProvider(provider) {
         if (!['google', 'naver'].includes(provider)) return {error: '지도 종류를 확인해 주세요.'};
         if (!config) return {error: '지도를 연결한 뒤 다시 눌러 주세요.'};
-        if (provider === 'naver' && (needsGoogle(selectedPlace) || needsGoogle(map.getCenter())))
+        if (provider === 'naver' && (needsGoogle(map.getCenter()) || (!userControlled && needsGoogle(selectedPlace))))
           return {error: '해외 위치와 구글 지도에서 확인한 장소는 구글 지도로 표시해요.'};
         if (provider === 'naver' && (!config.available?.naver || !config.naverClientId || naverFailed))
           return {error: '네이버 지도 연결을 확인해 주세요.'};
