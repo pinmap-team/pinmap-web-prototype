@@ -16,10 +16,10 @@
   --gradient-accent:linear-gradient(90deg,#C6F5E1 0%,#AFF3E4 100%);
   /* 2026-11-27 사용자 요청: 진한 민트 그라디언트(Figma Pinmap/gradients/accent-strong) */
   --gradient-accent-strong:linear-gradient(90deg,#83EDC0 0%,#5BE7D9 100%);
-  --type-headline-lg:700 28px/36px var(--font-family);
-  --type-headline-md:700 22px/30px var(--font-family);
-  --type-body-md:400 16px/24px var(--font-family);
-  --type-label-md:600 14px/20px var(--font-family);
+  --type-headline-lg:700 29px/37px var(--font-family);
+  --type-headline-md:700 23px/31px var(--font-family);
+  --type-body-md:400 17px/25px var(--font-family);
+  --type-label-md:600 15px/21px var(--font-family);
   --type-body-sm:400 14px/20px var(--font-family);
   /* 2026-11-04 사용자 승인으로 추가: 글자 굵기 3단계. 크기·줄높이는 위 5단계 그대로 두고 굵기만 바꿀 때 쓴다. */
   --weight-regular:400;--weight-semibold:600;--weight-bold:700;

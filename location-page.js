@@ -32,7 +32,7 @@
     </article>`;}).join('');
   }
   pages.addresses=()=>`<section class="address-page">
-    <header class="address-header"><button type="button" data-action="addressback" aria-label="${fromMy()?'마이로 돌아가기':'지도로 돌아가기'}">${icon('back')}</button><h1 tabindex="-1">위치 편집</h1><button type="button" data-action="addressmanage" aria-label="${editing?'저장 위치 편집 완료':'저장 위치 편집'}" aria-pressed="${editing}">${editing?'완료':icon('edit')}</button></header>
+    <header class="address-header"><button type="button" data-action="addressback" aria-label="${fromMy()?'설정으로 돌아가기':'지도로 돌아가기'}">${icon('back')}</button><h1 tabindex="-1">위치 편집</h1><button type="button" data-action="addressmanage" aria-label="${editing?'저장 위치 편집 완료':'저장 위치 편집'}" aria-pressed="${editing}">${editing?'완료':icon('edit')}</button></header>
     <button type="button" class="address-search address-search-entry" data-action="addressadd" aria-label="장소 이름이나 동네로 검색, 위치 검색 열기">${icon('search')}<span>장소 이름이나 동네로 검색</span></button>
     <button type="button" class="address-locate" data-action="addresscurrent">${icon('target')} 현재 위치로 찾기</button>
     <div id="address-results" role="group" aria-label="저장한 위치 목록">${listBody()}</div>
@@ -138,7 +138,7 @@
     mapaddresses:()=>{origin='map';queryText='';editing=false;showList();},
     myaddresses:()=>{origin='my';queryText='';editing=false;showList();},
     addresslist:showList,
-    addressback:()=>{if(fromMy()){go('my');requestAnimationFrame(()=>$('#app [data-action="myaddresses"]')?.focus());return;}go('map');requestAnimationFrame(()=>$('#app .lm-location-title')?.focus());},
+    addressback:()=>{if(fromMy()){go('settingspage');requestAnimationFrame(()=>$('#app [data-action="placesheet"]')?.focus());return;}go('map');requestAnimationFrame(()=>$('#app .lm-location-title')?.focus());},
     addressmanage:()=>{editing=true;queryText='';showList();},
     addresscurrent:()=>actions.addressnewcurrent(),
     addressadd:()=>{if(myPlaces().length>=MAX_PLACES){toast(`위치는 최대 ${MAX_PLACES}개까지 저장할 수 있어요.`);return;}draftAddress='';draftName='';draftCoords=null;go(fromMy()?'myaddresssearch':'addresssearch');$('#address-new-query')?.focus();},

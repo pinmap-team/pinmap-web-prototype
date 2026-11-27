@@ -51,6 +51,8 @@ const CF_EDGE = 'M0 40.16Q0 32 9 32L30 32C39 32 41 41.6 50 41.6L91 41.6Q100 41.6
 const CF_FRONT_GOO_PATH = 'M0 .17Q0 0 .09 0L.3 0C.39 0 .41 .2 .5 .2L.91 .2Q1 .2 1 .37L1 .83Q1 1 .91 1L.09 1Q0 1 0 .83Z';
 // 2026-11-27: 폴더 고정은 Figma 'Icon / pushpin · 고정'(선 아이콘)
 const cfFilledPinIcon = () => figmaIcon('pushpin','cf-filled-pin');
+// 2026-11-27 Figma 'Icon / pushpin / 16'(선 1.3px)을 폴더 이름 앞 고정 표시에 그대로 써요.
+const cfPinMark16 = () => `<svg class="icon cf-filled-pin cf-pin16" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.6665 2.33331L13.6665 6.33331M10.6665 3.33331L7.6665 6.33331L4.99984 6.66665L3.99984 7.66665L8.33317 12L9.33317 11L9.6665 8.33331L12.6665 5.33331M6.1665 9.83331L2.6665 13.3333"/></svg>`;
 const cfUnpinIcon = () => cfFilledPinIcon().replace('cf-filled-pin"', 'cf-unpin-icon"').replace('</svg>', '<path class="cf-unpin-gap" d="M4 4l16 16"/><path class="cf-unpin-slash" d="M4 4l16 16"/></svg>');
 function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected = false, attr, pinned = false}){
   // 있는 사진만 보여줘요 (사진이 없으면 가운데 자리표시 1장)
@@ -68,7 +70,7 @@ function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected 
       <svg class="cf-shade" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
       <span class="cf-front"></span>
       <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
-      <span class="cf-meta">${pinned ? `<span class="cf-pinmark" aria-hidden="true">${cfFilledPinIcon()}</span>` : ''}<span class="cf-title">${esc(title)}</span><span class="cf-count">${count}<span class="sr">개 저장된 폴더${pinned ? ', 상단 고정됨' : ''}</span></span></span>
+      <span class="cf-meta">${pinned ? `<span class="cf-pinmark" aria-hidden="true">${cfPinMark16()}</span>` : ''}<span class="cf-title">${esc(title)}</span><span class="cf-count">${count}<span class="sr">개 저장된 폴더${pinned ? ', 상단 고정됨' : ''}</span></span></span>
     </span>
   </button>`;
 }

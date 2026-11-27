@@ -721,7 +721,7 @@ html body .bottomnav[hidden]{display:none!important}
 .setwarn>span{flex:1}.setwarn>.icon{flex:none;width:24px;height:24px}
 #sheet:has(.permopts){margin:auto!important;inset:0!important;width:calc(100% - 48px)!important;max-width:380px!important;max-height:85dvh;border-radius:var(--rounded-lg)!important;background:var(--color-surface)!important;transform:none!important;animation:none!important}
 #sheet:has(.permopts) .handle{display:none}
-.kwopt .kwico{width:28px;font-size:28px}.kwopt .kwico .icon{width:28px;height:28px}
+.kwopt .kwico{width:28px;font-size:29px}.kwopt .kwico .icon{width:28px;height:28px}
 .address-row-edit [data-address-delete]{border-color:var(--color-error);color:var(--color-error)}
 #sheet [data-action="addressdeleteconfirm"]{order:1;background:var(--color-error)!important;color:#fff!important}
 #sheet:has([data-action="addressdeleteconfirm"]) .cfkeep{order:2}
@@ -1571,7 +1571,7 @@ html body .t-like .pm-star .pm-star-line,html body .t-like .pm-star .pm-star-fil
 
 /* The current mark and wordmark share a balanced monochrome heading. */
 .homebrand .homebrand-symbol{flex:none;width:28px;height:33px;object-fit:contain}
-.homebrand .homebrand-name{color:var(--color-on-surface);font:var(--type-headline-lg);font-size:26px;line-height:33px;font-weight:var(--weight-bold);letter-spacing:-.5px}
+.homebrand .homebrand-name{color:var(--color-on-surface);font:var(--type-headline-lg);font-size:27px;line-height:33px;font-weight:var(--weight-bold);letter-spacing:-.5px}
 
 /* Calendar rows show their own square cover instead of a full-card photo. */
 .calrow{min-height:88px;background:var(--color-surface);color:var(--color-on-surface)}
@@ -1789,16 +1789,16 @@ html body :is(button,a,[role="button"],[role="menuitem"]):focus-visible:not(:dis
 .batch-save-trigger-ring::before{content:'';grid-area:1/1;width:39px;height:39px;border-radius:50%;background:var(--color-surface)}
 .batch-save-trigger-mark{grid-area:1/1;z-index:1;color:var(--color-secondary);font-size:13px;line-height:1}
 .batch-save-trigger.is-running .batch-save-trigger-mark{animation:batch-save-spin 1.6s linear infinite}
-.batch-save-trigger.is-done .batch-save-trigger-mark{font-size:19px}
+.batch-save-trigger.is-done .batch-save-trigger-mark{font-size:20px}
 .batch-save-popover{position:absolute;right:0;bottom:calc(100% + 12px);width:min(354px,calc(100vw - 48px))}
 @keyframes batch-save-spin{to{transform:rotate(360deg)}}
 .batch-save-card{padding:var(--space-md);border:1px solid var(--color-disabled);border-radius:var(--rounded-lg);background:var(--color-surface);color:var(--color-on-surface);box-shadow:var(--shadow-md);font:var(--type-body-sm)}
 .batch-save-head{display:flex;align-items:center;gap:var(--space-sm)}
-.batch-save-badge{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:var(--rounded-sm);background:var(--color-accent);color:var(--color-on-surface);font-size:21px}
+.batch-save-badge{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:var(--rounded-sm);background:var(--color-accent);color:var(--color-on-surface);font-size:22px}
 .batch-save-heading{display:grid;flex:1;min-width:0;gap:2px}
 .batch-save-heading strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--type-label-md)}
 .batch-save-heading small,.batch-save-step small{font:var(--type-body-sm);color:var(--color-secondary)}
-.batch-save-dismiss{display:grid;place-items:center;flex:none;width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:var(--color-secondary);font-size:24px;cursor:pointer}
+.batch-save-dismiss{display:grid;place-items:center;flex:none;width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:var(--color-secondary);font-size:25px;cursor:pointer}
 .batch-save-track{height:4px;margin:var(--space-sm) 0 var(--space-md);overflow:hidden;border-radius:999px;background:var(--color-disabled)}
 .batch-save-track span{display:block;height:100%;border-radius:inherit;background:var(--color-accent);transition:width .35s ease}
 .batch-save-steps{display:grid;gap:2px;list-style:none;margin:0;padding:0}
@@ -3139,7 +3139,7 @@ html body .lm-drawn-map .lm-header{position:absolute;inset:0 0 auto!important;z-
 html body .lm-drawn-map .lm-header::before{content:'';position:absolute;inset:0 0 auto;height:79px;background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,0));pointer-events:none}
 html body .lm-drawn-map .lm-drawn-search{position:absolute;z-index:1;left:17px;right:16px;top:40px;height:53px;display:flex;align-items:center;gap:13px;padding:0 9px 0 17px;border:0;border-radius:30px;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.1);pointer-events:auto}
 html body .lm-drawn-map .lm-drawn-search>.icon{flex:none;width:20px;height:20px;color:#858b95;stroke-width:1.7}
-html body .lm-drawn-map .lm-drawn-search input{flex:1;min-width:0;width:100%;height:100%;padding:0!important;border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;font:400 18px/24px var(--font-family);color:#282828}
+html body .lm-drawn-map .lm-drawn-search input{flex:1;min-width:0;width:100%;height:100%;padding:0!important;border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;font:400 19px/24px var(--font-family);color:#282828}
 html body .lm-drawn-map .lm-drawn-search input::placeholder{color:#858b95;opacity:1}
 html body .lm-drawn-map .lm-drawn-search input::-webkit-search-cancel-button{display:none}
 html body .lm-drawn-map .lm-drawn-avatar{flex:none;width:35px;height:35px;padding:0;border:0;border-radius:50%;overflow:hidden;background:#d7d7d7!important;display:grid;place-items:center}
@@ -3179,7 +3179,7 @@ html body .lm-drawn-map .lm-sheet-handle{flex:none;width:100%;height:35px;min-he
 html body .lm-drawn-map .lm-sheet-handle span{width:57px;height:5px;min-width:57px;min-height:5px;border-radius:100px;background:#8c8c8c}
 html body .lm-drawn-map .lm-drawn-tabs{--tabs-dur:250ms;--tabs-ease:cubic-bezier(.22,1,.36,1);position:relative;flex:none;display:flex;gap:0;width:calc(100% - 33px);height:58px;margin:0 16px 0 17px;padding:7px;border-radius:10px;background:#f0f2f4}
 html body .lm-drawn-map .t-tabs-pill.lm-drawn-tab-pill{position:absolute;z-index:0;left:0;top:7px;height:44px;border-radius:8px;background:#fff;transition:transform var(--tabs-dur) var(--tabs-ease),width var(--tabs-dur) var(--tabs-ease);pointer-events:none}
-html body .lm-drawn-map .lm-drawn-tabs button{position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;gap:9px;min-width:0;height:44px;padding:0!important;border:0!important;border-radius:8px;background:transparent!important;color:#2e2e2e;font:600 18px/24px var(--font-family);white-space:nowrap}
+html body .lm-drawn-map .lm-drawn-tabs button{position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;gap:9px;min-width:0;height:44px;padding:0!important;border:0!important;border-radius:8px;background:transparent!important;color:#2e2e2e;font:600 19px/24px var(--font-family);white-space:nowrap}
 html body .lm-drawn-map .lm-drawn-tabs button svg{width:18px;height:18px;color:#282828;stroke-width:2}
 html body .lm-drawn-map .lm-drawn-tabs button[aria-selected="true"] svg{color:#282828;fill:#282828}
 html body .lm-drawn-map .lm-drawn-tabs button svg.lm-place-tab-icon{width:18px;height:18px}
@@ -3226,7 +3226,7 @@ html body .lm-drawn-map .lm-drawn-course-list{display:grid;gap:15px;padding:25px
 html body .lm-drawn-map .lm-drawn-course-card{position:relative;display:block;width:100%;height:174px;min-height:174px;padding:0!important;overflow:hidden;text-align:left;border:0!important;border-radius:10px!important;background:#fff!important;box-shadow:0 4px 15px rgba(0,0,0,.1)!important;transition:transform var(--page-slide-dur) var(--page-slide-ease),box-shadow var(--page-slide-dur) var(--page-slide-ease)}
 html body .lm-drawn-map .lm-drawn-course-card:active{transform:scale(.985)}
 html body .lm-drawn-map .lm-drawn-course-copy{position:absolute;inset:16px auto 16px 19px;width:178px;display:block;pointer-events:none}
-html body .lm-drawn-map .lm-drawn-course-copy>strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#282828;font:700 20px/26px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-course-copy>strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#282828;font:700 21px/26px var(--font-family)}
 html body .lm-drawn-map .lm-drawn-course-copy>small{display:block;margin-top:1px;color:#909090;font:300 13px/18px var(--font-family)}
 html body .lm-drawn-map .lm-drawn-course-stops{position:absolute;left:0;bottom:0;display:grid;grid-template-columns:85px 85px;grid-template-rows:23px 23px;align-items:center;color:#2e2e2e}
 html body .lm-drawn-map .lm-drawn-course-stops>span{display:flex;align-items:center;gap:3px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:400 12px/19px var(--font-family)}
@@ -3295,3 +3295,52 @@ html body #onboarding .ob-screen.step3 .ob-groupcard:not(.on):not(:hover) .ob-em
 html body #onboarding .ob-screen.step3 .ob-groupcard:not(.on):hover .ob-emoji{background:#333333!important;border-radius:50%!important}
 html body #onboarding .ob-screen.step3 .ob-groupcard:not(.on):hover .ob-emoji :is(img,svg){filter:brightness(0) invert(1)!important}
 }
+/* 2026-11-27 캘린더 카테고리 버튼: 실제 화면(4배 캡처)에서 아이콘·글자가 함께 버튼 중앙보다 1.25px 위였어요(측정 0.25px 단위). 내용 전체를 1.25px 내려(3px는 화면 1px 맞춤 때문에 0.75px 넘침) 세로 중앙에 맞춰요. */
+html body .calcats .calcat{padding-top:2.5px!important;padding-bottom:0!important;box-sizing:border-box}
+
+/* 2026-11-27 사용자 요청: 마이 세부 페이지(설정·이용 가이드·자주 묻는 질문·앱 정보·캘린더 설정 등)의 흰색 둥근 박스를 없애고,
+   줄 높이·아이콘·글자 간격을 마이 첫 화면 목록과 같게 맞춰요(행 54px · 아이콘 28px 칸 · 간격 12px · body-md 16/24). */
+html body .mypage :is(.mgroup,.mycard.settings,.mycard.calx-list,.faq-panel-card){background:transparent!important;box-shadow:none!important;border:0!important;border-radius:0!important;padding-left:0!important;padding-right:0!important}
+html[data-theme="dark"] body .mypage :is(.mgroup,.mycard.settings,.mycard.calx-list,.faq-panel-card){background:transparent!important}
+html body .mypage .mgroup{padding-top:var(--space-sm)!important;padding-bottom:var(--space-sm)!important}
+html body .mypage .mgroup .mrow{min-height:54px!important;height:54px;padding:0!important;gap:var(--space-md)!important;border:0!important}
+html body .mypage .mgroup .mrow::before,html body .mypage .mgroup .mrow::after{display:none!important}
+html body .mypage .mgroup .mrow .mrico{width:28px!important;min-width:28px;height:28px;display:grid!important;place-items:center;flex:none}
+html body .mypage .mgroup .mrow .mrico svg.icon{display:block;width:24px!important;height:24px!important;stroke-width:1.7px!important}
+html body .mypage .mgroup .mrow .mrico svg.icon :is(path,circle,rect,line,polyline){stroke-width:1.7px!important}
+html body .mypage .mgroup .mrow .mrlabel{font:var(--type-body-md)!important;color:var(--color-on-surface)}
+html body .mypage .mgroup .mrow .mrval{font:var(--type-body-sm)!important;color:var(--color-secondary)}
+html body .mypage .mgroup .mrow>svg.icon:last-child{width:20px!important;height:20px!important;stroke-width:1.7px!important}
+html body .mypage .mycard.settings .setrow{padding-left:0!important;padding-right:0!important}
+html body .mypage .faq-panel-card .faq-slide{display:none!important}
+html body .mypage .faq-panel-card .faq-trigger{padding-left:0!important;padding-right:0!important}
+html body .mypage .faq-panel-card .faq-answer{padding-left:0!important;padding-right:0!important}
+html body .mypage .faq-panel-card .faq-text{padding-left:0!important;padding-right:0!important}
+/* 켜진 토글은 파란색 대신 진한 민트(accent-strong) */
+html body .setrow .sw.t-toggle[data-on="true"],html[data-theme="dark"] body .setrow .sw.t-toggle[data-on="true"]{background:var(--color-accent-strong)!important}
+html body .mypage .calendar-week-option{padding-left:0!important;padding-right:0!important}
+/* 2026-11-27 Figma 'Icon / pushpin · 고정': 폴더 이름 앞은 16px 버전(선 1.3), 길게 눌렀을 때 메뉴는 24px 버전(선 1.7) */
+html body .cf-meta .cf-pinmark svg.cf-pin16{width:16px!important;height:16px!important;fill:none!important}
+html body .cf-meta .cf-pinmark svg.cf-pin16 path{fill:none!important;stroke:currentColor!important;stroke-width:1.3px!important;stroke-linecap:round;stroke-linejoin:round;vector-effect:none!important}
+html body .cf-goo-action svg.cf-filled-pin path,html body .cf-goo-action svg.cf-unpin-icon>path:first-child{stroke-width:1.7px!important;stroke-linecap:round;stroke-linejoin:round}
+/* 2026-11-27 사용자 요청: 홈 카테고리 캐러셀 버튼을 누르는 동안 둥근 네모를 연한 민트(accent)로 */
+html body .homecategories .prefchip{transition:color .15s,background-color .15s}
+html body .homecategories .prefchip:active,html[data-theme="dark"] body .homecategories .prefchip:active{background:var(--color-accent)!important;color:#333333!important}
+html body .homecategories .prefchip:active *{color:inherit!important}
+/* 2026-11-27 토스트: 화면 가운데 대신 하단 메뉴(+ 버튼) 바로 위 */
+html body #snackbar{top:auto!important;bottom:calc(116px + env(safe-area-inset-bottom,0px))!important;transform:translate(-50%,8px) scale(.96)!important}
+html body #snackbar.show{transform:translate(-50%,0)!important}
+/* 2026-11-27 사용자 요청: 즐겨찾기 선택 = Figma 'Favorite / star · State=Fill, Color=Accent strong'(#51DDA1). 흰색·검정 칠 대신 진한 민트 */
+html body :is(.is-active,[data-liked="true"],[aria-pressed="true"]) .pm-star .pm-star-fill,
+html[data-theme="dark"] body :is(.is-active,[data-liked="true"],[aria-pressed="true"]) .pm-star .pm-star-fill{fill:var(--color-accent-strong)!important;stroke:var(--color-accent-strong)!important;color:var(--color-accent-strong)!important}
+/* 2026-11-27 사용자 요청: 지도 상단 카테고리 아이콘이 글자보다 커 보여 20 → 18px */
+html body .lm-drawn-map .lm-header .lm-categories .lm-category-art{width:18px!important;height:18px!important}
+html body .lm-drawn-map .lm-header .lm-categories .lm-category-art :is(svg,img.pm-category-icon){width:18px!important;height:18px!important}
+/* 지도 목록 탭: Figma 'Icon / pin'·'Icon / route' 선 아이콘(선택돼도 채우지 않음) */
+html body .lm-drawn-map .lm-drawn-tabs button svg.lm-tab-icon,html body .lm-drawn-map .lm-drawn-tabs button[aria-selected="true"] svg.lm-tab-icon{width:20px!important;height:20px!important;fill:none!important;stroke:currentColor!important;color:inherit!important}
+html body .lm-drawn-map .lm-drawn-tabs button svg.lm-tab-icon path{fill:none!important;stroke:currentColor!important;stroke-width:1.7px!important;stroke-linecap:round;stroke-linejoin:round}
+/* 2026-11-27 최소 글자 14px 재점검: 지도 묶음 마커 숫자(+N)와 가상 키보드 위 '자동 완성'도 14px */
+html body .lm-drawn-map .lm-drawn-cluster-disc{font-size:14px!important;line-height:1!important}
+html body .pm-keyboard-tools{font-size:14px!important}
+/* 2026-11-27 사용자 요청: 마우스를 올렸을 때도 홈 카테고리 버튼을 연한 민트(accent)로 */
+@media(hover:hover){html body .homecategories .prefchip:hover,html[data-theme="dark"] body .homecategories .prefchip:hover{background:var(--color-accent)!important;color:#333333!important}html body .homecategories .prefchip:hover *{color:inherit!important}}

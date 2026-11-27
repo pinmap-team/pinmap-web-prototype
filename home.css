@@ -108,7 +108,7 @@
 .pavatar{overflow:hidden}.pavatar img{width:100%;height:100%;object-fit:cover;display:block}
 .pfedit{display:grid;justify-items:center}
 .pfphoto{position:relative;margin-top:var(--space-sm)}
-.pavatar.big{width:104px;height:104px;font-size:38px}
+.pavatar.big{width:104px;height:104px;font-size:39px}
 .pfchange{position:absolute;right:-2px;bottom:-2px;width:34px;height:34px;border-radius:50%;background:var(--color-primary);color:var(--color-neutral);display:grid;place-items:center;border:3px solid var(--t-bg,var(--color-surface));cursor:pointer}
 .pfchange .icon{width:16px;height:16px}
 .pfbtns{display:flex;align-items:center;gap:var(--space-sm);margin:var(--space-lg) 0 var(--space-sm)}

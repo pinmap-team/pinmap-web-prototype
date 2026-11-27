@@ -3,7 +3,8 @@
   if (typeof document!=='undefined') document.documentElement.classList.add('nav-icononly');
   // 2026-11-24: 선택 전·후 모양이 같은 내비 아이콘. 선택되면 같은 윤곽을 채우고 안쪽 선만 비워요(mask). 홈 선택은 문 구멍 아래 바닥 선이 이어져요. 지도는 카테고리 '여행·명소'와 같은 아이콘.
   const NAV_GLYPHS={
-    home:{outline:'M3 10 12 3l9 7v10H3z',detail:'M9 20v-7h6v7',cut:'M9 13h6v5.3H9z',cutFill:true},
+    // 2026-11-27 Figma 'Nav / home': 18×18 정사각 비율, 선택은 같은 바깥 크기로 채우고 문 구멍 5.1×6.3(모서리 0.85).
+    home:{outline:'M3 10.4118 12 3l9 7.4118V21H3z',detail:'M9 21v-7.4118h6V21',selected:'M11.5825 2.25983C11.8837 2.09017 12.2649 2.11877 12.5396 2.3448L21.5396 9.7569C21.7354 9.91837 21.8491 10.1593 21.8491 10.4132V21.001C21.8487 21.4701 21.4687 21.8507 20.9995 21.8507H2.99951C2.53035 21.8507 2.15036 21.4701 2.1499 21.001V10.4132C2.1499 10.1593 2.26366 9.91837 2.45947 9.7569L11.4595 2.3448L11.5825 2.25983ZM10.3003 13.8507C9.83085 13.8507 9.44971 14.2308 9.44971 14.7003V19.2999C9.44971 19.7693 9.83085 20.1505 10.3003 20.1505H13.6997C14.1691 20.1505 14.5503 19.7693 14.5503 19.2999V14.7003C14.5503 14.2308 14.1691 13.8507 13.6997 13.8507H10.3003Z'},
     map:{outline:'M3 5 9 3l6 2 6-2v16l-6 2-6-2-6 2z',detail:'M9 3v16 M15 5v16',cut:'M9 3v16 M15 5v16'},
     bookmark:{outline:'M6 3h12v18l-6-4-6 4z'},
     user:{outline:'M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M4 21a8 8 0 0 1 16 0',filled:'M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M4 21a8 8 0 0 1 16 0z'}
@@ -12,6 +13,7 @@
   const navGlyph=(name,active)=>{
     const g=NAV_GLYPHS[name];
     if(!active)return `<svg class="icon pm-nav-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="${g.outline}${g.detail?' '+g.detail:''}"/></svg>`;
+    if(g.selected)return `<svg class="icon pm-nav-glyph is-selected" viewBox="0 0 24 24" aria-hidden="true"><path class="pm-nav-fill" fill-rule="evenodd" clip-rule="evenodd" d="${g.selected}"/></svg>`;
     const id=`pm-nav-cut-${name}-${++navMaskSeq}`;
     const mask=g.cut?`<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24"><rect width="24" height="24" style="fill:#fff;stroke:none"/><path d="${g.cut}" style="fill:${g.cutFill?'#000':'none'};stroke:#000"/></mask></defs>`:'';
     return `<svg class="icon pm-nav-glyph is-selected" viewBox="0 0 24 24" aria-hidden="true">${mask}<path class="pm-nav-fill" d="${g.filled||g.outline}"${g.cut?` mask="url(#${id})"`:''}/></svg>`;

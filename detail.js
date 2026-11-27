@@ -405,8 +405,9 @@ document.addEventListener('click', async event => {
 /* 직접 추가한 장소 설명은 첫 문장을 접힌 상태로 보여 줍니다. */
 // AI 요약에는 사용자가 지정한 세 개의 선형 별을 사용해요.
 // 2026-11-27: AI 컨텐츠 요약 아이콘은 Figma 'Icon / spark / accent' Color=Gradient(Pinmap/gradients/accent)
+// 2026-11-27 Figma 'Icon / spark / accent' · Color=Gradient strong (#83EDC0→#5BE7D9, gradient-accent-strong)
 function dtAiSparkIcon(){
-  return `<svg class="icon dtai-spark" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="dtai-spark-gradient" x1="2" y1="12" x2="22" y2="12" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#C6F5E1"/><stop offset="1" stop-color="#AFF3E4"/></linearGradient></defs><path d="${figmaIconPath('spark')}"/></svg>`;
+  return `<svg class="icon dtai-spark" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="dtai-spark-gradient" x1="2.8501" y1="12" x2="21.1499" y2="12" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#83EDC0"/><stop offset="1" stop-color="#5BE7D9"/></linearGradient></defs><path d="M12 2.8501L14.745 9.25504L21.1499 12L14.745 14.745L12 21.1499L9.25504 14.745L2.8501 12L9.25504 9.25504L12 2.8501Z"/></svg>`;
 }
 function dtSummaryBody(text){
   const all = String(text || '').trim();

@@ -99,7 +99,7 @@
 .bottomnav .pm-nav-indicator::before{height:56px;border-radius:28px}
 @media(prefers-reduced-motion:reduce){.live-map .lm-header .lm-search-row,.live-map .lm-header-search .lm-search-open-icon,.live-map .lm-header-search .lm-search-close-icon{transition:none}}
 .pm-keyboard-tools{display:flex;justify-content:space-between;align-items:center;height:31px;padding:0 18px;color:#505050;font-size:13px}
-.pm-keyboard-tools span:first-child,.pm-keyboard-tools span:last-child{font-size:20px}
+.pm-keyboard-tools span:first-child,.pm-keyboard-tools span:last-child{font-size:21px}
 .pm-keyboard-row{display:flex;justify-content:center;gap:5px;width:100%;height:44px}
 .pm-keyboard-row button{flex:1;min-width:0;padding:0;border:0;border-radius:5px;background:#fff;box-shadow:0 1px 0 #B2B2B2;color:#212121;font:500 18px -apple-system,BlinkMacSystemFont,sans-serif}
 .pm-keyboard-third button:first-child,.pm-keyboard-third button:last-child,.pm-keyboard-bottom button:first-child{background:#ABB2BE}

@@ -2,7 +2,7 @@
 // 마이에서 누르는 기능은 아래에서 올라오는 시트 대신 새 페이지로 열리고, 왼쪽 위 ← 로 마이로 돌아가요.
 // 현재 위치 · 관심 키워드 · 알림 · 저장 · 위치/지도 · 저장하는 방법 · 앱 정보 · 핀맵 계정 설정
 
-const MY_PAGES = {settingspage:'설정', calexport:'캘린더로 내보내기', calsettings:'캘린더 설정', calweek:'한 주의 시작 요일', favorites:'즐겨찾기', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리'};
+const MY_PAGES = {settingspage:'설정', themeset:'화면 모드', calexport:'캘린더로 내보내기', calsettings:'캘린더 설정', calweek:'한 주의 시작 요일', favorites:'즐겨찾기', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', faq:'자주 묻는 질문', notice:'공지사항', terms:'약관 및 정책', account:'계정 관리'};
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
 const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
@@ -16,12 +16,25 @@ function myQuickCards(){
 
 pages.settingspage = () => myPage('설정', `<section class="mgroup my-section" aria-label="설정 항목">
   ${myRow('placesheet',icon('pin'),'위치 설정')}
-  ${myRow('interests',icon('spark'),'관심 키워드 설정')}
-  ${myRow('savesheet',icon('spark'),'저장 설정')}
+  ${myRow('interests',icon('heart'),'관심 키워드 설정')}
+  ${myRow('savesheet',icon('bookmark'),'저장 설정')}
   ${myRow('notisettings',icon('bell'),'알림 설정')}
   ${myRow('calsettings',icon('calendar'),'캘린더 설정')}
+  ${myRow('themeset',icon(document.documentElement.dataset.theme==='dark'?'moon':'sun'),'화면 모드',THEME_LABELS[window.PinmapTheme?.mode]||'기기 설정')}
   ${myRow('account',icon('user'),'계정 관리')}
-</section>`, 'settingpage');
+</section>`, 'settingpage settingslist');
+// 2026-11-27 화면 모드: 홈·마이 오른쪽 위 버튼 대신 설정 안에서 바꿔요.
+const THEME_LABELS = {system:'기기 설정', light:'라이트', dark:'다크'};
+pages.themeset = () => myPage('화면 모드', `<fieldset class="calendar-week-settings theme-settings" aria-describedby="theme-hint">
+  <legend class="auth-sr-only">화면 모드</legend>
+  <p id="theme-hint">기기 설정을 고르면 휴대폰의 라이트·다크 설정을 따라가요.</p>
+  ${Object.entries(THEME_LABELS).map(([value,label])=>`<label class="calendar-week-option"><span>${label}</span><input type="radio" name="theme-mode" value="${value}" ${(window.PinmapTheme?.mode||'system')===value?'checked':''}></label>`).join('')}
+</fieldset>`, 'settingpage calendar-settings-page', 'settingspage');
+document.addEventListener('change', e => {
+  const input = e.target.closest?.('input[name="theme-mode"]'); if (!input) return;
+  window.PinmapTheme?.set(input.value);
+});
+actions.themeset = () => go('themeset');
 actions.settingspage = () => go('settingspage');
 
 /* ---------- 관심 키워드 설정 (온보딩으로 가지 않고 이 페이지에서 바로 바꿔요) ---------- */
@@ -31,7 +44,7 @@ pages.interestset = function(){
     <p class="muted mpdesc kwdesc">고른 키워드에 맞는 저장 콘텐츠를 홈에서 먼저 보여드려요.\n아무것도 고르지 않으면 최근 저장한 순서로 보여드려요.</p>
     <div class="kwgrid" role="group" aria-label="관심 키워드">${opts.map(o => { const on = preferences.some(id=>PinmapCategories.get(id)?.id===o.id);
       return `<button class="kwopt ${on ? 'on' : ''}" data-kw="${o.id}" role="checkbox" aria-checked="${on}"><span class="kwico" aria-hidden="true">${PinmapCategories.icon(o.id,on)}</span><span>${o.short}</span></button>`; }).join('')}</div>
-`, 'kwpage');
+`, 'kwpage', 'settingspage');
 };
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-kw]'); if (!b) return;
@@ -49,13 +62,13 @@ function pageFromModal(fn){ // my.js의 시트 내용을 그대로 페이지에 
   try { fn(); } finally { modal = realModal; }
   return html;
 }
-pages.notiset = () => myPage('알림 설정', pageFromModal(notiSettings), 'settingpage');
-pages.saveset = () => myPage('저장 설정', pageFromModal(saveSettings), 'settingpage');
+pages.notiset = () => myPage('알림 설정', pageFromModal(notiSettings), 'settingpage', 'settingspage');
+pages.saveset = () => myPage('저장 설정', pageFromModal(saveSettings), 'settingpage', 'settingspage');
 // 2026-11-23 캘린더 설정: 내보내기와 시작 요일을 한곳에서 들어가요.
 pages.calsettings = () => myPage('캘린더 설정', `<section class="mgroup my-section calset-list" aria-label="캘린더 설정">
   ${myRow('calexport', icon('share'), '캘린더로 내보내기', typeof calExportList === 'function' ? `마감 ${calExportList().length}개` : '')}
   ${myRow('calweek', icon('calendar'), '한 주의 시작 요일', settings.calendarWeekStart === 'monday' ? '월요일' : '일요일')}
-</section>`, 'settingpage calset-page');
+</section>`, 'settingpage calset-page', 'settingspage');
 pages.calweek = () => myPage('한 주의 시작 요일', `<fieldset class="calendar-week-settings" aria-describedby="calendar-week-hint">
   <legend class="auth-sr-only">한 주의 시작 요일</legend>
   <p id="calendar-week-hint">홈의 주간 일정과 캘린더에 함께 적용돼요.</p>
@@ -343,7 +356,7 @@ pages.account = () => myPage('계정 관리', `<h2 class="account-sub">프로필
   ${PM_ENV.requiresAuth ? '' : '<p class="account-note">프로토타입 예시 정보예요.</p>'}
   <nav class="account-exit" aria-label="로그아웃 및 회원 탈퇴">
     <button type="button" data-action="logoutask">로그아웃</button><span aria-hidden="true">|</span><button type="button" data-action="leaveask">회원 탈퇴</button>
-  </nav>`, 'accountpage');
+  </nav>`, 'accountpage', 'settingspage');
 /* ---------- 항목별 초기화: 저장 콘텐츠와 코스는 보존 ---------- */
 const RESET_OPTIONS = {
   keywords: {label:'키워드 초기화', description:'선택한 관심 키워드만 해제해요. 저장한 카테고리와 콘텐츠는 유지돼요.'},
@@ -432,7 +445,7 @@ pages.calexport = () => {
     <button type="button" class="filled calx-btn" data-action="calexportapple" ${n ? '' : 'disabled'}>${icon('calendar')}Apple 캘린더로 내보내기</button>
     <button type="button" class="calx-btn calx-secondary" data-action="calexportgoogle" ${n ? '' : 'disabled'}>${icon('calendar')}Google 캘린더로 내보내기</button>
   </div>
-  <p class="hint calx-hint">${list.length && !n ? '내보낼 일정을 하나 이상 골라 주세요.<br>' : ''}두 캘린더 모두 같은 파일로 가져와요. 핀맵에서 바꾼 내용은 자동으로 반영되지 않아요.</p>`, 'calxpage');
+  <p class="hint calx-hint">${list.length && !n ? '내보낼 일정을 하나 이상 골라 주세요.<br>' : ''}두 캘린더 모두 같은 파일로 가져와요. 핀맵에서 바꾼 내용은 자동으로 반영되지 않아요.</p>`, 'calxpage', 'calsettings');
 };
 document.addEventListener('click', e => {
   const row = e.target.closest('[data-calx-pick]'); if (!row || page !== 'calexport') return;

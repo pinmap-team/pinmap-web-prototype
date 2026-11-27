@@ -376,3 +376,5 @@ actions.notisettings = () => { closeNotiPanel(true); notiSettingsBase(); };
 // 알림을 누르면 패널을 닫고 해당 화면으로 (이동은 my.js에서 처리)
 document.addEventListener('click', e => { if (e.target.closest('#notipanel [data-noti]')) closeNotiPanel(true); }, true);
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('notipanel')) closeNotiPanel(); });
+// 2026-11-27: iOS Safari에서도 누르는 동안(:active) 카테고리 버튼 민트가 보이도록 터치 리스너를 둬요.
+document.addEventListener('touchstart',()=>{},{passive:true});

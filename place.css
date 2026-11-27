@@ -87,7 +87,7 @@ html.coach-lock,html.coach-lock body{overflow:hidden;overscroll-behavior:none}
 .herocar::-webkit-scrollbar{display:none}
 .herocar .forhero{flex:0 0 calc(100% - 22px);scroll-snap-align:start;margin:0;padding:var(--space-lg) var(--space-lg);gap:var(--space-lg)}
 .herocar:has(.forhero:only-child) .forhero{flex-basis:100%}
-.herocar .forhero-emoji{width:56px;height:56px;border-radius:18px;font-size:30px}
+.herocar .forhero-emoji{width:56px;height:56px;border-radius:18px;font-size:31px}
 .fhbody{min-width:0;flex:1}
 .herocar .forhero h2{margin:0 0 var(--space-xs);font:var(--type-body-md);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .herocar .forhero p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:var(--space-md)}
@@ -102,7 +102,7 @@ html.coach-lock,html.coach-lock body{overflow:hidden;overscroll-behavior:none}
 .bottomnav .navitem svg{width:22px!important;height:22px!important}
 /* 마이 */
 .mprofile{display:flex;align-items:center;gap:var(--space-lg);width:100%;padding:var(--space-sm) 0 var(--space-lg);text-align:left}
-.mprofile .pavatar{width:56px;height:56px;font-size:22px}
+.mprofile .pavatar{width:56px;height:56px;font-size:23px}
 .mpinfo{flex:1;min-width:0}.mpinfo b{display:block;font:var(--type-headline-md)}.mpinfo small{font:var(--type-body-sm);color:var(--color-secondary)}
 .mprofile>.icon,.mrow>.icon{width:18px;height:18px;color:var(--color-secondary);transform:rotate(-90deg)}
 .mstats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:var(--space-lg) 0;border-radius:var(--rounded-lg);background:var(--color-neutral)}
@@ -111,7 +111,7 @@ html.coach-lock,html.coach-lock body{overflow:hidden;overscroll-behavior:none}
 .mgroup{margin-top:var(--space-xl)}
 .mgroup>h2{margin:0 0 var(--space-xs);font:var(--type-label-md) !important;color:var(--color-secondary)}
 .mrow{display:flex;align-items:center;gap:var(--space-md);width:100%;min-height:52px;text-align:left}
-.mrico{width:24px;text-align:center;font-size:18px}
+.mrico{width:24px;text-align:center;font-size:19px}
 .mrlabel{flex:1;font:var(--type-body-md)}
 .mrval{max-width:45%;font:var(--type-body-sm);color:var(--color-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .main .sharepromo{margin-top:var(--space-lg)}

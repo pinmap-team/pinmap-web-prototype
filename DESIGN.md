@@ -1,5 +1,5 @@
 ---
-version: 2026-11-27-min-14
+version: 2026-11-27-type-up
 name: Pinmap
 description: 팀이 채택한 9주차 통합안 기반 디자인 규칙
 colors:
@@ -17,10 +17,10 @@ colors:
   icon-muted: "#737373"
   icon-hover: "#333333"
 typography:
-  headline-lg: {fontFamily: Pretendard, fontSize: 28px, lineHeight: 36px, fontWeight: 700}
-  headline-md: {fontFamily: Pretendard, fontSize: 22px, lineHeight: 30px, fontWeight: 700}
-  body-md: {fontFamily: Pretendard, fontSize: 16px, lineHeight: 24px, fontWeight: 400}
-  label-md: {fontFamily: Pretendard, fontSize: 14px, lineHeight: 20px, fontWeight: 600}
+  headline-lg: {fontFamily: Pretendard, fontSize: 29px, lineHeight: 37px, fontWeight: 700}
+  headline-md: {fontFamily: Pretendard, fontSize: 23px, lineHeight: 31px, fontWeight: 700}
+  body-md: {fontFamily: Pretendard, fontSize: 17px, lineHeight: 25px, fontWeight: 400}
+  label-md: {fontFamily: Pretendard, fontSize: 15px, lineHeight: 21px, fontWeight: 600}
   body-sm: {fontFamily: Pretendard, fontSize: 14px, lineHeight: 20px, fontWeight: 400}
 # Project extension (2026-11-04, user approved): font weights used with the 5 typography sizes.
 fontWeights: {regular: 400, semibold: 600, bold: 700}
@@ -56,6 +56,12 @@ modes:
 ---
 
 # Pinmap Design System
+
+## 2026-11-27 캘린더 카테고리 버튼 — 세로 중앙
+
+- 사용자 요청: 캘린더 페이지 상단 카테고리 버튼 아이콘 크기 통일, 글자와 정렬, 세로 중앙, 실제 화면 기준.
+- 측정(402×874, 4배 캡처, 실제 캘린더 화면 + 25개 아이콘 버튼 줄): 아이콘 긴 변 17.0~17.25px, 가로 중심 0.12px·글자와 세로 0.13px 이내로 이미 일치. 다만 아이콘과 글자가 함께 버튼(36px) 중심보다 1.25px 위.
+- 수정: `.calcats .calcat` 위 안쪽 여백 2.5px(내용 1.25px 아래로). 수정 후 아이콘·글자 중심 17.75~18.0px(버튼 중심 18), 3px로 하면 화면 1px 맞춤 때문에 18.75px로 넘쳐 2.5px 채택. 라이트·다크·선택 상태 확인.
 
 ## 2026-11-27 온보딩 2/2 묶음 카드 — Figma Option Card 배치
 
@@ -2562,3 +2568,20 @@ Figma의 colors/accent 변수(VariableID:1393:207), 선택 카드·관심 키워
 - 근거: 사용자의 ‘확인 필요’ 표기 제외 요청과 양평 ‘물의집’ 게시물의 예약 후 주소 안내 사례. 새 디자인 토큰은 없다.
 - 판정: 상세·목록·모음·알림에서 경고 배지가 사라지는지, 좌표가 없는 장소가 지도에 표시되지 않는지 로그인 앱에서 확인한다.
 - 수정내용: `account-content.js`, `detail.js`, `detail.css`, `library.js`, `collection.js`, `my.js`, 정적 자산 버전.
+
+## 2026-11-27 · 글자 크기 한 단계 키움 · 설정 화면 · 지도 마커 · 아이콘 반영
+
+- 타입 스케일(사용자 요청 “최소한으로 키우기”): headline-lg 28/36 → 29/37, headline-md 22/30 → 23/31, body-md 16/24 → 17/25, label-md 14/20 → 15/21. body-sm 14/20은 최소 글자 크기라 그대로. Figma `typography/*` 변수(Light·Dark)와 `Pinmap/typography/*` 텍스트 스타일도 같은 값. CSS에 직접 적은 15~40px 글자도 1px씩 키웠다. 실제 화면 20곳을 재서 14px 미만 읽는 글자 없음(온보딩 휴대폰 그림 속 6px 글자는 그림의 일부라 제외).
+- 마이 세부 페이지(설정·알림/저장/캘린더 설정·이용 가이드·자주 묻는 질문·앱 정보·공지·약관·캘린더 내보내기): 흰 둥근 박스를 없애고 마이 첫 화면 목록과 같은 행 54px·아이콘 칸 28px(아이콘 24px, 선 1.7px)·간격 12px·body-md, 값은 body-sm secondary. 자주 묻는 질문의 열린 질문 배경 패널도 없앤다.
+- 설정 아이콘(기존 아이콘 재사용): 위치 pin, 관심 키워드 heart, 저장 bookmark, 알림 bell, 캘린더 calendar, 화면 모드 sun/moon, 계정 user. 화면 모드(기기 설정·라이트·다크)는 설정 안 ‘화면 모드’ 페이지로 옮기고 홈·마이 오른쪽 위 버튼은 없앤다.
+- 설정 하위 페이지의 뒤로가기는 설정으로, 캘린더로 내보내기는 캘린더 설정으로 돌아간다. 마이 ‘앱 정보’ 오른쪽 ‘로그인 서비스’ 문구 삭제.
+- 켜진 토글: 파랑 대신 `--color-accent-strong`(#51DDA1).
+- 즐겨찾기 선택 별: Figma ‘Favorite / star · State=Fill, Color=Accent strong’(#51DDA1).
+- AI 컨텐츠 요약 아이콘: Figma ‘Icon / spark / accent · Color=Gradient strong’(#83EDC0→#5BE7D9).
+- 컬렉션 폴더 고정: 폴더 이름 앞은 Figma ‘Icon / pushpin / 16’(선 1.3px), 길게 눌렀을 때 메뉴는 24px 버전(선 1.7px).
+- 아이콘: ‘전체’ 모서리 2.2 → 1, 패션 옷깃 선 삭제(모든 상태·칩 면 아이콘), 하단 메뉴 홈은 Figma ‘Nav / home’ 18×18 정사각 비율, 선택은 같은 바깥 크기로 채우고 문 구멍 5.1×6.3(모서리 0.85).
+- 지도: 상단 카테고리 아이콘 20 → 18px. 목록 탭은 Figma ‘Icon / pin’·‘Icon / route’ 선 아이콘(선택돼도 채우지 않음, 20px·선 1.7). 지도 원형 마커는 `img/category/*-marker.svg`로 아이콘 그림의 실제 중심을 원(34px) 가운데에 맞춘다(측정 오차 0.25px 이하, 이전 최대 1.25px). Figma ‘Map marker / 원형 카테고리’(24종) 추가.
+- 홈 카테고리 버튼을 누르는 동안 바탕 `--color-accent`(#C6F5E1), 글자·아이콘 #333333.
+- 토스트: 화면 가운데 → 하단 메뉴(+ 버튼) 바로 위(아래에서 116px).
+- 최소 글자 14px 재점검(실제 앱): 지도 묶음 마커 숫자(+N) 13 → 14px, 가상 키보드 위 ‘자동 완성’ 13 → 14px. 남은 14px 미만은 온보딩 휴대폰 그림 속 글자(5~9.5px, 그림 비율 유지)뿐. 굵기는 글자 크기 변경 전후 화면 10곳 600여 개 글자에서 모두 같음(측정).
+- 홈 카테고리 버튼: 마우스를 올렸을 때(hover 가능한 기기)도 누를 때와 같은 연한 민트 바탕·#333333.

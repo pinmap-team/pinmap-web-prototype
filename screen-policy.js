@@ -2,7 +2,7 @@
    routing, not authorization: account and billing APIs still verify users. */
 (function(root){
   const screens=new Set(['home','map','library','my','calendar','topic','profile','courses','course',
-    'settingspage','interestset','notiset','saveset','favorites','appinfo','faq','notice','terms','guide','howtopage','account','calexport','calsettings','calweek','billing',
+    'settingspage','themeset','interestset','notiset','saveset','favorites','appinfo','faq','notice','terms','guide','howtopage','account','calexport','calsettings','calweek','billing',
     'addresses','addressedit','addressmanage','addresssearch','addressconfirm','myaddresses','myaddressedit','myaddressmanage','myaddresssearch','myaddressconfirm']);
   const aliases={placeset:'myaddresses',accountaccess:'account'};
   const retired=new Set(['snsdemo','sample','pushdemo','pushallow','pushdeny','localways','nearbyon','location','allow','later','resetdata','accounts','accadd','accsync','appearance']);

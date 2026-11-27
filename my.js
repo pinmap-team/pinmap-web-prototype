@@ -80,7 +80,7 @@ pages.my = function(){
     ${myRow('faq','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7 M12 17h.01"/></svg>','자주 묻는 질문')}
     ${myRow('notice',myNoticeIcon(),'공지사항')}
     ${myRow('terms','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z M14 3v5h5 M9 12h7 M9 16h7"/></svg>','약관 및 정책')}
-    ${myRow('appinfo',icon('info'),'앱 정보','로그인 서비스')}
+    ${myRow('appinfo',icon('info'),'앱 정보')}
   </section>`;
 };
 
