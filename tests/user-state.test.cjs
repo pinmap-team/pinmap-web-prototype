@@ -16,6 +16,21 @@ test('settings whitelist retains addresses and preferences without importing acc
  assert.equal(State.normalize({onboardingDone:true}).onboardingDone,true);
  assert.equal(State.normalize({onboardingDone:'true'}).onboardingDone,false);
 });
+test('home widget placements validate order and migrate older pins to the end',()=>{
+  assert.deepEqual(State.normalize({}).settings.pinnedHomeWidgets,[]);
+  assert.deepEqual(State.normalize({settings:{homeWidgets:['featured','calendar']}}).settings.pinnedHomeWidgets,[]);
+  const settings={pinnedHomeWidgets:['folders',{id:'places',slot:'calendar'},'unknown','folders',null,{id:'favorites',slot:'invalid'}]};
+  assert.deepEqual(State.normalize({settings}).settings.pinnedHomeWidgets,
+    [{id:'folders',slot:'end'},{id:'places',slot:'calendar'},{id:'favorites',slot:'end'}]);
+  assert.deepEqual(State.normalize({settings:{pinnedHomeWidgets:[]}}).settings.pinnedHomeWidgets,[]);
+  const mixed=[{id:'calendar',slot:'featured',isDefault:true},{id:'calendar',slot:'recent'},{id:'favorites',slot:'end',isDefault:true}];
+  assert.deepEqual(State.normalizeHomeWidgets(mixed),mixed.slice(0,2));
+  assert.deepEqual(State.normalizeHomeWidgets(['photo-stack',{id:'deadline-stack',slot:'calendar'}]),
+    [{id:'photo-stack',slot:'end'},{id:'deadline-stack',slot:'calendar'}]);
+  assert.deepEqual(State.normalize({}).settings.hiddenHomeWidgets,[]);
+  assert.deepEqual(State.normalize({settings:{hiddenHomeWidgets:['calendar','calendar','end','places','recent']}}).settings.hiddenHomeWidgets,['calendar','recent']);
+});
+
 test('courses persist backend references and resolve after numeric item IDs change; missing places remain recoverable',()=>{
  const values=[{id:'course',title:'나의 코스',date:'2026-11-22',days:[[{id:1,time:'10:00'},{id:2,time:'11:30'}]]}];
  const item=(id,backendId)=>({id,backendId,title:'장소',type:'맛집/카페',address:'서울',lat:37.5,lng:127});

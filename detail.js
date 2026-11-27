@@ -41,14 +41,16 @@ detail = function(){
   const authorPhoto = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(x.authorProfilePhoto || '') ? x.authorProfilePhoto : '';
   const extracted = Array.isArray(x.extractionPlaces) ? x.extractionPlaces : [];
   const locations=Array.isArray(x.mapLocations)?x.mapLocations:[];
-  const photoIndexes=PinmapPlaces.matchExtracted(extracted,locations);
+  const locationIndexes=PinmapPlaces.matchExtracted(extracted,locations);
   const extractedPlaces=PinmapPlaces.forExtracted(x);
-  const mappedCount=photoIndexes.filter(index=>index>=0).length;
+  const mappedCount=extractedPlaces.filter(place=>!place.unlocated).length;
   const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 찾음, 지도 표시 ${mappedCount}곳</p><ul>${extracted.map((place,i) => {
-    const index=photoIndexes[i],favorite=extractedPlaces[i],located=index>=0&&!favorite.unlocated;
+    const index=locationIndexes[i],favorite=extractedPlaces[i],located=!favorite.unlocated;
     const address=String((index>=0?locations[index]?.address:'')||place.address||'').trim();
     const addressInfo=address ? `<div class="dt-extraction-address"><span>${esc(address)}</span><button type="button" class="dt-extraction-copy-button" data-dt-copy-place="${i}" aria-label="${esc(place.name || '장소')} 주소 복사" title="주소 복사">${icon('copy')}</button></div>${!located&&place.reason?`<p>${esc(place.reason)}</p>`:''}` : `<p>${esc(located?'지도 위치 확인됨':place.reason||'주소를 확인하지 못했어요.')}</p>`;
-    return `<li class="dt-extraction-place">${located?PinmapPlacePhotos.markup(x.backendId,index,PinmapPlacePhotos.preferredImage(locations[index],x.photo),'dt-extraction-photo'):''}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong></div>${addressInfo}</div><button type="button" class="dt-extraction-heart lm-heart-motion t-like${favorite.favorite?' is-active':''}" data-fav-place-id="${esc(favorite.id)}" data-liked="${!!favorite.favorite}" aria-pressed="${!!favorite.favorite}" aria-label="${esc(favorite.title)} 장소 즐겨찾기"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button></li>`;
+    const location=locations[index];
+    const mapPreview=located ? `<button type="button" class="dt-extraction-map-button" data-dt-map-place="${esc(favorite.id)}" aria-label="${esc(favorite.title)} 지도에서 보기" title="지도에서 보기"><span class="dt-extraction-map-preview" data-lat="${favorite.lat}" data-lng="${favorite.lng}" data-coordinate-source="${esc(location?.coordinate_source || location?.provider || '')}" aria-hidden="true" inert></span>${window.PinmapMapMarker.disc(PinmapCategories.of(x).id)}</button>` : '';
+    return `<li class="dt-extraction-place">${mapPreview}<div class="dt-extraction-copy"><div class="dt-extraction-heading"><strong>${esc(place.name || '이름 확인 필요')}</strong></div>${addressInfo}</div><button type="button" class="dt-extraction-heart lm-heart-motion t-like${favorite.favorite?' is-active':''}" data-fav-place-id="${esc(favorite.id)}" data-liked="${!!favorite.favorite}" aria-pressed="${!!favorite.favorite}" aria-label="${esc(favorite.title)} 장소 즐겨찾기"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button></li>`;
   }).join('')}</ul></section>` : '';
   const eventInfo=dtEventInfo(x.events);
   const memoInfo = `<section class="dtsec dtmemo"><div class="dtsechead"><h2>내 메모</h2></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨 보세요.')}</span>${icon('chevron')}</button></section>`;
@@ -378,6 +380,46 @@ addEventListener('scroll', () => {
   document.body.classList.toggle('dtscrolled',sheet?sheet.getBoundingClientRect().top<80:!!hero&&hero.getBoundingClientRect().bottom<120);
   dtSheetSync();
 }, {passive: true});
+
+// The button handles navigation. The basemap only renders the surrounding streets.
+window.PinmapDetailPlaceMaps = (() => {
+  const maps=[];
+  let observer;
+
+  function mount() {
+    if(!window.L || !window.attachPinmapBasemap)return;
+    observer=new IntersectionObserver((entries,currentObserver)=>{
+      if(currentObserver!==observer)return;
+      for(const {target,isIntersecting} of entries){
+        if(!isIntersecting || !target.isConnected)continue;
+        observer.unobserve(target);
+        const {lat,lng,coordinateSource}=target.dataset;
+        const place={lat:Number(lat),lng:Number(lng),coordinateSource};
+        const map=L.map(target,{zoomControl:false,attributionControl:false,dragging:false,keyboard:false,
+          scrollWheelZoom:false,touchZoom:false,doubleClickZoom:false,boxZoom:false,zoomAnimation:false})
+          .setView([place.lat,place.lng],16);
+        maps.push(map);
+        window.attachPinmapBasemap(map,undefined,{places:[place]});
+      }
+    });
+    document.querySelectorAll('.dt-extraction-map-preview').forEach(target=>observer.observe(target));
+  }
+
+  function unmount() {
+    observer?.disconnect();
+    observer=null;
+    maps.splice(0).forEach(map=>map.remove());
+  }
+
+  return {mount,unmount};
+})();
+
+document.addEventListener('click', event => {
+  const button=event.target.closest('[data-dt-map-place]');
+  if(!button||detailId==null)return;
+  window.pmMapFocus=button.dataset.dtMapPlace;
+  go('map');
+});
 
 // 주소 복사 (클립보드 → 안 되면 선택 복사)
 async function dtCopy(text){

@@ -74,14 +74,21 @@
     requestAnimationFrame(() => { queued = false; deadlineAttention(); courseStepsFill(); });
   }).observe(document.getElementById('app') || document.body, {childList:true, subtree:true});
 
-  // 7. 코스 순서 바꾸기: 끌고 있는 카드에 밀려난 카드가 부드럽게 비켜나요(FLIP).
-  function flipRows(rows, mutate) {
+  // Cards displaced by a drag animate from their previous screen positions.
+  const gridFlips = new WeakMap();
+  function flipRows(rows, mutate, {horizontal = false} = {}) {
     if (reduce()) { mutate(); return; }
-    const before = new Map(rows.map(row => [row, row.getBoundingClientRect().top]));
+    const before = new Map(rows.map(row => [row, row.getBoundingClientRect()]));
+    if (horizontal) rows.forEach(row => gridFlips.get(row)?.cancel());
     mutate();
     rows.forEach(row => {
-      const dy = before.get(row) - row.getBoundingClientRect().top;
-      if (Math.abs(dy) > 1) row.animate([{transform:`translateY(${dy}px)`}, {transform:'none'}], {duration:180, easing:'cubic-bezier(.2,.8,.3,1)'});
+      const previous = before.get(row), current = row.getBoundingClientRect();
+      const dx = horizontal ? previous.left - current.left : 0;
+      const dy = previous.top - current.top;
+      if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+        const animation = row.animate([{transform:`translate(${dx}px,${dy}px)`}, {transform:'none'}], {duration:180, easing:'cubic-bezier(.2,.8,.3,1)'});
+        if (horizontal) gridFlips.set(row, animation);
+      }
     });
   }
 

@@ -33,6 +33,9 @@
   const categoryIcon = (kind,active=false) => kind==='all'?`<img class="pm-category-icon" src="img/category/all-${active?'active-dark':'inactive'}.svg?v=20261127d" width="20" height="20" alt="" aria-hidden="true">`:PinmapCategories.chipIcon(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind),active);
   // 2026-11-27 지도 원형 마커: 아이콘마다 그림의 실제 중심을 원 가운데에 맞춘 marker.svg(Figma 'Map marker / 카테고리')를 써요.
   const markerGlyph = kind => { const c=PinmapCategories.get(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind))||PinmapCategories.get('other'); return `<img class="pm-category-icon lm-marker-glyph" src="img/category/${c.id}-marker.svg?v=20261127d" width="18" height="18" alt="" aria-hidden="true">`; };
+  const markerDisc = glyph => `<span class="lm-drawn-marker-disc" aria-hidden="true">${glyph}</span>`;
+  const categoryMarkerDisc = kind => markerDisc(markerGlyph(kind));
+  window.PinmapMapMarker = {disc:categoryMarkerDisc};
   const mapChipIcon = (kind,active=false) => kind==='all' ? categoryIcon('all',active) : PinmapCategories.chipIcon(kind,active);
   // 2026-11-27 Figma 'Icon / pin' · 'Icon / route'(선 아이콘). 선택돼도 채우지 않고 같은 선 모양을 써요.
   const placeTabIcon = active => `<svg class="icon lm-tab-icon lm-place-tab-icon${active?' is-active':''}" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10C20 16 12 22 12 22C12 22 4 16 4 10C4 7.87827 4.84285 5.84344 6.34315 4.34315C7.84344 2.84285 9.87827 2 12 2C14.1217 2 16.1566 2.84285 17.6569 4.34315C19.1571 5.84344 20 7.87827 20 10ZM15 10C15 10.7956 14.6839 11.5587 14.1213 12.1213C13.5587 12.6839 12.7956 13 12 13C11.2044 13 10.4413 12.6839 9.87868 12.1213C9.31607 11.5587 9 10.7956 9 10C9 9.20435 9.31607 8.44129 9.87868 7.87868C10.4413 7.31607 11.2044 7 12 7C12.7956 7 13.5587 7.31607 14.1213 7.87868C14.6839 8.44129 15 9.20435 15 10Z"/></svg>`;
@@ -180,7 +183,7 @@
   const placeKey=place=>place.saved&&place.placeId?place.placeId:`search:${place.id}${place.locationIndex==null?'':':'+place.locationIndex}`;
   function markerIcon(place,expanded=false) {
     return L.divIcon({className:`lm-photo-marker lm-drawn-marker${expanded?' is-selected':''}`,
-      html:`<span class="lm-drawn-marker-body"><span class="lm-drawn-marker-disc">${markerGlyph(place.categoryId||place.kind)}</span><span class="lm-drawn-marker-label">${safe(place.title)}</span></span>`,
+      html:`<span class="lm-drawn-marker-body">${categoryMarkerDisc(place.categoryId||place.kind)}<span class="lm-drawn-marker-label">${safe(place.title)}</span></span>`,
       iconSize:[86,64],iconAnchor:[43,18]});
   }
   function clusterIcon(group) {
@@ -346,7 +349,7 @@
     saved.places.forEach(place=>{
       if(!Number.isFinite(place.lat)||!Number.isFinite(place.lng))return;
       L.marker([place.lat,place.lng],{interactive:false,keyboard:false,icon:L.divIcon({
-        className:'lm-drawn-marker',html:`<span class="lm-drawn-marker-body"><span class="lm-drawn-marker-disc">${icon('pin')}</span><span class="lm-drawn-marker-label">${safe(place.title)}</span></span>`,
+        className:'lm-drawn-marker',html:`<span class="lm-drawn-marker-body">${markerDisc(icon('pin'))}<span class="lm-drawn-marker-label">${safe(place.title)}</span></span>`,
         iconSize:[86,64],iconAnchor:[43,18]
       })}).addTo(courseRouteLayer);
     });
@@ -420,10 +423,10 @@
     renderSheet();
     status(searchResults ? `${list.length}개 저장 장소 검색 결과` : `${list.length}개 저장 장소`);
   }
-  function mount(followLocation=true) {
+  function mount(followLocation=true, initialProvider=preferredMapProvider) {
     if (!window.L) { status('지도 라이브러리를 불러오지 못했어요.'); return; }
     liveMap = L.map('live-map-canvas',{zoomControl:false,zoomAnimation:false}).setView(center,zoom);
-    mapProviderController=window.attachPinmapBasemap(liveMap,updateMapState,{preferredProvider:preferredMapProvider});
+    mapProviderController=window.attachPinmapBasemap(liveMap,updateMapState,{preferredProvider:initialProvider});
     courseRouteLayer=L.layerGroup().addTo(liveMap);
     pinLayer = L.layerGroup().addTo(liveMap); markers(); drawLocation();
     locate({recenter:followLocation&&!mapLocationName&&!searchResults,automatic:true});
@@ -433,7 +436,10 @@
   // Account pages can finish loading after the map opens. Rebuild its pins and
   // categories once the final set of saved places is available.
   window.addEventListener('pinmap:account-loaded', () => {
-    if (page === 'map' && !detailId && liveMap) render();
+    if (page !== 'map' || detailId || !liveMap) return;
+    const selected = markerEntries.get(expandedKey)?.place;
+    if (selected?.saved) window.pmMapFocus = selected.placeId;
+    render();
   });
   pages.map=content; // Register the active map renderer with the shared route policy.
   render = function() {
@@ -441,24 +447,50 @@
     sheetDrag=null;expandedKey=null;sheetStage='half';markerEntries.clear();
     window.unmountCourseMap?.();
     window.unmountCourseThumbnails?.();
+    window.PinmapDetailPlaceMaps?.unmount();
     stopLocation();
     if (liveMap) { liveMap.remove(); liveMap=null; mapProviderController=null; courseRouteLayer=null; locationMarker=null; locationHeadingMarker=null; }
     const isMap = page === 'map' && !detailId;
     document.body.classList.toggle('live-map-page',isMap);
-    // 저장 직후 지도 탭으로 이동할 때 해당 장소를 펼쳐요.
+    // A post focus fits all its places. A detail link selects one saved marker.
     const focusId = isMap ? window.pmMapFocus : null;
-    if (focusId != null) { window.pmMapFocus = null; searchResults = null; searchQuery = ''; category = 'all';
-      const f = savedPlaces().find(p => p.id === focusId); if (f) { center = [f.lat, f.lng]; zoom = 15; } }
+    const exactPlace = typeof focusId === 'string';
+    const focused = focusId == null ? [] : savedPlaces().filter(place=>exactPlace ? place.placeId===focusId : place.id===focusId);
+    const target = focused[0];
+    if (focusId != null) {
+      window.pmMapFocus = null;
+      searchResults = null; searchQuery = ''; category = 'all';
+      if (target) { center = [target.lat,target.lng]; zoom = 15; }
+      if (exactPlace && target) {
+        searchOpen = false;
+        panelTab = 'places';
+        if (!target.favorite) favoritesOnly = false;
+      }
+    }
     if (isMap) { $('#app').innerHTML=content();
       window.PinmapBottomNav?.mount();
       const categoryBar=document.querySelector('.lm-categories');
       alignCategoryIndicator(categoryBar);
       categoryObserver=new ResizeObserver(()=>alignCategoryIndicator(categoryBar));
       categoryObserver.observe(categoryBar);
-      mount(focusId==null); if(searchOpen&&searchQuery)searchPlaces(searchQuery); else if(searchResults)showResults();
-      if (focusId != null) { const focused=savedPlaces().filter(p=>p.id===focusId); if (focused.length>1 && liveMap) liveMap.fitBounds(focused.map(p=>[p.lat,p.lng]),{maxZoom:15,padding:[48,48]});
-        const f=focused[0]; if (f && liveMap) expandPlace(f,false); } }
-    else { originalRender(); if(page==='course' && !detailId) window.mountCourseMap?.(); if(page==='courses' && !detailId) window.mountCourseThumbnails?.(); }
+      const initialProvider = exactPlace && window.PinmapMapProviders.needsGoogle(target) ? 'google' : preferredMapProvider;
+      mount(focusId==null,initialProvider);
+      if(searchOpen&&searchQuery)searchPlaces(searchQuery); else if(searchResults)showResults();
+      if (target && liveMap) {
+        if (focused.length>1) liveMap.fitBounds(focused.map(place=>[place.lat,place.lng]),{maxZoom:15,padding:[48,48]});
+        expandPlace(target,exactPlace,!exactPlace);
+        if (exactPlace) {
+          const marker=markerEntries.get(placeKey(target))?.marker.getElement();
+          (marker||liveMap.getContainer()).focus({preventScroll:true});
+        }
+      }
+    }
+    else {
+      originalRender();
+      if(detailId)window.PinmapDetailPlaceMaps?.mount();
+      else if(page==='course')window.mountCourseMap?.();
+      else if(page==='courses')window.mountCourseThumbnails?.();
+    }
   };
   function drawLocation() {
     if(!liveMap)return;

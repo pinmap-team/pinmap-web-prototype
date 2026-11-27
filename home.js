@@ -110,6 +110,7 @@ function layoutHomeCategories(){
   const host = document.querySelector('.homecategories');
   if (!host) return;
   const chips = [...host.querySelectorAll('.prefchip')];
+  const controls = [...host.querySelectorAll(':scope > [data-home-widget-grab], :scope > [data-home-widget-remove]')];
   host.replaceChildren(...chips);
   const gap = 8, widths = chips.map(chip => chip.getBoundingClientRect().width);
   const total = widths.reduce((sum, w) => sum + w, 0) + Math.max(0, chips.length - 1) * gap;
@@ -123,6 +124,7 @@ function layoutHomeCategories(){
   } else rows[0].append(...chips);
   rows.forEach(row => { row.className = 'hc-row'; });
   host.replaceChildren(...rows);
+  host.append(...controls);
   host.classList.toggle('two-rows', rows.length > 1);
 }
 window.addEventListener('resize', layoutHomeCategories);
@@ -184,9 +186,601 @@ pages.home = function(){
     : `<div class="empty small"><p class="muted">아직 저장한 콘텐츠가 없어요.</p></div>`;
   if (!accountLoading && !picks.length) pendingSkeletonSlots.delete('home-hero');
   const brand = '<div class="homebrand" aria-label="Pinmap"><img class="homebrand-symbol" src="img/pinmap-symbol-splash.svg" alt=""><span class="homebrand-name" aria-hidden="true">Pinmap</span></div>';
-  // 2026-11-23: 마감 임박 배너는 맨 위 고정 대신 캘린더 위젯 바로 아래에 보여줘요.
-  return brand + main + (accountLoading || accountError ? '' : emptyHome ? `<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>` : calWidget()) + (accountLoading ? '' : stripBar() + chips + (emptyHome || accountError ? '' : subWidgets()));
+  if(accountLoading||accountError)return brand+main+(accountLoading?'':stripBar()+chips);
+  return brand+homeWidgetLayout([
+    ['featured',main,picks.length>0],['calendar',emptyHome?`<div class="home-empty-calendar" inert aria-hidden="true">${calWidget()}</div>`:calWidget(),!emptyHome],
+    ['deadlines',stripBar()],['categories',chips],['recent',emptyHome?'':subWidgets()],['end','']
+  ]);
 };
+
+const homeWidgetCatalog = {
+  featured:{title:'최근 저장',icon:'bookmark',wide:true},
+  deadlines:{title:'마감 임박',icon:'clock'},
+  places:{title:'저장한 장소',icon:'pin'},
+  calendar:{title:'주간 일정',icon:'calendar',wide:true},
+  categories:{title:'카테고리',icon:'folder',wide:true},
+  recent:{title:'최근 저장한 목록',icon:'image',wide:true},
+  favorites:{title:'즐겨찾기',icon:'star'},
+  folders:{title:'내 폴더',icon:'folder'},
+  'photo-stack':{title:'사진 스택',icon:'image'},
+  'deadline-stack':{title:'D-day 스택',icon:'clock',wide:true}
+};
+const homeWidgetNote=text=>`<p class="home-widget-note">${esc(text)}</p>`;
+function homeWidgetMetric(widget,attributes,value,unit,caption){
+  return `<button type="button" class="home-widget-metric" ${attributes}><span class="home-metric-head">${icon(widget.icon)}<span>${widget.title}</span>${icon('chevright')}</span><strong>${esc(value)}${unit?`<small>${unit}</small>`:''}</strong><span class="home-metric-caption">${esc(caption)}</span></button>`;
+}
+let homePhotoFrontId=null;
+function homeWidgetPhotoStack(widget){
+  const seen=new Set();
+  const photos=[];
+  for(const item of items){
+    const url=libPhoto(item);
+    if(!url||seen.has(url))continue;
+    seen.add(url);
+    photos.push(item);
+    if(photos.length===3)break;
+  }
+  if(!photos.length)return homeWidgetMetric(widget,'data-action="golib"','0','장','저장한 사진이 여기에 보여요.');
+  const current=Math.max(0,photos.findIndex(item=>String(item.id)===homePhotoFrontId));
+  const front=photos[current];
+  return `<button type="button" class="home-photo-widget" data-detail="${front.id}" aria-label="${esc(front.title)} 상세 보기"${photos.length>1?' aria-keyshortcuts="ArrowLeft ArrowRight"':''}>
+    <span class="home-photo-widget-title">${widget.title}</span>
+    <span class="home-photo-stack" aria-hidden="true">${photos.map((item,index)=>
+      `<span class="home-photo-stack-card" data-photo-depth="${(index-current+photos.length)%photos.length}" data-photo-id="${item.id}" data-photo-title="${esc(item.title)}">${libThumb(item)}</span>`
+    ).join('')}</span>
+  </button>`;
+}
+
+function advanceHomePhoto(button,step){
+  const cards=[...button.querySelectorAll('[data-photo-depth]')];
+  if(cards.length<2)return;
+  for(const card of cards)card.dataset.photoDepth=String((Number(card.dataset.photoDepth)-step+cards.length)%cards.length);
+  const front=cards.find(card=>card.dataset.photoDepth==='0');
+  homePhotoFrontId=front.dataset.photoId;
+  button.dataset.detail=homePhotoFrontId;
+  button.setAttribute('aria-label',front.dataset.photoTitle+' 상세 보기');
+}
+
+let homePhotoPress=null,homePhotoSwipeClick=null,homePhotoWheelLock=0;
+document.addEventListener('pointerdown',event=>{
+  if(!event.isPrimary||event.button!==0)return;
+  homePhotoSwipeClick=null;
+  const button=event.target.closest('.home-photo-widget');
+  if(button?.querySelector('[data-photo-depth="1"]')){
+    homePhotoPress={button,id:event.pointerId,x:event.clientX,y:event.clientY,sliding:false};
+  }
+});
+document.addEventListener('pointermove',event=>{
+  const press=homePhotoPress;
+  if(!press||press.id!==event.pointerId)return;
+  if(!press.button.isConnected){homePhotoPress=null;return;}
+  const dx=event.clientX-press.x,dy=event.clientY-press.y;
+  if(!press.sliding){
+    if(Math.max(Math.abs(dx),Math.abs(dy))<8)return;
+    if(Math.abs(dy)>=Math.abs(dx)){homePhotoPress=null;return;}
+    press.sliding=true;
+    press.button.setPointerCapture(event.pointerId);
+    press.button.classList.add('is-photo-sliding');
+  }
+  press.button.style.setProperty('--photo-pan',`${Math.max(-34,Math.min(34,dx*.28))}px`);
+});
+for(const type of ['pointerup','pointercancel'])document.addEventListener(type,event=>{
+  const press=homePhotoPress;
+  if(!press||press.id!==event.pointerId)return;
+  homePhotoPress=null;
+  if(!press.sliding)return;
+  homePhotoSwipeClick=press.button;
+  press.button.classList.remove('is-photo-sliding');
+  press.button.style.removeProperty('--photo-pan');
+  const dx=event.clientX-press.x;
+  if(type==='pointerup'&&Math.abs(dx)>=24)advanceHomePhoto(press.button,dx<0?1:-1);
+});
+document.addEventListener('click',event=>{
+  if(!event.detail||!homePhotoSwipeClick||!homePhotoSwipeClick.contains(event.target))return;
+  homePhotoSwipeClick=null;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+},true);
+document.addEventListener('dragstart',event=>{
+  if(event.target.closest('.home-photo-widget'))event.preventDefault();
+});
+document.addEventListener('keydown',event=>{
+  const button=event.target.closest('.home-photo-widget');
+  if(!button||!['ArrowLeft','ArrowRight'].includes(event.key))return;
+  event.preventDefault();
+  advanceHomePhoto(button,event.key==='ArrowRight'?1:-1);
+});
+document.addEventListener('wheel',event=>{
+  const button=event.target.closest('.home-photo-widget');
+  if(!button?.querySelector('[data-photo-depth="1"]')||Math.abs(event.deltaX)<=Math.abs(event.deltaY))return;
+  event.preventDefault();
+  if(Math.abs(event.deltaX)<6||performance.now()<homePhotoWheelLock)return;
+  homePhotoWheelLock=performance.now()+330;
+  advanceHomePhoto(button,event.deltaX>0?1:-1);
+},{passive:false});
+
+function homeDeadlineBanner(event,index,depth){
+  const date=calDue(event);
+  return `<button type="button" class="t-stack-banner" data-depth="${depth}" data-deadline-index="${index}" data-detail="${event.id}" ${depth?'inert aria-hidden="true"':''}>
+    <strong>${dLabel(event)}</strong>
+    <span class="home-deadline-copy"><b>${esc(event.title)}</b><small>${date.getMonth()+1}월 ${date.getDate()}일${event.dueLabel?` · ${esc(event.dueLabel)}`:''}</small></span>
+    ${icon('chevright')}
+  </button>`;
+}
+
+function homeWidgetDeadlineStack(widget){
+  const events=calDueList().filter(event=>calDue(event)>=calToday&&event.dueLabel!=='행사 시작'&&!event.eventCandidate);
+  return `<div class="home-deadline-widget">
+    <div class="home-deadline-head"><h3>${widget.title}</h3>
+      ${events.length>1?`<button type="button" class="home-deadline-next" data-home-deadline-next aria-label="다음 마감 일정">${icon('chevright')}</button>`:''}
+    </div>
+    ${events.length?`<div class="t-stack" data-current="0" data-home-deadline-stack>
+      ${events.slice(0,3).map((event,index)=>homeDeadlineBanner(event,index,index)).join('')}
+    </div>${events.length>1?`<div hidden>${events.map((event,index)=>`<template data-home-deadline-banner>${homeDeadlineBanner(event,index,0)}</template>`).join('')}</div><span class="sr" role="status" data-home-deadline-status></span>`:''}`
+    : `<p class="home-widget-note home-deadline-empty">다가오는 마감 일정이 없어요.</p>`}
+  </div>`;
+}
+
+// transitions.dev Banner stacking. A new deadline arrives at depth zero and pushes the previous ones back.
+document.addEventListener('click',event=>{
+  const nextButton=event.target.closest('[data-home-deadline-next]');
+  if(!nextButton)return;
+  const widget=nextButton.closest('.home-deadline-widget');
+  const stack=widget.querySelector('[data-home-deadline-stack]');
+  const templates=widget.querySelectorAll('[data-home-deadline-banner]');
+  const next=(Number(stack.dataset.current)+1)%templates.length;
+  const banner=templates[next].content.firstElementChild.cloneNode(true);
+  const duplicate=stack.querySelector(`.t-stack-banner[data-deadline-index="${next}"]`);
+  duplicate?.remove();
+  banner.classList.add('is-enter');
+  stack.prepend(banner);
+  const previous=[...stack.children].filter(element=>element!==banner&&!element.classList.contains('is-leaving'));
+  previous.forEach((element,index)=>{
+    element.inert=true;
+    element.setAttribute('aria-hidden','true');
+    if(index<2)element.dataset.depth=String(index+1);
+    else{
+      element.classList.add('is-leaving');
+      const closeMs=parseFloat(getComputedStyle(stack).getPropertyValue('--stack-close'));
+      setTimeout(()=>element.remove(),closeMs||250);
+    }
+  });
+  stack.dataset.current=String(next);
+  void banner.offsetWidth;
+  banner.classList.remove('is-enter');
+  widget.querySelector('[data-home-deadline-status]').textContent=[
+    banner.querySelector('strong').textContent,banner.querySelector('.home-deadline-copy').textContent.trim()
+  ].join(' ');
+});
+
+function homeWidgetContent(id){
+  const widget=homeWidgetCatalog[id];
+  switch(id){
+    case 'photo-stack': return homeWidgetPhotoStack(widget);
+    case 'deadline-stack': return homeWidgetDeadlineStack(widget);
+    case 'featured': {
+      const item=items[0];
+      return item
+        ? `<button type="button" class="home-widget-picture" data-detail="${item.id}">${libThumb(item)}<span><small>${widget.title}</small><b>${esc(item.title)}</b></span></button>`
+        : homeWidgetMetric(widget,'data-action="golib"','0','개','저장한 콘텐츠가 여기에 보여요.');
+    }
+    case 'deadlines': {
+      const due=calDueList().find(x=>calDue(x)>=calToday&&calDays(x)<=14&&x.dueLabel!=='행사 시작');
+      return homeWidgetMetric(widget,due?`data-detail="${due.id}"`:'data-action="gocal"',due?dLabel(due):'—','',due?due.title:'다가오는 마감 없음');
+    }
+    case 'places': {
+      const places=PinmapPlaces.all(items);
+      return homeWidgetMetric(widget,'data-page="map"',places.length,'곳',places[0]?.title||'지도 열기');
+    }
+    case 'calendar': {
+      const start=calWeekStartDate(calToday);
+      const end=new Date(start);
+      end.setDate(end.getDate()+7);
+      const week=calDueList().filter(entry=>{const date=calDue(entry);return date>=start&&date<end;});
+      return homeWidgetMetric(widget,'data-action="gocal"',week.length,'건',week[0]?.title||'이번 주 일정 없음');
+    }
+    case 'categories': {
+      const categories=savedHomeCategories();
+      return homeWidgetMetric(widget,'data-action="golib"',categories.length,'개',categories.map(category=>category.id).slice(0,3).join(' · ')||'카테고리 모아보기');
+    }
+    case 'recent':
+      return `<div class="home-widget-recent"><h3>${widget.title}</h3>${items.length?`<div class="home-widget-thumbs">${items.slice(0,3).map(rcard).join('')}</div>`:homeWidgetNote('아직 저장한 콘텐츠가 없어요.')}</div>`;
+    case 'favorites': {
+      const count=items.filter(item=>item.favorite).length+PinmapPlaces.favorites(items).length;
+      return homeWidgetMetric(widget,'data-page="favorites"',count,'개','게시물과 장소');
+    }
+    case 'folders': {
+      const folders=cfCustom();
+      return homeWidgetMetric(widget,'data-action="golib"',folders.length,'개',folders[0]||'컬렉션 열기');
+    }
+  }
+}
+
+let homeWidgetEditing=false, homeWidgetDrag=null;
+const homeWidgetPlacements=()=>PinmapUserState.normalizeHomeWidgets(settings.pinnedHomeWidgets);
+const homeHiddenWidgets=()=>PinmapUserState.normalizeHiddenHomeWidgets(settings.hiddenHomeWidgets);
+
+function homeWidgetRemoveButton(id,isDefault=false){
+  const title=homeWidgetCatalog[id].title;
+  return `<button type="button" class="home-widget-remove" data-home-widget-remove="${id}" ${isDefault?'data-home-widget-remove-default':''} aria-label="${isDefault?'기본 ':''}${title} 홈에서 빼기"><span aria-hidden="true">−</span></button>`;
+}
+
+function homeWidgetLayout(sections){
+  const placements=homeWidgetPlacements();
+  const hidden=new Set(homeHiddenWidgets());
+  const defaults=new Map(sections.map(([id,content,removable=true])=>[
+    id,{content:hidden.has(id)&&removable?'':content,removable}
+  ]));
+  const moved=new Set(placements.filter(place=>place.isDefault&&defaults.get(place.id)?.removable).map(place=>place.id));
+  const renderDefault=(id,relocated=false)=>{
+    const {content,removable}=defaults.get(id);
+    if(!content||!removable||(!relocated&&!homeWidgetEditing))return content;
+    return content.replace(/^(<[a-z]+)([^>]*)>/i,(_,tag,attributes)=>{
+      const controls=homeWidgetEditing?`<button type="button" class="home-widget-grab" data-home-widget-grab="${id}" data-home-widget-grab-default aria-label="기본 ${homeWidgetCatalog[id].title} 위치 옮기기"></button>${homeWidgetRemoveButton(id,true)}`:'';
+      return `${tag}${attributes}${relocated?' data-home-widget-moved':''}${homeWidgetEditing?` data-home-widget-default="${id}"`:''}>${controls}`;
+    });
+  };
+  const toolbar=homeWidgetEditing
+    ? `<div class="home-widget-toolbar" aria-label="홈 위젯 편집"><button type="button" data-home-widget-edit>${icon('pen')}편집</button><button type="button" data-home-widget-done>완료</button></div>`
+    : '';
+  return toolbar+sections.map(([slot])=>{
+    const content=moved.has(slot)?'':renderDefault(slot);
+    const cards=placements.filter(place=>place.slot===slot).map(({id,isDefault})=>{
+      if(isDefault)return moved.has(id)?renderDefault(id,true):'';
+      const widget=homeWidgetCatalog[id];
+      const controls=homeWidgetEditing?`
+        <button type="button" class="home-widget-grab" data-home-widget-grab="${id}" aria-label="${widget.title} 위치 옮기기"></button>
+        ${homeWidgetRemoveButton(id)}`:'';
+      return `<section class="home-widget${widget.wide?' is-wide':''}" data-home-widget-pinned="${id}" aria-label="${widget.title}"><div class="home-widget-preview" ${homeWidgetEditing?'inert':''}>${homeWidgetContent(id)}</div>${controls}</section>`;
+    }).join('');
+    if(!cards&&(!homeWidgetEditing||(!content&&!moved.has(slot)&&slot!=='end')))return content;
+    const target=homeWidgetEditing?`<button type="button" class="home-widget-drop" data-home-widget-drop aria-label="${content?homeWidgetCatalog[slot].title+' 앞에 놓기':slot==='end'?'홈 끝에 놓기':moved.has(slot)?homeWidgetCatalog[slot].title+' 원래 위치에 놓기':'이 구간에 놓기'}">배치</button>`:'';
+    return `<div class="home-widget-slot" data-home-widget-slot="${slot}">${cards?`<div class="home-widget-grid home-widget-pins" aria-label="홈 위젯">${cards}</div>`:''}${target}</div>${content}`;
+  }).join('');
+}
+
+function renderHomeWidgetEdit(){
+  const y=scrollY;
+  render();
+  scrollTo(0,y);
+}
+
+function enterHomeWidgetEdit(){
+  if(homeWidgetEditing)return;
+  homeWidgetEditing=true;
+  pickDrag=null;
+  navigator.vibrate?.(18);
+  renderHomeWidgetEdit();
+  $('[data-home-widget-edit]')?.focus({preventScroll:true});
+}
+
+function showHomeWidgets(){
+  const sheet=$('#sheet');
+  const y=sheet.open?sheet.scrollTop:0;
+  if(!sheet.open){
+    sheet.dataset.homeWidgetSheet='';
+    sheet.setAttribute('aria-label','홈 위젯');
+    sheet.addEventListener('close',()=>{
+      if(sheet.open)return;
+      delete sheet.dataset.homeWidgetSheet;
+      sheet.removeAttribute('aria-label');
+    },{once:true});
+  }
+  const restore=homeHiddenWidgets().map(id=>
+    `<button type="button" data-home-widget-restore="${id}" aria-label="기본 ${homeWidgetCatalog[id].title} 복원">${icon('plus')}${homeWidgetCatalog[id].title}</button>`
+  );
+  const pinned=new Set(homeWidgetPlacements().filter(place=>!place.isDefault).map(place=>place.id));
+  const cards=Object.entries(homeWidgetCatalog).filter(([id])=>!pinned.has(id)).map(([id,widget])=>
+    `<section class="home-widget${widget.wide?' is-wide':''}" aria-label="${widget.title}"><div class="home-widget-preview" inert>${homeWidgetContent(id)}</div><button type="button" class="home-widget-hold" data-home-widget-pin="${id}" aria-label="${widget.title} 위치 선택"></button></section>`
+  );
+  const recovery=restore.length?`<section class="home-widget-restore"><h3>기본 위젯 복원</h3><div>${restore.join('')}</div></section>`:'';
+  const gallery=cards.length?`<p class="home-widget-note">위젯을 꾹 눌러 원하는 곳으로 끌어 놓으세요.</p><div class="home-widget-grid">${cards.join('')}</div>`:homeWidgetNote('모든 위젯이 홈에 있어요.');
+  modal('홈 위젯',recovery+gallery);
+  sheet.scrollTop=y;
+}
+
+function saveHomeWidgetLayout(placements,hidden=homeHiddenWidgets()){
+  settings.pinnedHomeWidgets=placements;
+  settings.hiddenHomeWidgets=hidden;
+  renderHomeWidgetEdit();
+  if(PM_ENV.requiresAuth)void window.PinmapAccountState.persist();
+  else afterChange();
+}
+
+function homeWidgetDropAt(x,y){
+  const main=$('.main:has(.home-widget-toolbar)');
+  const bounds=main?.getBoundingClientRect();
+  if(!bounds||x<bounds.left||x>bounds.right||y<48||y>innerHeight-46)return null;
+  const drag=homeWidgetDrag;
+  const gap=drag.gap?.getBoundingClientRect();
+  if(gap&&x>=gap.left&&x<=gap.right&&y>=gap.top&&y<=gap.bottom)return drag.target;
+  const hovered=document.elementFromPoint(x,y);
+  const card=hovered?.closest('[data-home-widget-pinned],[data-home-widget-default]');
+  const onto=card&&card!==drag.source?card:null;
+  const direct=hovered?.closest('[data-home-widget-slot]');
+  if(direct){
+    if(!onto)return {node:direct};
+    const rect=onto.getBoundingClientRect();
+    const narrow=rect.width<direct.offsetWidth*.75;
+    const after=narrow?x>rect.left+rect.width/2:y>rect.top+rect.height/2;
+    const siblings=[...onto.parentElement.children].filter(element=>element!==drag.source&&element!==drag.gap);
+    return {node:direct,before:after?siblings[siblings.indexOf(onto)+1]:onto};
+  }
+  const slots=[...main.querySelectorAll('[data-home-widget-slot]')];
+  if(onto?.dataset.homeWidgetDefault){
+    const index=slots.findIndex(slot=>slot.dataset.homeWidgetSlot===onto.dataset.homeWidgetDefault);
+    if(index>=0){
+      const rect=onto.getBoundingClientRect();
+      return {node:slots[y>rect.top+rect.height/2?Math.min(index+1,slots.length-1):index]};
+    }
+  }
+  const distance=slot=>{
+    const rect=slot.getBoundingClientRect();
+    return Math.max(rect.top-y,y-rect.bottom,0);
+  };
+  const node=slots.reduce((best,slot)=>!best||distance(slot)<distance(best)?slot:best,null);
+  return node?{node}:null;
+}
+
+function reflowHomeWidgetGap(drag,target){
+  if(target?.node===drag.target?.node&&target?.before===drag.target?.before&&(!target||drag.gap.isConnected))return;
+  const rows=[...document.querySelectorAll('.main [data-home-widget-default],.main [data-home-widget-pinned]')]
+    .filter(row=>row!==drag.source);
+  const move=()=>{
+    const oldGrid=drag.gap.parentElement;
+    if(target){
+      let grid=target.node.querySelector(':scope > .home-widget-grid');
+      if(!grid){
+        grid=document.createElement('div');
+        grid.className='home-widget-grid home-widget-pins home-widget-gap-grid';
+        target.node.prepend(grid);
+      }
+      grid.insertBefore(drag.gap,target.before||null);
+    }else drag.gap.remove();
+    if(oldGrid?.classList.contains('home-widget-gap-grid')&&!oldGrid.childElementCount)oldGrid.remove();
+    drag.source?.classList.toggle('is-widget-out-of-flow',Boolean(target));
+    drag.target=target;
+  };
+  if(window.PinmapFx)PinmapFx.flipRows(rows,move,{horizontal:true});
+  else move();
+}
+
+function positionHomeWidgetDrag(){
+  const drag=homeWidgetDrag;
+  if(!drag?.ghost)return;
+  const left=Math.max(8,Math.min(drag.x-drag.width/2,innerWidth-drag.width-8));
+  drag.ghost.style.transform=`translate3d(${left}px,${drag.y-drag.offsetY}px,0)`;
+  if(!drag.moved)return;
+  if(!drag.fromGallery&&!drag.source?.isConnected){
+    drag.source=$(`[${drag.isDefault?'data-home-widget-default':'data-home-widget-pinned'}="${drag.id}"]`);
+    drag.source?.classList.add('is-widget-lifted');
+  }
+  reflowHomeWidgetGap(drag,homeWidgetDropAt(drag.x,drag.y));
+}
+
+function scrollHomeWidgetDrag(){
+  const drag=homeWidgetDrag;
+  if(!drag?.ghost)return;
+  const edge=100;
+  const delta=drag.y<edge?-Math.ceil((edge-drag.y)/8)
+    : drag.y>innerHeight-edge?Math.ceil((drag.y-innerHeight+edge)/8):0;
+  if(delta&&drag.moved){
+    scrollBy(0,delta);
+    positionHomeWidgetDrag();
+  }
+  drag.frame=requestAnimationFrame(scrollHomeWidgetDrag);
+}
+
+function liftHomeWidget(button,press){
+  const id=button.dataset.homeWidgetPin||button.dataset.homeWidgetGrab;
+  if(!id||homeWidgetDrag)return;
+  const fromGallery=Boolean(button.dataset.homeWidgetPin);
+  const isDefault=button.hasAttribute('data-home-widget-grab-default');
+  const card=button.closest('.home-widget,[data-home-widget-default]');
+  const bounds=card.getBoundingClientRect();
+  if(fromGallery)$('#sheet').close();
+  const drag={id,isDefault,fromGallery,pointer:press?.id,moved:false};
+  homeWidgetDrag=drag;
+  document.body.classList.add('home-widget-dragging');
+  if(!press){
+    document.body.classList.add('home-widget-keyboard-placement');
+    $('[data-home-widget-drop]')?.focus();
+    return;
+  }
+  navigator.vibrate?.(12);
+  const ghost=card.cloneNode(true);
+  ghost.querySelectorAll('button[data-home-widget-pin],button[data-home-widget-grab],button[data-home-widget-remove]').forEach(node=>node.remove());
+  ghost.removeAttribute('data-home-widget-default');
+  ghost.removeAttribute('data-home-widget-moved');
+  ghost.classList.add('home-widget-ghost');
+  ghost.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
+  ghost.inert=true;
+  ghost.setAttribute('aria-hidden','true');
+  ghost.style.width=`${bounds.width}px`;
+  document.body.append(ghost);
+  const gap=document.createElement('div');
+  gap.className='home-widget-gap';
+  gap.setAttribute('aria-hidden','true');
+  gap.style.height=`${bounds.height}px`;
+  if(isDefault||homeWidgetCatalog[id].wide)gap.classList.add('is-wide');
+  Object.assign(drag,{ghost,gap,source:fromGallery?null:card,width:bounds.width,offsetY:Math.min(bounds.height/2,64),x:press.x,y:press.y});
+  drag.source?.classList.add('is-widget-lifted');
+  document.body.setPointerCapture(press.id);
+  positionHomeWidgetDrag();
+  drag.frame=requestAnimationFrame(scrollHomeWidgetDrag);
+}
+
+function finishHomeWidgetDrag(target,{reopen=false}={}){
+  const drag=homeWidgetDrag;
+  if(!drag)return;
+  homeWidgetDrag=null;
+  cancelAnimationFrame(drag.frame);
+  drag.ghost?.remove();
+  const gapGrid=drag.gap?.parentElement;
+  drag.gap?.remove();
+  if(gapGrid?.classList.contains('home-widget-gap-grid')&&!gapGrid.childElementCount)gapGrid.remove();
+  drag.source?.classList.remove('is-widget-lifted','is-widget-out-of-flow');
+  document.body.classList.remove('home-widget-dragging','home-widget-keyboard-placement');
+  if(drag.pointer!=null&&document.body.hasPointerCapture(drag.pointer))document.body.releasePointerCapture(drag.pointer);
+  if(!target){
+    if(reopen&&drag.fromGallery&&homeWidgetEditing&&!$('#sheet').open)showHomeWidgets();
+    return;
+  }
+  const slot=target.node.dataset.homeWidgetSlot;
+  const placements=homeWidgetPlacements().filter(place=>place.id!==drag.id||Boolean(place.isDefault)!==drag.isDefault);
+  const beforeId=target.before?.dataset.homeWidgetDefault||target.before?.dataset.homeWidgetPinned;
+  const beforeIsDefault=Boolean(target.before?.dataset.homeWidgetDefault);
+  const index=placements.findIndex(place=>place.id===beforeId&&Boolean(place.isDefault)===beforeIsDefault);
+  if(!drag.isDefault||slot!==drag.id||target.before){
+    placements.splice(index<0?placements.length:index,0,drag.isDefault?{id:drag.id,slot,isDefault:true}:{id:drag.id,slot});
+  }
+  saveHomeWidgetLayout(placements);
+  requestAnimationFrame(()=>{
+    const card=$(`[${drag.isDefault?'data-home-widget-default':'data-home-widget-pinned'}="${drag.id}"]`);
+    card?.scrollIntoView({block:'nearest'});
+    if(!drag.ghost)card?.querySelector('[data-home-widget-grab]')?.focus({preventScroll:true});
+  });
+}
+
+let homeWidgetPress=null, homeWidgetPressTimer, homeWidgetClickBlockedUntil=0;
+function clearHomeWidgetPress(){
+  clearTimeout(homeWidgetPressTimer);
+  homeWidgetPress=null;
+}
+function homeWidgetHoldArea(target){
+  if(page!=='home'||detailId||target.closest('[data-home-widget-remove]'))return null;
+  if($('#sheet').open)return target.closest('#sheet[data-home-widget-sheet] [data-home-widget-pin]');
+  if(homeWidgetEditing)return target.closest('[data-home-widget-grab]');
+  const main=target.closest('.main:has(>.homebrand)');
+  return main&&!target.closest('.topbar')?main:null;
+}
+function activateHomeWidgetHold(area,press){
+  homeWidgetClickBlockedUntil=performance.now()+300;
+  if(press){press.activated=true;homeWidgetClickBlockedUntil=Infinity;}
+  if(area.matches('[data-home-widget-pin],[data-home-widget-grab]'))liftHomeWidget(area,press);
+  else enterHomeWidgetEdit();
+}
+document.addEventListener('pointerdown',event=>{
+  if(!event.isPrimary||event.button!==0||homeWidgetDrag)return;
+  homeWidgetClickBlockedUntil=0;
+  const area=homeWidgetHoldArea(event.target);
+  if(!area)return;
+  const press={id:event.pointerId,x:event.clientX,y:event.clientY,lastY:event.clientY,activated:false};
+  homeWidgetPress=press;
+  const draggable=area.matches('[data-home-widget-pin],[data-home-widget-grab]');
+  if(draggable&&event.pointerType==='touch')press.scroller=area.closest('#sheet')||window;
+  homeWidgetPressTimer=setTimeout(()=>{
+    if(homeWidgetPress===press&&homeWidgetHoldArea(area))activateHomeWidgetHold(area,press);
+  },draggable?410:520);
+});
+document.addEventListener('pointermove',event=>{
+  const drag=homeWidgetDrag;
+  if(drag?.pointer===event.pointerId){
+    drag.x=event.clientX;drag.y=event.clientY;
+    drag.moved ||= Math.hypot(drag.x-homeWidgetPress.x,drag.y-homeWidgetPress.y)>10;
+    positionHomeWidgetDrag();
+    return;
+  }
+  const press=homeWidgetPress;
+  if(!press||press.activated||event.pointerId!==press.id)return;
+  if(!press.scrolling&&Math.hypot(event.clientX-press.x,event.clientY-press.y)<=8)return;
+  if(!press.scroller){clearHomeWidgetPress();return;}
+  clearTimeout(homeWidgetPressTimer);
+  press.scrolling=true;
+  press.scroller.scrollBy(0,press.lastY-event.clientY);
+  press.lastY=event.clientY;
+});
+for(const type of ['pointerup','pointercancel'])document.addEventListener(type,event=>{
+  if(event.pointerId!==homeWidgetPress?.id)return;
+  const drag=homeWidgetDrag;
+  if(homeWidgetPress.activated)homeWidgetClickBlockedUntil=performance.now()+300;
+  clearHomeWidgetPress();
+  if(drag?.pointer!==event.pointerId)return;
+  const target=type==='pointerup'&&drag.moved?homeWidgetDropAt(event.clientX,event.clientY):null;
+  finishHomeWidgetDrag(target,{reopen:true});
+});
+document.body.addEventListener('lostpointercapture',event=>{
+  if(event.target!==document.body||event.pointerId!==homeWidgetDrag?.pointer)return;
+  clearHomeWidgetPress();
+  homeWidgetClickBlockedUntil=0;
+  finishHomeWidgetDrag(null,{reopen:true});
+});
+window.addEventListener('scroll',()=>{
+  if(homeWidgetPress&&!homeWidgetPress.activated&&!homeWidgetPress.scrolling)clearHomeWidgetPress();
+},{capture:true,passive:true});
+document.addEventListener('contextmenu',event=>{
+  const area=homeWidgetHoldArea(event.target);
+  if(!area)return;
+  event.preventDefault();
+  if(!area.matches('[data-home-widget-pin],[data-home-widget-grab]'))activateHomeWidgetHold(area,homeWidgetPress);
+});
+document.addEventListener('click',event=>{
+  if(performance.now()>=homeWidgetClickBlockedUntil||event.detail===0)return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+},true);
+let pendingHomeWidgetRemoval=null;
+function askHomeWidgetRemoval(button){
+  finishHomeWidgetDrag(null);
+  const id=button.dataset.homeWidgetRemove;
+  const isDefault=button.hasAttribute('data-home-widget-remove-default');
+  pendingHomeWidgetRemoval={id,isDefault};
+  confirmPop(`‘${homeWidgetCatalog[id].title}’ 위젯을 삭제할까요?`,
+    isDefault?'편집에서 기본 위젯을 다시 복원할 수 있어요.':'편집에서 위젯을 다시 추가할 수 있어요.',
+    'homewidgetremoveconfirm','삭제','취소');
+  const sheet=$('#sheet');
+  sheet.querySelector('.cfkeep')?.focus();
+  sheet.addEventListener('close',()=>{if(!sheet.open)pendingHomeWidgetRemoval=null;},{once:true});
+}
+actions.homewidgetremoveconfirm=()=>{
+  if(!pendingHomeWidgetRemoval)return;
+  const {id,isDefault}=pendingHomeWidgetRemoval;
+  pendingHomeWidgetRemoval=null;
+  $('#sheet').close();
+  const placements=homeWidgetPlacements().filter(place=>place.id!==id||Boolean(place.isDefault)!==isDefault);
+  saveHomeWidgetLayout(placements,isDefault?[...homeHiddenWidgets(),id]:homeHiddenWidgets());
+  $('[data-home-widget-edit]')?.focus({preventScroll:true});
+};
+document.addEventListener('click',event=>{
+  const button=event.target.closest('[data-home-widget-edit],[data-home-widget-done],[data-home-widget-remove],[data-home-widget-pin],[data-home-widget-grab],[data-home-widget-drop],[data-home-widget-restore]');
+  if(!button)return;
+  if(button.hasAttribute('data-home-widget-edit'))showHomeWidgets();
+  else if(button.hasAttribute('data-home-widget-done')){
+    finishHomeWidgetDrag(null);
+    homeWidgetEditing=false;
+    renderHomeWidgetEdit();
+  }else if(button.dataset.homeWidgetRemove){
+    askHomeWidgetRemoval(button);
+  }else if(button.dataset.homeWidgetRestore){
+    saveHomeWidgetLayout(homeWidgetPlacements(),homeHiddenWidgets().filter(id=>id!==button.dataset.homeWidgetRestore));
+    showHomeWidgets();
+    ($('#sheet [data-home-widget-restore]')||$('#sheet .dialoghead button'))?.focus({preventScroll:true});
+  }else if(button.hasAttribute('data-home-widget-drop'))finishHomeWidgetDrag({node:button.closest('[data-home-widget-slot]')});
+  else if(event.detail===0)liftHomeWidget(button);
+});
+document.addEventListener('keydown',event=>{
+  if(event.key!=='Escape'||!homeWidgetEditing||$('#sheet').open)return;
+  event.preventDefault();
+  if(homeWidgetDrag){
+    finishHomeWidgetDrag(null);
+    clearHomeWidgetPress();
+    homeWidgetClickBlockedUntil=0;
+  }else{
+    homeWidgetEditing=false;
+    renderHomeWidgetEdit();
+  }
+});
+window.addEventListener('pinmap:account-cleared',()=>{
+  finishHomeWidgetDrag(null);
+  clearHomeWidgetPress();
+  homePhotoFrontId=null;
+  homePhotoPress=null;
+  homePhotoSwipeClick=null;
+  homeWidgetEditing=false;
+  homeWidgetClickBlockedUntil=0;
+  const sheet=$('#sheet');
+  if(sheet.open&&(sheet.hasAttribute('data-home-widget-sheet')||pendingHomeWidgetRemoval))sheet.close();
+});
 
 // Android 공유 안내: 실제 설치나 공유 수신이 연결된 것으로 표시하지 않아요.
 actions.sharehelp = () => modal('공유로 저장하기', `<div class="home-share-guide">
@@ -263,7 +857,7 @@ function goPick(target){ // target: 이동할 위치 (현재 위치 기준 가�
   animatePick(to);
 }
 const renderBeforeHome = render;
-render = function(){ cancelAnimationFrame(pickAnim); pickAnim = null; renderBeforeHome(); layoutHomeCategories(); const n = pickCount(); if (n) { pickPos = n >= 3 ? wrapIdx(pickPos, n) : Math.max(0, Math.min(n - 1, Math.round(pickPos))); } layoutPicks(); };
+render = function(){ if(page!=='home'||detailId){finishHomeWidgetDrag(null);homeWidgetEditing=false;} cancelAnimationFrame(pickAnim); pickAnim = null; renderBeforeHome(); layoutHomeCategories(); const n = pickCount(); if (n) { pickPos = n >= 3 ? wrapIdx(pickPos, n) : Math.max(0, Math.min(n - 1, Math.round(pickPos))); } layoutPicks(); };
 window.addEventListener('resize', layoutPicks);
 
 // 끌어서 넘기기 (터치 · 마우스 공통). 세로로 움직이면 화면 스크롤에 양보해요

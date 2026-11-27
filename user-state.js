@@ -5,6 +5,22 @@
   const text=(v,n=200)=>typeof v==='string'?v.slice(0,n):'';
   const list=(v,n=100)=>[...new Set((Array.isArray(v)?v:[]).filter(x=>typeof x==='string').map(x=>text(x)).filter(Boolean))].slice(0,n);
   const defaults={notiDeadline:false,notiNearby:false,notiReminder:false,aiDefault:false,push:false,locPerm:'none',readNoti:[],places:[],recentPlaces:[],placeLabels:{},placeDetails:{},selectedPlace:null,calendarWeekStart:'sunday',pinnedFolders:[],favOrder:[],favSort:'custom'};
+  const homeWidgetIds=Object.freeze(['featured','deadlines','places','calendar','categories','recent','favorites','folders','photo-stack','deadline-stack']);
+  const homeWidgetSlots=['featured','calendar','deadlines','categories','recent','end'];
+  const normalizeHiddenHomeWidgets=value=>list(value).filter(id=>id!=='end'&&homeWidgetSlots.includes(id));
+  function normalizeHomeWidgets(value){
+    const seen=new Set(), placements=[];
+    for(const entry of Array.isArray(value)?value:[]){
+      const id=typeof entry==='string'?entry:entry?.id;
+      const isDefault=entry?.isDefault===true;
+      const key=isDefault?'default:'+id:id;
+      if(!homeWidgetIds.includes(id)||seen.has(key)||(isDefault&&!homeWidgetSlots.includes(id)))continue;
+      seen.add(key);
+      const slot=homeWidgetSlots.includes(entry?.slot)?entry.slot:'end';
+      placements.push(isDefault?{id,slot,isDefault}:{id,slot});
+    }
+    return placements;
+  }
   function normalize(value){
     const v=value&&typeof value==='object'?value:{},s=v.settings||{};
     const settings={...defaults};
@@ -25,6 +41,8 @@
     settings.pinnedFolders=list(s.pinnedFolders,50);
     settings.favOrder=list(s.favOrder,500);
     settings.favSort=['custom','recent','oldest','name'].includes(s.favSort)?s.favSort:'custom';
+    settings.pinnedHomeWidgets=normalizeHomeWidgets(s.pinnedHomeWidgets);
+    settings.hiddenHomeWidgets=normalizeHiddenHomeWidgets(s.hiddenHomeWidgets);
     return {settings,preferences:list(v.preferences,24),appearance:['light','dark','system'].includes(v.appearance)?v.appearance:'system',onboardingDone:v.onboardingDone===true};
   }
   function encodeCourses(courses,items){
@@ -61,6 +79,6 @@
     };
     return {write,flush:()=>tail};
   }
-  root.PinmapUserState={normalize,encodeCourses,decodeCourses,createStore};
+  root.PinmapUserState={normalize,normalizeHomeWidgets,normalizeHiddenHomeWidgets,encodeCourses,decodeCourses,createStore};
   if(typeof module!=='undefined'&&module.exports)module.exports=root.PinmapUserState;
 })(typeof window!=='undefined'?window:globalThis);
