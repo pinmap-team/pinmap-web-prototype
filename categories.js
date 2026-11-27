@@ -5,7 +5,7 @@ const PinmapCategories = (() => {
   const get = value => byValue.get(String(value || '').normalize('NFKC').trim());
   const of = item => get(item.category) || get(item.categoryId) || get(item.type) || get('other');
   const saved = items => {const ids=new Set(items.map(x=>of(x).id));return all.filter(c=>ids.has(c.id));};
-  const icon = (value, active=false) => {const c=get(value)||get('other');if(c.id==='humor')return solarIcon(active?'humorBold':'humor');return `<img class="pm-category-icon" src="img/category/${c.id}-${active?'active':'inactive'}.svg" width="24" height="24" alt="" aria-hidden="true">`;};
+  const icon = (value, active=false) => {const c=get(value)||get('other');return `<img class="pm-category-icon" src="img/category/${c.id}-${active?'active':'inactive'}.svg" width="24" height="24" alt="" aria-hidden="true">`;};
   const chipIcon = (value, active=false) => {const c=get(value)||get('other');return `<img class="pm-category-icon" src="img/category/${c.id}-${active?'active-dark':'inactive'}.svg" width="20" height="20" alt="" aria-hidden="true">`;};
   const presentation = value => {const c=get(value);return c && ({food:'맛집/카페',cafe:'맛집/카페',exhibition:'전시/팝업',festival:'전시/팝업',nature:'여행',travel:'여행',stay:'여행',activity:'여행',fashion:'쇼핑',recipe:'레시피',life:'생활 정보'}[c.id]) || '기타';};
   return Object.freeze({all,get,of,saved,icon,chipIcon,presentation});

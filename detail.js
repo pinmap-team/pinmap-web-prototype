@@ -404,8 +404,9 @@ document.addEventListener('click', async event => {
 
 /* 직접 추가한 장소 설명은 첫 문장을 접힌 상태로 보여 줍니다. */
 // AI 요약에는 사용자가 지정한 세 개의 선형 별을 사용해요.
+// 2026-11-27: AI 컨텐츠 요약 아이콘은 Figma 'Icon / spark / accent' Color=Gradient(Pinmap/gradients/accent)
 function dtAiSparkIcon(){
-  return icon('spark').replace('class="solar solar-sparkles-linear icon"','class="solar solar-sparkles-linear icon dtai-spark"');
+  return `<svg class="icon dtai-spark" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="dtai-spark-gradient" x1="2" y1="12" x2="22" y2="12" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#C6F5E1"/><stop offset="1" stop-color="#AFF3E4"/></linearGradient></defs><path d="${figmaIconPath('spark')}"/></svg>`;
 }
 function dtSummaryBody(text){
   const all = String(text || '').trim();

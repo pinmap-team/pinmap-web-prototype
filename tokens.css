@@ -8,15 +8,19 @@
   --color-primary-pressed:#4D4D4D;--color-disabled:#E8E8E8;--color-error:#D13D3D;
   /* 2026-11-10 승인: 기존 민트 40% + 흰색의 결과를 불투명한 공통 키 컬러로 고정 */
   --color-accent:#C6F5E1;
+  /* 2026-11-27 사용자 요청: 진한 민트 키컬러(Figma colors/accent-strong) */
+  --color-accent-strong:#51DDA1;
   /* 2026-11-24 사용자 승인: 홈 카테고리 칩 아이콘 기본·마우스 올림 색 */
   --color-icon-muted:#737373;--color-icon-hover:#333333;
   /* 2026-11-24 사용자 승인: 기존 그라디언트(Figma Pinmap/gradients/accent). 직접 추가한 장소 설명에 유지 */
   --gradient-accent:linear-gradient(90deg,#C6F5E1 0%,#AFF3E4 100%);
+  /* 2026-11-27 사용자 요청: 진한 민트 그라디언트(Figma Pinmap/gradients/accent-strong) */
+  --gradient-accent-strong:linear-gradient(90deg,#83EDC0 0%,#5BE7D9 100%);
   --type-headline-lg:700 28px/36px var(--font-family);
   --type-headline-md:700 22px/30px var(--font-family);
   --type-body-md:400 16px/24px var(--font-family);
   --type-label-md:600 14px/20px var(--font-family);
-  --type-body-sm:400 12px/16px var(--font-family);
+  --type-body-sm:400 14px/20px var(--font-family);
   /* 2026-11-04 사용자 승인으로 추가: 글자 굵기 3단계. 크기·줄높이는 위 5단계 그대로 두고 굵기만 바꿀 때 쓴다. */
   --weight-regular:400;--weight-semibold:600;--weight-bold:700;
   --space-xs:4px;--space-sm:8px;--space-md:12px;--space-lg:16px;--space-xl:24px;--space-2xl:32px;
@@ -29,7 +33,7 @@
   /* 2026-11-24: 다크 바탕도 순검정에서 한 단계 부드럽게 (#111111→#1E1E1E, surface #1B1B1B→#2A2A2A, disabled #333333→#3D3D3D) */
   --color-neutral:#1E1E1E;--color-surface:#2A2A2A;--color-on-surface:#F4F4F4;
   --color-secondary:#B4B4B4;--color-border:#8A8A8A;--color-primary:#F4F4F4;
-  --color-primary-pressed:#D4D4D4;--color-disabled:#3D3D3D;--color-error:#D73535;--color-accent:#C6F5E1;
+  --color-primary-pressed:#D4D4D4;--color-disabled:#3D3D3D;--color-error:#D73535;--color-accent:#C6F5E1;--color-accent-strong:#51DDA1;
   --color-icon-muted:#A3A3A3;--color-icon-hover:#F4F4F4;
   --shadow-sm:0 1px 2px rgba(0,0,0,.18),0 6px 20px rgba(0,0,0,.26);
   --shadow-md:0 10px 32px rgba(0,0,0,.34);

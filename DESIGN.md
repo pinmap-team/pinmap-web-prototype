@@ -1,5 +1,5 @@
 ---
-version: 2026-11-24-soft-black
+version: 2026-11-27-min-14
 name: Pinmap
 description: 팀이 채택한 9주차 통합안 기반 디자인 규칙
 colors:
@@ -13,6 +13,7 @@ colors:
   disabled: "#E8E8E8"
   error: "#D13D3D"
   accent: "#C6F5E1"
+  accent-strong: "#51DDA1"
   icon-muted: "#737373"
   icon-hover: "#333333"
 typography:
@@ -20,7 +21,7 @@ typography:
   headline-md: {fontFamily: Pretendard, fontSize: 22px, lineHeight: 30px, fontWeight: 700}
   body-md: {fontFamily: Pretendard, fontSize: 16px, lineHeight: 24px, fontWeight: 400}
   label-md: {fontFamily: Pretendard, fontSize: 14px, lineHeight: 20px, fontWeight: 600}
-  body-sm: {fontFamily: Pretendard, fontSize: 12px, lineHeight: 16px, fontWeight: 400}
+  body-sm: {fontFamily: Pretendard, fontSize: 14px, lineHeight: 20px, fontWeight: 400}
 # Project extension (2026-11-04, user approved): font weights used with the 5 typography sizes.
 fontWeights: {regular: 400, semibold: 600, bold: 700}
 spacing: {xs: 4px, sm: 8px, md: 12px, lg: 16px, xl: 24px, 2xl: 32px}
@@ -28,6 +29,7 @@ rounded: {sm: 8px, md: 12px, lg: 16px}
 # Project extension (2026-11-24, user approved): gradient retained for direct place descriptions.
 gradients:
   accent: "linear-gradient(90deg, #C6F5E1 0%, #AFF3E4 100%)"
+  accent-strong: "linear-gradient(90deg, #83EDC0 0%, #5BE7D9 100%)"
 # Project extensions: mode overrides and Effect Styles, not standard schema keys.
 shadows:
   shadow-sm: "0 1px 2px rgba(0,0,0,.03), 0 6px 20px rgba(0,0,0,.045)"
@@ -45,6 +47,7 @@ modes:
       disabled: "#3D3D3D"
       error: "#D73535"
       accent: "#C6F5E1"
+      accent-strong: "#51DDA1"
       icon-muted: "#A3A3A3"
       icon-hover: "#F4F4F4"
     shadows:
@@ -53,6 +56,26 @@ modes:
 ---
 
 # Pinmap Design System
+
+## 2026-11-27 온보딩 2/2 묶음 카드 — Figma Option Card 배치
+
+- 사용자 요청: Figma에서 편집한 8개 카테고리 박스를 '저장한 콘텐츠를 언제 다시 찾아보나요?' 카테고리 옵션 기본 디자인으로 적용. 아이콘 모양·글자 색 유지, 글자 위치는 박스마다 설정한 대로, 원은 사용자가 지정한 색·아이콘은 흰색, 마우스 올림·선택에서도 배치 유지하되 그때 색은 기존 그대로.
+- 근거: Figma 디자인 시스템 페이지 'Option Card' 인스턴스 8개(188×112, 2214:* 레이어). 원 'Icon Circle' 40×40은 `colors/secondary` 변수.
+- 규칙: 카드 높이 112, 원 40(왼쪽 17·위 34), 글자 왼쪽 73. 카드별 [묶음 이름 위, 카테고리 위] — 맛집·카페 [31, 64], 나들이 [24, 51], 문화·체험 [24, 51], 쇼핑·스타일 [24, 54], 건강·가족 [24, 54], 배움·일 [24, 54], 생활·디지털 [31, 64], 즐길 거리 [24, 54]. 카테고리 글자 body-sm(14/20), 셋 이상이면 앞 두 개 다음 줄바꿈.
+- 색: 기본(선택 안 됨·마우스 없음) 원 `--color-secondary`, 아이콘 흰색(필터). 마우스 올림(선택 전, 사용자 요청) 원 #333333·아이콘 흰색(라이트·다크 같음). 선택은 기존 색(흰 원, 선택 카드 accent). 글자 색 기존 그대로(이름 on-surface, 카테고리 secondary). 터치 기기는 선택 전 상태가 기본.
+- 검증: 402×874 라이트·다크에서 8개 카드의 원·글자 위치를 측정해 Figma 값과 일치 확인, 마우스 올림·선택 상태에서도 같은 위치. 카드 폭은 화면 폭에 맞춰 173px(Figma 188), 글자 잘림 없음.
+
+## 2026-11-27 Figma 아이콘 재적용 · 최소 글자 14px · 홈 칩 면 아이콘 · 토큰 추가
+
+- 사용자 요청: 다른 아이콘으로 교체된 것을 Figma 기준으로 다시 적용, 최소 폰트 14 수정 이후의 Figma 작업을 앱에 반영.
+- 아이콘 원본: `figma-icons.js`(Figma 'Pinmap / Icons' On-surface 변형에서 내보낸 path, 24px 칸·선 1.7). `icon(name)`은 이 원본을 먼저 쓰고, 없으면 기존 `paths`. 별칭 galleryAdd→image, settings→gear, notice→speaker. '전체'는 `img/category/all-*.svg`. Solar 아이콘 파일과 Solar 전용 CSS(채움·1.5px·크기 보정)는 삭제.
+- 교체 대상: 홈·정보·경로·사진 추가·반짝임·비행기(공유)·링크·설정(gear)·해(Figma에 `Icon / sun` 새로 추가)·공지(speaker)·달, 유머 카테고리(카테고리 파일), 하단 메뉴 홈(선택 시 문 구멍 + 바닥 선 마스크), 폴더 고정(`pushpin`, 고정 해제는 압정 + 사선), 지도 '근처 장소' 탭(`pin`), 마이 요금제(`card`)·화면 모드(`moon`), 즐겨찾기 별(Figma `Favorite / star` 선·채움), AI 컨텐츠 요약(`spark` + Pinmap/gradients/accent).
+- 선 굵기: 마이·하단 메뉴·추가 입력 아이콘 1.5px → Figma 기준 1.7px. Solar에 맞춘 scale(1.1~1.35) 보정 삭제.
+- 아이콘 크기(Figma 2026-11-24 재조정과 동일): 원형·꽉 찬 아이콘 긴 변 20px(시계·설정·도움말·정보·물음표·노드·핀·검색·반짝임·과녁·타이머·경고·물결·셰프), 하트 18.5·스피커 18·재생·화살표 17.7px, 운동 카테고리 21.7px(파일 전체와 category-masters.json, 캘린더 버튼 보정값 함께).
+- 최소 글자 14px: `--type-body-sm` 12/16 → 14/20(Figma typography/body-sm). 직접 지정한 12~13px 읽는 글자도 14/20. 원 안 숫자·기호(지도 마커 번호·묶음 개수·체크·프로필 이니셜·정보 i)와 가상 키보드 모형은 고정 크기라 제외.
+- 홈 카테고리 칩: Figma Category 'Chip fill'(면 아이콘). 흰 디테일 선을 투명하게 비운 `img/category/*-chip-fill.svg`를 mask로 쓰고 색은 글자와 같은 currentColor(icon-muted → hover icon-hover).
+- 토큰 추가(사용자 요청, Figma 변수와 동일): `--color-accent-strong` #51DDA1(라이트·다크 동일), `--gradient-accent-strong` linear-gradient(90deg, #83EDC0 0%, #5BE7D9 100%). 색 역할 12 → 13, 전체 32.
+- 검증: 402×874 라이트·다크 홈·지도·마이·상세·캘린더·컬렉션·즐겨찾기 캡처, 홈 칩 색 계산값, 자동 검사 175개 통과.
 
 ## 2026-11-27 즐겨찾기 선택 행 활성화 선 제거
 

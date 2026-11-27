@@ -30,11 +30,9 @@
     const saved = new Set(savedPlaces().map(place=>place.categoryId));
     return [['all','전체'],...PinmapCategories.all.filter(c=>saved.has(c.id)).map(c=>[c.id,c.label])];
   };
-  const categoryIcon = (kind,active=false) => kind==='all'?icon(active?'allBold':'all'):PinmapCategories.chipIcon(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind),active);
+  const categoryIcon = (kind,active=false) => kind==='all'?`<img class="pm-category-icon" src="img/category/all-${active?'active-dark':'inactive'}.svg" width="20" height="20" alt="" aria-hidden="true">`:PinmapCategories.chipIcon(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind),active);
   const mapChipIcon = (kind,active=false) => kind==='all' ? categoryIcon('all',active) : PinmapCategories.chipIcon(kind,active);
-  const placeTabIcon = active => active
-    ? '<svg class="lm-place-tab-icon is-bold" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2C16.4183 2 20 6.00258 20 10.5C20 14.9622 17.4466 19.8128 13.4629 21.6748C12.5343 22.1088 11.4657 22.1088 10.5371 21.6748C6.55337 19.8128 4 14.9622 4 10.5C4 6.00258 7.58172 2 12 2ZM12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></svg>'
-    : '<svg class="lm-place-tab-icon is-linear" viewBox="0 0 24 24" fill="none" stroke-width="1.5" aria-hidden="true"><path d="M13.4629 21.6744C12.5343 22.1085 11.4657 22.1085 10.5371 21.6744C6.55332 19.8124 4 14.6055 4 10.1433C4 5.64588 7.58172 2 12 2C16.4183 2 20 5.64588 20 10.1433C20 14.6055 17.4467 19.8124 13.4629 21.6744Z" stroke-linecap="round" stroke="currentColor"/><circle cx="12" cy="10" r="3" stroke-linecap="round" stroke="currentColor"/></svg>';
+  const placeTabIcon = active => figmaIcon('pin', `lm-place-tab-icon${active?' is-active':''}`);
   const localPhoto = kind => PM_ENV.development ? PM_ENV.placeholderImage : ({eat:'img/brunch.jpg',cafe:'img/cafe.jpg',event:'img/exhibit.jpg',walk:'img/park.jpg',shop:'img/lamp.jpg'})[kind] || 'img/park.jpg';
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
   const round = (name, symbol) => `<button class="lm-round" data-lm="locate" aria-label="${name}" title="${name}">${icon(symbol)}</button>`;

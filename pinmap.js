@@ -222,6 +222,8 @@ const OB_GROUPS = [
   ['생활·디지털', ['life', 'tech']],
   ['즐길 거리', ['creative', 'recipe', 'media', 'humor']]
 ];
+// 2026-11-27: Figma 옵션 카드처럼 항목이 셋 이상이면 앞의 두 개를 첫 줄, 나머지를 둘째 줄에 둬요.
+const obGroupDesc = ids => { const names = ids.map(id => interestOptions.find(o => o.id === id)?.label).filter(Boolean); return names.length > 2 ? `${names.slice(0, 2).join(', ')},<br>${names.slice(2).join(', ')}` : names.join(', '); };
 function onboardScreen() {
   const s = onboardStep;
   // 2026-11-04: 세 단계를 세로 카드 대신 가로로 넘기는 큰 카드(레퍼런스: 라벨 칩 + 큰 이미지 + 점 표시)로 보여줘요.
@@ -242,7 +244,7 @@ function onboardScreen() {
     <h1 class="ob-title ob-mixtitle" tabindex="-1"><b>저장한 콘텐츠</b>를<br>언제 다시 찾아보나요?</h1>
     <p class="ob-desc">고른 키워드의 콘텐츠를 홈에서 먼저 보여 드려요.<br>여러 개를 골라도 돼요<span class="ob-pickcount" aria-live="polite">${obGroupCount() ? `${obGroupCount()}개 선택했어요` : ''}</span></p>
     <div class="ob-options ob-groupcards" role="group" aria-label="관심사, 활용 목적">
-      ${OB_GROUPS.map(([title, ids], i) => { const on = ids.every(id => onboardDraft.includes(id)); return `<button class="ob-option ob-groupcard ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-group="${i}"><span class="ob-emoji" aria-hidden="true">${PinmapCategories.icon(ids[0],on)}</span><span class="ob-grouptext"><span class="ob-label">${title}</span><small>${ids.map(id => interestOptions.find(o => o.id === id)?.label).filter(Boolean).join(', ')}</small></span></button>`; }).join('')}
+      ${OB_GROUPS.map(([title, ids], i) => { const on = ids.every(id => onboardDraft.includes(id)); return `<button class="ob-option ob-groupcard ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-group="${i}"><span class="ob-emoji" aria-hidden="true">${PinmapCategories.icon(ids[0],on)}</span><span class="ob-grouptext"><span class="ob-label">${title}</span><small>${obGroupDesc(ids)}</small></span></button>`; }).join('')}
     </div>
     <div class="ob-actions"><button class="ob-action-back" data-ob="back">이전</button><button class="filled ob-next" data-ob="next">${onboardPreview ? '종료하기' : '시작하기'}</button></div>`;
   // 마지막 화면: 문구 없이, 저장 카드에서 핀맵으로 점이 하나씩 채워지며 이어지는 애니메이션

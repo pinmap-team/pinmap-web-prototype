@@ -49,7 +49,8 @@ function cfFolderData(list){
 // thumbnails[0] = 가장 최근 → 가운데 맨 앞
 const CF_EDGE = 'M0 40.16Q0 32 9 32L30 32C39 32 41 41.6 50 41.6L91 41.6Q100 41.6 100 49.76'; // 앞판 top 40% · cfFrontClip과 같은 가장자리
 const CF_FRONT_GOO_PATH = 'M0 .17Q0 0 .09 0L.3 0C.39 0 .41 .2 .5 .2L.91 .2Q1 .2 1 .37L1 .83Q1 1 .91 1L.09 1Q0 1 0 .83Z';
-const cfFilledPinIcon = () => solarPinIcon('cf-filled-pin');
+// 2026-11-27: 폴더 고정은 Figma 'Icon / pushpin · 고정'(선 아이콘)
+const cfFilledPinIcon = () => figmaIcon('pushpin','cf-filled-pin');
 const cfUnpinIcon = () => cfFilledPinIcon().replace('cf-filled-pin"', 'cf-unpin-icon"').replace('</svg>', '<path class="cf-unpin-gap" d="M4 4l16 16"/><path class="cf-unpin-slash" d="M4 4l16 16"/></svg>');
 function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected = false, attr, pinned = false}){
   // 있는 사진만 보여줘요 (사진이 없으면 가운데 자리표시 1장)

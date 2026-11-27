@@ -2550,16 +2550,13 @@ html body .homecategories .prefchip{padding-top:0!important;padding-bottom:0!imp
 .cf-goo-action.is-danger{color:var(--color-error)}
 .cf-goo-menu[data-open="true"] .cf-goo-action.cf-goo-left{background-color:#1E1E1E;color:#fff}
 .cf-goo-menu[data-open="true"] .cf-goo-action.cf-goo-right{background-color:var(--color-error);color:#fff}
-.cf-goo-action .cf-filled-pin,.cf-pinmark .cf-filled-pin{fill:currentColor!important;stroke:none!important}
-.cf-goo-action .cf-filled-pin path,.cf-pinmark .cf-filled-pin path{fill:currentColor!important;stroke:none!important}
-.cf-goo-action .cf-unpin-icon{fill:currentColor;stroke:none}
+.cf-goo-action .cf-filled-pin,.cf-pinmark .cf-filled-pin{fill:none!important}
+.cf-goo-action .cf-filled-pin path,.cf-pinmark .cf-filled-pin path{fill:none!important;stroke:currentColor!important}
+.cf-goo-action .cf-unpin-icon{fill:none}
+.cf-goo-action .cf-unpin-icon>path:first-child{fill:none!important;stroke:currentColor!important}
 .cf-goo-action .cf-unpin-gap,.cf-goo-action .cf-unpin-slash{fill:none;stroke-linecap:round}
 .cf-goo-action .cf-unpin-gap{stroke:#1e1e1e;stroke-width:3.5}
 .cf-goo-action .cf-unpin-slash{stroke:currentColor;stroke-width:1.7}
-html body svg.solar-pin-bold,html body svg.solar-volume-loud-bold,html body svg.solar-moon-bold{fill:currentColor!important;stroke:none!important}
-html body svg.solar-pin-bold>path:first-child,html body svg.solar-volume-loud-bold>path,html body svg.solar-moon-bold>path{fill:currentColor!important;stroke:none!important}
-html body svg.solar-routing-2-bold,html body svg.solar-routing-2-bold>path{fill:currentColor!important;stroke:none!important}
-html body svg.solar-bill-list-linear>path{fill:none!important;stroke:currentColor!important;stroke-width:1.5px!important}
 .cf-goo-menu[data-open="true"] .cf-goo-action:hover{filter:brightness(1.12)}
 .cf-goo-action:focus-visible{outline:0;filter:brightness(1.2)}
 @media(prefers-reduced-motion:reduce){.cf-menu-backdrop,.cf-menu-focus,.cf-goo-menu,.cf-goo-blob,.cf-goo-action,.cf-goo-action .icon{transition:none!important}}
@@ -2688,8 +2685,8 @@ html body .mgroup.my-section:not(.my-quota) .mrow{padding:0!important}
 
 /* 2026-11-24: 지도 목록 아이콘의 점은 칠한 원 */
 html body .live-map .lm-list-tab svg.pm-list-icon circle.pm-list-dot{fill:currentColor!important;stroke:none!important;stroke-width:0!important}
-/* 2026-11-24: AI 컨텐츠 요약 아이콘 — gradient 채움·선 */
-html body .dtsum h2.dtai svg.dtai-spark path{fill:none!important;stroke:currentColor!important}
+/* 2026-11-24·27: AI 컨텐츠 요약 아이콘 — Figma Icon / spark / accent, Color=Gradient(채움·선) */
+html body .dtsum h2.dtai svg.dtai-spark path{fill:url(#dtai-spark-gradient)!important;stroke:url(#dtai-spark-gradient)!important}
 /* 2026-11-24: 하단 메뉴 호버 — 흰 글씨 대신 진한 글씨 + 옅은 회색 둥근 배경 */
 @media(hover:hover){
   html body .bottomnav .pm-nav-main .navitem:not(.active):hover,html body .bottomnav .pm-nav-main .navitem:not(.active):hover *{color:var(--color-on-surface)!important}
@@ -2728,7 +2725,7 @@ html body .calcat img.pm-category-icon[src*="/beauty-inactive.svg"]{transform:tr
 html body .calcat img.pm-category-icon[src*="/interior-inactive.svg"]{transform:translate(-0.00px,-1.25px) scale(1.000)!important}
 html body .calcat img.pm-category-icon[src*="/tech-inactive.svg"]{transform:translate(-0.00px,-1.25px) scale(0.919)!important}
 html body .calcat img.pm-category-icon[src*="/recipe-inactive.svg"]{transform:translate(-0.59px,-1.61px) scale(0.958)!important}
-html body .calcat img.pm-category-icon[src*="/fitness-inactive.svg"]{transform:translate(-0.93px,-1.25px) scale(0.845)!important}
+html body .calcat img.pm-category-icon[src*="/fitness-inactive.svg"]{transform:translate(-0.93px,-1.25px) scale(0.929)!important}
 html body .calcat img.pm-category-icon[src*="/pets-inactive.svg"]{transform:translate(-0.00px,-0.79px) scale(0.919)!important}
 html body .calcat img.pm-category-icon[src*="/family-inactive.svg"]{transform:translate(1.21px,-2.10px) scale(0.971)!important}
 html body .calcat img.pm-category-icon[src*="/learning-inactive.svg"]{transform:translate(-1.00px,-1.50px) scale(1.000)!important}
@@ -2753,7 +2750,7 @@ html body .calcat img.pm-category-icon[src*="/beauty-active.svg"]{transform:tran
 html body .calcat img.pm-category-icon[src*="/interior-active.svg"]{transform:translate(-0.00px,-1.25px) scale(1.000)!important}
 html body .calcat img.pm-category-icon[src*="/tech-active.svg"]{transform:translate(-0.00px,-1.25px) scale(0.919)!important}
 html body .calcat img.pm-category-icon[src*="/recipe-active.svg"]{transform:translate(-0.59px,-1.61px) scale(0.958)!important}
-html body .calcat img.pm-category-icon[src*="/fitness-active.svg"]{transform:translate(-0.93px,-1.25px) scale(0.845)!important}
+html body .calcat img.pm-category-icon[src*="/fitness-active.svg"]{transform:translate(-0.93px,-1.25px) scale(0.929)!important}
 html body .calcat img.pm-category-icon[src*="/pets-active.svg"]{transform:translate(-0.00px,-1.00px) scale(1.000)!important}
 html body .calcat img.pm-category-icon[src*="/family-active.svg"]{transform:translate(1.21px,-2.10px) scale(0.971)!important}
 html body .calcat img.pm-category-icon[src*="/learning-active.svg"]{transform:translate(-1.00px,-1.37px) scale(1.000)!important}
@@ -3089,47 +3086,34 @@ html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:trans
 .dl-input-error[hidden]{display:none}
 @media(prefers-reduced-motion:reduce){.dl-stage,.dl-card,.dl-full,.dl-ring,.dl-ring-center>span,.dl-close,.dl-btn,.dl-bar-fill,.t-text-swap,.dl-link,.dl-body,.dl-link-clip,.dl-body-clip{transition:none!important}}
 
-/* Supplied Solar line icons inherit the existing page colors. */
-html body svg.solar:not(.solar-routing-2-bold):not(.solar-pin-bold):not(.solar-bill-list-linear):not(.solar-home-bold):not(.solar-emoji-funny-square-bold):not(.solar-widget-bold){fill:none!important;stroke:currentColor!important}
-html body svg.solar:not(.solar-routing-2-bold):not(.solar-pin-bold):not(.solar-bill-list-linear):not(.solar-home-bold):not(.solar-emoji-funny-square-bold):not(.solar-widget-bold) :is(path,circle,rect,line,polyline){fill:none!important;stroke:currentColor!important;stroke-width:1.5px!important}
 html body .dtsum.dtai-review .dtai-info-button svg{width:20px;height:20px;color:var(--color-secondary)}
 html body .dtsum.dtai-review .dtai-info-button>span{border:0}
 html body .dl-field-icon svg{width:20px;height:20px}
 html body .lm-map-credits summary svg{width:18px;height:18px;vertical-align:middle}
 
-html body svg.solar-home-bold,html body svg.solar-home-bold>path{fill:currentColor!important;stroke:none!important}
 
-html body svg.solar-emoji-funny-square-bold,html body svg.solar-emoji-funny-square-bold :is(path,circle,rect),html body svg.solar-widget-bold,html body svg.solar-widget-bold :is(path,circle,rect){fill:currentColor!important;stroke:none!important}
 
 /* My content icons share one optical grid; the navigation dock uses its own grid. */
 html body .main:has(.myprofile) .mrow .mrico{width:28px!important;min-width:28px;height:28px;display:grid!important;place-items:center;flex:none}
-html body .main:has(.myprofile) .mrow .mrico svg.icon{display:block;width:24px!important;height:24px!important;stroke-width:1.5px!important}
-html body .main:has(.myprofile) .mrow .mrico svg.icon :is(path,circle,rect,line,polyline){stroke-width:1.5px!important}
-html body .main:has(.myprofile) .mrow[data-action="terms"] .mrico svg{transform:scale(1.35,1.1)}
-html body .main:has(.myprofile) .mrow[data-action="notice"] .mrico svg{transform:scaleY(1.12)}
-html body .main:has(.myprofile) .mrow>svg.icon:last-child,html body .main:has(.myprofile) .myprofile-go svg.icon{stroke-width:1.5px!important}
-html body .main:has(.myprofile) :is(.mrow>svg.icon:last-child,.myprofile-go svg.icon,.topbar .bellbtn svg.icon) :is(path,circle,rect,line){stroke-width:1.5px!important}
-html body .main:has(.myprofile) .topbar .bellbtn svg.icon{transform:scale(1.12)}
+html body .main:has(.myprofile) .mrow .mrico svg.icon{display:block;width:24px!important;height:24px!important;stroke-width:1.7px!important}
+html body .main:has(.myprofile) .mrow .mrico svg.icon :is(path,circle,rect,line,polyline){stroke-width:1.7px!important}
+html body .main:has(.myprofile) .mrow>svg.icon:last-child,html body .main:has(.myprofile) .myprofile-go svg.icon{stroke-width:1.7px!important}
+html body .main:has(.myprofile) :is(.mrow>svg.icon:last-child,.myprofile-go svg.icon,.topbar .bellbtn svg.icon) :is(path,circle,rect,line){stroke-width:1.7px!important}
 html body .main:has(.myprofile) .my-quick .myq-ico{width:24px;height:24px;display:grid;place-items:center}
 html body .main:has(.myprofile) .my-quick .myq-ico svg{display:block;width:24px!important;height:24px!important}
-html body .main:has(.myprofile) .my-quick .myq-ico .pm-star{transform:scale(1.22);stroke-width:1.5px!important}
-html body .main:has(.myprofile) .my-quick .myq-ico .pm-star :is(path,circle,rect){stroke-width:1.5px!important}
-html body .main:has(.myprofile) .my-quick .myq-ico .solar-routing-2-bold{transform:scale(.94)}
-html body .main:has(.myprofile) .myprofile-photo .pavatar svg.icon,html body .main:has(.myprofile) .account-photo-edit svg.icon :is(path,circle,rect,line){stroke-width:1.5px!important}
-html body .main:has(.myprofile) .myprofile-photo .pavatar svg.icon :is(path,circle,rect,line){stroke-width:1.5px!important}
+html body .main:has(.myprofile) .my-quick .myq-ico .pm-star :is(path,circle,rect){stroke-width:1.7px!important}
+html body .main:has(.myprofile) .myprofile-photo .pavatar svg.icon,html body .main:has(.myprofile) .account-photo-edit svg.icon :is(path,circle,rect,line){stroke-width:1.7px!important}
+html body .main:has(.myprofile) .myprofile-photo .pavatar svg.icon :is(path,circle,rect,line){stroke-width:1.7px!important}
 html body .bottomnav .pm-nav-main .navitem .navicon{width:28px!important;height:28px!important;display:grid!important;place-items:center}
 html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph{display:block;width:26px!important;height:26px!important}
-html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph:not(.is-selected):not(.solar-home-bold) :is(path,circle,rect,line,polyline){stroke-width:1.5px!important;vector-effect:non-scaling-stroke!important}
+html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph:not(.is-selected) :is(path,circle,rect,line,polyline){stroke-width:1.7px!important;vector-effect:non-scaling-stroke!important}
 html body .bottomnav .pm-nav-main .navitem .navicon svg.pm-nav-glyph.is-selected .pm-nav-fill{stroke:none!important}
-html body .bottomnav .pm-nav-main .navitem[data-page="map"] .navicon svg{transform:scale(1.1)}
-html body .bottomnav .pm-nav-main .navitem[data-page="library"] .navicon svg{transform:scale(1.1)}
-html body .bottomnav .pm-nav-main .navitem[data-page="my"] .navicon svg{transform:scale(1.16)}
 
-/* A single 1.5px rendered line weight for the My screen and navigation. */
+/* 2026-11-27: Figma 기준 선 1.7px(마이·하단 메뉴). */
 html body .main:has(.myprofile) :is(.mrico,.myq-ico,.myprofile-photo,.myprofile-go,.bellbtn,.account-photo-edit) svg :is(path,circle,rect,line,polyline,polygon,ellipse),
-html body .bottomnav :is(.navicon,.t-goo-main,.t-goo-item) svg :is(path,circle,rect,line,polyline,polygon,ellipse){stroke-width:1.5px!important;vector-effect:non-scaling-stroke!important}
-html body .bottomnav .t-goo-main .icon,html body .bottomnav .t-goo-item .icon{stroke-width:1.5px!important}
-html body .bottomnav svg .pm-nav-fill,html body .main:has(.myprofile) svg.solar-routing-2-bold path{stroke:none!important}
+html body .bottomnav :is(.navicon,.t-goo-main,.t-goo-item) svg :is(path,circle,rect,line,polyline,polygon,ellipse){stroke-width:1.7px!important;vector-effect:non-scaling-stroke!important}
+html body .bottomnav .t-goo-main .icon,html body .bottomnav .t-goo-item .icon{stroke-width:1.7px!important}
+html body .bottomnav svg .pm-nav-fill{stroke:none!important}
 
 /* The three add inputs share a single dark glass card on the link satellite axis. */
 .dl-stage.is-input{width:min(320px,calc(100vw - 48px));left:50%;right:auto;top:var(--dl-input-link-center,calc(100dvh - 162px));bottom:auto;transform:translate(-50%,-50%)}
@@ -3141,7 +3125,7 @@ html body .bottomnav svg .pm-nav-fill,html body .main:has(.myprofile) svg.solar-
 .dl-stage.is-input .dl-field:focus-within{box-shadow:inset 0 0 0 1px rgba(255,255,255,.38)}
 .dl-stage.is-input .dl-field-icon{width:20px;height:20px;display:grid;place-items:center;flex:none;color:inherit}
 .dl-stage.is-input .dl-field-icon svg{width:20px;height:20px;stroke-width:1.5px}
-.dl-stage.is-input .dl-field-icon svg :is(path,circle,rect,line){stroke-width:1.5px!important;vector-effect:non-scaling-stroke}
+.dl-stage.is-input .dl-field-icon svg :is(path,circle,rect,line){stroke-width:1.7px!important;vector-effect:non-scaling-stroke}
 .dl-stage.is-input .dl-field textarea{height:22px;min-height:22px;line-height:22px;cursor:text}
 .dl-stage.is-input .dl-field.is-pending{opacity:.72;pointer-events:none}
 .dl-input-close{position:absolute;z-index:2;right:-12px;top:-12px;width:28px;height:28px;display:grid;place-items:center;border:0;border-radius:50%;padding:0;color:var(--color-neutral);background:var(--color-primary);box-shadow:0 0 0 1px rgba(255,255,255,.36),0 3px 10px rgba(0,0,0,.3);cursor:pointer}
@@ -3198,9 +3182,7 @@ html body .lm-drawn-map .t-tabs-pill.lm-drawn-tab-pill{position:absolute;z-index
 html body .lm-drawn-map .lm-drawn-tabs button{position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;gap:9px;min-width:0;height:44px;padding:0!important;border:0!important;border-radius:8px;background:transparent!important;color:#2e2e2e;font:600 18px/24px var(--font-family);white-space:nowrap}
 html body .lm-drawn-map .lm-drawn-tabs button svg{width:18px;height:18px;color:#282828;stroke-width:2}
 html body .lm-drawn-map .lm-drawn-tabs button[aria-selected="true"] svg{color:#282828;fill:#282828}
-html body .lm-drawn-map .lm-drawn-tabs button svg.lm-place-tab-icon{width:18px;height:18px;stroke-width:1.5}
-html body .lm-drawn-map .lm-drawn-tabs button svg.lm-place-tab-icon.is-bold,html body .lm-drawn-map .lm-drawn-tabs button svg.lm-place-tab-icon.is-bold path{stroke:none!important}
-html body .lm-drawn-map .lm-drawn-tabs button svg.lm-place-tab-icon.is-linear :is(path,circle){fill:none!important;stroke:currentColor!important;stroke-width:1.5!important}
+html body .lm-drawn-map .lm-drawn-tabs button svg.lm-place-tab-icon{width:18px;height:18px}
 html body .lm-drawn-map .lm-sheet-scroll{--page-slide-dur:250ms;--page-fade-dur:250ms;--page-slide-distance:8px;--page-blur:3px;--page-stagger:0ms;--page-exit-enabled:1;--page-slide-ease:cubic-bezier(.22,1,.36,1);--page-fade-ease:cubic-bezier(.22,1,.36,1);position:relative;flex:1;min-height:0;overflow:hidden;padding:0;overscroll-behavior:contain}
 html body .lm-drawn-map .lm-sheet-scroll>section{position:absolute;inset:0;overflow-y:auto;padding-bottom:100px;overscroll-behavior:contain;transition:opacity var(--page-fade-dur) var(--page-fade-ease),transform var(--page-slide-dur) var(--page-slide-ease),filter var(--page-slide-dur) var(--page-slide-ease)}
 html body .lm-drawn-map .lm-sheet-scroll #lm-panel-places{--t-page-from-x:calc(var(--page-slide-distance) * -1)}
@@ -3274,3 +3256,42 @@ html body .lm-drawn-map .lm-map-credits{display:none}
 @media(prefers-reduced-motion:reduce){html body .lm-drawn-map :is(.lm-drawn-marker-disc,.lm-drawn-tab-pill,.lm-drawn-course-card,.lm-drawn-place-row),html body .lm-drawn-map .lm-sheet-scroll>section{transition:none!important}}
 html[data-theme="dark"] body .lm-drawn-map{background:#f5f5f5!important;color:#282828!important}
 html[data-theme="dark"] body .lm-drawn-map :is(.lm-drawn-search,.lm-recent,.lm-search-results){background:#fff!important;color:#282828!important}
+
+/* 2026-11-27 최소 글자 크기 14px(body-sm 14/20, Figma typography/body-sm). 읽는 글자는 14px 아래로 내려가지 않아요.
+   원 안 숫자·기호(지도 마커 번호, 묶음 개수, 체크, 프로필 이니셜, 정보 i)와 가상 키보드 모형은 고정 크기라 제외. */
+html body .dt-extraction-photo .pm-photo-credit{font-size:14px;line-height:20px}
+html body .logout{font-size:14px}
+html body .lm-drawn-map .lm-drawn-place-heading small,html body .favpage .lm-drawn-place-heading small{font:400 14px/20px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-place-address,html body .favpage .lm-drawn-place-address{font:700 14px/20px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-place-description,html body .favpage .lm-drawn-place-description{font:400 14px/20px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-course-copy>small{font:300 14px/20px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-course-stops>span{font:400 14px/20px var(--font-family)}
+
+/* 2026-11-27 홈 카테고리 칩 면 아이콘(Figma Category 'Chip fill'·'Chip fill hover'). 흰 디테일 선은 투명하게 비운 칩 전용 파일(*-chip-fill.svg)을 mask로 쓰고 색은 글자와 같은 currentColor. */
+html body .homecategories .pm-home-category-art .pm-chip-fill{display:block;width:20px;height:20px;background-color:currentColor;-webkit-mask:var(--pm-chip-icon) center/20px 20px no-repeat;mask:var(--pm-chip-icon) center/20px 20px no-repeat;transition:background-color .15s}
+
+/* 2026-11-27 온보딩 2/2 묶음 카드 — Figma 디자인 시스템 'Option Card' 8개(사용자 편집본) 배치.
+   원 40px(왼쪽 17·위 34), 글자는 왼쪽 73에서 시작하고 카드마다 Figma에서 정한 높이에 둬요. 카드 높이 112.
+   기본 상태만 원 colors/secondary + 흰 아이콘. 마우스 올림·선택은 배치는 같고 색은 기존 그대로. */
+html body #onboarding .ob-screen.step3 .ob-groupcard{display:block!important;position:relative!important;height:112px!important;min-height:112px!important;padding:0!important;overflow:hidden}
+html body #onboarding .ob-screen.step3 .ob-groupcard .ob-emoji{position:absolute!important;left:17px!important;top:34px!important;width:40px!important;height:40px!important;min-width:40px!important;margin:0!important}
+html body #onboarding .ob-screen.step3 .ob-groupcard .ob-grouptext{display:block!important}
+html body #onboarding .ob-screen.step3 .ob-groupcard :is(.ob-label,.ob-grouptext small){position:absolute!important;left:73px!important;right:8px!important;margin:0!important;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body #onboarding .ob-screen.step3 .ob-groupcard .ob-label{top:var(--ob-title-y)!important;line-height:20px!important}
+html body #onboarding .ob-screen.step3 .ob-groupcard .ob-grouptext small{top:var(--ob-desc-y)!important;font:var(--type-body-sm)!important;line-height:20px!important}
+html body #onboarding .ob-screen.step3 .ob-groupcard[data-ob-group="0"]{--ob-title-y:31px;--ob-desc-y:64px}
+html body #onboarding .ob-screen.step3 .ob-groupcard[data-ob-group="1"]{--ob-title-y:24px;--ob-desc-y:51px}
+html body #onboarding .ob-screen.step3 .ob-groupcard[data-ob-group="2"]{--ob-title-y:24px;--ob-desc-y:51px}
+html body #onboarding .ob-screen.step3 .ob-groupcard[data-ob-group="3"]{--ob-title-y:24px;--ob-desc-y:54px}
+html body #onboarding .ob-screen.step3 .ob-groupcard[data-ob-group="4"]{--ob-title-y:24px;--ob-desc-y:54px}
+html body #onboarding .ob-screen.step3 .ob-groupcard[data-ob-group="5"]{--ob-title-y:24px;--ob-desc-y:54px}
+html body #onboarding .ob-screen.step3 .ob-groupcard[data-ob-group="6"]{--ob-title-y:31px;--ob-desc-y:64px}
+html body #onboarding .ob-screen.step3 .ob-groupcard[data-ob-group="7"]{--ob-title-y:24px;--ob-desc-y:54px}
+html body #onboarding .ob-screen.step3 .ob-groupcard:not(.on):not(:hover) .ob-emoji{background:var(--color-secondary)!important;border-radius:50%!important}
+html body #onboarding .ob-screen.step3 .ob-groupcard:not(.on):not(:hover) .ob-emoji :is(img,svg){filter:brightness(0) invert(1)}
+@media(hover:none){html body #onboarding .ob-screen.step3 .ob-groupcard:not(.on) .ob-emoji{background:var(--color-secondary)!important;border-radius:50%!important}html body #onboarding .ob-screen.step3 .ob-groupcard:not(.on) .ob-emoji :is(img,svg){filter:brightness(0) invert(1)}}
+/* 2026-11-27 사용자 요청: 마우스를 올렸을 때(선택 전) 원 #333333, 선 아이콘은 기본과 같은 흰색 */
+@media(hover:hover){
+html body #onboarding .ob-screen.step3 .ob-groupcard:not(.on):hover .ob-emoji{background:#333333!important;border-radius:50%!important}
+html body #onboarding .ob-screen.step3 .ob-groupcard:not(.on):hover .ob-emoji :is(img,svg){filter:brightness(0) invert(1)!important}
+}
