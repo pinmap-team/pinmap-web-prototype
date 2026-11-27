@@ -4,15 +4,55 @@ if (PM_ENV.requiresAuth) (() => {
   const app = document.getElementById('app');
   const login = () => window.top.location.replace(new URL('auth.html?screen=welcome', location.href).href);
   function maybeStartOnboarding() {
-    if (!user?.id || window.PinmapAccountState?.userId !== user.id || onboardDone ||
+    if (!user?.id || window.PinmapAccountState?.userId !== user.id ||
         document.documentElement.classList.contains('auth-pending') || document.getElementById('onboarding') ||
         onboardingUserId === user.id) return;
     onboardingUserId = user.id;
-    openOnboarding(1);
+    const owner = user.id;
+    const testIntro = sessionStorage.getItem('pinmap.test-intro') === owner;
+    sessionStorage.removeItem('pinmap.test-intro');
+    const needsIntro = !onboardDone && user.user_metadata?.pinmap_intro_seen !== true;
+    if (!testIntro && !needsIntro) {
+      if (!onboardDone) openOnboarding(1);
+      return;
+    }
+    openAccountStory(owner, false, needsIntro);
   }
+  function openAccountStory(owner, replay, needsIntro = false) {
+    if (document.getElementById('account-story')) return;
+    const previousFocus = document.activeElement;
+    const panel = document.createElement('div');
+    panel.id = 'account-story';
+    panel.setAttribute('role','dialog');
+    panel.setAttribute('aria-modal','true');
+    panel.setAttribute('aria-label','핀맵 소개');
+    document.body.append(panel);
+    app.inert = true;
+    const isCurrent = () => panel.isConnected && user?.id === owner && window.PinmapAccountState?.userId === owner;
+    let saving = false;
+    showPinmapIntro(panel, async () => {
+      if (saving || !isCurrent()) return;
+      saving = true;
+      try {
+        if (needsIntro) await PinmapUserState.createStore(client,owner,isCurrent).write({pinmap_intro_seen:true});
+        if (!isCurrent()) return;
+        panel.remove();
+        app.inert = false;
+        if (replay) previousFocus?.focus();
+        else if (!onboardDone) openOnboarding(1);
+      } catch {
+        if (isCurrent()) toast('온보딩을 저장하지 못했어요. 다시 눌러 주세요.');
+      } finally { saving = false; }
+    });
+  }
+  actions.intro = () => {
+    if (!user?.id || window.PinmapAccountState?.userId !== user.id || app.inert) return;
+    openAccountStory(user.id, true);
+  };
   window.addEventListener('pinmap:account-profile-loaded',maybeStartOnboarding);
   function gate(loading=false) {
     onboardingUserId = null;
+    document.getElementById('account-story')?.remove();
     document.documentElement.classList.add('auth-pending');
     app.inert = true;
     closeOnboarding();

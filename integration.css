@@ -67,7 +67,7 @@ body.live-map-page:before,body:has(.coursepage):before{display:none!important}
 body:has(.dt) .bottomnav{display:flex!important}
 body:has(.dt) .dtbar{bottom:80px;left:50%;right:auto;transform:translateX(-50%);width:min(100%,402px);padding:var(--space-md) var(--space-xl);border-radius:var(--rounded-lg) var(--rounded-lg) 0 0}
 body:has(.dt) .dt{padding-bottom:176px}
-body.onboarding-open .bottomnav,body.login-open .bottomnav,body:has(dialog[open]) .bottomnav,body:has(.cf-selecting) .bottomnav{display:none!important}
+body.onboarding-open .bottomnav,body:has(> #account-story) .bottomnav,body.login-open .bottomnav,body:has(dialog[open]) .bottomnav,body:has(.cf-selecting) .bottomnav{display:none!important}
 
 /* Minimal map controls and a single soft category backdrop. */
 .live-map .lm-bottom:before{inset:-20px -20px -95px;background:linear-gradient(transparent,rgba(255,255,255,.48) 35%,rgba(255,255,255,.65));backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);mask-image:linear-gradient(transparent,#000 28%);-webkit-mask-image:linear-gradient(transparent,#000 28%)}
@@ -82,7 +82,7 @@ body.onboarding-open .bottomnav,body.login-open .bottomnav,body:has(dialog[open]
 .pm-basemap-layer iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}
 
 /* Onboarding occupies the same phone viewport and isolates the home route. */
-body.onboarding-open #app{visibility:hidden!important;pointer-events:none!important}
+body.onboarding-open #app,body:has(> #account-story) #app{visibility:hidden!important;pointer-events:none!important}
 #onboarding{position:fixed!important;inset:0!important;margin:0 auto!important;width:100%!important;max-width:402px!important;height:100dvh!important;max-height:100dvh!important;transform:none!important;overflow-x:hidden!important}
 
 /* The browser preview has no native status bar above the home banner. */

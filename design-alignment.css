@@ -3604,3 +3604,31 @@ html body .mypage.accountpage .account-info dd{font:var(--type-body-md)!importan
   .home-deadline-widget .t-stack-banner,.home-photo-stack-card{transition:none!important}
   .home-deadline-widget .t-stack-banner{filter:none!important}
 }
+
+/* Illustrated onboarding after account sign-in. */
+.pm-story{display:flex;flex-direction:column;min-height:100%;box-sizing:border-box;padding:var(--space-xl);background:var(--color-surface);color:var(--color-on-surface);font:var(--type-body-md)}
+.pm-story nav,.pm-story header{display:flex;align-items:center;gap:var(--space-sm)}
+.pm-story header{justify-content:flex-end}
+.pm-story nav{flex:none}
+.pm-story button{min-height:44px;background:none;border:0;padding:0;cursor:pointer;color:inherit;font:var(--type-label-md)}
+.pm-story nav button{flex:1}
+.pm-story nav i,.pm-story nav b{display:block;height:var(--space-sm);border-radius:var(--rounded-sm)}
+.pm-story nav i{overflow:hidden;background:var(--color-disabled)}
+.pm-story nav b{background:var(--color-primary);transform-origin:left}
+.pm-story .story-skip{color:var(--color-secondary);font:var(--type-label-md);font-weight:var(--weight-regular)}
+.pm-story h1{white-space:pre-line;margin:var(--space-xl) 0 var(--space-sm);font:var(--type-headline-lg);outline:none}
+.pm-story p{margin:0;min-height:3em;font:var(--type-body-md);color:var(--color-secondary);word-break:keep-all}
+.pm-story figure{margin:var(--space-2xl) 0 0;display:grid;place-items:center}
+.pm-story img{display:block;width:100%;aspect-ratio:1;object-fit:contain;filter:brightness(1.035)}
+.pm-story .story-start{margin-top:auto;width:100%;min-height:56px;border-radius:var(--rounded-sm);background:var(--color-primary);color:var(--color-surface)}
+.pm-story [hidden]{display:none!important}
+
+/* White illustration canvas in both application themes. */
+#account-story,#account-story .pm-story{background:#fff;color:#333}
+.pm-story nav b{background:var(--color-secondary)}
+.pm-story .story-start{background:#333}
+.pm-story .story-start{color:#fff}
+.pm-story .story-skip,.pm-story p{color:#6c6c6c}
+.pm-story nav i{background:#e8e8e8}
+
+#account-story{position:fixed;inset:0;z-index:35;overflow:auto;overscroll-behavior:contain}

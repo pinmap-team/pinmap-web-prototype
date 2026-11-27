@@ -185,18 +185,23 @@
     if (!button || busy) return;
     const action = button.dataset.auth;
     if (action === 'test-login' && client && PinmapAuth.testLoginAvailable) {
+      let testUserId;
       await PinmapButton.run(button, async () => {
         loading(true); notice('');
         try {
           const response = await fetch('/api/auth/test-login', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}', cache:'no-store', signal:AbortSignal.timeout(35000)});
           const session = await response.json();
           if (!response.ok) throw new Error('TEST_LOGIN');
-          const {error} = await client.auth.setSession({access_token:session.access_token,refresh_token:session.refresh_token});
+          const {data,error} = await client.auth.setSession({access_token:session.access_token,refresh_token:session.refresh_token});
           if (error) throw error;
-          enterApp();
+          testUserId = data.user.id;
         } catch {notice('테스트 계정에 연결하지 못했어요. 다시 시도해 주세요.',true);}
         finally {loading(false);}
       }, '테스트 계정 연결 중');
+      if (testUserId) {
+        sessionStorage.setItem('pinmap.test-intro', testUserId);
+        enterApp();
+      }
       return;
     }
     if (action === 'retry') {await boot(); return;}
