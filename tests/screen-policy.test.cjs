@@ -30,7 +30,7 @@ test('iframe guard permits only the authenticated app route',()=>{
 });
 test('retired assets are deleted, public documents cannot load them, and archive URLs are excluded',()=>{
  const retired=['share.js','share.css','push.js','push.css','development.js','online-place-test.js','place-report-bridge.js','pull-refresh.js'];
- for(const file of ['app.html','index.html','auth.html','checkout.html','plans.html','terms.html','privacy.html','refunds.html']){
+ for(const file of ['app.html','index.html','auth.html','checkout.html','plans.html','terms.html','privacy.html','refunds.html','delete-account.html']){
   const html=read(file);assert(!html.includes('archive/'),file);
   for(const name of retired)assert(!new RegExp('(?:src|href)="'+name.replace('.','\\.')+'[?"\\s]').test(html),name);
  }
@@ -52,8 +52,8 @@ test('map is explicitly registered and removed pin/legacy location form handlers
  const place=read('place.js');for(const marker of ['function placeSheet(','function placeSearch(','function placeLabelSheet(','data-place-choose='])assert(!place.includes(marker),marker);
  assert(place.includes("go('myaddresses')"));
 });
-test('only the eight intentional HTML entry documents exist in the public root',()=>{
- assert.deepEqual(fs.readdirSync('.').filter(name=>name.endsWith('.html')).sort(),['app.html','auth.html','checkout.html','index.html','plans.html','privacy.html','refunds.html','terms.html']);
+test('only the nine intentional HTML entry documents exist in the public root',()=>{
+ assert.deepEqual(fs.readdirSync('.').filter(name=>name.endsWith('.html')).sort(),['app.html','auth.html','checkout.html','delete-account.html','index.html','plans.html','privacy.html','refunds.html','terms.html']);
 });
 test('stale retired forms cannot submit or navigate even if an old embed recreates them',()=>{
  const listeners={};vm.runInNewContext(read('screen-access.js'),{document:{addEventListener:(name,fn)=>listeners[name]=fn},PinmapScreenPolicy:policy,actions:{},pages:{},go(){}});
