@@ -2,21 +2,17 @@
 const $ = s => document.querySelector(s);
 const paths = {
   home:'M3 10 12 3l9 7v10H3z M9 20v-7h6v7', bookmark:'M6 3h12v18l-6-4-6 4z',
-  star:'m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z',
   map:'m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2z M9 3v16 M15 5v16', folder:'M3 7V4h7l3 3h8v13H3z',
   plus:'M12 5v14 M5 12h14', search:'M21 21l-5-5 M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0',
   arrow:'M5 12h14 M13 6l6 6-6 6', back:'M15 5l-7 7 7 7', close:'m6 6 12 12 M18 6 6 18',
   pin:'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0 M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
-  coffee:'M4 4h12v10a5 5 0 0 1-10 0V4 M16 5h2a3 3 0 0 1 0 6h-2 M3 21h16', check:'m5 12 4 4L20 5',
-  external:'M14 3h7v7 M21 3 10 14 M11 3H3v18h18v-8', spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3z',
+  coffee:'M4 4h12v10a5 5 0 0 1-10 0V4 M16 5h2a3 3 0 0 1 0 6h-2 M3 21h16', check:'m5 12 4 4L20 5', spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3z',
   target:'M12 2v4 M12 18v4 M2 12h4 M18 12h4 M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0 M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0',
   clock:'M12 7v5l3 2 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0', calendar:'M4 5h16v15H4z M4 10h16 M9 3v4 M15 3v4',
   heart:'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z', comment:'M4 5h16v11H9l-5 4z',
-  send:'M21 3 3 10l7 3 3 7z M10 13 21 3',
   link:'M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1 M14 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1',
   share:'M12 15V3 M7 8l5-5 5 5 M5 13v7h14v-7', story:'M12 3a9 9 0 1 0 9 9 M12 8v4l3 2',
-  more:'M6 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z M13 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z M20 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z', image:'M4 5h16v14H4z M4 16l5-5 4 4 3-3 4 4 M15 9h.01',
-  mail:'M3 6h18v12H3z M3 6l9 7 9-7', user:'M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M4 21a8 8 0 0 1 16 0',
+  more:'M6 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z M13 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z M20 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z', image:'M4 5h16v14H4z M4 16l5-5 4 4 3-3 4 4 M15 9h.01', user:'M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M4 21a8 8 0 0 1 16 0',
   bell:'M6 16V11a6 6 0 0 1 12 0v5l2 2H4z M10 21h4', note:'M5 3h14v18H5z M9 8h6 M9 12h6 M9 16h4', copy:'M8 8h12v12H8z M4 16V4h12',
   eat:'M7 3v18 M4 3v5a3 3 0 0 0 6 0V3 M20 21V3c-4 0-5 6-3 9h3',
   event:'M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4z M16 5v3 M16 11v2 M16 16v3',
@@ -25,7 +21,7 @@ const paths = {
   question:'M9 9a3 3 0 1 1 5.1 2.1c-1.6 1-2.1 1.7-2.1 3.4 M12 18h.01 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0'
 };
 // 2026-11-27: Figma 원본 아이콘(figma-icons.js)을 먼저 쓰고, 없으면 기존 paths. '전체'는 Figma 카테고리 파일.
-const icon = n => (n==='all'||n==='allBold') ? `<img class="pm-category-icon" src="img/category/all-${n==='allBold'?'active':'inactive'}.svg" width="24" height="24" alt="" aria-hidden="true">` : `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${figmaIconPath(n)||paths[n]||paths.bookmark}"/></svg>`;
+const icon = n => (n==='all'||n==='allBold') ? `<img class="pm-category-icon" src="img/category/all-${n==='allBold'?'active':'inactive'}.svg?v=20261127d" width="24" height="24" alt="" aria-hidden="true">` : `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${figmaIconPath(n)||paths[n]||paths.bookmark}"/></svg>`;
 // Keep the original pointed map star as the shared favorite shape.
 // The old function name stays for existing callers across map, detail, collections, and My.
 const likeHeartIcon = () => `<svg class="icon lm-like-heart pm-star t-like-heart" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path class="pm-star-line" d="${FIGMA_ICON_PATHS.favStar}" fill="none" stroke="currentColor"/><path class="pm-star-fill" d="${FIGMA_ICON_PATHS.favStarFill}" fill="currentColor" stroke="currentColor"/></svg>`;

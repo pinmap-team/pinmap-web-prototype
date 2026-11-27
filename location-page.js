@@ -87,7 +87,7 @@
       if(props){const found=placeParts(props);draftName=found.name.slice(0,24);if(found.address)draftAddress=found.address;}
     }catch{if(version!==reverseVersion||!onConfirm())return;}
     $('#location-confirm-title').textContent=draftName||'선택한 위치';
-    $('#location-confirm-detail').textContent=draftName?draftAddress:draftAddress+' · 위치 이름은 다음 화면에서 입력해 주세요.';
+    $('#location-confirm-detail').textContent=draftName?draftAddress:draftAddress+'. 위치 이름은 다음 화면에서 입력해 주세요.';
   }
   function locateConfirmation(){
     const version=++geoVersion;

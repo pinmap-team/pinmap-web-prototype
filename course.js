@@ -64,7 +64,7 @@
   /* 2026-11-24 코스 목록 카드 · 사진 경로 지도 · 순서 타임라인 */
   const cssVar=name=>(typeof getComputedStyle==='function'&&getComputedStyle(document.documentElement).getPropertyValue(name).trim())||'#333333';
   const categoryOf=place=>{const label=place.category||'';const c=typeof PinmapCategories!=='undefined'&&PinmapCategories.all.find(x=>x.label===label||(x.aliases||[]).includes(label));return {id:c?.id||'other',label:c?.label||label||'장소'};};
-  const chip=place=>{const c=categoryOf(place);return `<span class="course-chip"><i class="course-chip-icon" style="--chip-icon:url('img/category/${esc(c.id)}-inactive.svg')" aria-hidden="true"></i>${esc(c.label)}</span>`;};
+  const chip=place=>{const c=categoryOf(place);return `<span class="course-chip"><i class="course-chip-icon" style="--chip-icon:url('img/category/${esc(c.id)}-inactive.svg?v=20261127d')" aria-hidden="true"></i>${esc(c.label)}</span>`;};
   const chips=(places,max=2)=>{const seen=new Map();places.forEach(place=>{const c=categoryOf(place);if(!seen.has(c.label))seen.set(c.label,place)});const list=[...seen.values()];return list.slice(0,max).map(chip).join('')+(list.length>max?`<span class="course-chip course-chip-more">+${list.length-max}</span>`:'');};
   const legKm=(a,b)=>{const p=coordinates(a),q=coordinates(b);return p&&q?kmBetween(p,q):null;};
   const legText=km=>km==null?'':km<1?`약 ${Math.max(50,Math.round(km*1000/50)*50)}m`:`약 ${km.toFixed(1)}km`;

@@ -34,7 +34,7 @@
    img.src=url;
    if(photo.source==='google'){
     credit.replaceChildren();const source=document.createElement('a');source.textContent='Google Maps';source.href=link(photo.google_maps_uri)||'https://www.google.com/maps/';source.target='_blank';source.rel='noopener noreferrer';credit.append(source);
-    for(const author of photo.attributions||[]){if(typeof author.name!=='string')continue;credit.append(document.createTextNode(' · '));const a=document.createElement(link(author.uri)?'a':'span');a.textContent=author.name;if(a.tagName==='A'){a.href=link(author.uri);a.target='_blank';a.rel='noopener noreferrer';}credit.append(a);}
+    for(const author of photo.attributions||[]){if(typeof author.name!=='string')continue;credit.append(document.createTextNode(', '));const a=document.createElement(link(author.uri)?'a':'span');a.textContent=author.name;if(a.tagName==='A'){a.href=link(author.uri);a.target='_blank';a.rel='noopener noreferrer';}credit.append(a);}
     credit.hidden=false;
    }
   }catch{/* Keep the existing neutral placeholder and allow retry after the next render. */}

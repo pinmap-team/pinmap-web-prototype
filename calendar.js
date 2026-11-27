@@ -160,7 +160,7 @@ function calCategoryButtons(){
   if (!cats.length) return '';
   if (calCat && !ids.has(calCat)) calCat = '';
   const chip = (id, label, iconHtml) => `<button type="button" class="calcat${calCat === id ? ' on' : ''}" data-calcat="${id}" aria-pressed="${calCat === id}">${iconHtml}<span>${esc(label)}</span></button>`;
-  return `<div class="calcats" role="group" aria-label="카테고리별 일정">${chip('', '전체', `<img class="pm-category-icon" src="img/category/all-${calCat === '' ? 'active' : 'inactive'}.svg" width="24" height="24" alt="" aria-hidden="true">`)}${cats.map(c => chip(c.id, c.label, PinmapCategories.icon(c.id, calCat === c.id))).join('')}</div>`;
+  return `<div class="calcats" role="group" aria-label="카테고리별 일정">${chip('', '전체', `<img class="pm-category-icon" src="img/category/all-${calCat === '' ? 'active' : 'inactive'}.svg?v=20261127d" width="24" height="24" alt="" aria-hidden="true">`)}${cats.map(c => chip(c.id, c.label, PinmapCategories.icon(c.id, calCat === c.id))).join('')}</div>`;
 }
 
 function calRow(x){
@@ -169,7 +169,7 @@ function calRow(x){
   const badge = candidate ? '확인 필요' : n < 0 ? '지난 일정' : n === 0 ? 'D-day' : 'D-' + n;
   return `<button class="calrow" data-detail="${x.id}">
     <span class="calthumb">${libThumb(x)}</span>
-    <span class="caltext"><b>${esc(x.title)}</b><small>${icon('clock')}${fmtDay(d)} ${esc(x.dueLabel || (x.period ? '운영 종료' : '마감'))}${candidate ? ' · 추출 일정 후보' : ''}</small></span>
+    <span class="caltext"><b>${esc(x.title)}</b><small>${icon('clock')}${fmtDay(d)} ${esc(x.dueLabel || (x.period ? '운영 종료' : '마감'))}${candidate ? ', 추출 일정 후보' : ''}</small></span>
     <span class="calbadge ${!candidate && n >= 0 && n <= 3 ? 'soon' : ''}">${badge}</span>
   </button>`;
 }

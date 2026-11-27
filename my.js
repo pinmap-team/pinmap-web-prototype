@@ -57,7 +57,7 @@ pages.my = function(){
   const quotaUsed = Number.isInteger(quota?.used) ? Math.max(0,Math.min(quota.used,quotaLimit)) : null;
   const quotaPercent = quotaUsed === null ? 0 : Math.round(quotaUsed / quotaLimit * 100);
   const quotaTitle = quota?.active ? '월간 이용권 분석' : '무료 분석';
-  const quotaDetail = PM_ENV.requiresAuth ? billing?.error ? '사용량을 불러오지 못했어요.' : quotaUsed === null ? '사용량을 확인하고 있어요.' : `${quotaUsed}회 사용 · ${Math.max(0,quotaLimit-quotaUsed)}회 남음` : '로그인하면 사용량을 확인할 수 있어요.';
+  const quotaDetail = PM_ENV.requiresAuth ? billing?.error ? '사용량을 불러오지 못했어요.' : quotaUsed === null ? '사용량을 확인하고 있어요.' : `${quotaUsed}회 사용, ${Math.max(0,quotaLimit-quotaUsed)}회 남음` : '로그인하면 사용량을 확인할 수 있어요.';
   return `
   <div class="mprofile profilecard myprofile" role="group" aria-label="프로필">
     <button type="button" class="myprofile-photo" data-action="profilephoto" aria-label="프로필 사진 변경">${avatarHtml()}<span class="account-photo-edit" aria-hidden="true">${icon('galleryAdd')}</span></button>
@@ -77,9 +77,9 @@ pages.my = function(){
   </section>
   <section class="mgroup my-section" aria-label="도움말">
     ${myRow('guide','📚','이용 가이드')}
-    ${myRow('faq','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7 M12 17h.01"/></svg>','자주 묻는 질문')}
+    ${myRow('faq',icon('question'),'자주 묻는 질문')}
     ${myRow('notice',myNoticeIcon(),'공지사항')}
-    ${myRow('terms','<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z M14 3v5h5 M9 12h7 M9 16h7"/></svg>','약관 및 정책')}
+    ${myRow('terms',icon('document'),'약관 및 정책')}
     ${myRow('appinfo',icon('info'),'앱 정보')}
   </section>`;
 };

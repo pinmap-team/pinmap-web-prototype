@@ -3344,3 +3344,45 @@ html body .lm-drawn-map .lm-drawn-cluster-disc{font-size:14px!important;line-hei
 html body .pm-keyboard-tools{font-size:14px!important}
 /* 2026-11-27 사용자 요청: 마우스를 올렸을 때도 홈 카테고리 버튼을 연한 민트(accent)로 */
 @media(hover:hover){html body .homecategories .prefchip:hover,html[data-theme="dark"] body .homecategories .prefchip:hover{background:var(--color-accent)!important;color:#333333!important}html body .homecategories .prefchip:hover *{color:inherit!important}}
+/* 2026-11-27 아이콘 둥글기 반영 후 버튼 속 정렬 재점검: 그림 중심이 버튼 중심에서 0.5px 넘게 벗어난 것만 보정 */
+html body .dt .dtbtn.dtsharebtn>svg.icon{translate:-1.77px -0.45px}
+html body .bellbtn>svg.icon{translate:0 -1px}
+/* 2026-11-27 사용자 요청: 마이 '즐겨찾기'·'내 코스' 글자 크기를 아래 목록(요금제 및 결제·설정, body-md 17/25)과 같게, 굵기는 그대로 */
+html body .main:has(.myprofile) .my-quick .myq-card b{font-size:17px!important;line-height:25px!important}
+/* 2026-11-27 사용자 요청: 자주 묻는 질문 답변(14px)이 질문(17px)보다 너무 작아 보여 label-md 크기(15px)·regular 굵기로 키움 */
+html body .faq-panel-card .faq-text{font:var(--type-label-md)!important;font-weight:var(--weight-regular)!important;line-height:1.5!important}
+/* 2026-11-27 즐겨찾기: 왼쪽 위 정렬(컬렉션과 같은 정렬 메뉴) · 분류(전체/콘텐츠/장소) · '내가 정한 순서'에서 손잡이로 끌어 순서 바꾸기 */
+html body .favpage .fav-toolbar{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);min-height:44px;margin:var(--space-sm) 0 var(--space-md)}
+html body .favpage .fav-filters{display:flex;gap:var(--space-sm);margin:0 0 var(--space-lg)}
+html body .favpage .fav-filter{display:inline-flex;align-items:center;gap:var(--space-xs);height:36px;padding:0 var(--space-lg);border:0;border-radius:999px;background:var(--color-surface);color:var(--color-secondary);font:var(--type-label-md);cursor:pointer;transition:background-color .15s,color .15s}
+html body .favpage .fav-filter span{font-weight:var(--weight-regular)}
+html body .favpage .fav-filter.on{background:var(--color-primary);color:var(--color-surface)}
+html body .favpage .fav-filter:disabled{opacity:.45;cursor:default}
+@media(hover:hover){html body .favpage .fav-filter:not(.on):not(:disabled):hover{background:var(--color-accent);color:#333333}}
+html body .favpage .fav-group-list .fav-row{position:relative;transition:transform .18s cubic-bezier(.22,1,.36,1)}
+html body .favpage .fav-group-list .fav-row.is-dragging{transition:none;z-index:2;box-shadow:var(--shadow-md)}
+html body .favpage .fav-drag{flex:none;align-self:center;width:36px;height:44px;display:grid;place-items:center;margin-right:calc(-1 * var(--space-xs));padding:0;border:0;background:transparent;color:var(--color-secondary);cursor:grab;touch-action:none}
+html body .favpage .fav-drag:active{cursor:grabbing}
+html body .favpage .fav-drag svg.icon{width:20px;height:20px}
+html body .favpage .fav-sort-hint{margin:var(--space-md) 0 0;font:var(--type-body-sm);color:var(--color-secondary)}
+html body .favpage .fav-group-list .fav-row .fav-drag{position:absolute;right:2px;bottom:8px;width:32px;height:36px;margin:0}
+/* 2026-11-27 사용자 요청: 마이 세부 페이지 글자·간격 통일
+   · 안내 페이지(앱 정보·약관 및 정책·공지사항·자주 묻는 질문): 제목 17/25 semibold(=FAQ 질문) · 내용 15/22.5 regular secondary(=FAQ 답변), 줄마다 위아래 16px, 구분선 없음
+   · 설정 하위 페이지(알림·저장·캘린더·한 주의 시작 요일·화면 모드·관심 키워드·계정·캘린더 내보내기): 항목 17/25 regular(=설정 목록) · 설명/안내 15/22.5 regular secondary, 한 줄 항목 54px */
+html body .mypage:is(.settingpage,.faqpage) .mycard.settings .setrow{padding-top:var(--space-lg)!important;padding-bottom:var(--space-lg)!important;border-bottom:0!important;gap:var(--space-md)}
+html body .mypage .mycard.settings .setrow>div{display:flex;flex-direction:column;gap:var(--space-xs)}
+html body .mypage .mycard.settings .setrow b{font:var(--type-body-md)!important;font-weight:var(--weight-semibold)!important;color:var(--color-on-surface)}
+html body .mypage .mycard.settings .setrow small{font:var(--type-label-md)!important;font-weight:var(--weight-regular)!important;line-height:1.5!important;color:var(--color-secondary)}
+html body .mypage .mycard.settings .setrow+.setrow,html body .mypage .mycard.settings+.mycard.settings{border-top:0!important}
+/* 설정 하위 페이지: 스위치 줄 제목은 regular(설정 목록과 같은 굵기) */
+html body .mypage.settingpage:not(.faqpage) .mycard.settings .setrow:has(.sw) b{font-weight:var(--weight-regular)!important}
+html body .mypage .calendar-week-option{min-height:54px!important;border-bottom:0!important;font:var(--type-body-md)!important}
+html body .mypage :is(.mpdesc,.calendar-week-settings>p,.calx-desc,.kwdesc,.account-hint){font:var(--type-label-md)!important;font-weight:var(--weight-regular)!important;line-height:1.5!important;color:var(--color-secondary)!important;margin:0 0 var(--space-lg)!important}
+html body .mypage .calx-row b{font:var(--type-body-md)!important;font-weight:var(--weight-regular)!important}
+html body .mypage .calx-row .calx-date{font:var(--type-label-md)!important;font-weight:var(--weight-regular)!important;line-height:1.5!important;color:var(--color-secondary)}
+html body .mypage.accountpage p:not(.faq-text){font:var(--type-label-md);font-weight:var(--weight-regular);line-height:1.5;color:var(--color-secondary)}
+/* 계정 관리도 다른 설정 하위 페이지처럼 흰 박스 없이(안쪽 여백만 0으로 맞춰 왼쪽 24px 정렬) */
+html body .mypage.accountpage .account-card{background:transparent!important;box-shadow:none!important;border:0!important;border-radius:0!important;padding-left:0!important;padding-right:0!important}
+html body .mypage.accountpage .account-info>*{padding-left:0!important;padding-right:0!important;border:0!important}
+html body .mypage.accountpage .account-info dt{font:var(--type-label-md)!important;font-weight:var(--weight-regular)!important;color:var(--color-secondary)!important}
+html body .mypage.accountpage .account-info dd{font:var(--type-body-md)!important;color:var(--color-on-surface)!important}

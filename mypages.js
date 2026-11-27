@@ -27,7 +27,7 @@ pages.settingspage = () => myPage('설정', `<section class="mgroup my-section" 
 const THEME_LABELS = {system:'기기 설정', light:'라이트', dark:'다크'};
 pages.themeset = () => myPage('화면 모드', `<fieldset class="calendar-week-settings theme-settings" aria-describedby="theme-hint">
   <legend class="auth-sr-only">화면 모드</legend>
-  <p id="theme-hint">기기 설정을 고르면 휴대폰의 라이트·다크 설정을 따라가요.</p>
+  <p id="theme-hint">기기 설정을 고르면 휴대폰의 라이트/다크 설정을 따라가요.</p>
   ${Object.entries(THEME_LABELS).map(([value,label])=>`<label class="calendar-week-option"><span>${label}</span><input type="radio" name="theme-mode" value="${value}" ${(window.PinmapTheme?.mode||'system')===value?'checked':''}></label>`).join('')}
 </fieldset>`, 'settingpage calendar-settings-page', 'settingspage');
 document.addEventListener('change', e => {
@@ -148,14 +148,83 @@ pages.favorites = () => {
       ${favSel?`<span class="fav-choice" aria-hidden="true">${icon('check')}</span>`:`<button type="button" class="lm-carousel-heart lm-heart-motion t-like is-active fav-star" data-fav-toggle="${esc(x.id)}" data-liked="true" aria-pressed="true" aria-label="${esc(x.title)} 즐겨찾기 해제"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button>`}
     </article>`;
   };
-  const posts=list.filter(entry=>entry.kind==='post'),places=list.filter(entry=>entry.kind==='place');
+  // 2026-11-27: '게시물/장소' 두 묶음 대신 한 목록 + 위쪽 분류(전체·콘텐츠·장소)와 정렬. '내가 정한 순서'에서는 손잡이로 끌어 순서를 바꿔요.
+  const counts={all:list.length,post:list.filter(x=>x.kind==='post').length,place:list.filter(x=>x.kind==='place').length};
+  if(favFilter!=='all'&&!counts[favFilter])favFilter='all';
+  const shown=favSorted(list.filter(x=>favFilter==='all'||x.kind===favFilter));
+  const canDrag=!favSel&&favSortKey()==='custom'&&shown.length>1;
   const selectButton=`<button type="button" class="cf-textbtn" data-action="${favSel?'favselectoff':'favselect'}">${favSel?'취소':'선택'}</button>`;
-  const group=(entries,kind,label,first=false)=>entries.length?`<section class="fav-group"><div class="fav-group-head"><h2 class="fav-group-title">${label}</h2>${first?selectButton:''}</div><div class="fav-group-list">${(favExpanded[kind]?entries:entries.slice(0,3)).map(row).join('')}</div>${entries.length>3?`<button type="button" class="fav-more" data-fav-more="${kind}" aria-expanded="${favExpanded[kind]}">${favExpanded[kind]?'접기':'더보기'}</button>`:''}</section>`:'';
+  const sortSelect=`<label class="libsort"><span class="sr">즐겨찾기 정렬</span><select data-favsort aria-label="즐겨찾기 정렬">${Object.entries(FAV_SORTS).map(([k,v])=>`<option value="${k}" ${favSortKey()===k?'selected':''}>${v}</option>`).join('')}</select></label>`;
+  const filters=`<div class="fav-filters" role="tablist" aria-label="즐겨찾기 분류">${[['all','전체'],['post','콘텐츠'],['place','장소']].map(([k,v])=>`<button type="button" role="tab" class="fav-filter${favFilter===k?' on':''}" aria-selected="${favFilter===k}" data-fav-filter="${k}" ${counts[k]||k==='all'?'':'disabled'}>${v}<span>${counts[k]}</span></button>`).join('')}</div>`;
+  const rowWithHandle=x=>{const html=row(x);return canDrag?html.replace('<span class="lm-drawn-place-copy">',`<span class="lm-drawn-place-copy">`).replace(/<\/article>$/,`<button type="button" class="fav-drag" data-fav-drag="${esc(x.id)}" aria-label="${esc(x.title)} 순서 바꾸기" title="끌어서 순서 바꾸기, 방향키 위/아래로 이동">${icon('drag')}</button></article>`):html;};
   return myPage('즐겨찾기', list.length
-    ? `<div class="fav-items">${group(posts,'post','게시물',!!posts.length)}${group(places,'place','장소',!posts.length)}</div>
+    ? `<div class="fav-toolbar">${sortSelect}${selectButton}</div>${filters}
+      <div class="fav-items"><div class="fav-group-list${canDrag?' is-sortable':''}" data-fav-list>${shown.map(rowWithHandle).join('')}</div>${canDrag?'':favSortKey()!=='custom'&&!favSel?'<p class="fav-sort-hint">순서를 직접 바꾸려면 정렬을 ‘내가 정한 순서’로 바꿔 주세요.</p>':''}</div>
       ${favSel?`<div class="cf-selbar" role="toolbar" aria-label="선택한 즐겨찾기"><button type="button" class="cf-selall fav-selall" data-action="favselall">${list.every(item=>favSel.has(item.id))?'선택 해제':'전체 선택'}</button><span class="cf-selcount fav-selcount" aria-live="polite">${count?`${count}개 선택`:''}</span><button type="button" class="cf-seldel fav-remove" data-action="favremove" ${count&&!favRemoving?'':'disabled'}>${likeHeartIcon()}즐겨찾기 해제</button></div>`:''}`
-    : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 게시물이나 장소가 없어요</h3><p class="muted">게시물 상세나 지도에서 별을 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="map">지도로 가기</button></div>`, `favpage${favSel?' cf-selecting':''}`);
+    : `<div class="empty fav-empty">${likeHeartIcon()}<h3>아직 즐겨찾기한 콘텐츠나 장소가 없어요</h3><p class="muted">콘텐츠 상세나 지도에서 별을 누르면 여기에 모여요.</p><button type="button" class="fav-go" data-page="map">지도로 가기</button></div>`, `favpage${favSel?' cf-selecting':''}`);
 };
+/* ---------- 즐겨찾기 정렬·분류·끌어서 순서 바꾸기 ---------- */
+let favFilter='all';
+const FAV_SORTS={custom:'내가 정한 순서',recent:'최근 저장한 순',oldest:'오래 저장한 순',name:'이름순'};
+const favSortKey=()=>Object.hasOwn(FAV_SORTS,settings.favSort)?settings.favSort:'custom';
+const favTime=x=>savedTimestamp(x.sourceItem||x);
+function favSorted(list){
+  const key=favSortKey();
+  if(key==='name')return [...list].sort((a,b)=>String(a.title).localeCompare(String(b.title),'ko',{numeric:true}));
+  if(key==='recent'||key==='oldest')return [...list].sort((a,b)=>cfCompareSavedTime(favTime(a),favTime(b),key==='oldest'));
+  const order=new Map((settings.favOrder||[]).map((id,i)=>[id,i]));
+  // 아직 순서를 정하지 않은 새 즐겨찾기는 맨 위(최근 저장 순), 그다음 내가 정한 순서
+  return [...list].sort((a,b)=>{const ia=order.has(a.id)?order.get(a.id):-1,ib=order.has(b.id)?order.get(b.id):-1;return ia===ib?cfCompareSavedTime(favTime(a),favTime(b),false):ia-ib;});
+}
+function favSaveOrder(visibleIds){
+  const all=favSorted(favoriteItems()).map(x=>x.id),set=new Set(visibleIds);let k=0;
+  settings.favOrder=all.map(id=>set.has(id)?visibleIds[k++]:id).slice(0,500);
+  afterChange();
+}
+document.addEventListener('change',event=>{
+  const select=event.target.closest?.('select[data-favsort]');if(!select||!Object.hasOwn(FAV_SORTS,select.value))return;
+  if(select.value==='custom'&&!(settings.favOrder||[]).length)settings.favOrder=favSorted(favoriteItems()).map(x=>x.id);
+  settings.favSort=select.value;afterChange();render();
+  requestAnimationFrame(()=>document.querySelector('[data-favsort]')?.parentElement.querySelector('button')?.focus());
+});
+document.addEventListener('click',event=>{
+  const tab=event.target.closest('[data-fav-filter]');if(!tab||page!=='favorites')return;
+  event.stopPropagation();favFilter=tab.dataset.favFilter;render();
+  document.querySelector(`[data-fav-filter="${favFilter}"]`)?.focus({preventScroll:true});
+},true);
+let favDrag=null;
+document.addEventListener('pointerdown',event=>{
+  const handle=event.target.closest('[data-fav-drag]');if(!handle||page!=='favorites')return;
+  const rowEl=handle.closest('.fav-row'),listEl=rowEl?.parentElement;if(!rowEl||!listEl)return;
+  event.preventDefault();handle.setPointerCapture?.(event.pointerId);
+  const rows=[...listEl.children],rects=rows.map(r=>r.getBoundingClientRect());
+  favDrag={handle,rowEl,listEl,startY:event.clientY,rows,rects,from:rows.indexOf(rowEl),to:rows.indexOf(rowEl),moved:false};
+  rowEl.classList.add('is-dragging');listEl.classList.add('is-dragging');
+});
+document.addEventListener('pointermove',event=>{
+  if(!favDrag)return;
+  const d=favDrag,dy=event.clientY-d.startY;if(Math.abs(dy)>3)d.moved=true;
+  d.rowEl.style.transform=`translateY(${dy}px)`;
+  const h=d.rects[d.from].height+(d.rects[1]?d.rects[1].top-d.rects[0].bottom:0);
+  const center=d.rects[d.from].top+d.rects[d.from].height/2+dy;
+  let to=d.rects.findIndex(r=>center<r.top+r.height/2);if(to<0)to=d.rects.length-1;else if(to>d.from)to-=1;
+  d.to=Math.max(0,Math.min(d.rows.length-1,to));
+  d.rows.forEach((r,i)=>{if(r===d.rowEl)return;let shift=0;if(d.from<d.to&&i>d.from&&i<=d.to)shift=-h;if(d.from>d.to&&i<d.from&&i>=d.to)shift=h;r.style.transform=shift?`translateY(${shift}px)`:'';});
+});
+const favDragEnd=()=>{
+  if(!favDrag)return;const d=favDrag;favDrag=null;
+  d.rows.forEach(r=>{r.style.transform='';});d.rowEl.classList.remove('is-dragging');d.listEl.classList.remove('is-dragging');
+  if(d.moved&&d.from!==d.to){const ids=d.rows.map(r=>r.dataset.favitem);const [m]=ids.splice(d.from,1);ids.splice(d.to,0,m);favSaveOrder(ids);render();
+    requestAnimationFrame(()=>document.querySelector(`[data-fav-drag="${CSS.escape(m)}"]`)?.focus({preventScroll:true}));toast('순서를 바꿨어요.');}
+};
+document.addEventListener('pointerup',favDragEnd);document.addEventListener('pointercancel',favDragEnd);
+document.addEventListener('click',event=>{if(event.target.closest('[data-fav-drag]')){event.stopPropagation();event.preventDefault();}},true);
+document.addEventListener('keydown',event=>{
+  const handle=event.target.closest?.('[data-fav-drag]');if(!handle||!['ArrowUp','ArrowDown'].includes(event.key))return;
+  event.preventDefault();const ids=[...handle.closest('[data-fav-list]').children].map(r=>r.dataset.favitem);const i=ids.indexOf(handle.dataset.favDrag),j=i+(event.key==='ArrowUp'?-1:1);
+  if(j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];favSaveOrder(ids);render();
+  requestAnimationFrame(()=>document.querySelector(`[data-fav-drag="${CSS.escape(handle.dataset.favDrag)}"]`)?.focus({preventScroll:true}));
+});
 actions.favselect=()=>{favSel=new Set();render();};
 actions.favselectoff=()=>{favSel=null;render();};
 actions.favselall=()=>{
@@ -209,12 +278,12 @@ pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
     <div class="setrow"><div><b>핀맵</b><small>저장을 다시, 일상으로</small></div></div>
     <div class="setrow"><div><b>이용 환경</b><small>로그인 서비스</small></div></div>
     <div class="setrow"><div><b>데이터 보관</b><small>저장한 콘텐츠와 설정은 로그인한 계정에서 다시 볼 수 있어요.</small></div></div>
-  </div>`);
+  </div>`, 'settingpage');
 
 /* ---------- 자주 묻는 질문 · 공지사항 · 약관 및 정책 (2026-11-03, 마이 하단 도움말) ---------- */
 const infoRows = rows => `<div class="mycard settings">${rows.map(([t, d]) => `<div class="setrow"><div><b>${t}</b><small>${d}</small></div></div>`).join('')}</div>`;
 const faqRows = [
-  ['SNS 콘텐츠는 어떻게 저장하나요?', '홈 추가 메뉴에서 Instagram 링크·저장 ZIP·캡처 이미지를 선택해 주세요.'],
+  ['SNS 콘텐츠는 어떻게 저장하나요?', '홈 추가 메뉴에서 Instagram 링크, 저장 ZIP, 캡처 이미지를 선택해 주세요.'],
   ['저장한 콘텐츠는 어디에서 다시 보나요?', '홈에서 주변 저장 장소와 최근 저장을, 컬렉션에서 전체 목록을 볼 수 있어요.'],
   ['AI 자동 분류가 틀렸어요.', '콘텐츠 상세에서 카테고리를 직접 바꿀 수 있어요.<br>저장 설정에서 자동 분류를 끌 수도 있어요.'],
   ['원본 게시물이 삭제되면 어떻게 되나요?', '원본 링크가 열리지 않을 수 있어요. 핀맵에 저장된 장소 정보와 내 메모는 남지만, 원본 삭제 여부를 자동으로 확인하지는 않아요.'],
@@ -309,14 +378,14 @@ document.addEventListener('keydown', event => {
 });
 window.addEventListener('resize', () => faqInit(document.querySelector('.faq-panel-card')));
 pages.notice = () => myPage('공지사항', infoRows([
-  ['콘텐츠 추가 안내', 'Instagram 게시물·릴스 링크, 저장 게시물 ZIP 또는 캡처 이미지를 추가할 수 있어요.'],
+  ['콘텐츠 추가 안내', 'Instagram 게시물/릴스 링크, 저장 게시물 ZIP 또는 캡처 이미지를 추가할 수 있어요.'],
   ['웹 공유받기 안내', '현재 웹에서는 다른 앱의 공유 메뉴에서 핀맵으로 바로 저장할 수 없어요. Instagram 링크를 복사해 추가창에 붙여넣거나 캡처 화면으로 추가해 주세요.']
 ]), 'settingpage');
 pages.terms = () => myPage('약관 및 정책', `<div class="mycard settings policy-list">
-  <a class="setrow" href="terms.html" target="_top"><div><b>서비스 이용약관</b><small>계정·콘텐츠 분석·월간 이용권의 이용 조건이에요.</small></div></a>
-  <a class="setrow" href="privacy.html" target="_top"><div><b>개인정보 처리방침</b><small>계정·콘텐츠·구독 정보의 처리와 삭제 안내예요.</small></div></a>
-  <a class="setrow" href="refunds.html" target="_top"><div><b>환불·해지 정책</b><small>구독 해지와 Paddle 환불 요청 방법을 확인해요.</small></div></a>
-  <a class="setrow" href="plans.html" target="_top"><div><b>서비스·요금제 및 문의</b><small>월 5,000원·매월 분석 300개와 문의처를 확인해요.</small></div></a>
+  <a class="setrow" href="terms.html" target="_top"><div><b>서비스 이용약관</b><small>계정, 콘텐츠 분석, 월간 이용권의 이용 조건이에요.</small></div></a>
+  <a class="setrow" href="privacy.html" target="_top"><div><b>개인정보 처리방침</b><small>계정, 콘텐츠, 구독 정보의 처리와 삭제 안내예요.</small></div></a>
+  <a class="setrow" href="refunds.html" target="_top"><div><b>환불 및 해지 정책</b><small>구독 해지와 Paddle 환불 요청 방법을 확인해요.</small></div></a>
+  <a class="setrow" href="plans.html" target="_top"><div><b>서비스, 요금제 및 문의</b><small>월 5,000원, 매월 분석 300개와 문의처를 확인해요.</small></div></a>
 </div>${infoRows([
   ['위치기반서비스 안내', '현재 위치의 처리와 권한 설정은 개인정보 처리방침에서 확인할 수 있어요.'],
   ['오픈소스 라이선스', '지도 표시에 Leaflet을 사용해요.']
@@ -439,7 +508,7 @@ pages.calexport = () => {
   return myPage('캘린더로 내보내기', `<p class="mpdesc calx-desc">내 캘린더에 넣을 마감 일정을 골라 주세요.</p>
   <section class="mycard calx-list" aria-label="내보낼 마감 일정">
     <div class="calx-head"><h2>마감 일정 <span>${list.length ? `${n}/${list.length}` : '0'}</span></h2>${list.length ? `<button type="button" class="textbtn calx-all" data-action="calxall">${all ? '모두 해제' : '모두 선택'}</button>` : ''}</div>
-    ${list.length ? list.map(x => { const on = calxPick.has(calxKey(x)); return `<button type="button" class="calx-row calx-pick ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" data-calx-pick="${esc(calxKey(x))}"><span class="calx-check" aria-hidden="true">${on ? icon('check') : ''}</span><span class="calx-text"><b>${esc(x.title)}</b><span class="calx-date">${esc(fmtDay(calDue(x)))} · ${esc(x.dueLabel || '마감')}</span></span></button>`; }).join('') : '<p class="muted">다가오는 마감 일정이 없어요.</p>'}
+    ${list.length ? list.map(x => { const on = calxPick.has(calxKey(x)); return `<button type="button" class="calx-row calx-pick ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" data-calx-pick="${esc(calxKey(x))}"><span class="calx-check" aria-hidden="true">${on ? icon('check') : ''}</span><span class="calx-text"><b>${esc(x.title)}</b><span class="calx-date">${esc(fmtDay(calDue(x)))}, ${esc(x.dueLabel || '마감')}</span></span></button>`; }).join('') : '<p class="muted">다가오는 마감 일정이 없어요.</p>'}
   </section>
   <div class="calx-actions">
     <button type="button" class="filled calx-btn" data-action="calexportapple" ${n ? '' : 'disabled'}>${icon('calendar')}Apple 캘린더로 내보내기</button>

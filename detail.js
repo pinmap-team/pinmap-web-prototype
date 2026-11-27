@@ -19,13 +19,13 @@ function dtEventDate(value){
 }
 function dtEventInfo(events){
   if(!Array.isArray(events)||!events.length)return '';
-  return `<section class="dtsec dt-extraction dt-events"><h2>게시물에서 찾은 행사 일정</h2><p class="dt-extraction-count">${events.length}건 · 게시물에서 추출한 일정</p><ul>${events.map(event => {
+  return `<section class="dtsec dt-extraction dt-events"><h2>게시물에서 찾은 행사 일정</h2><p class="dt-extraction-count">게시물에서 추출한 일정 ${events.length}건</p><ul>${events.map(event => {
     const start = dtEventDate(event.start_date), end = dtEventDate(event.end_date);
     const hasDate=!!(start||end);
     const date = start ? `${start}${end && end !== start ? ' – ' + end : ''}` : end || event.date_text || '날짜 확인 필요';
     const kind = {exhibition:'전시',pop_up:'팝업',other:'행사'}[event.event_type] || '행사';
     const notes = Array.isArray(event.notes) ? event.notes.filter(note => typeof note === 'string').slice(0, 3) : [];
-    return `<li><div><strong>${esc(event.title || '행사 이름 확인 필요')}</strong><span class="${hasDate?'dt-extraction-ready':'dt-extraction-pending'}">${kind} · ${hasDate?'날짜 추출':'날짜 확인 필요'}</span></div><p>${icon('calendar')}${esc(date)}${hasDate ? '' : ' · 확정 날짜 아님'}</p>${event.time_text ? `<p>${icon('clock')}${esc(event.time_text)}</p>` : ''}${event.venue_name || event.address ? `<p>${icon('pin')}${esc([event.venue_name,event.address].filter(Boolean).join(' · '))}</p>` : ''}${notes.map(note => `<p>${esc(note)}</p>`).join('')}</li>`;
+    return `<li><div><strong>${esc(event.title || '행사 이름 확인 필요')}</strong><span class="${hasDate?'dt-extraction-ready':'dt-extraction-pending'}">${kind}, ${hasDate?'날짜 추출':'날짜 확인 필요'}</span></div><p>${icon('calendar')}${esc(date)}${hasDate ? '' : ' (확정 날짜 아님)'}</p>${event.time_text ? `<p>${icon('clock')}${esc(event.time_text)}</p>` : ''}${event.venue_name || event.address ? `<p>${icon('pin')}${esc([event.venue_name,event.address].filter(Boolean).join(', '))}</p>` : ''}${notes.map(note => `<p>${esc(note)}</p>`).join('')}</li>`;
   }).join('')}</ul></section>`;
 }
 
@@ -44,7 +44,7 @@ detail = function(){
   const photoIndexes=PinmapPlaces.matchExtracted(extracted,locations);
   const extractedPlaces=PinmapPlaces.forExtracted(x);
   const mappedCount=photoIndexes.filter(index=>index>=0).length;
-  const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 찾음 · 지도 표시 ${mappedCount}곳</p><ul>${extracted.map((place,i) => {
+  const extractionInfo = extracted.length ? `<section class="dtsec dt-extraction"><h2>게시물에서 찾은 장소</h2><p class="dt-extraction-count">${extracted.length}곳 찾음, 지도 표시 ${mappedCount}곳</p><ul>${extracted.map((place,i) => {
     const index=photoIndexes[i],favorite=extractedPlaces[i],located=index>=0&&!favorite.unlocated;
     const address=String((index>=0?locations[index]?.address:'')||place.address||'').trim();
     const addressInfo=address ? `<div class="dt-extraction-address"><span>${esc(address)}</span><button type="button" class="dt-extraction-copy-button" data-dt-copy-place="${i}" aria-label="${esc(place.name || '장소')} 주소 복사" title="주소 복사">${icon('copy')}</button></div>${!located&&place.reason?`<p>${esc(place.reason)}</p>`:''}` : `<p>${esc(located?'지도 위치 확인됨':place.reason||'주소를 확인하지 못했어요.')}</p>`;
@@ -354,7 +354,7 @@ function saveSheet(){
         <input type="hidden" name="type" value="ai">
         <input type="hidden" name="collection" value="">
         <input type="hidden" name="memo" value="">
-        <p class="eshint">이 브라우저에 저장돼요. 장소·일정 자동 추출은 로그인 화면에서 이용할 수 있어요.</p>
+        <p class="eshint">이 브라우저에 저장돼요. 장소 및 일정 자동 추출은 로그인 화면에서 이용할 수 있어요.</p>
         <p class="eserror" id="saveerror" role="alert"></p>
       </div>
       <div class="esfoot"><button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
@@ -407,7 +407,7 @@ document.addEventListener('click', async event => {
 // 2026-11-27: AI 컨텐츠 요약 아이콘은 Figma 'Icon / spark / accent' Color=Gradient(Pinmap/gradients/accent)
 // 2026-11-27 Figma 'Icon / spark / accent' · Color=Gradient strong (#83EDC0→#5BE7D9, gradient-accent-strong)
 function dtAiSparkIcon(){
-  return `<svg class="icon dtai-spark" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="dtai-spark-gradient" x1="2.8501" y1="12" x2="21.1499" y2="12" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#83EDC0"/><stop offset="1" stop-color="#5BE7D9"/></linearGradient></defs><path d="M12 2.8501L14.745 9.25504L21.1499 12L14.745 14.745L12 21.1499L9.25504 14.745L2.8501 12L9.25504 9.25504L12 2.8501Z"/></svg>`;
+  return `<svg class="icon dtai-spark" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="dtai-spark-gradient" x1="2.8501" y1="12" x2="21.1499" y2="12" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#83EDC0"/><stop offset="1" stop-color="#5BE7D9"/></linearGradient></defs><path d="M 11.081,4.9948 C 11.427,4.1867 12.573,4.1867 12.919,4.9948 L 14.587,8.8874 C 14.689,9.1234 14.877,9.3114 15.113,9.4126 L 19.005,11.0809 C 19.813,11.4272 19.813,12.5728 19.005,12.9191 L 15.113,14.5874 C 14.877,14.6886 14.689,14.8766 14.587,15.1126 L 12.919,19.0052 C 12.573,19.8133 11.427,19.8133 11.081,19.0052 L 9.413,15.1126 C 9.311,14.8766 9.123,14.6886 8.887,14.5874 L 4.995,12.9191 C 4.187,12.5728 4.187,11.4272 4.995,11.0809 L 8.887,9.4126 C 9.123,9.3114 9.311,9.1234 9.413,8.8874 L 11.081,4.9948"/></svg>`;
 }
 function dtSummaryBody(text){
   const all = String(text || '').trim();
@@ -425,7 +425,7 @@ function dtAiSummaryBody(item){
     .map(word=>word.replace(/(?:에서|으로|에게|까지|부터|처럼|보다|들을|들이|을|를|은|는|이|가|의|에|와|과|도)$/u,''))
     .filter(word=>word.length>=2&&word.length<=24&&!stopwords.has(word));
   const tags=[...new Set([...keywords,...words(title).slice(0,2)])].slice(0,5);
-  const kind={place:'장소',event:'행사',mixed:'장소·행사'}[item.contentKind]||'게시물';
+  const kind={place:'장소',event:'행사',mixed:'장소 및 행사'}[item.contentKind]||'게시물';
   for(const word of [...words(body),item.type,item.source,kind,'저장 콘텐츠']){
     if(tags.length>=2)break;
     const value=typeof word==='string'?word.trim():'';

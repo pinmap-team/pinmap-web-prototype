@@ -52,7 +52,7 @@ const CF_FRONT_GOO_PATH = 'M0 .17Q0 0 .09 0L.3 0C.39 0 .41 .2 .5 .2L.91 .2Q1 .2 
 // 2026-11-27: 폴더 고정은 Figma 'Icon / pushpin · 고정'(선 아이콘)
 const cfFilledPinIcon = () => figmaIcon('pushpin','cf-filled-pin');
 // 2026-11-27 Figma 'Icon / pushpin / 16'(선 1.3px)을 폴더 이름 앞 고정 표시에 그대로 써요.
-const cfPinMark16 = () => `<svg class="icon cf-filled-pin cf-pin16" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.6665 2.33331L13.6665 6.33331M10.6665 3.33331L7.6665 6.33331L4.99984 6.66665L3.99984 7.66665L8.33317 12L9.33317 11L9.6665 8.33331L12.6665 5.33331M6.1665 9.83331L2.6665 13.3333"/></svg>`;
+const cfPinMark16 = () => `<svg class="icon cf-filled-pin cf-pin16" viewBox="0 0 16 16" aria-hidden="true"><path d="M 9.667,2.333 L 13.667,6.333 M 10.667,3.333 L 7.829,6.171 C 7.724,6.276 7.586,6.343 7.438,6.362 L 5.228,6.638 C 5.08,6.657 4.943,6.724 4.837,6.829 L 4.474,7.193 C 4.212,7.455 4.212,7.879 4.474,8.14 L 7.859,11.526 C 8.121,11.788 8.545,11.788 8.807,11.526 L 9.171,11.163 C 9.276,11.057 9.343,10.92 9.362,10.772 L 9.638,8.561 C 9.656,8.414 9.724,8.276 9.829,8.171 L 12.667,5.333 M 6.167,9.833 L 2.667,13.333"/></svg>`;
 const cfUnpinIcon = () => cfFilledPinIcon().replace('cf-filled-pin"', 'cf-unpin-icon"').replace('</svg>', '<path class="cf-unpin-gap" d="M4 4l16 16"/><path class="cf-unpin-slash" d="M4 4l16 16"/></svg>');
 function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected = false, attr, pinned = false}){
   // 있는 사진만 보여줘요 (사진이 없으면 가운데 자리표시 1장)
@@ -285,7 +285,7 @@ pages.library = function(){
     ? `<button type="button" class="subback cf-back-btn" data-action="cfback" aria-label="컬렉션으로 돌아가기">${icon('back')}</button>`
     : ((typeof backHome !== "undefined" && backHome) ? `<button type="button" class="subback cf-back-btn" data-action="backhome" aria-label="홈으로 돌아가기">${icon('back')}</button>` : '');
   if(query)cfSearchOpen=true;
-  const ph = open ? `${open}에서 찾기` : '제목·설명·장소 검색';
+  const ph = open ? `${open}에서 찾기` : '제목, 설명, 장소 검색';
   const n = cfSel?.size || 0;
   const selbar = cfSel ? `<div class="cf-selbar" role="toolbar" aria-label="선택한 콘텐츠">
       <button type="button" class="cf-selall" data-action="cfselall">${cfOpenList().length && cfOpenList().every(x => cfSel.has(x.id)) ? '선택 해제' : '전체 선택'}</button>
@@ -610,7 +610,7 @@ function cfAskDeleteCategory(id){
     <div class="esbody"><section class="cf-catwarn" role="note" aria-label="삭제 전 확인">
       <h3>${icon('warning')}<span>삭제한 콘텐츠는 되돌릴 수 없어요</span></h3>
       <ul>
-        <li>메모, 즐겨찾기, 추출한 장소·일정도 함께 지워져요.</li>
+        <li>메모, 즐겨찾기, 추출한 장소와 일정도 함께 지워져요.</li>
         ${inMine ? `<li>내가 만든 폴더에 담긴 ${inMine}개도 그 폴더에서 빠져요.</li>` : ''}
         <li>원본 SNS 게시물은 그대로 남아 있어요.</li>
       </ul>

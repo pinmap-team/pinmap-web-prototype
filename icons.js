@@ -1,10 +1,12 @@
 // 이모지 → 검정 선 아이콘 (화면에 그려질 때 자동으로 바꿔요 · 맨 마지막에 불러와요)
 // 데이터와 다른 코드의 이모지는 그대로 두고, 보이는 화면에서만 아이콘으로 바꿉니다.
+// 2026-11-27: 이모지 대신 그리는 선 아이콘도 Figma 원본과 맞춰요.
+if (typeof FIGMA_ICON_PATHS !== 'undefined') Object.keys(FIGMA_ICON_PATHS).forEach(k => { if (k in paths) paths[k] = FIGMA_ICON_PATHS[k]; });
 const EMOJI_ICONS = {
   '📍': paths.pin, '✨': paths.spark, '☕': paths.coffee, '🔖': paths.bookmark, '🗓': paths.calendar,
   '⏰': paths.clock, '🖼': paths.image, '📁': paths.folder, '🔎': paths.search, '🔔': paths.bell,
   '🗺': paths.map, '🏠': paths.home,
-  '💡': 'M9 18h6 M10 21h4 M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z',
+  '💡': (typeof FIGMA_ICON_PATHS !== 'undefined' && FIGMA_ICON_PATHS.idea) || 'M9 18h6 M10 21h4 M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z',
   '📲': 'M8 3h9v18H8z M11.5 18h2 M2 11h7 M6 8l3 3-3 3',
   '🛍': paths.shop,
   '✈': 'M3 13.5 21 6l-4 14-5-5-3 4v-6z M12 15l9-9',

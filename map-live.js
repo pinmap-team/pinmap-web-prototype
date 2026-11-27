@@ -30,9 +30,9 @@
     const saved = new Set(savedPlaces().map(place=>place.categoryId));
     return [['all','전체'],...PinmapCategories.all.filter(c=>saved.has(c.id)).map(c=>[c.id,c.label])];
   };
-  const categoryIcon = (kind,active=false) => kind==='all'?`<img class="pm-category-icon" src="img/category/all-${active?'active-dark':'inactive'}.svg" width="20" height="20" alt="" aria-hidden="true">`:PinmapCategories.chipIcon(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind),active);
+  const categoryIcon = (kind,active=false) => kind==='all'?`<img class="pm-category-icon" src="img/category/all-${active?'active-dark':'inactive'}.svg?v=20261127d" width="20" height="20" alt="" aria-hidden="true">`:PinmapCategories.chipIcon(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind),active);
   // 2026-11-27 지도 원형 마커: 아이콘마다 그림의 실제 중심을 원 가운데에 맞춘 marker.svg(Figma 'Map marker / 카테고리')를 써요.
-  const markerGlyph = kind => { const c=PinmapCategories.get(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind))||PinmapCategories.get('other'); return `<img class="pm-category-icon lm-marker-glyph" src="img/category/${c.id}-marker.svg" width="18" height="18" alt="" aria-hidden="true">`; };
+  const markerGlyph = kind => { const c=PinmapCategories.get(({eat:'food',event:'exhibition',walk:'nature',shop:'fashion'}[kind]||kind))||PinmapCategories.get('other'); return `<img class="pm-category-icon lm-marker-glyph" src="img/category/${c.id}-marker.svg?v=20261127d" width="18" height="18" alt="" aria-hidden="true">`; };
   const mapChipIcon = (kind,active=false) => kind==='all' ? categoryIcon('all',active) : PinmapCategories.chipIcon(kind,active);
   // 2026-11-27 Figma 'Icon / pin' · 'Icon / route'(선 아이콘). 선택돼도 채우지 않고 같은 선 모양을 써요.
   const placeTabIcon = active => `<svg class="icon lm-tab-icon lm-place-tab-icon${active?' is-active':''}" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10C20 16 12 22 12 22C12 22 4 16 4 10C4 7.87827 4.84285 5.84344 6.34315 4.34315C7.84344 2.84285 9.87827 2 12 2C14.1217 2 16.1566 2.84285 17.6569 4.34315C19.1571 5.84344 20 7.87827 20 10ZM15 10C15 10.7956 14.6839 11.5587 14.1213 12.1213C13.5587 12.6839 12.7956 13 12 13C11.2044 13 10.4413 12.6839 9.87868 12.1213C9.31607 11.5587 9 10.7956 9 10C9 9.20435 9.31607 8.44129 9.87868 7.87868C10.4413 7.31607 11.2044 7 12 7C12.7956 7 13.5587 7.31607 14.1213 7.87868C14.6839 8.44129 15 9.20435 15 10Z"/></svg>`;
@@ -67,7 +67,7 @@
         areaHint:loc?.area_hint||'',coordinateSource:loc?.coordinate_source||loc?.provider||'',
         countryCode:loc?.country_code||loc?.countryCode||'',category:item.category||item.type,
         description:item.desc||'',searchSummary:item.searchSummary||'',
-        savedLabel:loc?.review_required?'지도 검색 위치 · 확인 필요':savedAgo(item)+' 저장',
+        savedLabel:loc?.review_required?'지도 검색 위치(확인 필요)':savedAgo(item)+' 저장',
         source:'저장한 콘텐츠',saved:true,favorite:place.favorite};
     });
   };
@@ -106,7 +106,7 @@
         toggle.dataset.provider=targetProvider;
       }
       toggle.setAttribute('aria-label',`${next} 지도로 전환`);
-      toggle.title=`현재 ${state.current==='naver'?'네이버':'구글'} 지도 · ${next} 지도로 전환`;
+      toggle.title=`현재 ${state.current==='naver'?'네이버':'구글'} 지도, ${next} 지도로 전환`;
     }
     if(credit&&['google','naver'].includes(state.current))credit.textContent=`지도 © ${state.current==='naver'?'NAVER':'Google'}`;
     if(state.error&&notice){notice.textContent=state.error;notice.hidden=false;}

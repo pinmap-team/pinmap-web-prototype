@@ -68,7 +68,7 @@ const ANALYSIS_FAILURE_STATES={
   private:{label:'비공개 게시물',title:'공개된 게시물만 분석할 수 있어요',description:'계정 또는 게시물이 비공개여서 내용을 가져오지 못했어요. Instagram에서 공개 범위를 확인해 주세요.',hint:'원본의 공개 범위를 확인해 주세요',icon:'user',action:'original',actionLabel:'Instagram에서 확인'},
   deleted:{label:'원본 확인 불가',title:'원본 게시물을 찾을 수 없어요',description:'게시물이 삭제되었거나 더 이상 제공되지 않아 내용을 가져오지 못했어요. 저장한 링크와 메모는 유지돼요.',hint:'원본 링크를 확인해 주세요',icon:'close',action:'original',actionLabel:'원본 링크 확인'},
   login:{label:'로그인 필요',title:'Instagram에서 로그인해 주세요',description:'Instagram이 로그인 화면을 표시해 내용을 가져오지 못했어요. 원본에서 접근 가능한지 확인해 주세요. 로그인만으로 자동 재분석되지는 않아요.',hint:'Instagram에서 접근 상태를 확인해 주세요',icon:'link',action:'original',actionLabel:'Instagram에서 확인'},
-  media:{label:'미디어 확인 실패',title:'사진과 영상을 불러오지 못했어요',description:'미디어를 가져오지 못해 분석을 시작하거나 완료할 수 없었어요. 원본이 정상 재생되는지 확인해 주세요.',hint:'사진·영상의 재생 상태를 확인해 주세요',icon:'image',action:'original',actionLabel:'원본에서 확인'},
+  media:{label:'미디어 확인 실패',title:'사진과 영상을 불러오지 못했어요',description:'미디어를 가져오지 못해 분석을 시작하거나 완료할 수 없었어요. 원본이 정상 재생되는지 확인해 주세요.',hint:'사진과 영상의 재생 상태를 확인해 주세요',icon:'image',action:'original',actionLabel:'원본에서 확인'},
   temporary:{label:'분석 연결 오류',title:'분석을 완료하지 못했어요',description:'응답 지연이나 일시적인 분석 서비스 오류로 결과를 받지 못했어요. 잠시 후 같은 링크를 다시 추가할 수 있어요.',hint:'잠시 후 다시 시도해 주세요',icon:'clock',action:'analysisretry',actionLabel:'링크 다시 추가'},
   quota:{label:'이용 한도 도달',title:'분석 이용 한도를 확인해 주세요',description:'이용 한도에 도달해 게시물을 분석하지 못했어요. 요금제와 다음 이용 가능 시점을 확인해 주세요.',hint:'분석 이용량을 확인해 주세요',icon:'clock',action:'billing',actionLabel:'이용량 확인'},
   unknown:{label:'분석 확인 필요',title:'분석 결과를 얻지 못했어요',description:'결과가 없지만 정확한 실패 원인은 확인되지 않았어요. 원본이 열리는지 확인한 뒤 다시 시도해 주세요.',hint:'원본 상태를 확인해 주세요',icon:'spark',action:'original',actionLabel:'원본에서 확인'}

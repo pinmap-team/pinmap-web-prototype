@@ -113,17 +113,17 @@
       <div class="billing-page-slide">
         <section class="billing-page billing-page-free${selectedPlan==='free'?' on':''}" role="tabpanel" id="billing-panel-free" aria-labelledby="billing-tab-free" aria-hidden="${selectedPlan!=='free'}" data-plan="free" ${selectedPlan==='free'?'':'inert'}>
           <div><p class="billing-sub-meta">무료 요금제</p><p class="billing-price"><strong>0원</strong><span>/ 월</span></p><p class="billing-sub-meta">매월 무료 이용</p></div>
-          <div class="billing-divider"></div><ul class="billing-features"><li>매월 콘텐츠 분석 50회</li><li>장소·일정 추출</li><li>AI 설명과 카테고리 분류</li><li>저장한 콘텐츠 확인</li></ul>
+          <div class="billing-divider"></div><ul class="billing-features"><li>매월 콘텐츠 분석 50회</li><li>장소 및 일정 추출</li><li>AI 설명과 카테고리 분류</li><li>저장한 콘텐츠 확인</li></ul>
         </section>
         <section class="billing-page billing-page-monthly${selectedPlan==='monthly'?' on':''}" role="tabpanel" id="billing-panel-monthly" aria-labelledby="billing-tab-monthly" aria-hidden="${selectedPlan!=='monthly'}" data-plan="monthly" ${selectedPlan==='monthly'?'':'inert'}>
-          <div><p class="billing-sub-meta">핀맵 월간</p><p class="billing-price"><strong class="billing-price-digits"><span>5</span><span data-stagger="1">,</span><span data-stagger="2">000</span>원</strong><span>/ 월</span></p><p class="billing-sub-meta">매월 자동 결제 · 세금 포함</p></div>
+          <div><p class="billing-sub-meta">핀맵 월간</p><p class="billing-price"><strong class="billing-price-digits"><span>5</span><span data-stagger="1">,</span><span data-stagger="2">000</span>원</strong><span>/ 월</span></p><p class="billing-sub-meta">매월 자동 결제, 세금 포함</p></div>
           <div class="billing-divider"></div>
-          <ul class="billing-features"><li>결제 주기마다 콘텐츠 분석 300개</li><li>장소·일정 추출</li><li>AI 설명과 카테고리 분류</li><li>저장한 콘텐츠 확인</li></ul>
+          <ul class="billing-features"><li>결제 주기마다 콘텐츠 분석 300개</li><li>장소 및 일정 추출</li><li>AI 설명과 카테고리 분류</li><li>저장한 콘텐츠 확인</li></ul>
         </section>
       </div>
       <button type="button" class="filled billing-checkout" data-action="paddlecheckout" ${selectedPlan==='monthly'&&ready()&&!account?.active?'':'disabled'}><span class="billing-action-text">${selectedPlan==='free'?'무료 요금제':account?.active?'구독 중':isLive()?'월 5,000원 구독하기':'테스트 결제하기'}</span></button>
     </section>
-    <div class="billing-account" role="status"><b>${account?.active?'월간 이용권 이용 중':account?'무료 이용 중':'구독 상태'}</b><p>${accountError?esc(accountError):account?account.active?`이번 주기 ${account.used} / 300개 사용 · ${account.remaining}개 남음`:`이번 달 무료 분석 ${account.used} / 50회 사용 · ${account.remaining}회 남음`:'구독 정보를 확인하려면 아래 버튼을 눌러 주세요.'}</p>${account?.periodEnd?`<p>${account.cancelAt?'해지 예정 · ':'다음 주기 · '}${esc(new Date(account.periodEnd).toLocaleDateString('ko-KR'))}</p>`:''}<div class="billing-account-actions"><button type="button" class="textbtn" data-action="billingrefresh">이용권 새로고침</button>${account&&account.status!=='free'?'<button type="button" class="outlined" data-action="billingportal">구독 관리 · 해지</button>':''}</div></div>
+    <div class="billing-account" role="status"><b>${account?.active?'월간 이용권 이용 중':account?'무료 이용 중':'구독 상태'}</b><p>${accountError?esc(accountError):account?account.active?`이번 주기 ${account.used} / 300개 사용, ${account.remaining}개 남음`:`이번 달 무료 분석 ${account.used} / 50회 사용, ${account.remaining}회 남음`:'구독 정보를 확인하려면 아래 버튼을 눌러 주세요.'}</p>${account?.periodEnd?`<p>${account.cancelAt?'해지 예정: ':'다음 주기: '}${esc(new Date(account.periodEnd).toLocaleDateString('ko-KR'))}</p>`:''}<div class="billing-account-actions"><button type="button" class="textbtn" data-action="billingrefresh">이용권 새로고침</button>${account&&account.status!=='free'?'<button type="button" class="outlined" data-action="billingportal">구독 관리 및 해지</button>':''}</div></div>
     <p class="billing-note">${isLive()?'매월 5,000원(세금 포함)이 자동 결제돼요. 구독 관리에서 해지할 수 있어요.':ready()?'테스트 결제 모드예요. 실제 요금은 청구되지 않아요.':'결제 서비스 연결을 확인하고 있어요.'}</p>
     <p id="billing-message" class="muted" role="status">${account?.active?'구독 관리에서 결제 내역과 해지를 확인할 수 있어요.':ready()?isLive()?'Paddle 결제창에서 요금과 결제 주기를 확인해 주세요.':'Paddle의 테스트 결제창으로 이동해요.':'결제 연결 후 이용할 수 있어요.'}</p>
     <p class="muted billing-caption">분석에 성공한 콘텐츠만 차감돼요. 남은 횟수는 다음 결제 주기로 이월되지 않아요.</p>`, 'billingpage');

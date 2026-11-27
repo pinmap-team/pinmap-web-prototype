@@ -406,7 +406,7 @@ if (PM_ENV.requiresAuth) (() => {
         if (item.mapLocations.length && !item.events.length) { window.pmMapFocus = item.id; go('map'); }
         else { go('library'); openDetail(item.id); }
         toast(item.status === 'extracted' || item.status === 'needs_review'
-          ? `캡처를 저장했어요 · 장소 ${item.extractedPlaceCount}곳 · 일정 ${item.events.length}건`
+          ? `캡처를 저장했어요. 장소 ${item.extractedPlaceCount}곳, 일정 ${item.events.length}건`
           : '캡처를 저장했지만 분석을 마치지 못했어요. 상세에서 확인해 주세요.');
         if (wasLoading) void loadAccount();
         return item;
@@ -478,8 +478,8 @@ if (PM_ENV.requiresAuth) (() => {
         toast(item.contentKind === 'unknown' && item.status !== 'extracted'
           ? '링크를 저장했어요. 분석은 완료하지 못했어요.'
           : item.contentKind === 'unknown'
-          ? '저장했어요 · AI 컨텐츠 요약 · ' + item.category
-          : `저장했어요 · 장소 ${item.extractedPlaceCount}곳 · 행사 ${item.events.length}건`);
+          ? '저장했어요. AI 컨텐츠 요약: ' + item.category
+          : `저장했어요. 장소 ${item.extractedPlaceCount}곳, 행사 ${item.events.length}건`);
         if (wasLoading) void loadAccount();
       } catch (error) {
         if (controller.signal.aborted) return;

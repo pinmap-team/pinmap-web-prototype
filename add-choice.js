@@ -59,7 +59,7 @@
   window.PinmapStartZipFile = async (file, signal) => {
     if (!file || !/\.zip$/i.test(file.name) || file.size > 40 * 1024 * 1024)
       throw Error('40MB 이하의 Instagram 내보내기 ZIP 파일을 선택해 주세요.');
-    if (!window.PinmapZipImport) throw Error('ZIP 분석·저장은 로그인 후 사용할 수 있어요.');
+    if (!window.PinmapZipImport) throw Error('ZIP 분석과 저장은 로그인 후 사용할 수 있어요.');
     signal?.throwIfAborted();
     const bytes = new Uint8Array(await new Promise((resolve, reject) => {
       const reader = new FileReader();

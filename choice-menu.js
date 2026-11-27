@@ -19,7 +19,7 @@
         const wrapper=document.createElement('span');wrapper.className='pm-choice-field';select.before(wrapper);wrapper.append(select);host=wrapper;
       }
       if(host.classList.contains('pm-choice'))return;
-      const isSort=select.hasAttribute('data-libsort')||select.hasAttribute('data-folder-sort');
+      const isSort=select.hasAttribute('data-libsort')||select.hasAttribute('data-folder-sort')||select.hasAttribute('data-favsort');
       host.classList.add('pm-choice');
       select.hidden=true;
       [...host.children].filter(el=>el!==select).forEach(el=>el.remove());

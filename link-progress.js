@@ -377,7 +377,7 @@
     try {
       const image = await preparePhoto(file);
       await new Promise(resolve => setTimeout(resolve, reduced() ? 0 : duration('--acc-dur',250)));
-      if (!window.PinmapCaptureSave) throw Error('사진 분석·저장은 로그인 후 사용할 수 있어요.');
+      if (!window.PinmapCaptureSave) throw Error('사진 분석과 저장은 로그인 후 사용할 수 있어요.');
       await window.PinmapCaptureSave(image, crypto.randomUUID());
     } catch (error) { if (inputMode) inputError(error.message || '사진을 확인해 주세요.'); }
     finally { inputPending = false; get('.dl-field').classList.remove('is-pending'); }
