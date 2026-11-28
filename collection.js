@@ -49,7 +49,7 @@ function cfFolderData(list){
 // thumbnails[0] = 가장 최근 → 가운데 맨 앞
 const CF_EDGE = 'M0 40.16Q0 32 9 32L30 32C39 32 41 41.6 50 41.6L91 41.6Q100 41.6 100 49.76'; // 앞판 top 40% · cfFrontClip과 같은 가장자리
 const CF_FRONT_GOO_PATH = 'M0 .17Q0 0 .09 0L.3 0C.39 0 .41 .2 .5 .2L.91 .2Q1 .2 1 .37L1 .83Q1 1 .91 1L.09 1Q0 1 0 .83Z';
-// The supplied pin-linear.svg / pin-bold.svg are the source for both menu states and the folder badge.
+// The supplied pin-bold.svg is shared by the folder badge and both menu states.
 const cfPinIcon = variant => `<span class="icon cf-pin-icon is-${variant}" aria-hidden="true"></span>`;
 const cfPinMark16 = () => cfPinIcon('bold');
 const cfUnpinIcon = () => cfPinIcon('unpin');
@@ -565,7 +565,7 @@ function cfOpenFolderMenu(tile,point){
       <circle class="cf-goo-blob cf-goo-left" cx="${centerX}" cy="${centerY}" r="27"/>
       <circle class="cf-goo-blob cf-goo-right" cx="${centerX}" cy="${centerY}" r="27"/>
     </g></g></svg>
-    <button type="button" class="cf-goo-action cf-goo-left" style="left:${centerX-27}px;top:${centerY-27}px" data-action="cfpintoggle" aria-label="${pinned?'상단 고정 해제':'상단에 고정'}" title="${pinned?'상단 고정 해제':'상단에 고정'}" tabindex="-1">${pinned?cfUnpinIcon():cfPinIcon('linear')}</button>
+    <button type="button" class="cf-goo-action cf-goo-left" style="left:${centerX-27}px;top:${centerY-27}px" data-action="cfpintoggle" aria-label="${pinned?'상단 고정 해제':'상단에 고정'}" title="${pinned?'상단 고정 해제':'상단에 고정'}" tabindex="-1">${pinned?cfUnpinIcon():cfPinIcon('bold')}</button>
     <button type="button" class="cf-goo-action cf-goo-right is-danger" style="left:${centerX-27}px;top:${centerY-27}px" data-action="cfmenudelete" aria-label="폴더 삭제" title="폴더 삭제" tabindex="-1">${icon('trash')}</button>`;
   menu._folderTile=tile;menu._folderKey=key;menu._backdrop=backdrop;menu._focus=focus;
   tile._cfGooMenu=menu;cfHoldMenu=menu;cfHoldMenuTile=tile;
