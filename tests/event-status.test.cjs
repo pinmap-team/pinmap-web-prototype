@@ -13,10 +13,10 @@ test('detail marks a full extracted date without a review-needed badge',()=>{
     {title:'날짜 미상 전시',event_type:'exhibition',date_text:'12월 중',needs_review:true}
   ])`,context);
   const [dated,undated]=markup.match(/<li>.*?<\/li>/g);
-  assert.match(dated,/전시 · 날짜 추출/);
+  assert.match(dated,/전시, 날짜 추출/);
   assert.match(dated,/2026\.12\.11 – 2027\.04\.11/);
   assert.doesNotMatch(dated,/확인 필요/);
-  assert.match(undated,/전시 · 날짜 확인 필요/);
+  assert.match(undated,/전시, 날짜 확인 필요/);
 });
 
 test('invalid calendar dates do not become dated event badges',()=>{

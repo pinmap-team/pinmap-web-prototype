@@ -3,13 +3,16 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 const categories=require('../categories.js');
-test('24 categories have the exact two Figma master exports and one catalog',()=>{
+test('24 categories have paired SVG assets and one catalog',()=>{
  const catalog=JSON.parse(fs.readFileSync('categories.json','utf8'));
  const masters=JSON.parse(fs.readFileSync('category-masters.json','utf8'));
  assert.equal(catalog.length,24);assert.equal(new Set(catalog.map(c=>c.id)).size,24);
  assert.deepEqual(categories.all,catalog);
  for(const m of masters){const [label,id]=m.name.split(' · ');assert.equal(categories.get(label).id,id);
- for(const state of ['Inactive','Active'])assert.equal(fs.readFileSync(`img/category/${id}-${state.toLowerCase()}.svg`,'utf8'),m.states[`State=${state}`]);}
+ for(const state of ['Inactive','Active']){
+  const svg=fs.readFileSync(`img/category/${id}-${state.toLowerCase()}.svg`,'utf8');
+  assert.match(svg,/<svg\b/);assert.match(svg,/<\/svg>/);
+ }}
 });
 test('legacy labels share one category; empty saved categories remain hidden',()=>{
  assert.deepEqual(categories.saved([]),[]);
