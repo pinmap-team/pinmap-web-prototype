@@ -49,10 +49,10 @@ function cfFolderData(list){
 // thumbnails[0] = 가장 최근 → 가운데 맨 앞
 const CF_EDGE = 'M0 40.16Q0 32 9 32L30 32C39 32 41 41.6 50 41.6L91 41.6Q100 41.6 100 49.76'; // 앞판 top 40% · cfFrontClip과 같은 가장자리
 const CF_FRONT_GOO_PATH = 'M0 .17Q0 0 .09 0L.3 0C.39 0 .41 .2 .5 .2L.91 .2Q1 .2 1 .37L1 .83Q1 1 .91 1L.09 1Q0 1 0 .83Z';
-// Restore the user's last filled pushpin, used by both the folder badge and action menu.
-const cfFilledPinIcon = () => '<svg class="icon cf-filled-pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.64 2L13.07 2L13.55 2.21L18.31 5.16L18.9 5.53L19.33 6.17L19.22 6.97L18.52 8.1L17.99 8.63L17.4 8.84L16.87 8.84L15.74 8.52L13.6 12.8L13.71 13.02L14.25 13.28L14.67 13.71L15.05 14.51L14.94 15.85L14.25 17.03L13.66 17.51L12.96 17.51L12.53 17.29L5.53 12.96L5.21 12.7L4.99 12.21L5.1 11.47L6.17 9.97L7.08 9.54L7.94 9.54L9.17 10.13L11.41 7.19L12.05 6.17L11.3 5.42L11.09 5.05L11.04 4.03L11.95 2.43L12.21 2.16Z M8.36 15.32L9.22 15.8L9.22 16.06L5.74 21.68L5.37 22L4.83 21.89L4.67 21.63L4.83 20.98Z"/></svg>';
-const cfPinMark16 = () => cfFilledPinIcon().replace('cf-filled-pin"','cf-filled-pin cf-pin16"');
-const cfUnpinIcon = () => cfFilledPinIcon().replace('cf-filled-pin"', 'cf-unpin-icon"').replace('</svg>', '<path class="cf-unpin-gap" d="M4 4l16 16"/><path class="cf-unpin-slash" d="M4 4l16 16"/></svg>');
+// The supplied pin-linear.svg / pin-bold.svg are the source for both menu states and the folder badge.
+const cfPinIcon = variant => `<span class="icon cf-pin-icon is-${variant}" aria-hidden="true"></span>`;
+const cfPinMark16 = () => cfPinIcon('bold');
+const cfUnpinIcon = () => cfPinIcon('unpin');
 function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected = false, attr, pinned = false}){
   // 있는 사진만 보여줘요 (사진이 없으면 가운데 자리표시 1장)
   const shown = Math.max(1, Math.min(3, thumbnails.length));
@@ -565,7 +565,7 @@ function cfOpenFolderMenu(tile,point){
       <circle class="cf-goo-blob cf-goo-left" cx="${centerX}" cy="${centerY}" r="27"/>
       <circle class="cf-goo-blob cf-goo-right" cx="${centerX}" cy="${centerY}" r="27"/>
     </g></g></svg>
-    <button type="button" class="cf-goo-action cf-goo-left" style="left:${centerX-27}px;top:${centerY-27}px" data-action="cfpintoggle" aria-label="${pinned?'상단 고정 해제':'상단에 고정'}" title="${pinned?'상단 고정 해제':'상단에 고정'}" tabindex="-1">${pinned?cfUnpinIcon():cfFilledPinIcon()}</button>
+    <button type="button" class="cf-goo-action cf-goo-left" style="left:${centerX-27}px;top:${centerY-27}px" data-action="cfpintoggle" aria-label="${pinned?'상단 고정 해제':'상단에 고정'}" title="${pinned?'상단 고정 해제':'상단에 고정'}" tabindex="-1">${pinned?cfUnpinIcon():cfPinIcon('linear')}</button>
     <button type="button" class="cf-goo-action cf-goo-right is-danger" style="left:${centerX-27}px;top:${centerY-27}px" data-action="cfmenudelete" aria-label="폴더 삭제" title="폴더 삭제" tabindex="-1">${icon('trash')}</button>`;
   menu._folderTile=tile;menu._folderKey=key;menu._backdrop=backdrop;menu._focus=focus;
   tile._cfGooMenu=menu;cfHoldMenu=menu;cfHoldMenuTile=tile;

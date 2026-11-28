@@ -2145,13 +2145,6 @@ html[data-theme="dark"] body .dtsum:has(>h2.dtai),html[data-theme="dark"] body .
 html body .dtsum.dtai-review h2.dtai{display:flex;align-items:center;gap:var(--space-sm);width:100%;margin:0 0 var(--space-lg);padding:0;font:var(--type-headline-md);color:#333!important}
 html[data-theme="dark"] body .dtsum.dtai-review h2.dtai{color:var(--color-on-surface)!important}
 html body .dtsum.dtai-review h2.dtai>.icon{width:24px!important;height:24px!important;color:#9256E8!important;filter:drop-shadow(0 1px 2px rgba(130,75,220,.2))}
-html body .dtsum.dtai-review .dtai-info-button{display:grid;place-items:center;flex:none;width:36px;height:36px;margin-left:-4px;padding:0;border:0;background:transparent;color:#8B8B94;cursor:pointer}
-html body .dtsum.dtai-review .dtai-info-button>span{display:grid;place-items:center;width:20px;height:20px;border:2px solid #B6B6BF;border-radius:50%;font:600 12px/1 var(--font-family)}
-html body .dtsum.dtai-review .dtai-info-button:focus-visible{outline:2px solid var(--color-on-surface);outline-offset:1px;border-radius:var(--rounded-sm)}
-html body .dtai-info-tooltip{position:fixed;z-index:3000;box-sizing:border-box;width:max-content;max-width:min(280px,calc(100vw - 32px));padding:var(--space-md) var(--space-lg);border:1px solid var(--color-disabled);border-radius:var(--rounded-md);background:var(--color-surface);box-shadow:var(--shadow-sm);color:var(--color-on-surface);font:var(--type-body-sm);line-height:1.5;word-break:keep-all;pointer-events:none;transform:translate(-50%,-100%)}
-html body .dtai-info-tooltip.is-below{transform:translate(-50%,0)}
-html body .dtai-info-tooltip::after{content:'';position:absolute;left:var(--dtai-arrow-left);bottom:-6px;width:10px;height:10px;border-right:1px solid var(--color-disabled);border-bottom:1px solid var(--color-disabled);background:var(--color-surface);transform:translateX(-50%) rotate(45deg)}
-html body .dtai-info-tooltip.is-below::after{top:-6px;bottom:auto;border:0;border-top:1px solid var(--color-disabled);border-left:1px solid var(--color-disabled);transform:translateX(-50%) rotate(45deg)}
 html body .dtsum.dtai-review .dtai-keyline{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:var(--type-body-md);font-weight:var(--weight-bold);color:#333}
 html body .dtsum.dtai-review .dtai-body{margin:var(--space-md) 0 0;font:var(--type-body-md);color:#555!important;word-break:keep-all}
 html body .dtsum.dtai-review .dtai-tags{display:flex;flex-wrap:wrap;gap:var(--space-xs);margin-top:var(--space-lg)}
@@ -2556,19 +2549,17 @@ html body .homecategories .prefchip{padding-top:0!important;padding-bottom:0!imp
 .cf-goo-action.is-danger{color:var(--color-error)}
 .cf-goo-menu[data-open="true"] .cf-goo-action.cf-goo-left{background-color:#1E1E1E;color:#fff}
 .cf-goo-menu[data-open="true"] .cf-goo-action.cf-goo-right{background-color:var(--color-error);color:#fff}
-.cf-goo-action .cf-filled-pin,.cf-pinmark .cf-filled-pin{fill:currentColor!important}
-.cf-goo-action .cf-filled-pin path,.cf-pinmark .cf-filled-pin path{fill:currentColor!important;stroke:none!important}
-.cf-goo-action .cf-unpin-icon{fill:none}
-.cf-goo-action .cf-unpin-icon>path:first-child{fill:currentColor!important;stroke:none!important}
-.cf-goo-action .cf-unpin-gap,.cf-goo-action .cf-unpin-slash{fill:none;stroke-linecap:round}
-.cf-goo-action .cf-unpin-gap{stroke:#1e1e1e;stroke-width:3.5}
-.cf-goo-action .cf-unpin-slash{stroke:currentColor;stroke-width:1.7}
+.cf-pin-icon{position:relative;display:block;flex:none;width:25px;height:25px}
+.cf-pin-icon::before{content:'';position:absolute;inset:0;background:currentColor;-webkit-mask:url('img/pin-linear.svg') center/contain no-repeat;mask:url('img/pin-linear.svg') center/contain no-repeat}
+.cf-pin-icon:is(.is-bold,.is-unpin)::before{-webkit-mask-image:url('img/pin-bold.svg');mask-image:url('img/pin-bold.svg')}
+.cf-pin-icon.is-unpin::after{content:'';position:absolute;left:-2px;top:calc(50% - 1px);width:29px;height:2px;background:currentColor;box-shadow:0 0 0 1.5px #1e1e1e;transform:rotate(45deg)}
+.cf-meta .cf-pinmark .cf-pin-icon{width:16px;height:16px}
 .cf-goo-menu[data-open="true"] .cf-goo-action:hover{filter:brightness(1.12)}
 .cf-goo-action:focus-visible{outline:0;filter:brightness(1.2)}
 @media(prefers-reduced-motion:reduce){.cf-menu-backdrop,.cf-menu-focus,.cf-goo-menu,.cf-goo-blob,.cf-goo-action,.cf-goo-action .icon{transition:none!important}}
 
-/* Keep the Shimmer text visible in the heading and across multi-line summaries. */
-.dtsum.dtai-review .t-shimmer{
+/* The moving gradient belongs only to the AI summary heading. */
+.dtsum.dtai-review .dtai-title.t-shimmer{
   --shimmer-dur:2000ms;
   --shimmer-base:var(--color-secondary);
   --shimmer-highlight:#111;
@@ -2577,11 +2568,9 @@ html body .homecategories .prefchip{padding-top:0!important;padding-bottom:0!imp
   position:relative;
   display:inline-block;
 }
-.dtai-body.t-shimmer{display:block}
 html body .dtsum.dtai-review h2.dtai .dtai-title.t-shimmer{color:var(--shimmer-base)!important}
-html body .dtsum.dtai-review .dtai-body.t-shimmer{color:var(--shimmer-base)!important}
-html[data-theme="dark"] body .dtsum.dtai-review .t-shimmer{--shimmer-highlight:#fff}
-.t-shimmer::before{
+html[data-theme="dark"] body .dtsum.dtai-review .dtai-title.t-shimmer{--shimmer-highlight:#fff}
+.dtsum.dtai-review .dtai-title.t-shimmer::before{
   content:attr(data-text);
   position:absolute;
   inset:0;
@@ -2596,7 +2585,7 @@ html[data-theme="dark"] body .dtsum.dtai-review .t-shimmer{--shimmer-highlight:#
   animation:t-shimmer var(--shimmer-dur) var(--shimmer-ease) infinite;
 }
 @keyframes t-shimmer{0%{background-position:100% 0}100%{background-position:0% 0}}
-@media(prefers-reduced-motion:reduce){.t-shimmer::before{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.dtsum.dtai-review .dtai-title.t-shimmer::before{animation:none!important}}
 
 /* transitions.dev Toggle: original 44×22 track, pill thumb, colors and bounce. */
 .t-toggle{
@@ -3092,8 +3081,6 @@ html body .calcat img.pm-category-icon[src*="/other-active.svg"]{transform:trans
 .dl-input-error[hidden]{display:none}
 @media(prefers-reduced-motion:reduce){.dl-stage,.dl-card,.dl-full,.dl-ring,.dl-ring-center>span,.dl-close,.dl-btn,.dl-bar-fill,.t-text-swap,.dl-link,.dl-body,.dl-link-clip,.dl-body-clip{transition:none!important}}
 
-html body .dtsum.dtai-review .dtai-info-button svg{width:20px;height:20px;color:var(--color-secondary)}
-html body .dtsum.dtai-review .dtai-info-button>span{border:0}
 html body .dl-field-icon svg{width:20px;height:20px}
 html body .lm-map-credits summary svg{width:18px;height:18px;vertical-align:middle}
 
@@ -3143,7 +3130,7 @@ html body .bottomnav svg .pm-nav-fill{stroke:none!important}
 html body .lm-drawn-map{--lm-drawn-sheet-height:383px;background:#f5f5f5;color:#282828}
 html body .lm-drawn-map .lm-header{position:absolute;inset:0 0 auto!important;z-index:600;width:100%;height:132px;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;pointer-events:none}
 html body .lm-drawn-map .lm-header::before{content:'';position:absolute;inset:0 0 auto;height:79px;background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,0));pointer-events:none}
-html body .lm-drawn-map .lm-drawn-search{position:absolute;z-index:1;left:17px;right:16px;top:40px;height:53px;display:flex;align-items:center;gap:13px;padding:0 9px 0 17px;border:0;border-radius:30px;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.1);pointer-events:auto}
+html body .lm-drawn-map .lm-drawn-search{position:absolute;z-index:1;left:17px;right:16px;top:40px;height:53px;display:flex;align-items:center;gap:13px;padding:0 9px 0 17px;border:1px solid rgba(255,255,255,.75);border-radius:30px;background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,255,255,.78));-webkit-backdrop-filter:blur(18px) saturate(1.25);backdrop-filter:blur(18px) saturate(1.25);box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 8px 24px rgba(0,0,0,.12);pointer-events:auto}
 html body .lm-drawn-map .lm-drawn-search>.icon{flex:none;width:20px;height:20px;color:#858b95;stroke-width:1.7}
 html body .lm-drawn-map .lm-drawn-search input{flex:1;min-width:0;width:100%;height:100%;padding:0!important;border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;font:400 19px/24px var(--font-family);color:#282828}
 html body .lm-drawn-map .lm-drawn-search input::placeholder{color:#858b95;opacity:1}
@@ -3262,7 +3249,8 @@ html body .lm-drawn-map .lm-map-credits{display:none}
 @media(max-width:360px){html body .lm-drawn-map .lm-header .lm-categories{left:-8px;right:-8px}html body .lm-drawn-map .lm-drawn-search{left:12px;right:12px}html body .lm-drawn-map .lm-drawn-place-heading small{display:none}}
 @media(prefers-reduced-motion:reduce){html body .lm-drawn-map :is(.lm-drawn-marker-disc,.lm-drawn-tab-pill,.lm-drawn-course-card,.lm-drawn-place-row),html body .lm-drawn-map .lm-sheet-scroll>section{transition:none!important}}
 html[data-theme="dark"] body .lm-drawn-map{background:#f5f5f5!important;color:#282828!important}
-html[data-theme="dark"] body .lm-drawn-map :is(.lm-drawn-search,.lm-recent,.lm-search-results){background:#fff!important;color:#282828!important}
+html[data-theme="dark"] body .lm-drawn-map :is(.lm-recent,.lm-search-results){background:#fff!important;color:#282828!important}
+html[data-theme="dark"] body .lm-drawn-map .lm-drawn-search{color:#282828!important}
 
 /* 2026-11-27 최소 글자 크기 14px(body-sm 14/20, Figma typography/body-sm). 읽는 글자는 14px 아래로 내려가지 않아요.
    원 안 숫자·기호(지도 마커 번호, 묶음 개수, 체크, 프로필 이니셜, 정보 i)와 가상 키보드 모형은 고정 크기라 제외. */
@@ -3323,10 +3311,6 @@ html body .mypage .faq-panel-card .faq-text{padding-left:0!important;padding-rig
 /* 켜진 토글은 파란색 대신 진한 민트(accent-strong) */
 html body .setrow .sw.t-toggle[data-on="true"],html[data-theme="dark"] body .setrow .sw.t-toggle[data-on="true"]{background:var(--color-accent-strong)!important}
 html body .mypage .calendar-week-option{padding-left:0!important;padding-right:0!important}
-/* 2026-11-28 사용자가 마지막으로 선택한 채움 압정 경로를 폴더 표시와 메뉴에서 함께 사용해요. */
-html body .cf-meta .cf-pinmark svg.cf-pin16{width:16px!important;height:16px!important;fill:currentColor!important}
-html body .cf-meta .cf-pinmark svg.cf-pin16 path{fill:currentColor!important;stroke:none!important}
-html body .cf-goo-action svg.cf-filled-pin path,html body .cf-goo-action svg.cf-unpin-icon>path:first-child{fill:currentColor!important;stroke:none!important}
 /* 2026-11-27 사용자 요청: 홈 카테고리 캐러셀 버튼을 누르는 동안 둥근 네모를 연한 민트(accent)로 */
 html body .homecategories .prefchip{transition:color .15s,background-color .15s}
 html body .homecategories .prefchip:active,html[data-theme="dark"] body .homecategories .prefchip:active{background:var(--color-accent)!important;color:#333333!important}
