@@ -2556,10 +2556,10 @@ html body .homecategories .prefchip{padding-top:0!important;padding-bottom:0!imp
 .cf-goo-action.is-danger{color:var(--color-error)}
 .cf-goo-menu[data-open="true"] .cf-goo-action.cf-goo-left{background-color:#1E1E1E;color:#fff}
 .cf-goo-menu[data-open="true"] .cf-goo-action.cf-goo-right{background-color:var(--color-error);color:#fff}
-.cf-goo-action .cf-filled-pin,.cf-pinmark .cf-filled-pin{fill:none!important}
-.cf-goo-action .cf-filled-pin path,.cf-pinmark .cf-filled-pin path{fill:none!important;stroke:currentColor!important}
+.cf-goo-action .cf-filled-pin,.cf-pinmark .cf-filled-pin{fill:currentColor!important}
+.cf-goo-action .cf-filled-pin path,.cf-pinmark .cf-filled-pin path{fill:currentColor!important;stroke:none!important}
 .cf-goo-action .cf-unpin-icon{fill:none}
-.cf-goo-action .cf-unpin-icon>path:first-child{fill:none!important;stroke:currentColor!important}
+.cf-goo-action .cf-unpin-icon>path:first-child{fill:currentColor!important;stroke:none!important}
 .cf-goo-action .cf-unpin-gap,.cf-goo-action .cf-unpin-slash{fill:none;stroke-linecap:round}
 .cf-goo-action .cf-unpin-gap{stroke:#1e1e1e;stroke-width:3.5}
 .cf-goo-action .cf-unpin-slash{stroke:currentColor;stroke-width:1.7}
@@ -3148,10 +3148,6 @@ html body .lm-drawn-map .lm-drawn-search>.icon{flex:none;width:20px;height:20px;
 html body .lm-drawn-map .lm-drawn-search input{flex:1;min-width:0;width:100%;height:100%;padding:0!important;border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;font:400 19px/24px var(--font-family);color:#282828}
 html body .lm-drawn-map .lm-drawn-search input::placeholder{color:#858b95;opacity:1}
 html body .lm-drawn-map .lm-drawn-search input::-webkit-search-cancel-button{display:none}
-html body .lm-drawn-map .lm-drawn-avatar{flex:none;width:35px;height:35px;padding:0;border:0;border-radius:50%;overflow:hidden;background:#d7d7d7!important;display:grid;place-items:center}
-html body .lm-drawn-map .lm-drawn-avatar .pavatar{display:grid;place-items:center;width:35px;height:35px;border:0;border-radius:50%;overflow:hidden}
-html body .lm-drawn-map .lm-drawn-avatar .pavatar img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
-html body .lm-drawn-map .lm-drawn-avatar .pavatar svg{display:block;width:20px;height:20px}
 html body .lm-drawn-map .lm-drawn-clear{flex:none;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:#f0f2f4!important;color:#282828;display:grid;place-items:center}
 html body .lm-drawn-map .lm-drawn-clear[hidden]{display:none!important}
 html body .lm-drawn-map .lm-drawn-clear svg{width:16px;height:16px}
@@ -3170,17 +3166,18 @@ html body .lm-drawn-map.is-searching .lm-header .lm-categories{visibility:hidden
 html body .lm-drawn-map .lm-recent,html body .lm-drawn-map .lm-search-results{position:absolute;left:17px;right:16px;top:101px;z-index:615;max-height:min(440px,50dvh);border:0;border-radius:20px;background:#fff;box-shadow:0 4px 15px rgba(0,0,0,.1)}
 html body .lm-drawn-map .lm-status{top:144px;left:17px;right:16px}
 html body .lm-drawn-map .lm-drawn-actions{position:absolute;z-index:650;right:28px;bottom:calc(var(--lm-drawn-sheet-height) + 25px);display:flex;flex-direction:column;gap:10px}
-html body .lm-drawn-map .lm-drawn-actions>button{width:36px;height:36px;min-width:36px;min-height:36px;display:grid;place-items:center;padding:0;border:0!important;border-radius:50%;background:#fff!important;color:#282828;box-shadow:0 0 10px rgba(0,0,0,.1)!important}
-html body .lm-drawn-map .lm-drawn-actions>button.lm-drawn-provider[data-provider="naver"]{background:#0fcd00!important;overflow:hidden}
+html body .lm-drawn-map :is(.lm-drawn-actions>button,.lm-drawn-provider){width:36px;height:36px;min-width:36px;min-height:36px;display:grid;place-items:center;padding:0;border:0!important;border-radius:50%;background:#fff!important;color:#282828;box-shadow:0 0 10px rgba(0,0,0,.1)!important}
+html body .lm-drawn-map .lm-drawn-provider{position:absolute;z-index:650;left:28px;bottom:calc(var(--lm-drawn-sheet-height) + 25px)}
+html body .lm-drawn-map .lm-drawn-provider[data-provider="naver"]{background:#0fcd00!important;overflow:hidden}
 html body .lm-drawn-map .lm-drawn-actions svg{width:20px;height:20px}
-html body .lm-drawn-map .lm-drawn-actions .lm-provider-mark{display:grid;place-items:center;width:32px;height:32px}
-html body .lm-drawn-map .lm-drawn-actions .lm-provider-logo{display:block;width:20px;height:20px;object-fit:contain}
-html body .lm-drawn-map .lm-drawn-actions .lm-provider-logo-naver{width:28px;height:28px}
+html body .lm-drawn-map .lm-drawn-provider .lm-provider-mark{display:grid;place-items:center;width:32px;height:32px}
+html body .lm-drawn-map .lm-drawn-provider .lm-provider-logo{display:block;width:20px;height:20px;object-fit:contain}
+html body .lm-drawn-map .lm-drawn-provider .lm-provider-logo-naver{width:28px;height:28px}
 html body .lm-drawn-map .lm-selected-host{position:absolute;inset:0!important;z-index:680;pointer-events:none}
 html body .lm-drawn-map .lm-sheet,html body .lm-drawn-map .lm-sheet.is-half{--lm-sheet-height:min(383px,calc(100% - 144px));position:absolute;inset:auto 0 0;height:var(--lm-sheet-height);max-height:none;overflow:hidden;display:flex;flex-direction:column;border:0;border-radius:30px 30px 0 0;background:#fff!important;color:#282828!important;box-shadow:0 -4px 10px rgba(0,0,0,.1);pointer-events:auto}
 html body .lm-drawn-map .lm-sheet.is-peek{--lm-sheet-height:162px}
 html body .lm-drawn-map .lm-sheet.is-full{--lm-sheet-height:100%;border-radius:0}
-html body .lm-drawn-map:has(.lm-sheet.is-full) .lm-drawn-actions{display:none}
+html body .lm-drawn-map:has(.lm-sheet.is-full) :is(.lm-drawn-actions,.lm-drawn-provider){display:none}
 html body .lm-drawn-map .lm-sheet-handle{flex:none;width:100%;height:35px;min-height:35px;display:flex;align-items:flex-start;justify-content:center;padding:11px 0 0!important;background:transparent!important;touch-action:none}
 html body .lm-drawn-map .lm-sheet-handle span{width:57px;height:5px;min-width:57px;min-height:5px;border-radius:100px;background:#8c8c8c}
 html body .lm-drawn-map .lm-drawn-tabs{--tabs-dur:250ms;--tabs-ease:cubic-bezier(.22,1,.36,1);position:relative;flex:none;display:flex;gap:0;width:calc(100% - 33px);height:58px;margin:0 16px 0 17px;padding:7px;border-radius:10px;background:#f0f2f4}
@@ -3228,16 +3225,20 @@ html body .favpage .lm-drawn-place-description{display:-webkit-box;overflow:hidd
 html body .favpage .fav-row .fav-star{position:absolute;top:20px;right:12px;width:28px;height:28px;display:grid;place-items:center;padding:0;border:0;background:transparent;box-shadow:none;color:var(--color-on-surface)}
 html body .favpage .fav-row .fav-star svg{width:20px;height:20px}
 html body .favpage.cf-selecting .fav-row .lm-drawn-place-copy{padding-right:31px}
-html body .lm-drawn-map .lm-drawn-course-list{display:grid;gap:15px;padding:25px 17px 24px}
-html body .lm-drawn-map .lm-drawn-course-card{position:relative;display:block;width:100%;height:174px;min-height:174px;padding:0!important;overflow:hidden;text-align:left;border:0!important;border-radius:10px!important;background:#fff!important;box-shadow:0 4px 15px rgba(0,0,0,.1)!important;transition:transform var(--page-slide-dur) var(--page-slide-ease),box-shadow var(--page-slide-dur) var(--page-slide-ease)}
+html body .lm-drawn-map .lm-drawn-course-list{display:grid;gap:20px;padding:18px 17px 24px}
+html body .lm-drawn-map .lm-drawn-course-group{display:grid;gap:14px;min-width:0}
+html body .lm-drawn-map .lm-drawn-course-group h3{margin:0;color:#282828;font:700 16px/22px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-course-group h3 span{margin-left:5px;color:#858b95;font:400 14px/20px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-course-group-empty{margin:0;padding:9px 2px;color:#858b95;font:400 14px/20px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-course-card{position:relative;display:block;width:100%;height:143px;min-height:143px;padding:0!important;overflow:hidden;text-align:left;border:0!important;border-radius:10px!important;background:#fff!important;box-shadow:0 4px 15px rgba(0,0,0,.1)!important;transition:transform var(--page-slide-dur) var(--page-slide-ease),box-shadow var(--page-slide-dur) var(--page-slide-ease)}
 html body .lm-drawn-map .lm-drawn-course-card:active{transform:scale(.985)}
-html body .lm-drawn-map .lm-drawn-course-copy{position:absolute;inset:16px auto 16px 19px;width:178px;display:block;pointer-events:none}
+html body .lm-drawn-map .lm-drawn-course-copy{position:absolute;inset:13px auto 12px 19px;width:calc(100% - 190px);display:block;pointer-events:none}
 html body .lm-drawn-map .lm-drawn-course-copy>strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#282828;font:700 21px/26px var(--font-family)}
-html body .lm-drawn-map .lm-drawn-course-copy>small{display:block;margin-top:1px;color:#909090;font:300 13px/18px var(--font-family)}
-html body .lm-drawn-map .lm-drawn-course-stops{position:absolute;left:0;bottom:0;display:grid;grid-template-columns:85px 85px;grid-template-rows:23px 23px;align-items:center;color:#2e2e2e}
-html body .lm-drawn-map .lm-drawn-course-stops>span{display:flex;align-items:center;gap:3px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:400 12px/19px var(--font-family)}
-html body .lm-drawn-map .lm-drawn-course-stops svg{flex:none;width:18px;height:18px}
-html body .lm-drawn-map .lm-drawn-course-map{position:absolute;right:10px;top:12px;width:158px;height:150px;overflow:hidden;border:1px solid #d7d7d7;border-radius:10px;background:#f0f2f4;pointer-events:none}
+html body .lm-drawn-map .lm-drawn-course-date{display:flex;flex-wrap:wrap;align-items:center;column-gap:8px;row-gap:0;min-width:0;margin-top:1px;white-space:nowrap}
+html body .lm-drawn-map .lm-drawn-course-date small{color:#909090;font:400 14px/20px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-course-date b{color:#282828;font:700 14px/20px var(--font-family)}
+html body .lm-drawn-map .lm-drawn-course-categories{position:absolute;left:0;bottom:0;display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;max-height:40px;color:#2e2e2e;font:400 14px/20px var(--font-family);overflow-wrap:anywhere}
+html body .lm-drawn-map .lm-drawn-course-map{position:absolute;right:10px;top:12px;width:min(158px,43%);height:119px;overflow:hidden;border:1px solid #d7d7d7;border-radius:10px;background:#f0f2f4;pointer-events:none}
 html body .lm-drawn-map .lm-drawn-course-map .leaflet-container{width:100%;height:100%}
 html body .lm-drawn-map .lm-drawn-course-map .pm-native-map{filter:grayscale(1)}
 html body .lm-drawn-map .course-preview-marker{background:transparent;border:0;pointer-events:none}
@@ -3269,8 +3270,6 @@ html body .logout{font-size:14px}
 html body .lm-drawn-map .lm-drawn-place-heading small,html body .favpage .lm-drawn-place-heading small{font:400 14px/20px var(--font-family)}
 html body .lm-drawn-map .lm-drawn-place-address,html body .favpage .lm-drawn-place-address{font:700 14px/20px var(--font-family)}
 html body .lm-drawn-map .lm-drawn-place-description,html body .favpage .lm-drawn-place-description{font:400 14px/20px var(--font-family)}
-html body .lm-drawn-map .lm-drawn-course-copy>small{font:300 14px/20px var(--font-family)}
-html body .lm-drawn-map .lm-drawn-course-stops>span{font:400 14px/20px var(--font-family)}
 
 /* 2026-11-27 홈 카테고리 칩 면 아이콘(Figma Category 'Chip fill'·'Chip fill hover'). 흰 디테일 선은 투명하게 비운 칩 전용 파일(*-chip-fill.svg)을 mask로 쓰고 색은 글자와 같은 currentColor. */
 html body .homecategories .pm-home-category-art .pm-chip-fill{display:block;width:20px;height:20px;background-color:currentColor;-webkit-mask:var(--pm-chip-icon) center/20px 20px no-repeat;mask:var(--pm-chip-icon) center/20px 20px no-repeat;transition:background-color .15s}
@@ -3324,10 +3323,10 @@ html body .mypage .faq-panel-card .faq-text{padding-left:0!important;padding-rig
 /* 켜진 토글은 파란색 대신 진한 민트(accent-strong) */
 html body .setrow .sw.t-toggle[data-on="true"],html[data-theme="dark"] body .setrow .sw.t-toggle[data-on="true"]{background:var(--color-accent-strong)!important}
 html body .mypage .calendar-week-option{padding-left:0!important;padding-right:0!important}
-/* 2026-11-27 Figma 'Icon / pushpin · 고정': 폴더 이름 앞은 16px 버전(선 1.3), 길게 눌렀을 때 메뉴는 24px 버전(선 1.7) */
-html body .cf-meta .cf-pinmark svg.cf-pin16{width:16px!important;height:16px!important;fill:none!important}
-html body .cf-meta .cf-pinmark svg.cf-pin16 path{fill:none!important;stroke:currentColor!important;stroke-width:1.3px!important;stroke-linecap:round;stroke-linejoin:round;vector-effect:none!important}
-html body .cf-goo-action svg.cf-filled-pin path,html body .cf-goo-action svg.cf-unpin-icon>path:first-child{stroke-width:1.7px!important;stroke-linecap:round;stroke-linejoin:round}
+/* 2026-11-28 사용자가 마지막으로 선택한 채움 압정 경로를 폴더 표시와 메뉴에서 함께 사용해요. */
+html body .cf-meta .cf-pinmark svg.cf-pin16{width:16px!important;height:16px!important;fill:currentColor!important}
+html body .cf-meta .cf-pinmark svg.cf-pin16 path{fill:currentColor!important;stroke:none!important}
+html body .cf-goo-action svg.cf-filled-pin path,html body .cf-goo-action svg.cf-unpin-icon>path:first-child{fill:currentColor!important;stroke:none!important}
 /* 2026-11-27 사용자 요청: 홈 카테고리 캐러셀 버튼을 누르는 동안 둥근 네모를 연한 민트(accent)로 */
 html body .homecategories .prefchip{transition:color .15s,background-color .15s}
 html body .homecategories .prefchip:active,html[data-theme="dark"] body .homecategories .prefchip:active{background:var(--color-accent)!important;color:#333333!important}

@@ -79,14 +79,15 @@
     return `<section class="live-map lm-drawn-map${searchOpen?' is-searching':''}" aria-label="지도에서 장소 탐색"><div id="live-map-canvas"></div>
       <header class="lm-header">
         <h1 class="lm-sr-only">지도에서 저장한 장소 찾기</h1>
-        <form class="lm-drawn-search" id="lm-search" role="search">${icon('search')}<input name="q" type="search" enterkeyhint="search" aria-label="지도 저장 장소 검색" placeholder="근처 장소 검색" value="${safe(searchQuery)}" autocomplete="off" maxlength="80"><button type="button" class="lm-drawn-clear" data-lm="clear-search" aria-label="검색어 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button><button type="button" class="lm-drawn-avatar" data-page="my" aria-label="마이페이지">${avatarHtml('lm-map-avatar')}</button></form>
+        <form class="lm-drawn-search" id="lm-search" role="search">${icon('search')}<input name="q" type="search" enterkeyhint="search" aria-label="지도 저장 장소 검색" placeholder="근처 장소 검색" value="${safe(searchQuery)}" autocomplete="off" maxlength="80"><button type="button" class="lm-drawn-clear" data-lm="clear-search" aria-label="검색어 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button></form>
         <section class="cf-recent lm-recent" id="lm-recent" aria-label="최근 지도 검색어" ${searchOpen&&!searchQuery.trim()?'':'hidden'}>${mapRecentContent()}</section>
         <div class="lm-categories" role="group" aria-label="지도 카테고리">${mapCategories().map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="prefchip ${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art" aria-hidden="true">${mapChipIcon(id,category===id)}</span><b>${safe(label)}</b></button>`).join('')}</div>
       </header>
       <details class="lm-map-credits"><summary aria-label="지도 출처 보기" title="지도 출처 보기">${icon('info')}</summary><div class="lm-map-credits-panel"><strong>지도 출처</strong><p data-map-credit>지도 연결 중</p></div></details>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" role="status" aria-live="polite" hidden></div>
-      <div class="lm-drawn-actions"><button type="button" class="lm-drawn-provider" data-lm="map-provider" aria-label="지도 종류 전환" title="지도 종류 전환"><span class="lm-provider-mark" aria-hidden="true">${icon('map')}</span></button><button type="button" class="lm-drawn-favorites lm-heart-motion t-like${favoritesOnly?' is-active':''}" data-lm="favorite-filter" data-liked="${favoritesOnly}" aria-label="즐겨찾기 장소만 보기" aria-pressed="${favoritesOnly}"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button>${round('현재 위치로 이동','target')}</div>
+      <button type="button" class="lm-drawn-provider" data-lm="map-provider" aria-label="지도 종류 전환" title="지도 종류 전환"><span class="lm-provider-mark" aria-hidden="true">${icon('map')}</span></button>
+      <div class="lm-drawn-actions"><button type="button" class="lm-drawn-favorites lm-heart-motion t-like${favoritesOnly?' is-active':''}" data-lm="favorite-filter" data-liked="${favoritesOnly}" aria-label="즐겨찾기 장소만 보기" aria-pressed="${favoritesOnly}"><span class="lm-heart-glyph t-like-icon">${likeHeartIcon()}</span></button>${round('현재 위치로 이동','target')}</div>
       <div class="lm-list-scrim" data-lm="close-list" hidden></div><section class="lm-list-sheet" id="lm-list-sheet" role="dialog" aria-label="저장한 장소 목록" hidden></section>
       <section class="lm-selected-host" id="lm-selected-place" aria-label="이 근방 저장된 장소"></section></section>`;
   }
@@ -289,19 +290,29 @@
     window.setTimeout(()=>{if(!burst.isConnected)return;burst.remove();button.classList.remove('is-bursting');},650);
   }
   window.PinmapHeartMotion = playHeartMotion;
+  function courseCard(saved) {
+    const labels=PinmapMapCourseList.categories(saved.places);
+    const categoryText=labels.join(' · ');
+    const dayLabel=PinmapMapCourseList.dDay(saved.daysUntil);
+    return `<button type="button" class="lm-drawn-course-card${saved.id===selectedCourseId?' is-selected':''}" data-lm="open-course" data-course-id="${safe(saved.id)}" aria-label="${safe(saved.title)}, ${safe(dayLabel)}, ${safe(categoryText)}, 장소 ${saved.places.length}곳 코스 열기"><span class="lm-drawn-course-copy"><strong>${safe(saved.title)}</strong><span class="lm-drawn-course-date"><small>${safe(saved.date.replace(/-/g,'/'))}</small><b>${safe(dayLabel)}</b></span><span class="lm-drawn-course-categories" title="${safe(categoryText)}">${safe(categoryText||'장소 분류 없음')}</span></span><span class="lm-drawn-course-map course-map-pattern${saved.places.some(place=>place.lat!=null&&place.lng!=null)?'':' is-empty'}" data-course-map="${safe(saved.id)}" role="img" aria-label="${safe(saved.title)} 경로 미리보기"></span></button>`;
+  }
+  function courseGroup(title, courses, emptyText) {
+    return `<section class="lm-drawn-course-group" aria-label="${title}"><h3>${title} <span>${courses.length}</span></h3>${courses.length?courses.map(courseCard).join(''):`<p class="lm-drawn-course-group-empty">${emptyText}</p>`}</section>`;
+  }
   function renderSheet() {
     const host=$('#lm-selected-place');if(!host)return;
     window.unmountCourseThumbnails?.();
     const list=(searchResults ? visiblePlaces() : nearbyPlaces().filter(place=>!favoritesOnly||place.favorite))
       .sort((a,b)=>{const point=liveMap?.getCenter();return point ? (a.lat-point.lat)**2+(a.lng-point.lng)**2-(b.lat-point.lat)**2-(b.lng-point.lng)**2 : 0;});
     const courses=window.PinmapCourses?.list?.()||[];
+    const courseGroups=PinmapMapCourseList.group(courses);
     if(!courses.some(saved=>saved.id===selectedCourseId))selectedCourseId=courses[0]?.id||null;
     host.setAttribute('aria-label','근처 장소와 코스');
     host.innerHTML=`<section class="lm-sheet is-${sheetStage}" aria-label="지도 목록">
       <button type="button" class="lm-sheet-handle" aria-label="지도 목록 높이 조절" aria-expanded="${sheetStage!=='peek'}"><span></span></button>
       <div class="lm-drawn-tabs t-tabs" role="tablist" aria-label="지도 목록 종류"><span class="lm-drawn-tab-pill t-tabs-pill" aria-hidden="true"></span><button type="button" class="t-tab" role="tab" id="lm-tab-places" data-lm="show-places" aria-selected="${panelTab==='places'}" aria-controls="lm-panel-places">${placeTabIcon(panelTab==='places')}<span>근처 장소</span></button><button type="button" class="t-tab" role="tab" id="lm-tab-courses" data-lm="show-courses" aria-selected="${panelTab==='courses'}" aria-controls="lm-panel-courses">${courseTabIcon()}<span>코스</span></button></div>
       <div class="lm-sheet-scroll t-page-slide" data-map-panel="${panelTab}"><section id="lm-panel-places" class="t-page" data-page-id="1" role="tabpanel" aria-labelledby="lm-tab-places" aria-hidden="${panelTab!=='places'}" ${panelTab==='places'?'':'inert'}><div class="lm-drawn-place-list">${list.length?list.map(place=>`<article class="lm-drawn-place-row${placeKey(place)===expandedKey?' is-selected':''}" data-lm="select-place" data-place-key="${safe(placeKey(place))}">${PinmapPlacePhotos.markup(place.backendId,place.locationIndex,place.image||localPhoto(place.kind),'lm-drawn-place-photo')}<div class="lm-drawn-place-copy"><button type="button" class="lm-drawn-place-main" aria-label="${safe(place.title)} 지도에서 보기"><span class="lm-drawn-place-heading"><strong>${safe(place.title)}</strong><small>${safe(place.category||'장소')}</small></span></button><button type="button" class="lm-drawn-place-address" data-lm="open-place" data-place-key="${safe(placeKey(place))}" aria-label="${safe(place.title)} 상세 보기, ${safe(place.address||'주소 정보 없음')}">${safe(place.address||'주소 정보 없음')}</button><span class="lm-drawn-place-description">${safe(place.description||place.searchSummary||'')}</span></div>${favoriteButton(place)}</article>`).join(''):'<p class="lm-drawn-empty">이 근처에 저장한 장소가 없어요.</p>'}</div></section>
-      <section id="lm-panel-courses" class="t-page" data-page-id="2" role="tabpanel" aria-labelledby="lm-tab-courses" aria-hidden="${panelTab!=='courses'}" ${panelTab==='courses'?'':'inert'}><div class="lm-drawn-course-list">${courses.length?courses.map(saved=>`<button type="button" class="lm-drawn-course-card${saved.id===selectedCourseId?' is-selected':''}" data-lm="open-course" data-course-id="${safe(saved.id)}" aria-label="${safe(saved.title)}, 장소 ${saved.places.length}곳 코스 열기"><span class="lm-drawn-course-copy"><strong>${safe(saved.title)}</strong><small>${safe(saved.date.replace(/-/g,'/'))}</small><span class="lm-drawn-course-stops">${saved.places.slice(0,4).map(place=>`<span>${icon('pin')}${safe(place.title)}</span>`).join('')}</span></span><span class="lm-drawn-course-map course-map-pattern${saved.places.some(place=>place.lat!=null&&place.lng!=null)?'':' is-empty'}" data-course-map="${safe(saved.id)}" role="img" aria-label="${safe(saved.title)} 경로 미리보기"></span></button>`).join(''):'<div class="lm-drawn-empty"><p>아직 저장한 코스가 없어요.</p><button type="button" data-course-new>새 코스 만들기</button></div>'}</div></section></div>
+      <section id="lm-panel-courses" class="t-page" data-page-id="2" role="tabpanel" aria-labelledby="lm-tab-courses" aria-hidden="${panelTab!=='courses'}" ${panelTab==='courses'?'':'inert'}><div class="lm-drawn-course-list">${courses.length?courseGroup('앞으로 갈 코스',courseGroups.upcoming,'예정된 코스가 없어요.')+courseGroup('지난 코스',courseGroups.past,'지난 코스가 없어요.'):'<div class="lm-drawn-empty"><p>아직 저장한 코스가 없어요.</p><button type="button" data-course-new>새 코스 만들기</button></div>'}</div></section></div>
     </section>`;
     bindSheetHandle(host.querySelector('.lm-sheet'));
     syncTabPill(false);
