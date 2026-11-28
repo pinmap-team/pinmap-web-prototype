@@ -2,7 +2,7 @@
 // 하단 시트가 아니라 페이지로 넘어가고, 왼쪽 위 ← 버튼으로 마이로 돌아가요.
 
 /* ---------- 프로필 사진 ---------- */
-const avatarHtml = (cls = '') => PM_ENV.development && !settings.avatar ? `<span class="pavatar ${cls}" aria-hidden="true">${icon('user')}</span>` : `<span class="pavatar ${cls}" aria-hidden="true"><img src="${settings.avatar || 'img/profile-demo.png'}" alt=""></span>`;
+const avatarHtml = (cls = '') => `<span class="pavatar ${cls}${settings.avatar ? '' : ' is-default'}" aria-hidden="true"><img src="${settings.avatar || 'img/profile-default.svg'}" alt=""></span>`;
 const subHead = (title, back = 'my') => `<div class="subhead"><button class="subback" data-page="${back}" aria-label="${back === 'guide' ? '이용 가이드로' : back === 'account' ? '프로필 및 계정으로' : back === 'calsettings' ? '캘린더 설정으로' : back === 'settingspage' ? '설정으로' : '마이로'} 돌아가기">${icon('back')}</button><h1>${title}</h1></div>`;
 
 pages.profile = function(){
