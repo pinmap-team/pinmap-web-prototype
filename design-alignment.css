@@ -665,6 +665,9 @@ html body .bottomnav[hidden]{display:none!important}
 .myprofile-photo{position:relative;flex:none;display:block;padding:0;border-radius:50%;background:transparent}
 .myprofile-photo .pavatar{width:56px;height:56px}
 html body .pavatar.is-default{background:transparent!important}
+html body .pavatar.is-default .pavatar-dark{display:none}
+html[data-theme="dark"] body .pavatar.is-default .pavatar-light{display:none}
+html[data-theme="dark"] body .pavatar.is-default .pavatar-dark{display:block}
 .myprofile .account-photo-edit{width:24px;height:24px;right:calc(-1 * var(--space-xs));bottom:calc(-1 * var(--space-xs))}
 .myprofile-name{display:flex;align-items:center;gap:var(--space-sm);min-height:44px;padding:0;background:transparent;color:var(--color-on-surface);text-align:left}
 .myprofile-name b{font:var(--type-headline-md);overflow-wrap:anywhere}
